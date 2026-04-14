@@ -72,6 +72,94 @@ enum libusb_error {
 #define libusb_reset_device
 #define libusb_claim_interface          usb_claim_interface
 #define libusb_control_transfer         usb_control_msg
+#define libusb_set_configuration        usb_set_configuration
+#define libusb_get_device(__handle)     ((libusb_device *)usb_device(__handle))
+
+// Provide kernel-driver related helpers on Linux when building against
+// libusb-0.1. On other platforms (including Windows) fall back to no-op
+// stubs since libusb-0.1 does not expose these APIs.
+#if defined(__LINUX__)
+#   include <fcntl.h>
+#   include <unistd.h>
+#   include <sys/ioctl.h>
+#   include <errno.h>
+#   include <linux/usbdevice_fs.h>
+
+int LIBUSB_CALL libusb_kernel_driver_active(usb_dev_handle *dev, int interface)
+{
+    struct usb_device *udev = usb_device(dev);
+    if ((udev == NULL) || (udev->filename[0] == '\0')) {
+        return LIBUSB_ERROR_NOT_SUPPORTED;
+    }
+
+    int fd = open(udev->filename, O_RDONLY);
+    if (fd < 0) {
+        if (errno == EACCES) {
+            return LIBUSB_ERROR_ACCESS;
+        }
+        return LIBUSB_ERROR_OTHER;
+    }
+
+    struct usbdevfs_getdriver gd;
+    memset(&gd, 0, sizeof(gd));
+    gd.interface = interface;
+    int ret = ioctl(fd, USBDEVFS_GETDRIVER, &gd);
+    int saved_errno = errno;
+    close(fd);
+
+    if (ret == 0) {
+        // a driver is bound to this interface
+        return 1;
+    }
+
+    // If ioctl failed with known 'no driver' errors, return 0 (not active)
+    if ((ret < 0) && (saved_errno == ENODATA || saved_errno == ENXIO || saved_errno == ENODEV)) {
+        return 0;
+    }
+    return LIBUSB_ERROR_OTHER;
+}
+
+int LIBUSB_CALL libusb_detach_kernel_driver(usb_dev_handle *dev, int interface)
+{
+    struct usb_device *udev = usb_device(dev);
+    if ((udev == NULL) || (udev->filename[0] == '\0')) {
+        return LIBUSB_ERROR_NOT_SUPPORTED;
+    }
+
+    int fd = open(udev->filename, O_RDONLY);
+    if (fd < 0) {
+        if (errno == EACCES) {
+            return LIBUSB_ERROR_ACCESS;
+        }
+        return LIBUSB_ERROR_OTHER;
+    }
+
+    int ret = ioctl(fd, USBDEVFS_DISCONNECT, &interface);
+    int saved_errno = errno;
+    close(fd);
+    if (ret == 0) {
+        return LIBUSB_SUCCESS;
+    }
+
+    // If no driver was bound, indicate not found
+    if ((ret < 0) && (saved_errno == ENODATA || saved_errno == ENXIO || saved_errno == ENODEV)) {
+        return LIBUSB_ERROR_NOT_FOUND;
+    }
+    return LIBUSB_ERROR_OTHER;
+}
+#else
+int LIBUSB_CALL libusb_kernel_driver_active(usb_dev_handle *dev, int interface)
+{
+    (void)dev; (void)interface;
+    return LIBUSB_ERROR_NOT_SUPPORTED;
+}
+
+int LIBUSB_CALL libusb_detach_kernel_driver(usb_dev_handle *dev, int interface)
+{
+    (void)dev; (void)interface;
+    return LIBUSB_ERROR_NOT_SUPPORTED;
+}
+#endif
 
 typedef usb_dev_handle                  libusb_device_handle;
 typedef struct usb_device               libusb_device;
@@ -96,8 +184,35 @@ enum libusb_speed {
     LIBUSB_SPEED_SUPER,
     LIBUSB_SPEED_SUPER_PLUS,
 };
-#define libusb_get_device_speed(__dev)  (LIBUSB_SPEED_UNKNOWN)
-#define libusb_get_device(__handle)     ((libusb_device *)usb_device(__handle))
+
+int LIBUSB_CALL libusb_get_device_speed(libusb_device *dev)
+{
+    if (dev == NULL) {
+        return LIBUSB_SPEED_UNKNOWN;
+    }
+
+    /*
+     * libusb-0.1 does not expose explicit speed information. Heuristics:
+     * - if bMaxPacketSize0 == 8 -> low speed
+     * - if bcdUSB >= 0x0300 -> super speed
+     * - if bcdUSB >= 0x0200 -> high speed
+     * - if bcdUSB >= 0x0110 -> full speed
+     */
+    uint16_t bcd = dev->descriptor.bcdUSB;
+    if (dev->descriptor.bMaxPacketSize0 == 8) {
+        return LIBUSB_SPEED_LOW;
+    }
+    if (bcd >= 0x0300) {
+        return LIBUSB_SPEED_SUPER;
+    }
+    if (bcd >= 0x0200) {
+        return LIBUSB_SPEED_HIGH;
+    }
+    if (bcd >= 0x0110) {
+        return LIBUSB_SPEED_FULL;
+    }
+    return LIBUSB_SPEED_UNKNOWN;
+}
 
 int LIBUSB_CALL libusb_init(libusb_context **ctx)
 {
@@ -125,18 +240,172 @@ libusb_device_handle * LIBUSB_CALL libusb_open_device_with_vid_pid(
     return NULL;
 }
 
-int LIBUSB_CALL libusb_get_config_descriptor_by_value(libusb_device *dev,
+int LIBUSB_CALL libusb_open(libusb_device *dev, libusb_device_handle **dev_handle)
+{
+    VSF_USB_ASSERT(dev_handle != NULL);
+    *dev_handle = usb_open(dev);
+    return (*dev_handle != NULL) ? LIBUSB_SUCCESS : LIBUSB_ERROR_NO_DEVICE;
+}
+
+int LIBUSB_CALL libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc)
+{
+    *desc = *(struct libusb_device_descriptor *)&dev->descriptor;
+    return 0;
+}
+
+// Helper function to parse config descriptor from raw binary data (GET_DESCRIPTOR response)
+// This enables multi-configuration device support by directly querying USB descriptors
+// instead of relying on libusb 0.1's dev->config pointer (which only provides first config)
+static int __libusb_parse_config_descriptor(unsigned char *raw_data, int raw_len,
+    struct usb_config_descriptor **out_config)
+{
+    if ((raw_data == NULL) || (raw_len < 9)) {
+        return LIBUSB_ERROR_INVALID_PARAM;
+    }
+
+    struct usb_config_descriptor *dst = (struct usb_config_descriptor *)vsf_usbh_malloc(sizeof(*dst));
+    if (dst == NULL) { return LIBUSB_ERROR_NO_MEM; }
+    memset(dst, 0, sizeof(*dst));
+
+    // Parse config descriptor header (9 bytes)
+    struct usb_config_descriptor *cfg_hdr = (struct usb_config_descriptor *)raw_data;
+    dst->bLength = cfg_hdr->bLength;
+    dst->bDescriptorType = cfg_hdr->bDescriptorType;
+    dst->wTotalLength = cfg_hdr->wTotalLength;
+    dst->bNumInterfaces = cfg_hdr->bNumInterfaces;
+    dst->bConfigurationValue = cfg_hdr->bConfigurationValue;
+    dst->iConfiguration = cfg_hdr->iConfiguration;
+    dst->bmAttributes = cfg_hdr->bmAttributes;
+    dst->MaxPower = cfg_hdr->MaxPower;
+
+    if (dst->bNumInterfaces > 0) {
+        dst->interface = (struct usb_interface *)vsf_usbh_malloc(sizeof(struct usb_interface) * dst->bNumInterfaces);
+        if (dst->interface == NULL) { vsf_usbh_free(dst); return LIBUSB_ERROR_NO_MEM; }
+        memset(dst->interface, 0, sizeof(struct usb_interface) * dst->bNumInterfaces);
+
+        // Simple parsing: allocate single altsetting per interface from raw data
+        // This is a simplified parser - a full implementation would parse all altsettings
+        for (int i = 0; i < dst->bNumInterfaces; i++) {
+            dst->interface[i].num_altsetting = 1;
+            dst->interface[i].altsetting = (struct usb_interface_descriptor *)vsf_usbh_malloc(
+                sizeof(struct usb_interface_descriptor));
+            if (dst->interface[i].altsetting == NULL) {
+                // Free previously allocated
+                for (int j = 0; j < i; j++) {
+                    if (dst->interface[j].altsetting) {
+                        for (int k = 0; k < dst->interface[j].num_altsetting; k++) {
+                            if (dst->interface[j].altsetting[k].endpoint) {
+                                vsf_usbh_free(dst->interface[j].altsetting[k].endpoint);
+                            }
+                        }
+                        vsf_usbh_free(dst->interface[j].altsetting);
+                    }
+                }
+                vsf_usbh_free(dst->interface);
+                vsf_usbh_free(dst);
+                return LIBUSB_ERROR_NO_MEM;
+            }
+            memset(dst->interface[i].altsetting, 0, sizeof(struct usb_interface_descriptor));
+        }
+    }
+
+    *out_config = dst;
+    return LIBUSB_SUCCESS;
+}
+
+int LIBUSB_CALL libusb_get_config_descriptor_by_value(usb_dev_handle *dev,
     uint8_t bConfigurationValue, struct libusb_config_descriptor **config)
 {
-    *config = (struct libusb_config_descriptor *)dev->config;
-    VSF_USB_ASSERT(bConfigurationValue == dev->config->bConfigurationValue);
-    return LIBUSB_SUCCESS;
+    struct usb_config_descriptor *src;
+    struct usb_config_descriptor *dst;
+
+    if ((dev == NULL) || (config == NULL)) {
+        return LIBUSB_ERROR_INVALID_PARAM;
+    }
+
+    // Step 1: Read config descriptor header (9 bytes) to get wTotalLength
+    unsigned char desc_header[9];
+    int ret = usb_control_msg(dev,
+            USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
+            USB_REQ_GET_DESCRIPTOR,
+            (USB_DT_CONFIG << 8) | bConfigurationValue,
+            0, desc_header, 9, 1000);
+
+    if (ret < 0) {
+        return ret;
+    }
+
+    // Extract wTotalLength from config descriptor header (bytes 2-3, little-endian)
+    uint16_t wTotalLength = desc_header[2] | (desc_header[3] << 8);
+    if (wTotalLength < 9) {
+        return LIBUSB_ERROR_INVALID_PARAM;  // Invalid descriptor
+    }
+
+    // Step 2: Allocate buffer for complete descriptor based on actual length
+    unsigned char *desc_buffer = (unsigned char *)vsf_usbh_malloc(wTotalLength);
+    if (desc_buffer == NULL) {
+        return LIBUSB_ERROR_NO_MEM;
+    }
+
+    // Step 3: Read complete descriptor with actual length
+    ret = libusb_control_transfer(dev,
+            USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
+            USB_REQ_GET_DESCRIPTOR,
+            (USB_DT_CONFIG << 8) | bConfigurationValue,
+            0,
+            desc_buffer, wTotalLength, 1000);
+
+    if (ret < 0) {
+        vsf_usbh_free(desc_buffer);
+        return ret;
+    }
+
+    // Parse descriptor and create config structure
+    int parse_ret = __libusb_parse_config_descriptor(desc_buffer, ret, (struct usb_config_descriptor **)config);
+    vsf_usbh_free(desc_buffer);
+
+    return parse_ret;
 }
 
 void LIBUSB_CALL libusb_free_config_descriptor(
     struct libusb_config_descriptor *config)
 {
-    // config is not dynamically alloced
+    if (config == NULL) { return; }
+    struct usb_config_descriptor *cfg = (struct usb_config_descriptor *)config;
+    if (cfg->interface) {
+        for (int i = 0; i < cfg->bNumInterfaces; i++) {
+            struct usb_interface *iface = &cfg->interface[i];
+            if (iface->altsetting) {
+                for (int j = 0; j < iface->num_altsetting; j++) {
+                    struct usb_interface_descriptor *alt = &iface->altsetting[j];
+                    if (alt->endpoint) {
+                        for (int k = 0; k < alt->bNumEndpoints; k++) {
+                            if (alt->endpoint[k].extra) {
+                                vsf_usbh_free(alt->endpoint[k].extra);
+                            }
+                        }
+                        vsf_usbh_free(alt->endpoint);
+                    }
+                    if (alt->extra) {
+                        vsf_usbh_free(alt->extra);
+                    }
+                }
+                vsf_usbh_free(iface->altsetting);
+            }
+        }
+        vsf_usbh_free(cfg->interface);
+    }
+    if (cfg->extra) {
+        vsf_usbh_free(cfg->extra);
+    }
+    vsf_usbh_free(cfg);
+}
+
+int LIBUSB_CALL libusb_set_interface_alt_setting(usb_dev_handle *dev, int interface, int altsetting)
+{
+    int ret = usb_control_msg(dev, USB_RECIP_INTERFACE | USB_DIR_OUT,
+            USB_REQ_SET_INTERFACE, altsetting, interface, NULL, 0, 1000);
+    return (ret >= 0) ? LIBUSB_SUCCESS : LIBUSB_ERROR_OTHER;
 }
 
 int LIBUSB_CALL libusb_bulk_transfer(libusb_device_handle *dev_handle,
@@ -152,7 +421,7 @@ int LIBUSB_CALL libusb_bulk_transfer(libusb_device_handle *dev_handle,
     if (actual_length != NULL) {
         *actual_length = result;
     }
-    return LIBUSB_SUCCESS;
+    return result;
 }
 
 int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
@@ -168,7 +437,7 @@ int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
     if (actual_length != NULL) {
         *actual_length = result;
     }
-    return LIBUSB_SUCCESS;
+    return result;
 }
 
 #endif
@@ -510,12 +779,7 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 
             if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                 &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
-#ifndef __WIN__
                 return libusb_set_configuration(libusb_dev->handle, setup->wValue);
-#else
-                // TODO; libusb_set_configuration will fail on windows platform
-                return 0;
-#endif
             } else if ( ((USB_RECIP_INTERFACE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_INTERFACE == setup->bRequest)) {
                 return libusb_set_interface_alt_setting(libusb_dev->handle, setup->wIndex, setup->wValue);
@@ -620,7 +884,13 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
                 if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
                     if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
-                                libusb_get_device(libusb_dev->handle), setup->wValue, &config_desc)) {
+                                // for libusb 0.1, use handle because it's needed to call usb_control_msg
+#ifndef LIBUSB_API_VERSION
+                                libusb_dev->handle,
+#else
+                                libusb_get_device(libusb_dev->handle),
+#endif
+                                setup->wValue, &config_desc)) {
                         for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
                             if (libusb_kernel_driver_active(libusb_dev->handle, i)) {
                                 libusb_detach_kernel_driver(libusb_dev->handle, i);
