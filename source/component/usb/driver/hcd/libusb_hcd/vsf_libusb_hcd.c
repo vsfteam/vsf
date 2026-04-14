@@ -66,14 +66,37 @@ enum libusb_error {
 #define libusb_hotplug_register_callback(...)   (LIBUSB_ERROR_NOT_SUPPORTED)
 #define libusb_has_capability(...)              (false)
 
-#define libusb_close                    usb_close
-// TODO: usb_reset will make device handle invalid
-//#define libusb_reset_device             usb_reset
-#define libusb_reset_device
-#define libusb_claim_interface          usb_claim_interface
-#define libusb_control_transfer         usb_control_msg
-#define libusb_set_configuration        usb_set_configuration
-#define libusb_get_device(__handle)     ((libusb_device *)usb_device(__handle))
+// Data structure wrappers to simulate libusb 1.0 types
+typedef struct libusb_device_handle_s   libusb_device_handle;
+typedef struct libusb_device_s {
+    struct usb_device *real;
+    libusb_device_handle *owner;
+} libusb_device;
+struct libusb_device_handle_s {
+    usb_dev_handle *real;
+    libusb_device dev;
+};
+typedef void *                          libusb_context;
+typedef enum {
+    LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED = 0x01U,
+    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT    = 0x02U,
+} libusb_hotplug_event;
+
+struct libusb_device_descriptor {
+    struct usb_device_descriptor;
+};
+struct libusb_config_descriptor {
+    struct usb_config_descriptor;
+};
+
+enum libusb_speed {
+    LIBUSB_SPEED_UNKNOWN,
+    LIBUSB_SPEED_LOW,
+    LIBUSB_SPEED_FULL,
+    LIBUSB_SPEED_HIGH,
+    LIBUSB_SPEED_SUPER,
+    LIBUSB_SPEED_SUPER_PLUS,
+};
 
 // Provide kernel-driver related helpers on Linux when building against
 // libusb-0.1. On other platforms (including Windows) fall back to no-op
@@ -85,9 +108,9 @@ enum libusb_error {
 #   include <errno.h>
 #   include <linux/usbdevice_fs.h>
 
-int LIBUSB_CALL libusb_kernel_driver_active(usb_dev_handle *dev, int interface)
+int LIBUSB_CALL libusb_kernel_driver_active(libusb_device_handle *dev, int interface)
 {
-    struct usb_device *udev = usb_device(dev);
+    struct usb_device *udev = usb_device(dev->real);
     if ((udev == NULL) || (udev->filename[0] == '\0')) {
         return LIBUSB_ERROR_NOT_SUPPORTED;
     }
@@ -119,9 +142,9 @@ int LIBUSB_CALL libusb_kernel_driver_active(usb_dev_handle *dev, int interface)
     return LIBUSB_ERROR_OTHER;
 }
 
-int LIBUSB_CALL libusb_detach_kernel_driver(usb_dev_handle *dev, int interface)
+int LIBUSB_CALL libusb_detach_kernel_driver(libusb_device_handle *dev, int interface)
 {
-    struct usb_device *udev = usb_device(dev);
+    struct usb_device *udev = usb_device(dev->real);
     if ((udev == NULL) || (udev->filename[0] == '\0')) {
         return LIBUSB_ERROR_NOT_SUPPORTED;
     }
@@ -148,42 +171,20 @@ int LIBUSB_CALL libusb_detach_kernel_driver(usb_dev_handle *dev, int interface)
     return LIBUSB_ERROR_OTHER;
 }
 #else
-int LIBUSB_CALL libusb_kernel_driver_active(usb_dev_handle *dev, int interface)
+int LIBUSB_CALL libusb_kernel_driver_active(libusb_device_handle *dev, int interface)
 {
     (void)dev; (void)interface;
     return LIBUSB_ERROR_NOT_SUPPORTED;
 }
 
-int LIBUSB_CALL libusb_detach_kernel_driver(usb_dev_handle *dev, int interface)
+int LIBUSB_CALL libusb_detach_kernel_driver(libusb_device_handle *dev, int interface)
 {
     (void)dev; (void)interface;
     return LIBUSB_ERROR_NOT_SUPPORTED;
 }
 #endif
 
-typedef usb_dev_handle                  libusb_device_handle;
-typedef struct usb_device               libusb_device;
-typedef void *                          libusb_context;
-typedef enum {
-    LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED = 0x01U,
-    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT    = 0x02U,
-} libusb_hotplug_event;
 
-struct libusb_device_descriptor {
-    struct usb_device_descriptor;
-};
-struct libusb_config_descriptor {
-    struct usb_config_descriptor;
-};
-
-enum libusb_speed {
-    LIBUSB_SPEED_UNKNOWN,
-    LIBUSB_SPEED_LOW,
-    LIBUSB_SPEED_FULL,
-    LIBUSB_SPEED_HIGH,
-    LIBUSB_SPEED_SUPER,
-    LIBUSB_SPEED_SUPER_PLUS,
-};
 
 int LIBUSB_CALL libusb_get_device_speed(libusb_device *dev)
 {
@@ -198,8 +199,8 @@ int LIBUSB_CALL libusb_get_device_speed(libusb_device *dev)
      * - if bcdUSB >= 0x0200 -> high speed
      * - if bcdUSB >= 0x0110 -> full speed
      */
-    uint16_t bcd = dev->descriptor.bcdUSB;
-    if (dev->descriptor.bMaxPacketSize0 == 8) {
+    uint16_t bcd = dev->real->descriptor.bcdUSB;
+    if (dev->real->descriptor.bMaxPacketSize0 == 8) {
         return LIBUSB_SPEED_LOW;
     }
     if (bcd >= 0x0300) {
@@ -233,23 +234,100 @@ libusb_device_handle * LIBUSB_CALL libusb_open_device_with_vid_pid(
             if (    (dev->descriptor.idVendor == vendor_id)
                 &&  (dev->descriptor.idProduct == product_id)) {
 
-                return usb_open(dev);
+                usb_dev_handle *real = usb_open(dev);
+                if (real == NULL) { return NULL; }
+
+                libusb_device_handle *h = (libusb_device_handle *)vsf_usbh_malloc(sizeof(*h));
+                if (h == NULL) { usb_close(real); return NULL; }
+                h->real = real;
+                h->dev.real = dev;
+                h->dev.owner = h;
+                return h;
             }
         }
     }
     return NULL;
 }
 
+// Simulate libusb 1.0 libusb_reset_device semantics:
+// reset the device and keep the wrapper valid by closing and reopening the real handle.
+int LIBUSB_CALL libusb_reset_device(libusb_device_handle *dev_handle)
+{
+    uint16_t vid = dev_handle->dev.real->descriptor.idVendor;
+    uint16_t pid = dev_handle->dev.real->descriptor.idProduct;
+
+    usb_reset(dev_handle->real);
+    usb_close(dev_handle->real);
+    dev_handle->real = NULL;
+
+    for (int retry = 0; retry < 10; retry++) {
+        __vsf_arch_irq_sleep(200);
+        libusb_device_handle *new_handle = libusb_open_device_with_vid_pid(NULL, vid, pid);
+        if (new_handle != NULL) {
+            dev_handle->real = new_handle->real;
+            dev_handle->dev.real = new_handle->dev.real;
+            vsf_usbh_free(new_handle);
+            return LIBUSB_SUCCESS;
+        }
+    }
+    return LIBUSB_ERROR_NOT_FOUND;
+}
+
+void LIBUSB_CALL libusb_close(libusb_device_handle *dev_handle)
+{
+    if (dev_handle != NULL) {
+        usb_close(dev_handle->real);
+        vsf_usbh_free(dev_handle);
+    }
+}
+
+libusb_device * LIBUSB_CALL libusb_get_device(libusb_device_handle *dev_handle)
+{
+    return &dev_handle->dev;
+}
+
+int LIBUSB_CALL libusb_claim_interface(libusb_device_handle *dev_handle, int interface)
+{
+    return usb_claim_interface(dev_handle->real, interface);
+}
+
+int LIBUSB_CALL libusb_control_transfer(libusb_device_handle *dev_handle,
+    uint8_t bmRequestType, uint8_t bRequest, uint16_t wValue,
+    uint16_t wIndex, unsigned char *data, uint16_t wLength, unsigned int timeout)
+{
+    return usb_control_msg(dev_handle->real, bmRequestType, bRequest,
+            wValue, wIndex, (char *)data, wLength, timeout);
+}
+
+int LIBUSB_CALL libusb_set_configuration(libusb_device_handle *dev_handle, int configuration)
+{
+    return usb_set_configuration(dev_handle->real, configuration);
+}
+
 int LIBUSB_CALL libusb_open(libusb_device *dev, libusb_device_handle **dev_handle)
 {
     VSF_USB_ASSERT(dev_handle != NULL);
-    *dev_handle = usb_open(dev);
-    return (*dev_handle != NULL) ? LIBUSB_SUCCESS : LIBUSB_ERROR_NO_DEVICE;
+    usb_dev_handle *real = usb_open(dev->real);
+    if (real == NULL) {
+        *dev_handle = NULL;
+        return LIBUSB_ERROR_NO_DEVICE;
+    }
+    libusb_device_handle *h = (libusb_device_handle *)vsf_usbh_malloc(sizeof(*h));
+    if (h == NULL) {
+        usb_close(real);
+        *dev_handle = NULL;
+        return LIBUSB_ERROR_NO_MEM;
+    }
+    h->real = real;
+    h->dev.real = dev->real;
+    h->dev.owner = h;
+    *dev_handle = h;
+    return LIBUSB_SUCCESS;
 }
 
 int LIBUSB_CALL libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc)
 {
-    *desc = *(struct libusb_device_descriptor *)&dev->descriptor;
+    *desc = *(struct libusb_device_descriptor *)&dev->real->descriptor;
     return 0;
 }
 
@@ -313,16 +391,16 @@ static int __libusb_parse_config_descriptor(unsigned char *raw_data, int raw_len
     return LIBUSB_SUCCESS;
 }
 
-int LIBUSB_CALL libusb_get_config_descriptor_by_value(usb_dev_handle *dev,
+int LIBUSB_CALL libusb_get_config_descriptor_by_value(libusb_device *dev,
     uint8_t bConfigurationValue, struct libusb_config_descriptor **config)
 {
     if ((dev == NULL) || (config == NULL)) {
         return LIBUSB_ERROR_INVALID_PARAM;
     }
 
-    // Get number of configurations from device descriptor
-    struct usb_device *udev = usb_device(dev);
-    if (udev == NULL) {
+    usb_dev_handle *handle = dev->owner->real;
+    struct usb_device *udev = dev->real;
+    if ((handle == NULL) || (udev == NULL)) {
         return LIBUSB_ERROR_NO_DEVICE;
     }
     uint8_t num_configs = udev->descriptor.bNumConfigurations;
@@ -332,11 +410,11 @@ int LIBUSB_CALL libusb_get_config_descriptor_by_value(usb_dev_handle *dev,
     for (uint8_t idx = 0; idx < num_configs; idx++) {
         // Step 1: Read config descriptor header (9 bytes)
         unsigned char desc_header[9];
-        int ret = usb_control_msg(dev,
+        int ret = usb_control_msg(handle,
                 USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
                 USB_REQ_GET_DESCRIPTOR,
                 (USB_DT_CONFIG << 8) | idx,
-                0, desc_header, 9, 1000);
+                0, (char *)desc_header, 9, 1000);
 
         if (ret < 9) {
             continue;
@@ -360,12 +438,12 @@ int LIBUSB_CALL libusb_get_config_descriptor_by_value(usb_dev_handle *dev,
         }
 
         // Step 3: Read complete descriptor with actual length
-        ret = usb_control_msg(dev,
+        ret = usb_control_msg(handle,
                 USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
                 USB_REQ_GET_DESCRIPTOR,
                 (USB_DT_CONFIG << 8) | idx,
                 0,
-                desc_buffer, wTotalLength, 1000);
+                (char *)desc_buffer, wTotalLength, 1000);
 
         if (ret < 9) {
             vsf_usbh_free(desc_buffer);
@@ -415,9 +493,9 @@ void LIBUSB_CALL libusb_free_config_descriptor(
     vsf_usbh_free(cfg);
 }
 
-int LIBUSB_CALL libusb_set_interface_alt_setting(usb_dev_handle *dev, int interface, int altsetting)
+int LIBUSB_CALL libusb_set_interface_alt_setting(libusb_device_handle *dev, int interface, int altsetting)
 {
-    int ret = usb_control_msg(dev, USB_RECIP_INTERFACE | USB_DIR_OUT,
+    int ret = usb_control_msg(dev->real, USB_RECIP_INTERFACE | USB_DIR_OUT,
             USB_REQ_SET_INTERFACE, altsetting, interface, NULL, 0, 1000);
     return (ret >= 0) ? LIBUSB_SUCCESS : LIBUSB_ERROR_OTHER;
 }
@@ -428,9 +506,9 @@ int LIBUSB_CALL libusb_bulk_transfer(libusb_device_handle *dev_handle,
 {
     int result;
     if (endpoint & 0x80) {
-        result = usb_bulk_read(dev_handle, endpoint, (char *)data, length, timeout);
+        result = usb_bulk_read(dev_handle->real, endpoint, (char *)data, length, timeout);
     } else {
-        result = usb_bulk_write(dev_handle, endpoint, (char *)data, length, timeout);
+        result = usb_bulk_write(dev_handle->real, endpoint, (char *)data, length, timeout);
     }
     if (actual_length != NULL) {
         *actual_length = result;
@@ -444,15 +522,46 @@ int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
 {
     int result;
     if (endpoint & 0x80) {
-        result = usb_interrupt_read(dev_handle, endpoint, (char *)data, length, timeout);
+        result = usb_interrupt_read(dev_handle->real, endpoint, (char *)data, length, timeout);
     } else {
-        result = usb_interrupt_write(dev_handle, endpoint, (char *)data, length, timeout);
+        result = usb_interrupt_write(dev_handle->real, endpoint, (char *)data, length, timeout);
     }
     if (actual_length != NULL) {
         *actual_length = result;
     }
     return result;
 }
+
+void __libusb_irq_start(vsf_arch_irq_thread_t *irq_thread)
+{
+    __vsf_arch_irq_start(irq_thread);
+}
+
+void __libusb_irq_end(vsf_arch_irq_thread_t *irq_thread)
+{
+    __vsf_arch_irq_end(irq_thread, false);
+}
+
+#define VSF_LIBUSB_DRIVER_TYPE    WDI_LIBUSB0
+#define VSF_LIBUSB_DRIVER_NAME    "libusb0"
+
+#else       // LIBUSB_API_VERSION defined, libusb 1.0
+
+void __libusb_irq_start(vsf_arch_irq_thread_t *irq_thread)
+{
+}
+
+void __libusb_irq_end(vsf_arch_irq_thread_t *irq_thread)
+{
+}
+
+#define VSF_LIBUSB_DRIVER_TYPE    WDI_WINUSB
+#define VSF_LIBUSB_DRIVER_NAME    "WinUSB"
+
+// Ensure LIBUSB_SPEED_SUPER_PLUS is available for older libusb 1.0 versions
+#ifndef LIBUSB_SPEED_SUPER_PLUS
+#   define LIBUSB_SPEED_SUPER_PLUS    (LIBUSB_SPEED_SUPER + 1)
+#endif
 
 #endif
 
@@ -477,7 +586,10 @@ int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
 
 typedef struct vk_libusb_hcd_dev_t {
     uint16_t vid, pid;
-    libusb_device_handle *handle;
+    struct {
+        libusb_device_handle *handle;
+        libusb_device *dev;
+    } libusb;
     vk_usbh_dev_t *dev;
 
     enum usb_device_speed_t speed;
@@ -627,11 +739,7 @@ static bool __vk_libusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool
         .trim_whitespaces   = TRUE,
     };
     struct wdi_options_prepare_driver pd_options = {
-#   ifndef LIBUSB_API_VERSION
-        .driver_type        = WDI_LIBUSB0,
-#   else
-        .driver_type        = WDI_WINUSB,
-#   endif
+        .driver_type        = VSF_LIBUSB_DRIVER_TYPE,
     };
     struct wdi_device_info *device, *list;
     int r = WDI_ERROR_OTHER;
@@ -645,11 +753,7 @@ static bool __vk_libusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool
     for (device = list; device != NULL; device = device->next) {
         if (    (device->vid == vid) && (device->pid == pid) && !device->is_composite
             &&  (   force ||
-#   ifndef LIBUSB_API_VERSION
-                    strcmp(device->driver, "libusb0")
-#   else
-                    strcmp(device->driver, "WinUSB")
-#   endif
+                    strcmp(device->driver, VSF_LIBUSB_DRIVER_NAME)
                 )) {
 #if VSF_LIBUSB_CFG_INSTALL_EMBEDDED_DRIVER != ENABLED
             if (wdi_prepare_driver(device, "usb_driver", "libusb_device.inf", &pd_options) == WDI_SUCCESS)
@@ -673,27 +777,6 @@ static void __vk_libusb_hcd_on_left(vk_libusb_hcd_dev_t *libusb_dev)
 
 static void __vk_libusb_hcd_on_arrived(vk_libusb_hcd_dev_t *libusb_dev)
 {
-    libusb_device *device = libusb_get_device(libusb_dev->handle);
-    switch (libusb_get_device_speed(device)) {
-        case LIBUSB_SPEED_UNKNOWN:
-            libusb_dev->speed = USB_SPEED_UNKNOWN;
-            break;
-        case LIBUSB_SPEED_LOW:
-            libusb_dev->speed = USB_SPEED_LOW;
-            break;
-        case LIBUSB_SPEED_FULL:
-            libusb_dev->speed = USB_SPEED_FULL;
-            break;
-        case LIBUSB_SPEED_HIGH:
-            libusb_dev->speed = USB_SPEED_HIGH;
-            break;
-#if defined(LIBUSB_API_VERSION) && ((LIBUSB_MAJOR > 1) || (LIBUSB_MINOR  > 0) || (LIBUSB_MICRO > 21))
-        case LIBUSB_SPEED_SUPER_PLUS:
-#endif
-        case LIBUSB_SPEED_SUPER:
-            libusb_dev->speed = USB_SPEED_SUPER;
-            break;
-    }
     libusb_dev->evt_mask.is_attaching = true;
     __vsf_arch_irq_request_send(&libusb_dev->irq_request);
 }
@@ -716,16 +799,13 @@ static int LIBUSB_CALL __vk_libusb_hcd_hotplug_cb(libusb_context *ctx, libusb_de
         if (libusb_dev != NULL) {
             switch (event) {
             case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
-                if (NULL == libusb_dev->handle) {
-                    if (LIBUSB_SUCCESS == libusb_open(device, &libusb_dev->handle)) {
-                        __vk_libusb_hcd_on_arrived(libusb_dev);
-                    } else {
-                        libusb_dev->handle = NULL;
-                    }
+                if (NULL == libusb_dev->libusb.handle) {
+                    libusb_dev->libusb.dev = device;
+                    __vk_libusb_hcd_on_arrived(libusb_dev);
                 }
                 break;
             case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
-                if (libusb_dev->handle != NULL) {
+                if (libusb_dev->libusb.handle != NULL) {
                     __vk_libusb_hcd_on_left(libusb_dev);
                 }
                 break;
@@ -754,7 +834,7 @@ static int __vk_libusb_hcd_init(void)
         libusb_dev = &__vk_libusb_hcd.devs[i];
         libusb_dev->state = VSF_LIBUSB_HCD_DEV_STATE_DETACHED;
         libusb_dev->evt_mask.value = 0;
-        libusb_dev->handle = NULL;
+        libusb_dev->libusb.handle = NULL;
         libusb_dev->addr = -1;
 
         __vsf_arch_irq_request_init(&libusb_dev->irq_request);
@@ -780,7 +860,7 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
     vk_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
     vk_usbh_pipe_t pipe = urb->pipe;
 
-    if (NULL == libusb_dev->handle) {
+    if (NULL == libusb_dev->libusb.handle) {
         return LIBUSB_ERROR_NO_DEVICE;
     }
 
@@ -793,12 +873,12 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 
             if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                 &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
-                return libusb_set_configuration(libusb_dev->handle, setup->wValue);
+                return libusb_set_configuration(libusb_dev->libusb.handle, setup->wValue);
             } else if ( ((USB_RECIP_INTERFACE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_INTERFACE == setup->bRequest)) {
-                return libusb_set_interface_alt_setting(libusb_dev->handle, setup->wIndex, setup->wValue);
+                return libusb_set_interface_alt_setting(libusb_dev->libusb.handle, setup->wIndex, setup->wValue);
             } else {
-                return libusb_control_transfer(libusb_dev->handle, setup->bRequestType,
+                return libusb_control_transfer(libusb_dev->libusb.handle, setup->bRequestType,
                         setup->bRequest, setup->wValue, setup->wIndex, urb->buffer,
                         setup->wLength, urb->timeout);
             }
@@ -808,7 +888,7 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
         return LIBUSB_ERROR_NOT_SUPPORTED;
     case USB_ENDPOINT_XFER_BULK: {
             int actual_length;
-            int err = libusb_bulk_transfer(libusb_dev->handle,
+            int err = libusb_bulk_transfer(libusb_dev->libusb.handle,
                         (pipe.dir_in1out0 ? 0x80 : 0x00) | pipe.endpoint,
                         urb->buffer, urb->transfer_length, &actual_length, urb->timeout);
             if (err < 0) {
@@ -819,7 +899,7 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
         }
     case USB_ENDPOINT_XFER_INT: {
             int actual_length;
-            int err = libusb_interrupt_transfer(libusb_dev->handle,
+            int err = libusb_interrupt_transfer(libusb_dev->libusb.handle,
                         (pipe.dir_in1out0 ? 0x80 : 0x00) | pipe.endpoint,
                         urb->buffer, urb->transfer_length, &actual_length, urb->timeout);
             if (err < 0) {
@@ -846,6 +926,34 @@ static void __vk_libusb_hcd_dev_thread(void *arg)
 
         if (libusb_dev->evt_mask.is_attaching) {
             libusb_dev->evt_mask.is_attaching = false;
+
+            __libusb_irq_start(irq_thread);
+            if (LIBUSB_SUCCESS != libusb_open(libusb_dev->libusb.dev, &libusb_dev->libusb.handle)) {
+                // failed to open, ignore device
+                __libusb_irq_end(irq_thread);
+                continue;
+            }
+            libusb_device *device = libusb_get_device(libusb_dev->libusb.handle);
+            switch (libusb_get_device_speed(device)) {
+            case LIBUSB_SPEED_UNKNOWN:
+                libusb_dev->speed = USB_SPEED_UNKNOWN;
+                break;
+            case LIBUSB_SPEED_LOW:
+                libusb_dev->speed = USB_SPEED_LOW;
+                break;
+            case LIBUSB_SPEED_FULL:
+                libusb_dev->speed = USB_SPEED_FULL;
+                break;
+            case LIBUSB_SPEED_HIGH:
+                libusb_dev->speed = USB_SPEED_HIGH;
+                break;
+            case LIBUSB_SPEED_SUPER_PLUS:
+            case LIBUSB_SPEED_SUPER:
+                libusb_dev->speed = USB_SPEED_SUPER;
+                break;
+            }
+            __libusb_irq_end(irq_thread);
+
             __vsf_arch_irq_start(irq_thread);
                 vsf_eda_post_evt(&__vk_libusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_LIBUSB_HCD_ATTACH | idx);
             __vsf_arch_irq_end(irq_thread, false);
@@ -856,12 +964,18 @@ static void __vk_libusb_hcd_dev_thread(void *arg)
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (libusb_dev->evt_mask.is_detached) {
-            libusb_close(libusb_dev->handle);
-            libusb_dev->handle = NULL;
+            if (libusb_dev->libusb.handle != NULL) {
+                __libusb_irq_start(irq_thread);
+                libusb_close(libusb_dev->libusb.handle);
+                __libusb_irq_end(irq_thread);
+                libusb_dev->libusb.handle = NULL;
+            }
             libusb_dev->evt_mask.is_detached = false;
         }
         if (libusb_dev->evt_mask.is_resetting) {
-            libusb_reset_device(libusb_dev->handle);
+            __libusb_irq_start(irq_thread);
+            libusb_reset_device(libusb_dev->libusb.handle);
+            __libusb_irq_end(irq_thread);
             libusb_dev->evt_mask.is_resetting = false;
         }
     }
@@ -897,29 +1011,18 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
 
                 if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
-#ifndef LIBUSB_API_VERSION
-                    __vsf_arch_irq_start(irq_thread);
-#endif
+                    __libusb_irq_start(irq_thread);
                     if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
-                                // for libusb 0.1, use handle because it's needed to call usb_control_msg
-#ifndef LIBUSB_API_VERSION
-                                libusb_dev->handle,
-#else
-                                libusb_get_device(libusb_dev->handle),
-#endif
+                                libusb_get_device(libusb_dev->libusb.handle),
                                 setup->wValue, &config_desc)) {
-#ifndef LIBUSB_API_VERSION
-                        __vsf_arch_irq_end(irq_thread, false);
-#endif
+                        __libusb_irq_end(irq_thread);
                         for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
-                            if (libusb_kernel_driver_active(libusb_dev->handle, i)) {
-                                libusb_detach_kernel_driver(libusb_dev->handle, i);
+                            if (libusb_kernel_driver_active(libusb_dev->libusb.handle, i)) {
+                                libusb_detach_kernel_driver(libusb_dev->libusb.handle, i);
                             }
                         }
                     } else {
-#ifndef LIBUSB_API_VERSION
-                        __vsf_arch_irq_end(irq_thread, false);
-#endif
+                        __libusb_irq_end(irq_thread);
                         VSF_LINUX_ASSERT(false);
                     }
                 }
@@ -939,13 +1042,9 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
             if (actual_length < 0) {
                 urb->status = actual_length;
                 if (config_desc != NULL) {
-#ifndef LIBUSB_API_VERSION
-                    __vsf_arch_irq_start(irq_thread);
-#endif
+                    __libusb_irq_start(irq_thread);
                     libusb_free_config_descriptor(config_desc);
-#ifndef LIBUSB_API_VERSION
-                    __vsf_arch_irq_end(irq_thread, false);
-#endif
+                    __libusb_irq_end(irq_thread);
                 }
             } else {
                 urb->status = URB_OK;
@@ -960,15 +1059,12 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
 
                         VSF_LINUX_ASSERT(config_desc != NULL);
                         for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
-                            libusb_claim_interface(libusb_dev->handle, i);
+                            libusb_claim_interface(libusb_dev->libusb.handle, i);
                         }
-#ifndef LIBUSB_API_VERSION
-                        __vsf_arch_irq_start(irq_thread);
-#endif
+
+                        __libusb_irq_start(irq_thread);
                         libusb_free_config_descriptor(config_desc);
-#ifndef LIBUSB_API_VERSION
-                        __vsf_arch_irq_end(irq_thread, false);
-#endif
+                        __libusb_irq_end(irq_thread);
                     }
                 }
             }
@@ -1026,13 +1122,21 @@ static void __vk_libusb_hcd_init_thread(void *arg)
     while (!__vk_libusb_hcd.is_hotplug_supported) {
         vk_libusb_hcd_dev_t *libusb_dev = &__vk_libusb_hcd.devs[0];
         for (int i = 0; i < dimof(__vk_libusb_hcd.devs); i++, libusb_dev++) {
-            if ((NULL == libusb_dev->handle) && (0 == libusb_dev->evt_mask.value)) {
+            if ((NULL == libusb_dev->libusb.handle) && (0 == libusb_dev->evt_mask.value)) {
 #if defined(__WIN__) && VSF_LIBUSB_CFG_INSTALL_DRIVER == ENABLED
                 __vk_libusb_ensure_driver(libusb_dev->vid, libusb_dev->pid, false);
 #endif
-                libusb_dev->handle = libusb_open_device_with_vid_pid(
+                __libusb_irq_start(irq_thread);
+                libusb_dev->libusb.handle = libusb_open_device_with_vid_pid(
                     __vk_libusb_hcd.ctx, libusb_dev->vid, libusb_dev->pid);
-                if (libusb_dev->handle != NULL) {
+                __libusb_irq_end(irq_thread);
+                if (libusb_dev->libusb.handle != NULL) {
+                    // Reset device to clear stale state (e.g. from a previous session),
+                    // simulating the port reset a real HCD would perform on device detection.
+                    __libusb_irq_start(irq_thread);
+                    libusb_reset_device(libusb_dev->libusb.handle);
+                    __libusb_irq_end(irq_thread);
+                    libusb_dev->libusb.dev = libusb_get_device(libusb_dev->libusb.handle);
                     __vk_libusb_hcd_on_arrived(libusb_dev);
                 }
             }
