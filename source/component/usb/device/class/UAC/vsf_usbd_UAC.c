@@ -482,15 +482,14 @@ vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *if
                 if (0 == request->wValue) {
                     // 0-bandwidth
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-                    vsf_trace_debug("uac: stop stream." VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_debug("uac: stop stream %d." VSF_TRACE_CFG_LINEEND, request->wIndex);
 #endif
-                    vsf_usbd_uac_stop_stream(uac_as, request->wValue);
+                    vsf_usbd_uac_stop_stream(uac_as, request->wIndex);
                 } else {
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-                    vsf_trace_debug("uac: start stream %d." VSF_TRACE_CFG_LINEEND,
-                                request->wValue);
+                    vsf_trace_debug("uac: start stream %d." VSF_TRACE_CFG_LINEEND, request->wIndex);
 #endif
-                    vsf_usbd_uac_start_stream(uac_as, request->wValue);
+                    vsf_usbd_uac_start_stream(uac_as, request->wIndex);
                 }
                 break;
             }
