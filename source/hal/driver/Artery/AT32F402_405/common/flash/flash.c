@@ -23,6 +23,9 @@
 
 #include "hal/vsf_hal.h"
 
+// for vsf_trace
+#include "service/vsf_service.h"
+
 // HW
 // for vendor headers
 #include "hal/driver/vendor_driver.h"
