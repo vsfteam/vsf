@@ -710,7 +710,7 @@ typedef union __vsf_eda_state_t {
         /* if is_limitted, eda can only receive 1 event */
         uint8_t                 is_limitted : 1;
         uint8_t                 is_sync_got : 1;
-#   ifdef __VSF_OS_CFG_EVTQ_LIST
+#   if (VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED) && defined(__VSF_OS_CFG_EVTQ_LIST)
         uint8_t                 is_to_set_due : 1;
 #   endif
 #endif

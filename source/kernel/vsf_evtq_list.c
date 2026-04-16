@@ -383,7 +383,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                 vsf_evtq_on_eda_fini(eda);
                 orig = vsf_protect_int();
             }
-#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
             else if (!eda->flag.state.is_ready) {
                 vsf_unprotect_int(orig);
                 // refer to comments of __vsf_eda_sync_set_timeout in vsf_eda_sync.c
