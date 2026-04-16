@@ -52,7 +52,9 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 extern vsf_evtq_t * __vsf_os_evtq_get(vsf_prio_t priority);
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
