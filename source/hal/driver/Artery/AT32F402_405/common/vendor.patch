@@ -1,0 +1,25 @@
+ libraries/drivers/inc/at32f402_405_crm.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libraries/drivers/inc/at32f402_405_crm.h b/libraries/drivers/inc/at32f402_405_crm.h
+index fbb4a1f..39efd7d 100644
+--- a/libraries/drivers/inc/at32f402_405_crm.h
++++ b/libraries/drivers/inc/at32f402_405_crm.h
+@@ -897,7 +897,7 @@ typedef struct
+     struct
+     {
+       __IO uint32_t tmr1en               : 1; /* [0] */
+-      __IO uint32_t reserved1            : 2; /* [3:1] */
++      __IO uint32_t reserved1            : 3; /* [3:1] */
+       __IO uint32_t usart1en             : 1; /* [4] */
+       __IO uint32_t usart6en             : 1; /* [5] */
+       __IO uint32_t reserved2            : 2; /* [7:6] */
+@@ -914,7 +914,7 @@ typedef struct
+       __IO uint32_t i2sf5en              : 1; /* [20] */
+       __IO uint32_t reserved7            : 8; /* [28:21] */
+       __IO uint32_t accen                : 1; /* [29] */
+-      __IO uint32_t reserved8            : 2; /* [30] */
++      __IO uint32_t reserved8            : 1; /* [30] */
+       __IO uint32_t otghsphyen           : 1; /* [31] */
+     } apb2en_bit;
+   };
