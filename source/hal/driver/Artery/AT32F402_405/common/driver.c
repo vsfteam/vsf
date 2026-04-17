@@ -160,7 +160,7 @@ static const uint16_t __VSF_HW_CLK_PLLP_PRESCALER[16] = {
     1, 2, 4, 6, 8, 10 , 12, 14, 16, 18, 20, 22, 24, 26, 28, 30
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLLP = {
-    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x01, 16,  4),   // CRM_PLLCFG.PLLRCS
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x01, 16,  4),   // CRM_PLLCFG.PLL_FP
     .clksrc                     = &VSF_HW_CLK_PLL,
     .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
     .clkprescaler_mapper        = __VSF_HW_CLK_PLLP_PRESCALER,
@@ -172,7 +172,7 @@ static const uint16_t __VSF_HW_CLK_PLLU_PRESCALER[8] = {
 const vsf_hw_clk_t VSF_HW_CLK_PLLU = {
     .clken_region               = VSF_HW_CLKRST_REGION(0x01, 29,  1),   // CRM_PLLCFG.PLLU_EN
     .clkrdy_region              = VSF_HW_CLKRST_REGION(0x00, 26,  1),   // CRM_CTRL.PLLUSTBL
-    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x01, 20,  3),   // CRM_PLLCFG.PLLRCS
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x01, 20,  3),   // CRM_PLLCFG.PLL_FU
     .clksrc                     = &VSF_HW_CLK_PLL,
     .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
     .clkprescaler_mapper        = __VSF_HW_CLK_PLLU_PRESCALER,
