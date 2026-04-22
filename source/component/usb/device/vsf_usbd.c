@@ -42,6 +42,10 @@
 VSF_USBD_CFG_PROTECT_LEVEL MUST be set to the level suitable for stream evthandler(maybe called in interrupt) ********
 #endif
 
+#if VSF_USBD_CFG_USE_EDA != ENABLED || VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#   warning usbd wakeup will not be supported if VSF_USBD_CFG_USE_EDA and VSF_KERNEL_CFG_EDA_SUPPORT_TIMER are disabled
+#endif
+
 #ifndef VSF_USBD_CFG_PROTECT_LEVEL
 /*! \note     If ep_stream is enabled, default protect level will be interrupt,
  *!         because vk_usbd_ep_recv and vk_usbd_ep_send will be called in
@@ -798,7 +802,7 @@ static void __vk_usbd_hal_evthandler(void *p, usb_evt_t evt, uint_fast8_t value)
 {
     vk_usbd_dev_t *dev = p;
     __vsf_usbd_trace_evt(evt, value);
-    vsf_eda_post_evt(&dev->eda, (vsf_evt_t)(VSF_EVT_USER + (evt | (value << 8))));
+    vsf_eda_post_evt((vsf_eda_t *)&dev->eda, (vsf_evt_t)(VSF_EVT_USER + (evt | (value << 8))));
 }
 
 static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
@@ -807,20 +811,30 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     uint_fast8_t value;
     usb_evt_t evt;
 
+    dev = vsf_container_of(eda, vk_usbd_dev_t, eda);
+    VSF_USBD_DRV_PREPARE(dev);
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    if (VSF_EVT_TIMER == evt_eda) {
+        if (dev->wakeup_pending) {
+            dev->wakeup_pending = false;
+            vk_usbd_drv_wakeup(false);
+        }
+        return;
+    }
+#endif
     if (evt_eda < VSF_EVT_USER) {
         return;
     }
     evt_eda -= VSF_EVT_USER;
 
-    dev = vsf_container_of(eda, vk_usbd_dev_t, eda);
     value = evt_eda >> 8;
     evt = (usb_evt_t)(evt_eda & 0xFF);
 #else
 {
     vk_usbd_dev_t *dev = p;
+    VSF_USBD_DRV_PREPARE(dev);
     __vsf_usbd_trace_evt(evt, value);
 #endif
-    VSF_USBD_DRV_PREPARE(dev);
 
     switch (evt) {
     case USB_ON_ATTACH:
@@ -985,7 +999,20 @@ void vk_usbd_wakeup(vk_usbd_dev_t *dev)
 {
     VSF_USB_ASSERT(dev != NULL);
     VSF_USBD_DRV_PREPARE(dev);
-    vk_usbd_drv_wakeup();
+
+#if VSF_USBD_CFG_RAW_MODE != ENABLED
+    if (!(dev->feature & USB_CONFIG_ATT_WAKEUP)) {
+        return;
+    }
+#endif
+
+#if VSF_USBD_CFG_USE_EDA == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    dev->wakeup_pending = true;
+    vk_usbd_drv_wakeup(true);
+    vsf_teda_set_timer_ex(&dev->eda, vsf_systimer_ms_to_tick(5));
+#else
+    vsf_trace_warning("usbd wakeup need VSF_USBD_CFG_USE_EDA and VSF_KERNEL_CFG_EDA_SUPPORT_TIMER\n");
+#endif
 }
 
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
@@ -1055,13 +1082,23 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
 #endif
 
 #if VSF_USBD_CFG_USE_EDA == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    dev->eda.use_as__vsf_eda_t.fn.evthandler = __vk_usbd_evthandler;
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    dev->eda.use_as__vsf_eda_t.on_terminate = NULL;
+#       endif
+    dev->wakeup_pending = false;
+    vsf_teda_init(&dev->eda, VSF_USBD_CFG_EDA_PRIORITY);
+#   else
     dev->eda.fn.evthandler = __vk_usbd_evthandler;
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     dev->eda.on_terminate = NULL;
-#   endif
+#       endif
     vsf_eda_init(&dev->eda, VSF_USBD_CFG_EDA_PRIORITY);
+    dev->wakeup_pending = false;
+#   endif
 #   if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_kernel_trace_eda_info(&dev->eda, "usbd_task", NULL, 0);
+    vsf_kernel_trace_eda_info((vsf_eda_t *)&dev->eda, "usbd_task", NULL, 0);
 #   endif
 #endif
 

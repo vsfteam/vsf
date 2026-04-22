@@ -129,7 +129,7 @@ extern void vsf_hal_distbus_usbd_reset(vsf_hal_distbus_usbd_t *usbd, usb_dc_cfg_
 
 extern void vsf_hal_distbus_usbd_connect(vsf_hal_distbus_usbd_t *usbd);
 extern void vsf_hal_distbus_usbd_disconnect(vsf_hal_distbus_usbd_t *usbd);
-extern void vsf_hal_distbus_usbd_wakeup(vsf_hal_distbus_usbd_t *usbd);
+extern void vsf_hal_distbus_usbd_wakeup(vsf_hal_distbus_usbd_t *usbd, bool set);
 
 extern void vsf_hal_distbus_usbd_set_address(vsf_hal_distbus_usbd_t *usbd, uint_fast8_t addr);
 extern uint_fast8_t vsf_hal_distbus_usbd_get_address(vsf_hal_distbus_usbd_t *usbd);

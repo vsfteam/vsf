@@ -171,7 +171,7 @@ void f1cx00s_usbd_disconnect(f1cx00s_usb_dcd_t *usbd)
     MUSB_BASE->Common.Power &= ~MUSBD_Power_SoftConn;
 }
 
-void f1cx00s_usbd_wakeup(f1cx00s_usb_dcd_t *usbd)
+void f1cx00s_usbd_wakeup(f1cx00s_usb_dcd_t *usbd, bool set)
 {
 }
 

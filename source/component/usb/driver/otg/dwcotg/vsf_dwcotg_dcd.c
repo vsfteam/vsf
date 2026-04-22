@@ -144,6 +144,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
 
     global_regs->gintmsk = USB_OTG_GINTMSK_USBRST | USB_OTG_GINTMSK_ENUMDNEM
         |   USB_OTG_GINTMSK_IEPINT | USB_OTG_GINTMSK_OEPINT
+        |   USB_OTG_GINTMSK_OTGINT
 //        |   USB_OTG_GINTMSK_IISOIXFRM | USB_OTG_GINTMSK_PXFRM_IISOOXFRM |
         ;
     if (!dwcotg_dcd->dma_en) {
@@ -197,8 +198,13 @@ void vk_dwcotg_dcd_disconnect(vk_dwcotg_dcd_t *dwcotg_dcd)
     dwcotg_dcd->reg.dev.global_regs->dctl |= USB_OTG_DCTL_SDIS;
 }
 
-void vk_dwcotg_dcd_wakeup(vk_dwcotg_dcd_t *dwcotg_dcd)
+void vk_dwcotg_dcd_wakeup(vk_dwcotg_dcd_t *dwcotg_dcd, bool set)
 {
+    if (set) {
+        dwcotg_dcd->reg.dev.global_regs->dctl |= USB_OTG_DCTL_RWUSIG;
+    } else {
+        dwcotg_dcd->reg.dev.global_regs->dctl &= ~USB_OTG_DCTL_RWUSIG;
+    }
 }
 
 void vk_dwcotg_dcd_set_address(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t addr)
@@ -680,6 +686,13 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         VSF_USB_ASSERT(false);
         global_regs->gintsts = USB_OTG_GINTSTS_MMIS;
     }
+    if (intsts & USB_OTG_GINTSTS_OTGINT) {
+        uint_fast32_t otgint = global_regs->gotgint;
+        if (otgint & USB_OTG_GOTGINT_SEDET) {
+            __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_DETACH, 0);
+        }
+        global_regs->gotgint = otgint;
+    }
     if (intsts & USB_OTG_GINTSTS_USBRST) {
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_RESET, 0);
         global_regs->gintsts = USB_OTG_GINTSTS_USBRST;
@@ -696,22 +709,19 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
     }
     if (intsts & USB_OTG_GINTSTS_USBSUSP) {
         if (dev_global_regs->dsts & USB_OTG_DSTS_SUSPSTS) {
+            global_regs->gintmsk |= USB_OTG_GINTMSK_WUIM;
             __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SUSPEND, 0);
         }
         global_regs->gintsts = USB_OTG_GINTSTS_USBSUSP;
     }
     if (intsts & USB_OTG_GINTSTS_WKUINT) {
+        global_regs->gintmsk &= ~USB_OTG_GINTMSK_WUIM;
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_RESUME, 0);
         global_regs->gintsts = USB_OTG_GINTSTS_WKUINT;
     }
     if (intsts & USB_OTG_GINTSTS_SOF) {
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SOF, vk_dwcotg_dcd_get_frame_number(dwcotg_dcd));
         global_regs->gintsts = USB_OTG_GINTSTS_SOF;
-    }
-    if (intsts & USB_OTG_GINTSTS_USBSUSP) {
-        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_DETACH, 0);
-        global_regs->gintsts = USB_OTG_GINTSTS_USBSUSP;
-        global_regs->gintmsk &= ~USB_OTG_GINTMSK_USBSUSPM;
     }
 
     if (intsts & USB_OTG_GINTSTS_IEPINT) {

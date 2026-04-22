@@ -237,7 +237,7 @@ void vk_musb_fdrc_usbd_disconnect(vk_musb_fdrc_dcd_t *usbd)
     usbd->param->op->Disconnect();
 }
 
-void vk_musb_fdrc_usbd_wakeup(vk_musb_fdrc_dcd_t *usbd)
+void vk_musb_fdrc_usbd_wakeup(vk_musb_fdrc_dcd_t *usbd, bool set)
 {
 }
 

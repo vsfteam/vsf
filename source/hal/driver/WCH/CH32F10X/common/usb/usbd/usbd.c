@@ -394,7 +394,7 @@ void ch32f10x_usbd_disconnect(ch32f10x_usbd_t *usbd)
     EXTEN->EXTEN_CTR &= ~(1 << 1);
 }
 
-void ch32f10x_usbd_wakeup(ch32f10x_usbd_t *usbd)
+void ch32f10x_usbd_wakeup(ch32f10x_usbd_t *usbd, bool set)
 {
 
 }

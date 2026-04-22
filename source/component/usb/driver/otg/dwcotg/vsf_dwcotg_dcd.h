@@ -109,7 +109,7 @@ extern void vk_dwcotg_dcd_irq_disable(vk_dwcotg_dcd_t *dwcotg_dcd);
 
 extern void vk_dwcotg_dcd_connect(vk_dwcotg_dcd_t *dwcotg_dcd);
 extern void vk_dwcotg_dcd_disconnect(vk_dwcotg_dcd_t *dwcotg_dcd);
-extern void vk_dwcotg_dcd_wakeup(vk_dwcotg_dcd_t *dwcotg_dcd);
+extern void vk_dwcotg_dcd_wakeup(vk_dwcotg_dcd_t *dwcotg_dcd, bool set);
 
 extern void vk_dwcotg_dcd_set_address(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t addr);
 extern uint_fast8_t vk_dwcotg_dcd_get_address(vk_dwcotg_dcd_t *dwcotg_dcd);

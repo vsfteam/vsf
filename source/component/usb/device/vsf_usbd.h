@@ -509,7 +509,12 @@ vsf_class(vk_usbd_dev_t) {
 #endif
         vsf_slist_t trans_list;
 #if VSF_USBD_CFG_USE_EDA == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+        vsf_teda_t eda;
+        bool wakeup_pending;
+#   else
         vsf_eda_t eda;
+#   endif
 #endif
     )
 };

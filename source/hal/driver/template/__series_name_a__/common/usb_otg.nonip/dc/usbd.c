@@ -57,7 +57,7 @@ void vsf_hw_usbd_disconnect(vsf_hw_usbd_t *usbd)
 
 }
 
-void vsf_hw_usbd_wakeup(vsf_hw_usbd_t *usbd)
+void vsf_hw_usbd_wakeup(vsf_hw_usbd_t *usbd, bool set)
 {
 
 }

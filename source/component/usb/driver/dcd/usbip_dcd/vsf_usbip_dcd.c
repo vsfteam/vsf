@@ -658,7 +658,7 @@ void vk_usbip_usbd_disconnect(vk_usbip_dcd_t *usbd)
     }
 }
 
-void vk_usbip_usbd_wakeup(vk_usbip_dcd_t *usbd)
+void vk_usbip_usbd_wakeup(vk_usbip_dcd_t *usbd, bool set)
 {
 }
 

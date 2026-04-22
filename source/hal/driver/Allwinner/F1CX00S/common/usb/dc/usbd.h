@@ -41,7 +41,7 @@ extern void f1cx00s_usbd_reset(f1cx00s_usb_dcd_t *usbd, usb_dc_cfg_t *cfg);
 
 extern void f1cx00s_usbd_connect(f1cx00s_usb_dcd_t *usbd);
 extern void f1cx00s_usbd_disconnect(f1cx00s_usb_dcd_t *usbd);
-extern void f1cx00s_usbd_wakeup(f1cx00s_usb_dcd_t *usbd);
+extern void f1cx00s_usbd_wakeup(f1cx00s_usb_dcd_t *usbd, bool set);
 
 extern void f1cx00s_usbd_set_address(f1cx00s_usb_dcd_t *usbd, uint_fast8_t addr);
 extern uint_fast8_t f1cx00s_usbd_get_address(f1cx00s_usb_dcd_t *usbd);

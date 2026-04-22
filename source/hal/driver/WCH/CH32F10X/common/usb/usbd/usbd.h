@@ -99,7 +99,7 @@ extern void ch32f10x_usbd_reset(ch32f10x_usbd_t *usbd, usb_dc_cfg_t *cfg);
 
 extern void ch32f10x_usbd_connect(ch32f10x_usbd_t *usbd);
 extern void ch32f10x_usbd_disconnect(ch32f10x_usbd_t *usbd);
-extern void ch32f10x_usbd_wakeup(ch32f10x_usbd_t *usbd);
+extern void ch32f10x_usbd_wakeup(ch32f10x_usbd_t *usbd, bool set);
 
 extern void ch32f10x_usbd_set_address(ch32f10x_usbd_t *usbd, uint_fast8_t addr);
 extern uint_fast8_t ch32f10x_usbd_get_address(ch32f10x_usbd_t *usbd);

@@ -171,7 +171,7 @@ void vsf_hal_distbus_usbd_disconnect(vsf_hal_distbus_usbd_t *usbd)
     vsf_distbus_send_msg(distbus, &usbd->service, msg);
 }
 
-void vsf_hal_distbus_usbd_wakeup(vsf_hal_distbus_usbd_t *usbd)
+void vsf_hal_distbus_usbd_wakeup(vsf_hal_distbus_usbd_t *usbd, bool set)
 {
     vsf_distbus_t *distbus = usbd->distbus;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, 0, NULL);

@@ -129,7 +129,7 @@ static void         usb_dc##__N##_reset(usb_dc_cfg_t *cfg);                     
                                                                                 \
 static void         usb_dc##__N##_connect(void);                                \
 static void         usb_dc##__N##_disconnect(void);                             \
-static void         usb_dc##__N##_wakeup(void);                                 \
+static void         usb_dc##__N##_wakeup(bool set);                             \
                                                                                 \
 static void         usb_dc##__N##_set_address(uint_fast8_t addr);               \
 static uint_fast8_t usb_dc##__N##_get_address(void);                            \
@@ -224,8 +224,8 @@ static void usb_dc##__N##_connect(void)                                         
 { __HEADER##_connect(&(__OBJ)); }                                               \
 static void usb_dc##__N##_disconnect(void)                                      \
 { __HEADER##_disconnect(&(__OBJ)); }                                            \
-static void usb_dc##__N##_wakeup(void)                                          \
-{ __HEADER##_wakeup(&(__OBJ)); }                                                \
+static void usb_dc##__N##_wakeup(bool set)                                      \
+{ __HEADER##_wakeup(&(__OBJ), set); }                                           \
 static void usb_dc##__N##_set_address(uint_fast8_t addr)                        \
 { __HEADER##_set_address(&(__OBJ), addr); }                                     \
 static uint_fast8_t usb_dc##__N##_get_address(void)                             \
@@ -349,7 +349,7 @@ def_interface(i_usb_dc_t)
 
     void            (*Connect)          (void);
     void            (*Disconnect)       (void);
-    void            (*Wakeup)           (void);
+    void            (*Wakeup)           (bool set);
 
     void            (*SetAddress)       (uint_fast8_t addr);
     uint_fast8_t    (*GetAddress)       (void);

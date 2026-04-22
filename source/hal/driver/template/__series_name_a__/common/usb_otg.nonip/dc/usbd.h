@@ -42,7 +42,7 @@ extern void vsf_hw_usbd_reset(vsf_hw_usbd_t *usbd, usb_dc_cfg_t *cfg);
 
 extern void vsf_hw_usbd_connect(vsf_hw_usbd_t *usbd);
 extern void vsf_hw_usbd_disconnect(vsf_hw_usbd_t *usbd);
-extern void vsf_hw_usbd_wakeup(vsf_hw_usbd_t *usbd);
+extern void vsf_hw_usbd_wakeup(vsf_hw_usbd_t *usbd, bool set);
 
 extern void vsf_hw_usbd_set_address(vsf_hw_usbd_t *usbd, uint_fast8_t addr);
 extern uint_fast8_t vsf_hw_usbd_get_address(vsf_hw_usbd_t *usbd);

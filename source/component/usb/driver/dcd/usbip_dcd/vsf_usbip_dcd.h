@@ -414,7 +414,7 @@ extern void vk_usbip_usbd_reset(vk_usbip_dcd_t *usbd, usb_dc_cfg_t *cfg);
 
 extern void vk_usbip_usbd_connect(vk_usbip_dcd_t *usbd);
 extern void vk_usbip_usbd_disconnect(vk_usbip_dcd_t *usbd);
-extern void vk_usbip_usbd_wakeup(vk_usbip_dcd_t *usbd);
+extern void vk_usbip_usbd_wakeup(vk_usbip_dcd_t *usbd, bool set);
 
 extern void vk_usbip_usbd_set_address(vk_usbip_dcd_t *usbd, uint_fast8_t addr);
 extern uint_fast8_t vk_usbip_usbd_get_address(vk_usbip_dcd_t *usbd);

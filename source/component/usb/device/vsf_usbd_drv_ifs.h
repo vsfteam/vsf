@@ -53,9 +53,9 @@
         vk_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0_OO_PREFIX, disconnect)       \
             (&VSF_USBD_CFG_DRV_LV0_OO_OBJ)
 
-#   define vk_usbd_drv_wakeup()                                                 \
+#   define vk_usbd_drv_wakeup(__set)                                             \
         vk_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0_OO_PREFIX, wakeup)           \
-            (&VSF_USBD_CFG_DRV_LV0_OO_OBJ)
+            (&VSF_USBD_CFG_DRV_LV0_OO_OBJ, (__set))
 
 #   define vk_usbd_drv_set_address(__addr)                                      \
         vk_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0_OO_PREFIX, set_address)      \
@@ -131,7 +131,7 @@
 #   define vk_usbd_drv_reset(__cfg)                     __drv->Reset((__cfg))
 #   define vk_usbd_drv_connect()                        __drv->Connect()
 #   define vk_usbd_drv_disconnect()                     __drv->Disconnect()
-#   define vk_usbd_drv_wakeup()                         __drv->Wakeup()
+#   define vk_usbd_drv_wakeup(__set)                     __drv->Wakeup((__set))
 #   define vk_usbd_drv_set_address(__addr)              __drv->SetAddress((__addr))
 #   define vk_usbd_drv_get_setup(__request)             __drv->GetSetup((uint8_t *)(__request))
 #   define vk_usbd_drv_status_stage(__is_in)            __drv->StatusStage((__is_in))
