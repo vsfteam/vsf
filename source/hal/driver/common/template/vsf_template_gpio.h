@@ -1455,7 +1455,7 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
                                                  uint16_t         pin_index,
                                                  vsf_gpio_cfg_t  *cfg_ptr)
 {
-    return vsf_gpio_port_config_pins(gpio_ptr, 1 << pin_index, cfg_ptr);
+    return vsf_gpio_port_config_pins(gpio_ptr, (vsf_gpio_pin_mask_t)1 << pin_index, cfg_ptr);
 }
 
 

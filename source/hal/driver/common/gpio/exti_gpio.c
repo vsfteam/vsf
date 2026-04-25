@@ -24,6 +24,7 @@
 #if VSF_HAL_USE_GPIO == ENABLED
 
 #include "hal/driver/driver.h"
+#include "utilities/template/vsf_bitmap.h"
 #include "exti_gpio.h"
 
 /*============================ MACROS ========================================*/
@@ -33,15 +34,30 @@
 #   define VSF_GPIO_EXTI_CFG_IMP_PREFIX         VSF_GPIO_EXTI_CFG_CALL_PREFIX
 #endif
 
-#if VSF_GPIO_CFG_PIN_COUNT > 32
-#   error "TODO: Support for more than 32bit cases"
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+dcl_vsf_bitmap(__vsf_gpio_irq_mask_bitmap, VSF_GPIO_CFG_PIN_COUNT);
+
+typedef union __vsf_gpio_irq_mask_t {
+    vsf_gpio_pin_mask_t                  value;
+    vsf_bitmap(__vsf_gpio_irq_mask_bitmap) bitmap;
+} __vsf_gpio_irq_mask_t;
+
 /*============================ IMPLEMENTATION ================================*/
+
+static uint_fast8_t __vsf_gpio_irq_get_next_pin(__vsf_gpio_irq_mask_t *pin_mask_ptr)
+{
+    VSF_HAL_ASSERT(pin_mask_ptr != NULL);
+    VSF_HAL_ASSERT(pin_mask_ptr->value != 0);
+
+    int_fast32_t pin = vsf_bitmap_ffs(pin_mask_ptr->bitmap, VSF_GPIO_CFG_PIN_COUNT);
+    VSF_HAL_ASSERT(pin >= 0);
+    vsf_bitmap_clear(pin_mask_ptr->bitmap, pin);
+    return (uint_fast8_t)pin;
+}
 
 static void __gpio_irq_distributor_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
                                            vsf_gpio_pin_mask_t pin_mask)
@@ -54,15 +70,16 @@ static void __gpio_irq_distributor_handler(void *target_ptr, vsf_gpio_t *gpio_pt
     VSF_HAL_ASSERT(gpio_irq_distributor_ptr->gpio != NULL);
     VSF_HAL_ASSERT(gpio_irq_distributor_ptr->exti_irq != NULL);
 
-    while (pin_mask) {
-        uint32_t pin = (VSF_GPIO_CFG_PIN_COUNT - 1) - vsf_clz32(pin_mask);
-        pin_mask &= ~(1 << pin);
-
+    __vsf_gpio_irq_mask_t pending_pin_mask = {
+        .value = pin_mask,
+    };
+    while (pending_pin_mask.value != 0) {
+        uint_fast8_t pin = __vsf_gpio_irq_get_next_pin(&pending_pin_mask);
         if (gpio_irq_distributor_ptr->exti_irq[pin].handler_fn != NULL) {
             gpio_irq_distributor_ptr->exti_irq[pin].handler_fn(
                 gpio_irq_distributor_ptr->exti_irq[pin].target_ptr,
                 (vsf_gpio_t *)gpio_irq_distributor_ptr->gpio,
-                0x01UL << pin);
+                (vsf_gpio_pin_mask_t)1 << pin);
         }
     }
 }
@@ -77,10 +94,11 @@ vsf_err_t vsf_gpio_irq_distributor_pin_config(vsf_gpio_irq_distributor_t *gpio_i
     VSF_HAL_ASSERT(pin_mask != 0);
     VSF_HAL_ASSERT(irq_cfg_ptr != NULL);
 
-    while (pin_mask) {
-        uint32_t pin = (VSF_GPIO_CFG_PIN_COUNT - 1) - vsf_clz32(pin_mask);
-        pin_mask &= ~(1 << pin);
-
+    __vsf_gpio_irq_mask_t pending_pin_mask = {
+        .value = pin_mask,
+    };
+    while (pending_pin_mask.value != 0) {
+        uint_fast8_t pin = __vsf_gpio_irq_get_next_pin(&pending_pin_mask);
         gpio_irq_distributor_ptr->exti_irq[pin].handler_fn = irq_cfg_ptr->handler_fn;
         gpio_irq_distributor_ptr->exti_irq[pin].target_ptr = irq_cfg_ptr->target_ptr;
     }
