@@ -18,6 +18,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "utilities/vsf_utilities_cfg.h"
+
+#ifdef __VSF_CPP__
+
 // for vsf_heap
 #include "service/vsf_service.h"
 
@@ -45,5 +49,7 @@ void operator delete(void *ptr)
     vsf_heap_free(ptr);
 }
 #endif
+
+#endif      // __VSF_CPP__
 
 /* EOF */
