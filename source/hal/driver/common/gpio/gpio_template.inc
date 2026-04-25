@@ -412,7 +412,7 @@ vsf_err_t vsf_real_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
         uint16_t pin_index  = vsf_gpio_get_pin(cfg_ptr[i].port_pin_index);
         vsf_real_gpio_t *gpio_ptr = vsf_real_gpios[port_index];
         vsf_err_t        result =
-            vsf_real_gpio_port_config_pins(gpio_ptr, 1 << pin_index, &cfg);
+            vsf_real_gpio_port_config_pins(gpio_ptr, (vsf_gpio_pin_mask_t)1 << pin_index, &cfg);
         if (result != VSF_ERR_NONE) {
             return result;
         }
