@@ -20,6 +20,8 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #include "component/script/python/vsf_python.h"
 
+#if VSF_USE_LINUX == ENABLED
+
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
@@ -473,7 +475,7 @@ vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vs
 {
     char *path_str = vsf_pyal_funcarg_getstr(path);
     char abspath_buffer[PATH_MAX];
-    
+
     if (NULL == realpath((const char *)path_str, (char *)abspath_buffer)) {
         return VSF_PYAL_OBJ_NULL;
     }
@@ -678,3 +680,5 @@ vsf_pyal_module(os,
     vsf_pyal_module_submod(os, path),
 )
 #endif
+
+#endif      // VSF_USE_LINUX

@@ -24,16 +24,14 @@
 
 #if (VSF_USE_STDPYTHON == ENABLED) || (VSF_USE_PIKAPYTHON == ENABLED) || (VSF_USE_MICROPYTHON == ENABLED)
 #   define VSF_USE_PYTHON       ENABLED
-#endif
 
-#if     VSF_USE_STDPYTHON == ENABLED
-#   include "./al/stdpython/vsf_stdpython.h"
-#elif   VSF_USE_PIKAPYTHON == ENABLED
-#   include "./al/pikapython/vsf_pikapython.h"
-#elif   VSF_USE_MICROPYTHON == ENABLED
-#   include "./al/micropython/vsf_micropython.h"
-#else
-#   error please enable one of VSF_USE_PIKAPYTHON or VSF_USE_MICROPYTHON
+#   if     VSF_USE_STDPYTHON == ENABLED
+#       include "./al/stdpython/vsf_stdpython.h"
+#   elif   VSF_USE_PIKAPYTHON == ENABLED
+#       include "./al/pikapython/vsf_pikapython.h"
+#   elif   VSF_USE_MICROPYTHON == ENABLED
+#       include "./al/micropython/vsf_micropython.h"
+#   endif
 #endif
 
 /*============================ MACROS ========================================*/
