@@ -39,6 +39,4 @@
 #endif
 //! @}
 
-#endif /* __USE_MCS51_COMPILER_H_PART_1__ */
-
-#endif      // __MSC51_COMPILER_DETECT_H__
+#endif
