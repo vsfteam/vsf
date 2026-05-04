@@ -47,10 +47,48 @@ vsf_class(mbedtls_session_t) {
         mbedtls_ctr_drbg_context ctr_drbg;
         mbedtls_net_context server_fd;
         mbedtls_x509_crt cacert;
+        mbedtls_x509_crt clicert;   // client certificate (used only when client_cert is set)
+        mbedtls_pk_context pkey;    // client private key (used only when client_key is set)
     )
     public_member(
+        // Server CA certificate. NULL = fall back to built-in mbedtls_test_cas_pem
+        // (preserves original behaviour).
         const unsigned char *cert;
         size_t cert_len;
+
+        // ---- Extensions (all zero-initialised => fall back to original behaviour) ----
+        // Client certificate / private key for mutual-TLS. The pair must be set
+        // together; either both NULL (no client auth, default) or both non-NULL.
+        const unsigned char *client_cert;
+        size_t client_cert_len;
+        const unsigned char *client_key;
+        size_t client_key_len;
+        const unsigned char *key_password;  // optional, NULL if key is unencrypted
+        size_t key_password_len;
+
+        // TLS protocol version lock.
+        //   0 = any (PRESET_DEFAULT, unchanged behaviour)
+        //   1 = force TLS 1.2
+        //   2 = force TLS 1.3 (only effective if MBEDTLS_SSL_PROTO_TLS1_3 is
+        //                      enabled in config; ignored otherwise)
+        int tls_version;
+
+        // SNI / server-name override.
+        //   NULL = use the `host` argument of mbedtls_session_connect()
+        //          (original behaviour)
+        const char *common_name;
+
+        // When true, authmode becomes VERIFY_NONE; otherwise VERIFY_OPTIONAL
+        // (original behaviour).
+        bool skip_cn_check;
+
+        // NULL-terminated array of ALPN protocol names, e.g. { "h2", "http/1.1", NULL }.
+        // NULL = ALPN not configured (original behaviour).
+        const char **alpn_protos;
+
+        // Read timeout in milliseconds. 0 = blocking (original behaviour).
+        // Non-zero: bio recv switches to mbedtls_net_recv_timeout().
+        int timeout_ms;
     )
 };
 
@@ -58,9 +96,23 @@ vsf_class(mbedtls_session_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void mbedtls_session_cleanup(mbedtls_session_t *session);
-extern int mbedtls_session_write(mbedtls_session_t *session, uint8_t *buf, uint16_t len);
-extern int mbedtls_session_read(mbedtls_session_t *session, uint8_t *buf, uint16_t len);
+extern int mbedtls_session_write(mbedtls_session_t *session, uint8_t *buf, size_t len);
+extern int mbedtls_session_read(mbedtls_session_t *session, uint8_t *buf, size_t len);
 extern void mbedtls_session_close(mbedtls_session_t *session);
 extern int mbedtls_session_connect(mbedtls_session_t *session, const char *host, const char *port);
+
+// Update the read timeout of an existing session. Legal at any time:
+//   - Before connect: stores into session->timeout_ms, applied at connect().
+//   - After connect: additionally patches mbedtls_ssl_conf_read_timeout so
+//     that the very next mbedtls_ssl_read() honours the new value (the bio
+//     recv is mbedtls_net_recv_timeout which reads the timeout from conf on
+//     every call).
+// timeout_ms <= 0 means "no timeout" (blocking).
+extern int mbedtls_session_set_timeout(mbedtls_session_t *session, int timeout_ms);
+
+// Returns the underlying TCP socket fd. Valid only after a successful
+// mbedtls_session_connect(); returns -1 when the session has not been
+// connected (mbedtls_net_init() initialises fd to -1).
+extern int mbedtls_session_get_fd(mbedtls_session_t *session);
 
 #endif

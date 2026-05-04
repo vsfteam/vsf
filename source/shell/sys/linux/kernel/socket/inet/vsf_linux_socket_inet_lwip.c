@@ -253,6 +253,31 @@ static vsf_dlist_t vsf_linux_ip6_route_table;
 #   endif
 #endif
 
+// Slot-id encoding of vsf_linux_fd_t* inside lwip's struct netconn::socket.
+// lwip declares netconn::socket as int; on platforms where sizeof(void *)
+// > sizeof(int) (e.g. x64/aarch64 hosts), the historical cast
+// (int)vsf_linux_fd_t* silently truncated 8-byte pointers to 4 bytes and
+// corrupted the fd lookup on event dispatch. Only on those platforms do
+// we fall back to a small index (1..N) that resolves through a slot
+// table; native-width platforms (typical MCU targets with 32-bit
+// pointers) still stuff the pointer directly and pay zero extra RAM.
+// Negative values in [-1-256, -1] keep their original meaning (a counter
+// for NETCONN_EVT_RCVPLUS that arrives before the fd has been published)
+// in both modes, so the existing pre-fd event accounting is preserved.
+#include <limits.h>         // UINT_MAX (for UINTPTR_MAX comparison)
+#if defined(UINTPTR_MAX) && defined(UINT_MAX) && (UINTPTR_MAX > UINT_MAX)
+#   define VSF_LINUX_SOCKET_INET_LWIP_FD_SLOT_EN    1
+#else
+#   define VSF_LINUX_SOCKET_INET_LWIP_FD_SLOT_EN    0
+#endif
+
+#if VSF_LINUX_SOCKET_INET_LWIP_FD_SLOT_EN
+#ifndef VSF_LINUX_SOCKET_INET_LWIP_MAX_FD
+#   define VSF_LINUX_SOCKET_INET_LWIP_MAX_FD     MEMP_NUM_NETCONN
+#endif
+static vsf_linux_fd_t *__vsf_linux_socket_inet_fd_slots[VSF_LINUX_SOCKET_INET_LWIP_MAX_FD];
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
@@ -290,6 +315,57 @@ const vsf_linux_socket_op_t vsf_linux_socket_netlink_op = {
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_LINUX_SOCKET_INET_LWIP_FD_SLOT_EN
+static int __vsf_linux_socket_inet_fd_encode(vsf_linux_fd_t *sfd)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    for (int i = 0; i < VSF_LINUX_SOCKET_INET_LWIP_MAX_FD; i++) {
+        if (__vsf_linux_socket_inet_fd_slots[i] == NULL) {
+            __vsf_linux_socket_inet_fd_slots[i] = sfd;
+            vsf_unprotect_sched(orig);
+            return i + 1;
+        }
+    }
+    vsf_unprotect_sched(orig);
+    VSF_LINUX_ASSERT(false);
+    return 0;
+}
+
+static vsf_linux_fd_t *__vsf_linux_socket_inet_fd_decode(int slot)
+{
+    if ((slot <= 0) || (slot > VSF_LINUX_SOCKET_INET_LWIP_MAX_FD)) {
+        return NULL;
+    }
+    return __vsf_linux_socket_inet_fd_slots[slot - 1];
+}
+
+static void __vsf_linux_socket_inet_fd_release(int slot)
+{
+    if ((slot <= 0) || (slot > VSF_LINUX_SOCKET_INET_LWIP_MAX_FD)) {
+        return;
+    }
+    vsf_protect_t orig = vsf_protect_sched();
+    __vsf_linux_socket_inet_fd_slots[slot - 1] = NULL;
+    vsf_unprotect_sched(orig);
+}
+#else
+// Native pointer fits in int: the original direct cast is zero-overhead
+// and preserves binary behavior on 32-bit MCU targets.
+static inline int __vsf_linux_socket_inet_fd_encode(vsf_linux_fd_t *sfd)
+{
+    VSF_LINUX_ASSERT(sizeof(int) >= sizeof(vsf_linux_fd_t *));
+    return (int)(uintptr_t)sfd;
+}
+static inline vsf_linux_fd_t *__vsf_linux_socket_inet_fd_decode(int slot)
+{
+    return (vsf_linux_fd_t *)(uintptr_t)slot;
+}
+static inline void __vsf_linux_socket_inet_fd_release(int slot)
+{
+    (void)slot;
+}
+#endif
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
@@ -587,8 +663,7 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
 #endif
 
     priv->conn = conn;
-    VSF_LINUX_ASSERT(sizeof(conn->socket) >= sizeof(vsf_linux_fd_t *));
-    conn->socket = (int)sfd;
+    conn->socket = __vsf_linux_socket_inet_fd_encode(sfd);
     return 0;
 }
 
@@ -1177,7 +1252,7 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, 
     newconn->callback = __vsf_linux_socket_inet_lwip_evthandler;
     LOCK_TCPIP_CORE();
         int rcvplus = -1 -  newconn->socket;
-        newconn->socket = (int)sfd;
+        newconn->socket = __vsf_linux_socket_inet_fd_encode(sfd);
         while (rcvplus > 0) {
             rcvplus--;
             newconn->callback(newconn, NETCONN_EVT_RCVPLUS, 0);
@@ -1489,7 +1564,7 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
         return;
     }
 
-    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)conn->socket;
+    vsf_linux_fd_t *sfd = __vsf_linux_socket_inet_fd_decode(conn->socket);
     if (NULL == sfd) {
         return;
     }
@@ -1752,6 +1827,7 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
         }
     }
 
+    __vsf_linux_socket_inet_fd_release(conn->socket);
     conn->socket = 0;
     if (ERR_OK != netconn_prepare_delete(conn)) {
         return -1;

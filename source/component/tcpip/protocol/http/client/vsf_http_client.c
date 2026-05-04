@@ -23,6 +23,8 @@
 
 // for vsf_min
 #include "utilities/vsf_utilities.h"
+// for vsf_heap_malloc / vsf_heap_free used by default buffer allocation
+#include "service/vsf_service.h"
 
 #define __VSF_HTTP_CLIENT_CLASS_IMPLEMENT
 #include "./vsf_http_client.h"
@@ -44,11 +46,22 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_MBEDTLS == ENABLED
+// Cast function pointers from mbedtls_session_{read,write,...} (int return,
+// mbedtls_session_t* param) to vsf_http_op_t's (void* param). Layout-compatible
+// on every ABI VSF targets; matches the convention used elsewhere in VSF.
 const vsf_http_op_t vsf_mbedtls_http_op = {
     .fn_connect     = (int (*)(void *, const char *, const char *))mbedtls_session_connect,
     .fn_close       = (void (*)(void *))mbedtls_session_close,
-    .fn_write       = (int (*)(void *, uint8_t *, uint16_t))mbedtls_session_write,
-    .fn_read        = (int (*)(void *, uint8_t *, uint16_t))mbedtls_session_read,
+    .fn_write       = (int (*)(void *, uint8_t *, size_t))mbedtls_session_write,
+    .fn_read        = (int (*)(void *, uint8_t *, size_t))mbedtls_session_read,
+    .fn_set_timeout = (int (*)(void *, int))mbedtls_session_set_timeout,
+#if VSF_USE_LINUX == ENABLED
+    // fd returned by mbedtls net context is only select()/poll()-compatible
+    // when mbedtls runs on top of the VSF linux socket layer. On bare winsock
+    // / raw lwip / custom bio backends, leaving fn_get_fd NULL tells
+    // vsf_http_client_get_fd to return -1 ("no fd available").
+    .fn_get_fd      = (int (*)(void *))mbedtls_session_get_fd,
+#endif
 };
 #endif
 
@@ -66,9 +79,49 @@ char * strnchr(const char *s, size_t n, int c)
     return NULL;
 }
 
-void vsf_http_client_init(vsf_http_client_t *http)
+vsf_err_t vsf_http_client_init(vsf_http_client_t *http)
 {
-    http->cur_size = 0;
+    http->cur_size       = 0;
+    http->cur_chunk_size = 0;
+    http->cur_buffer     = NULL;
+    http->is_chunked     = false;
+    // NOTE: do NOT reset _buffer_owned here. init() is idempotent on an
+    // already-initialised handle (e.g. reused across several transfers);
+    // clearing the flag would leak a heap-allocated buffer on the 2nd call.
+    // _buffer_owned is written only when we actually allocate below.
+    //
+    // The caller MUST zero-initialise vsf_http_client_t before the FIRST
+    // init(); otherwise buffer/buffer_size/_buffer_owned hold indeterminate
+    // values and any branch taken below is undefined behaviour.
+
+    // Buffer ownership rules (see vsf_http_client_t in header):
+    //   user-provided buffer -> keep as-is (buffer != NULL)
+    //   NULL + size == 0     -> allocate CFG_BUFFER_SIZE bytes
+    //   NULL + size  > 0     -> allocate requested size
+    if (NULL == http->buffer) {
+        size_t sz = http->buffer_size > 0 ? http->buffer_size
+                                          : (size_t)VSF_HTTP_CLIENT_CFG_BUFFER_SIZE;
+        http->buffer = (uint8_t *)vsf_heap_malloc(sz);
+        if (NULL == http->buffer) {
+            return VSF_ERR_NOT_ENOUGH_RESOURCES;
+        }
+        http->buffer_size   = sz;
+        http->_buffer_owned = true;
+    } else if (0 == http->buffer_size) {
+        // defensive: caller forgot to set size; refuse rather than silently overflow
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    return VSF_ERR_NONE;
+}
+
+void vsf_http_client_fini(vsf_http_client_t *http)
+{
+    if (http->_buffer_owned && http->buffer != NULL) {
+        vsf_heap_free(http->buffer);
+        http->buffer       = NULL;
+        http->buffer_size  = 0;
+        http->_buffer_owned = false;
+    }
 }
 
 void vsf_http_client_close(vsf_http_client_t *http)
@@ -76,13 +129,31 @@ void vsf_http_client_close(vsf_http_client_t *http)
     http->op->fn_close(http->param);
 }
 
-int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
+int vsf_http_client_connect(vsf_http_client_t *http, const char *host, const char *port)
 {
-    http->redirect_path = NULL;
-    int result = http->op->fn_connect(http->param, req->host, req->port);
-    if (result != 0) {
-        return result;
+    return http->op->fn_connect(http->param, host, port);
+}
+
+vsf_err_t vsf_http_client_set_timeout(vsf_http_client_t *http, int timeout_ms)
+{
+    if (NULL == http->op->fn_set_timeout) {
+        return VSF_ERR_NOT_SUPPORT;
     }
+    return http->op->fn_set_timeout(http->param, timeout_ms) == 0
+           ? VSF_ERR_NONE : VSF_ERR_FAIL;
+}
+
+int vsf_http_client_get_fd(vsf_http_client_t *http)
+{
+    if (NULL == http->op->fn_get_fd) {
+        return -1;
+    }
+    return http->op->fn_get_fd(http->param);
+}
+
+int vsf_http_client_send_header(vsf_http_client_t *http, vsf_http_client_req_t *req)
+{
+    int header_len, written;
 
     if (NULL == req->header) {
         req->header = (char *)"Accept: */*\r\n";
@@ -92,7 +163,7 @@ int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
     }
 
     if ((req->txdata_len > 0) && (req->txdata != NULL)) {
-        result = sprintf((char *)http->buffer, "\
+        header_len = sprintf((char *)http->buffer, "\
 %s %s HTTP/1.1\r\n\
 Host: %s\r\n\
 User-Agent: %s\r\n\
@@ -100,43 +171,49 @@ Connection: %s\r\n\
 Content-Length: %d\r\n\
 %s\
 \r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, VSF_HTTP_CLIENT_CFG_USER_AGENT, req->connect_mode, (int)req->txdata_len, req->header);
-        vsf_http_trace("http request:\n%s", http->buffer);
     } else {
-        result = sprintf((char *)http->buffer, "\
+        header_len = sprintf((char *)http->buffer, "\
 %s %s HTTP/1.1\r\n\
 Host: %s\r\n\
 User-Agent: %s\r\n\
 Connection: %s\r\n\
 %s\
 \r\n", NULL == req->verb ? "GET" : req->verb, req->path, req->host, VSF_HTTP_CLIENT_CFG_USER_AGENT, req->connect_mode, req->header);
-        vsf_http_trace("http request:\n%s", http->buffer);
     }
-    result = http->op->fn_write(http->param, http->buffer, result);
-    if (result < 0) {
-        return result;
-    }
+    vsf_http_trace("http request:\n%s", http->buffer);
 
-    if ((req->txdata_len > 0) && (req->txdata != NULL)) {
-        result = http->op->fn_write(http->param, req->txdata, req->txdata_len);
-        if (result < 0) {
-            return result;
-        }
+    // Fix: loop-write via vsf_http_client_write to handle transport-layer short-write.
+    written = vsf_http_client_write(http, http->buffer, (size_t)header_len);
+    if (written < header_len) {
+        return written < 0 ? written : -1;
     }
+    return written;
+}
+
+int vsf_http_client_fetch_headers(vsf_http_client_t *http, vsf_http_client_req_t *req)
+{
+    int result;
+
+    // Fix: reset state once before the read_more loop. The original code
+    // reset content_length/is_chunked on every re-read, which lost already
+    // parsed header fields when response headers span multiple fn_read()
+    // calls (e.g. long Set-Cookie, TCP fragmentation).
+    http->redirect_path  = NULL;
+    http->content_length = 0;
+    http->is_chunked     = false;
 
     vsf_http_trace("http response:\n");
 read_more:
-    if (http->cur_size >= sizeof(http->buffer)) {
+    if (http->cur_size >= http->buffer_size) {
         vsf_http_client_close(http);
         return -1;
     }
-    result = http->op->fn_read(http->param, http->buffer + http->cur_size, sizeof(http->buffer) - http->cur_size);
+    result = http->op->fn_read(http->param, http->buffer + http->cur_size, http->buffer_size - http->cur_size);
     if (result <= 0) {
         return result;
     }
-    http->cur_size = result + http->cur_size;
+    http->cur_size = (size_t)result + http->cur_size;
     http->cur_buffer = http->buffer;
-    http->content_length = 0;
-    http->is_chunked = false;
 
     char *tmp, *line;
     while (http->cur_size > 0) {
@@ -183,6 +260,9 @@ read_more:
                 line[strlen(line) - 1] = '\0';
             }
             // 2. remove possible '/'
+            // TODO: confirm with VSF team whether stripping a trailing '/'
+            //       on Location is intentional; RFC 3986 treats "/" and ""
+            //       as distinct paths. Kept as-is to preserve legacy behavior.
             if (line[strlen(line) - 1] == '/') {
                 line[strlen(line) - 1] = '\0';
             }
@@ -199,10 +279,40 @@ read_more:
     return 0;
 }
 
-int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, uint16_t len)
+// Backward-compatible wrapper: combines connect/send_header/(body)/fetch_headers.
+// Behavior matches the original monolithic implementation except for the
+// two fixes noted above (short-write on body, state reset in fetch_headers).
+int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
+{
+    int result;
+
+    result = vsf_http_client_connect(http, req->host, req->port);
+    if (result != 0) {
+        return result;
+    }
+
+    result = vsf_http_client_send_header(http, req);
+    if (result < 0) {
+        return result;
+    }
+
+    if ((req->txdata_len > 0) && (req->txdata != NULL)) {
+        // Fix: use loop-write wrapper; original code called op->fn_write once
+        // and ignored short-writes, silently truncating bodies larger than
+        // the transport's single-call capacity (e.g. TLS record size).
+        int written = vsf_http_client_write(http, req->txdata, req->txdata_len);
+        if ((size_t)written < req->txdata_len) {
+            return written < 0 ? written : -1;
+        }
+    }
+
+    return vsf_http_client_fetch_headers(http, req);
+}
+
+int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, size_t len)
 {
     int result = 0;
-    uint16_t cur_size;
+    size_t cur_size;
 again:
     while (len && http->cur_size) {
         if (http->is_chunked) {
@@ -252,7 +362,7 @@ again:
     }
 do_read:
     if (len > 0) {
-        int rxlen = http->op->fn_read(http->param, http->buffer + http->cur_size, sizeof(http->buffer) - http->cur_size);
+        int rxlen = http->op->fn_read(http->param, http->buffer + http->cur_size, http->buffer_size - http->cur_size);
         if (rxlen <= 0) {
             return result;
         }
@@ -263,19 +373,25 @@ do_read:
     return result;
 }
 
-int vsf_http_client_write(vsf_http_client_t *http, uint8_t *buf, uint16_t len)
+int vsf_http_client_write(vsf_http_client_t *http, uint8_t *buf, size_t len)
 {
-    int result = len, cur_txlen;
+    size_t remaining = len;
+    int cur_txlen;
 
-    while (len > 0) {
-        cur_txlen = http->op->fn_write(http->param, buf, len);
+    // NOTE: len is size_t but fn_write/this function return int. In the
+    // HTTP use case the total body is bounded well below INT_MAX (typical
+    // buffers are a few KB to a few MB), so the implicit size_t -> int
+    // narrowing at the return site is always safe. No clamping is added:
+    // following the same convention as mbedtls_session_read/write.
+    while (remaining > 0) {
+        cur_txlen = http->op->fn_write(http->param, buf, remaining);
         if (cur_txlen <= 0) {
             break;
         }
-        len -= cur_txlen;
+        remaining -= (size_t)cur_txlen;
         buf += cur_txlen;
     }
-    return result - len;
+    return (int)(len - remaining);
 }
 
 #endif
