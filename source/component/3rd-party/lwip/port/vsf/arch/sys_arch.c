@@ -169,6 +169,9 @@ sys_thread_t sys_thread_new(const char *name,
     if (NULL == thread) {
         return NULL;
     }
+    // heap block may carry stale bytes from a previous owner; zero the thread
+    // control block so fields like is_inited / req.is_inited start clean.
+    memset(thread, 0, thread_size);
 
     thread->on_terminate = __vsf_lwip_thread_on_terminate;
 
