@@ -38,6 +38,7 @@ dcl_vsf_peda_methods(static, __vk_mem_mal_init)
 dcl_vsf_peda_methods(static, __vk_mem_mal_fini)
 dcl_vsf_peda_methods(static, __vk_mem_mal_read)
 dcl_vsf_peda_methods(static, __vk_mem_mal_write)
+dcl_vsf_peda_methods(static, __vk_mem_mal_erase)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -53,6 +54,7 @@ const vk_mal_drv_t vk_mem_mal_drv = {
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_read),
     .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_write),
+    .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_erase),
 };
 
 #if     __IS_COMPILER_GCC__
@@ -139,6 +141,34 @@ __vsf_component_peda_ifs_entry(__vk_mem_mal_write, vk_mal_write)
         memcpy(&pthis->mem.buffer[addr], vsf_local.buff, size);
     }
     vsf_eda_return(size);
+    vsf_peda_end();
+}
+
+// RAM-backed erase: fill the requested range with 0xFF so callers that
+// rely on NOR-flash erase semantics (e.g. LittleFS block recycling) see a
+// clean slate. size == 0 means "erase from addr to end", matching the
+// contract documented in vsf_mal.c. Runs in a single tick because the
+// backing store is directly addressable.
+__vsf_component_peda_ifs_entry(__vk_mem_mal_erase, vk_mal_erase)
+{
+    vsf_peda_begin();
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)&vsf_this;
+    uint_fast64_t addr;
+    uint_fast32_t size;
+
+    VSF_MAL_ASSERT(pthis != NULL);
+    addr = vsf_local.addr;
+    size = vsf_local.size;
+    VSF_MAL_ASSERT(addr <= pthis->mem.size);
+    if (size == 0) {
+        size = (uint_fast32_t)(pthis->mem.size - addr);
+    }
+    VSF_MAL_ASSERT((addr + size) <= pthis->mem.size);
+
+    if (size > 0) {
+        memset(&pthis->mem.buffer[addr], 0xFF, size);
+    }
+    vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
 

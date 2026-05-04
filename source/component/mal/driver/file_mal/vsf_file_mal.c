@@ -26,6 +26,7 @@
 
 #include "../../vsf_mal.h"
 #include "./vsf_file_mal.h"
+#include "service/heap/vsf_heap.h"
 
 /*============================ MACROS ========================================*/
 
@@ -45,6 +46,7 @@ dcl_vsf_peda_methods(static, __vk_file_mal_init)
 dcl_vsf_peda_methods(static, __vk_file_mal_fini)
 dcl_vsf_peda_methods(static, __vk_file_mal_read)
 dcl_vsf_peda_methods(static, __vk_file_mal_write)
+dcl_vsf_peda_methods(static, __vk_file_mal_erase)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -61,6 +63,7 @@ const vk_mal_drv_t vk_file_mal_drv = {
     .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_fini),
     .read               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_read),
     .write              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_write),
+    .erase              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_erase),
 };
 
 #if     __IS_COMPILER_GCC__
@@ -170,6 +173,84 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_write, vk_mal_write,
             break;
         }
         break;
+    }
+    vsf_peda_end();
+}
+
+// Erase emulation on a file-backed mal: seek to addr and stream 0xFF across
+// the requested range. size == 0 means "erase from addr to end" per the
+// vk_mal_erase contract documented in vsf_mal.c. A 0xFF fill buffer of
+// block_size bytes is heap-allocated once per erase call, and the range is
+// written in block_size-sized chunks. The file cursor advances implicitly
+// after each vk_file_write, so only one seek is needed at the top.
+__vsf_component_peda_ifs_entry(__vk_file_mal_erase, vk_mal_erase,
+    uint8_t  state;
+    uint32_t remain;
+    uint8_t *fill_buf;
+)
+{
+    vsf_peda_begin();
+    enum {
+        STATE_SET_POS,
+        STATE_WRITE,
+    };
+    vk_file_mal_t *pthis = (vk_file_mal_t *)&vsf_this;
+    vsf_err_t err;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        VSF_MAL_ASSERT((pthis != NULL) && (pthis->file != NULL));
+        VSF_MAL_ASSERT(vsf_local.addr <= pthis->size);
+        vsf_local.remain = (vsf_local.size != 0)
+                         ? (uint32_t)vsf_local.size
+                         : (uint32_t)(pthis->size - vsf_local.addr);
+        VSF_MAL_ASSERT((vsf_local.addr + vsf_local.remain) <= pthis->size);
+        vsf_local.fill_buf = NULL;
+        if (vsf_local.remain == 0) {
+            vsf_eda_return(VSF_ERR_NONE);
+            return;
+        }
+        vsf_local.fill_buf = vsf_heap_malloc(pthis->block_size);
+        if (vsf_local.fill_buf == NULL) {
+            vsf_eda_return(-1);
+            return;
+        }
+        memset(vsf_local.fill_buf, 0xFF, pthis->block_size);
+        vsf_local.state = STATE_SET_POS;
+        err = vk_file_seek(pthis->file, vsf_local.addr, VSF_FILE_SEEK_SET);
+    __check_result:
+        if (err != VSF_ERR_NONE) {
+            if (vsf_local.fill_buf != NULL) {
+                vsf_heap_free(vsf_local.fill_buf);
+                vsf_local.fill_buf = NULL;
+            }
+            vsf_eda_return(-1);
+            return;
+        }
+        break;
+    case VSF_EVT_RETURN:
+        if (vsf_local.state == STATE_WRITE) {
+            int32_t written = (int32_t)vsf_eda_get_return_value();
+            if (written < 0) {
+                vsf_heap_free(vsf_local.fill_buf);
+                vsf_local.fill_buf = NULL;
+                vsf_eda_return(-1);
+                return;
+            }
+            vsf_local.remain -= pthis->block_size;
+            if (vsf_local.remain == 0) {
+                vsf_heap_free(vsf_local.fill_buf);
+                vsf_local.fill_buf = NULL;
+                vsf_eda_return(VSF_ERR_NONE);
+                return;
+            }
+        }
+        // Write the next block_size chunk of 0xFF. File cursor is already
+        // at the correct offset from the initial seek or previous write.
+        vsf_local.state = STATE_WRITE;
+        err = vk_file_write(pthis->file, vsf_local.fill_buf,
+                            pthis->block_size);
+        goto __check_result;
     }
     vsf_peda_end();
 }
