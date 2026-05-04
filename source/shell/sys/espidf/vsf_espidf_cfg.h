@@ -124,6 +124,96 @@
 #ifndef VSF_ESPIDF_CFG_USE_HTTP_CLIENT
 #   define VSF_ESPIDF_CFG_USE_HTTP_CLIENT       DISABLED
 #endif
+
+// --------------------------------------------------------------------------
+// esp_http_client feature profile + atomic switches.
+//
+// The 5 atomic switches below toggle optional pieces of the esp_http_client
+// compatibility shim. They are grouped behind a single PROFILE knob so that
+// most users pick one of 3 presets and only the advanced users need to
+// override individual switches.
+//
+//   MINIMAL  - smallest footprint; HTTP/HTTPS basic GET/POST only.
+//              No redirect following, no Digest auth, no bundled CA store,
+//              no cooperative cancel, no async mode. Basic auth is ALWAYS
+//              compiled in (cost < 50 LOC, not worth a flag).
+//   STANDARD - default. MINIMAL + HTTP 3xx redirect follow + 401 challenge
+//              retry loop. +~40 LOC vs MINIMAL.
+//   FULL     - STANDARD + Digest auth + esp_crt_bundle_attach + cooperative
+//              cancel. +~120 LOC + CA bundle payload (~10..500KB) vs STANDARD.
+//              Does NOT enable async mode (that flag stays opt-in, see below).
+//
+// Any atomic switch a user predefines before this header is included wins
+// over the profile default, regardless of PROFILE value.
+// --------------------------------------------------------------------------
+#define VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_MINIMAL      0
+#define VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_STANDARD     1
+#define VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_FULL         2
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE
+#   define VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE           VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_STANDARD
+#endif
+
+// 3xx redirect following + 401 "WWW-Authenticate: Basic" challenge retry.
+// Cost: ~40 LOC + one extra header-parse pass per hop.
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_USE_REDIRECT
+#   if VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE >= VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_STANDARD
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_REDIRECT      ENABLED
+#   else
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_REDIRECT      DISABLED
+#   endif
+#endif
+
+// HTTP Digest (RFC 7616) authentication parser + response hashing.
+// Cost: ~50 LOC + pulls MD5 + realm/nonce/qop state. HTTP Basic auth
+// remains unconditionally available in all profiles.
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_USE_DIGEST_AUTH
+#   if VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE >= VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_FULL
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_DIGEST_AUTH   ENABLED
+#   else
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_DIGEST_AUTH   DISABLED
+#   endif
+#endif
+
+// esp_crt_bundle_attach(): verify server cert against a compiled-in CA store.
+// Cost: ~40 LOC wiring + CA bundle blob (~10..500KB depending on which bundle).
+// When DISABLED, callers must pass cert_pem explicitly; otherwise TLS will
+// run with MBEDTLS_SSL_VERIFY_NONE-equivalent semantics (see TLS layer).
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_USE_CRT_BUNDLE
+#   if VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE >= VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_FULL
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_CRT_BUNDLE    ENABLED
+#   else
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_CRT_BUNDLE    DISABLED
+#   endif
+#endif
+
+// Cooperative cancellation: esp_http_client_cancel_request() sets a flag
+// that the perform loop checks between chunks. Does NOT preempt a blocked
+// recv() -- use esp_http_client_set_timeout_ms() to bound that.
+// Cost: ~30 LOC + one bool field per client.
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_USE_CANCEL
+#   if VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE >= VSF_ESPIDF_HTTP_CLIENT_CFG_PROFILE_FULL
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_CANCEL        ENABLED
+#   else
+#       define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_CANCEL        DISABLED
+#   endif
+#endif
+
+// Async mode: esp_http_client_perform() returns ESP_ERR_HTTP_EAGAIN instead
+// of blocking; caller polls until completion. Requires a non-blocking
+// transport port. Cost: ~1500+ LOC (full state machine replicating IDF's
+// dispatch loop). Because of the size, this stays opt-in even when
+// PROFILE == FULL -- users enabling async must predefine it explicitly.
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_USE_ASYNC
+#   define VSF_ESPIDF_HTTP_CLIENT_CFG_USE_ASYNC             DISABLED
+#endif
+
+// Working buffer size used by the shim when the caller does not provide
+// their own via esp_http_client_config_t::buffer_size. Must be >= the
+// largest expected header line (ESP-IDF default is 512).
+#ifndef VSF_ESPIDF_HTTP_CLIENT_CFG_BUFFER_SIZE
+#   define VSF_ESPIDF_HTTP_CLIENT_CFG_BUFFER_SIZE           512
+#endif
+
 #ifndef VSF_ESPIDF_CFG_USE_HTTP_SERVER
 #   define VSF_ESPIDF_CFG_USE_HTTP_SERVER       DISABLED
 #endif

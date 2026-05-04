@@ -30,11 +30,11 @@ vsf_add_sources(
     driver_ledc_port.c     # -> vsf_template_pwm.h (pool-injected vsf_pwm_t)
     driver_adc_port.c      # -> vsf_template_adc.h (oneshot only)
     esp_netif_port.c       # -> component/tcpip/netdrv + lwip raw API
+    esp_http_client_port.c # -> component/tcpip/protocol/http/client + mbedtls TLS
 )
 
 # vsf_add_sources(
 #     esp_event_deprecated.c # placeholder
-#     esp_http_client_port.c # -> component/tcpip/protocol/http
 #     driver_uart_port.c     # -> vsf_template_usart.h (moved to active)
 #     driver_i2c_port.c      # -> (moved to active)
 #     driver_spi_master_port.c # -> (moved to active)
