@@ -71,12 +71,26 @@ esp_err_t esp_netif_set_driver_config(esp_netif_t *esp_netif,
 
 /*---------- VSF extension ---------------------------------------------------*/
 
-/* VSF-specific attach path: bind a vk_netdrv_t directly. This is the
- * primary attach API when the link driver is a native VSF netdrv (e.g.
- * the wpcap shim). Mutually exclusive with esp_netif_attach(). */
-struct vk_netdrv;
-esp_err_t esp_netif_attach_netdrv(esp_netif_t *esp_netif,
-                                  struct vk_netdrv *netdrv);
+/* Wrap a vk_netdrv_t into a driver handle compatible with the standard
+ * esp_netif_attach(). Mirrors the ESP-IDF glue pattern (compare with
+ * esp_eth_new_netif_glue()): the returned object embeds an
+ * esp_netif_driver_base_t as its first member, so it can be passed
+ * directly to esp_netif_attach(). The installed post_attach callback
+ * performs the lwIP<->netdrv bind and propagates any MAC override set on
+ * the esp_netif inherent config.
+ *
+ * Typical usage:
+ *     esp_netif_t *nif = esp_netif_new(&cfg);
+ *     esp_netif_attach(nif, vsf_netdrv_new_netif_glue(&my_netdrv));
+ *
+ * The glue object is heap-allocated (calloc) per ESP-IDF convention;
+ * release it with vsf_netdrv_del_netif_glue() after esp_netif_destroy().
+ * Returns NULL when netdrv is NULL or allocation fails. */
+typedef struct vk_netdrv_t vk_netdrv_t;
+typedef struct vsf_netdrv_netif_glue_t vsf_netdrv_netif_glue_t;
+
+vsf_netdrv_netif_glue_t * vsf_netdrv_new_netif_glue(vk_netdrv_t *netdrv);
+void                      vsf_netdrv_del_netif_glue(vsf_netdrv_netif_glue_t *glue);
 
 /*============================ ACTIONS =======================================*/
 

@@ -68,18 +68,18 @@
 extern void lwip_netif_set_netdrv(struct netif *netif, vk_netdrv_t *netdrv);
 
 #include <string.h>
+#include <stdlib.h>
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES
-#   define VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES    4
-#endif
 
 /*============================ TYPES =========================================*/
 
 struct esp_netif_obj {
-    /* Pool slot management. */
-    bool                            in_use;
+    /* Forward-linked list anchor. Maintained by __alloc_slot / __free_slot,
+     * walked by esp_netif_next() and esp_netif_get_handle_from_ifkey().
+     * Mirrors the `next_esp_netif` chain in ESP-IDF's esp_netif_lwip.c. */
+    struct esp_netif_obj           *next;
+
     bool                            is_started;
 
     /* User configuration (cfg.base is copied by value to decouple the
@@ -88,14 +88,17 @@ struct esp_netif_obj {
     esp_netif_ip_info_t             static_ip;  /*!< resolved from base.ip_info */
     bool                            has_static_ip;
 
-    /* Link-layer binding. Exactly one of { netdrv, driver_ifcfg.handle }
-     * is populated at runtime; attach_netdrv() takes the first path,
-     * esp_netif_attach() the second. */
+    /* Link-layer binding. A vk_netdrv_t is bound through the
+     * vsf_netdrv_new_netif_glue() helper + esp_netif_attach() flow; its
+     * post_attach callback stores the netdrv pointer here so the action /
+     * MAC accessors below can reach it without walking the glue object.
+     * driver_ifcfg stays available for non-netdrv IDF-style drivers that
+     * rely purely on transmit / driver_free_rx_buffer callbacks. */
     vk_netdrv_t                    *netdrv;
     esp_netif_driver_ifconfig_t     driver_ifcfg;
 
-    /* lwIP-side state. lwip_netif lives inside the slot so that its
-     * storage outlives all internal lwIP bookkeeping. */
+    /* lwIP-side state. The struct netif is embedded so its storage
+     * outlives any internal lwIP bookkeeping tied to this esp_netif. */
     struct netif                    lwip_netif;
     esp_netif_dhcp_status_t         dhcpc_status;
     esp_netif_dhcp_status_t         dhcps_status;
@@ -111,29 +114,42 @@ ESP_EVENT_DEFINE_BASE(IP_EVENT);
 
 static struct {
     bool                            is_inited;
-    struct esp_netif_obj            pool[VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES];
+    struct esp_netif_obj           *head;   /*!< singly-linked list head */
 } __vsf_espidf_netif = { 0 };
 
 /*============================ HELPERS =======================================*/
 
+/* Allocate an esp_netif object on the heap (per ESP-IDF convention, see
+ * components/esp_netif/lwip/esp_netif_lwip.c:esp_netif_new_api) and
+ * prepend it to the global list. */
 static struct esp_netif_obj * __alloc_slot(void)
 {
-    for (size_t i = 0; i < VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES; i++) {
-        if (!__vsf_espidf_netif.pool[i].in_use) {
-            struct esp_netif_obj *o = &__vsf_espidf_netif.pool[i];
-            memset(o, 0, sizeof(*o));
-            o->in_use = true;
-            o->dhcpc_status = ESP_NETIF_DHCP_INIT;
-            o->dhcps_status = ESP_NETIF_DHCP_INIT;
-            return o;
-        }
+    struct esp_netif_obj *o = calloc(1, sizeof(struct esp_netif_obj));
+    if (o == NULL) {
+        return NULL;
     }
-    return NULL;
+    o->dhcpc_status = ESP_NETIF_DHCP_INIT;
+    o->dhcps_status = ESP_NETIF_DHCP_INIT;
+    o->next         = __vsf_espidf_netif.head;
+    __vsf_espidf_netif.head = o;
+    return o;
 }
 
+/* Unlink the object from the global list and free it. No-op on NULL. */
 static void __free_slot(struct esp_netif_obj *o)
 {
-    memset(o, 0, sizeof(*o));
+    if (o == NULL) {
+        return;
+    }
+    struct esp_netif_obj **pp = &__vsf_espidf_netif.head;
+    while (*pp != NULL) {
+        if (*pp == o) {
+            *pp = o->next;
+            break;
+        }
+        pp = &(*pp)->next;
+    }
+    free(o);
 }
 
 /* Copy the flat uint32 network-order address across the two representations. */
@@ -179,12 +195,12 @@ static void __capture_ip_info(struct netif *n, esp_netif_ip_info_t *out)
 #if LWIP_NETIF_STATUS_CALLBACK
 static void __status_cb(struct netif *n)
 {
-    /* Walk the pool to find the matching esp_netif slot. */
+    /* Walk the list to find the matching esp_netif. */
     struct esp_netif_obj *self = NULL;
-    for (size_t i = 0; i < VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES; i++) {
-        if (__vsf_espidf_netif.pool[i].in_use &&
-            &__vsf_espidf_netif.pool[i].lwip_netif == n) {
-            self = &__vsf_espidf_netif.pool[i];
+    for (struct esp_netif_obj *o = __vsf_espidf_netif.head;
+         o != NULL; o = o->next) {
+        if (&o->lwip_netif == n) {
+            self = o;
             break;
         }
     }
@@ -260,7 +276,7 @@ esp_netif_t * esp_netif_new(const esp_netif_config_t *cfg)
 
 void esp_netif_destroy(esp_netif_t *netif)
 {
-    if (netif == NULL || !netif->in_use) {
+    if (netif == NULL) {
         return;
     }
     if (netif->is_started) {
@@ -295,22 +311,63 @@ esp_err_t esp_netif_set_driver_config(esp_netif_t *netif,
     return ESP_OK;
 }
 
-esp_err_t esp_netif_attach_netdrv(esp_netif_t *netif, struct vk_netdrv *netdrv)
+/*---------- VSF extension: vk_netdrv_t -> iodriver_handle glue --------------*/
+
+struct vsf_netdrv_netif_glue_t {
+    /* MUST be first: esp_netif_attach() downcasts iodriver_handle to
+     * esp_netif_driver_base_t * and invokes base.post_attach. */
+    esp_netif_driver_base_t         base;
+    vk_netdrv_t                    *netdrv;
+};
+
+/* Glue post_attach: performs the lwIP<->netdrv bind that
+ * esp_netif_attach_netdrv() used to do inline. Called from
+ * esp_netif_attach() after base.netif has been wired up. */
+static esp_err_t __vsf_netdrv_glue_post_attach(esp_netif_t *netif,
+                                               esp_netif_iodriver_handle h)
 {
-    if (netif == NULL || netdrv == NULL) {
+    struct vsf_netdrv_netif_glue_t *glue = (struct vsf_netdrv_netif_glue_t *)h;
+    if (netif == NULL || glue == NULL || glue->netdrv == NULL) {
         return ESP_ERR_INVALID_ARG;
     }
-    netif->netdrv = (vk_netdrv_t *)netdrv;
+    vk_netdrv_t *netdrv = glue->netdrv;
+    netif->netdrv = netdrv;
+
     /* Apply MAC override from the inherent config, if provided. */
     static const uint8_t __zero_mac[6] = { 0 };
     if (memcmp(netif->base.mac, __zero_mac, 6) != 0) {
-        memcpy(((vk_netdrv_t *)netdrv)->macaddr.addr_buf, netif->base.mac, 6);
-        ((vk_netdrv_t *)netdrv)->macaddr.size = 6;
+        memcpy(netdrv->macaddr.addr_buf, netif->base.mac, 6);
+        netdrv->macaddr.size = 6;
     }
+
     /* Bind the lwIP netif <-> netdrv. After this the adapter op-set is
      * populated and vk_netdrv_prepare / _connect can safely run. */
-    lwip_netif_set_netdrv(&netif->lwip_netif, (vk_netdrv_t *)netdrv);
+    lwip_netif_set_netdrv(&netif->lwip_netif, netdrv);
     return ESP_OK;
+}
+
+/* Heap-allocated per ESP-IDF convention (compare esp_eth_new_netif_glue()
+ * in components/esp_eth/src/esp_eth_netif_glue.c, which uses calloc()).
+ * Returns NULL on allocation failure or invalid input; caller releases
+ * the object with vsf_netdrv_del_netif_glue() after esp_netif_destroy(). */
+vsf_netdrv_netif_glue_t * vsf_netdrv_new_netif_glue(struct vk_netdrv_t *netdrv)
+{
+    if (netdrv == NULL) {
+        return NULL;
+    }
+    struct vsf_netdrv_netif_glue_t *glue =
+        calloc(1, sizeof(struct vsf_netdrv_netif_glue_t));
+    if (glue == NULL) {
+        return NULL;
+    }
+    glue->base.post_attach = __vsf_netdrv_glue_post_attach;
+    glue->netdrv           = (vk_netdrv_t *)netdrv;
+    return glue;
+}
+
+void vsf_netdrv_del_netif_glue(vsf_netdrv_netif_glue_t *glue)
+{
+    free(glue);
 }
 
 /*============================ ACTIONS =======================================*/
@@ -329,8 +386,8 @@ esp_err_t esp_netif_action_start(esp_netif_t *netif,
         return ESP_ERR_INVALID_STATE;
     }
 
-    /* Adapter.op was populated by esp_netif_attach_netdrv. The weak
-     * vsf_pnp_on_netdrv_prepare hook is a no-op; calling prepare is
+    /* Adapter.op was populated by the glue's post_attach callback. The
+     * weak vsf_pnp_on_netdrv_prepare hook is a no-op; calling prepare is
      * still required to assert the binding and run any user hook. */
     vk_netdrv_prepare(netif->netdrv);
     vsf_err_t rc = vk_netdrv_connect(netif->netdrv);
@@ -695,25 +752,15 @@ esp_netif_flags_t esp_netif_get_flags(esp_netif_t *netif)
 
 esp_netif_t * esp_netif_next(esp_netif_t *prev)
 {
-    size_t start = 0;
-    if (prev != NULL) {
-        start = (size_t)(prev - __vsf_espidf_netif.pool) + 1;
-    }
-    for (size_t i = start; i < VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES; i++) {
-        if (__vsf_espidf_netif.pool[i].in_use) {
-            return &__vsf_espidf_netif.pool[i];
-        }
-    }
-    return NULL;
+    return (prev == NULL) ? __vsf_espidf_netif.head : prev->next;
 }
 
 size_t esp_netif_get_nr_of_ifs(void)
 {
     size_t n = 0;
-    for (size_t i = 0; i < VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES; i++) {
-        if (__vsf_espidf_netif.pool[i].in_use) {
-            n++;
-        }
+    for (struct esp_netif_obj *o = __vsf_espidf_netif.head;
+         o != NULL; o = o->next) {
+        n++;
     }
     return n;
 }
@@ -723,10 +770,9 @@ esp_netif_t * esp_netif_get_handle_from_ifkey(const char *ifkey)
     if (ifkey == NULL) {
         return NULL;
     }
-    for (size_t i = 0; i < VSF_ESPIDF_CFG_NETIF_MAX_INSTANCES; i++) {
-        struct esp_netif_obj *o = &__vsf_espidf_netif.pool[i];
-        if (o->in_use && o->base.if_key != NULL &&
-            strcmp(o->base.if_key, ifkey) == 0) {
+    for (struct esp_netif_obj *o = __vsf_espidf_netif.head;
+         o != NULL; o = o->next) {
+        if (o->base.if_key != NULL && strcmp(o->base.if_key, ifkey) == 0) {
             return o;
         }
     }
