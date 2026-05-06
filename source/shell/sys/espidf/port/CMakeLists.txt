@@ -32,6 +32,7 @@ vsf_add_sources(
     esp_netif_port.c       # -> component/tcpip/netdrv + lwip raw API
     esp_http_client_port.c # -> component/tcpip/protocol/http/client + mbedtls TLS
     usb_host_port.c        # -> component/usb/host (vsf_usbh bridge)
+    usb_device_port.c      # -> component/usb/device (vsf_usbd bridge)
 )
 
 # vsf_add_sources(

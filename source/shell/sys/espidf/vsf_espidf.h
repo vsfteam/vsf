@@ -40,6 +40,10 @@
 #   include "component/usb/host/vsf_usbh.h"
 #endif
 
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+#   include "component/usb/device/vsf_usbd.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -188,6 +192,21 @@ typedef struct vsf_espidf_usb_host_cfg_t {
 } vsf_espidf_usb_host_cfg_t;
 #endif
 
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+// USB Device sub-system configuration.
+//
+// The board layer provides a pre-configured vk_usbd_dev_t with the DCD
+// driver, descriptors and a bridge class interface already set according
+// to the actual hardware environment. The espidf shim wraps the ROM
+// usb_device.h API on top.
+//
+//   usbd  Board-owned vk_usbd_dev_t instance. NULL -> usb_enable()
+//         returns failure.
+typedef struct vsf_espidf_usb_device_cfg_t {
+    vk_usbd_dev_t              *usbd;
+} vsf_espidf_usb_device_cfg_t;
+#endif
+
 typedef struct vsf_espidf_cfg_t {
 #if VSF_HAL_USE_RNG == ENABLED
     vsf_rng_t *rng;
@@ -216,6 +235,9 @@ typedef struct vsf_espidf_cfg_t {
 #if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
     vsf_espidf_usb_host_cfg_t  usb_host;
 #endif
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+    vsf_espidf_usb_device_cfg_t  usb_device;
+#endif
 } vsf_espidf_cfg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -235,6 +257,10 @@ extern vsf_rng_t * vsf_espidf_get_rng(void);
 
 #if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
 extern vk_usbh_t * vsf_espidf_get_usbh(void);
+#endif
+
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+extern vk_usbd_dev_t * vsf_espidf_get_usbd(void);
 #endif
 
 #ifdef __cplusplus

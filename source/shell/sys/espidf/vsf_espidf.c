@@ -42,6 +42,9 @@ static struct {
 #if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
     vk_usbh_t  *usbh;
 #endif
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+    vk_usbd_dev_t *usbd;
+#endif
 } __vsf_espidf = { 0 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -63,6 +66,9 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
 
 #if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
     __vsf_espidf.usbh = (cfg != NULL) ? cfg->usb_host.usbh : NULL;
+#endif
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+    __vsf_espidf.usbd = (cfg != NULL) ? cfg->usb_device.usbd : NULL;
 #endif
 
     // Per-module init hooks. Only modules with visible init state are
@@ -135,6 +141,11 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
     // The caller-supplied vk_usbh_t (with user-selected HCD driver already set)
     // is stored during vsf_espidf_init() and consumed by usb_host_install().
 #endif
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+    // USB Device is initialized lazily by the application via usb_enable().
+    // The caller-supplied vk_usbd_dev_t (with user-selected DCD driver already
+    // set) is stored during vsf_espidf_init() and consumed by usb_enable().
+#endif
     // TODO:
     //   vsf_espidf_nvs_init();
 }
@@ -150,6 +161,13 @@ vsf_rng_t * vsf_espidf_get_rng(void)
 vk_usbh_t * vsf_espidf_get_usbh(void)
 {
     return __vsf_espidf.usbh;
+}
+#endif
+
+#if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
+vk_usbd_dev_t * vsf_espidf_get_usbd(void)
+{
+    return __vsf_espidf.usbd;
 }
 #endif
 

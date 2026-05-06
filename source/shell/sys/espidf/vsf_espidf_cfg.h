@@ -249,4 +249,9 @@
 #   define VSF_ESPIDF_CFG_USE_USB_HOST          DISABLED
 #endif
 
+// USB Device (bridged to vsf_usbd)
+#ifndef VSF_ESPIDF_CFG_USE_USB_DEVICE
+#   define VSF_ESPIDF_CFG_USE_USB_DEVICE        DISABLED
+#endif
+
 #endif      // __VSF_ESPIDF_CFG_H__
