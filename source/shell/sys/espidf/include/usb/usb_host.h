@@ -42,11 +42,7 @@
 
 #include "utilities/compiler/compiler.h"
 
-/* USB descriptor types.  Guarded so they are only included once whether
- * the application or the VSF port layer pulls them in first. */
-#ifndef __USB_COMMON_H__
-#   include "component/usb/common/usb_common.h"
-#endif
+#include "component/usb/common/usb_common.h"
 
 /* usb_str_desc_t is not in VSF's usb_common.h -- define it here. */
 #ifndef __vsf_espidf_usb_str_desc_t
