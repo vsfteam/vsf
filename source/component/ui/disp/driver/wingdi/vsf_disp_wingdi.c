@@ -244,6 +244,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 #endif
 
     switch (msg) {
+#if VSF_USE_INPUT == ENABLED
     case WM_TIMER: {
             static XINPUT_STATE prevState;
             static const vk_input_item_info_t vk_xinput_gamepad_item_info[GAMEPAD_ID_NUM] = {
@@ -300,6 +301,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             }
         }
         break;
+#endif
     case WM_SETCURSOR:
         SetCursor(LoadCursor(NULL, IDC_ARROW));
         return TRUE;
