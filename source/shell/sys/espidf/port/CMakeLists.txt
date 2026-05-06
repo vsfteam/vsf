@@ -33,6 +33,7 @@ vsf_add_sources(
     esp_http_client_port.c # -> component/tcpip/protocol/http/client + mbedtls TLS
     usb_host_port.c        # -> component/usb/host (vsf_usbh bridge)
     usb_device_port.c      # -> component/usb/device (vsf_usbd bridge)
+    esp_lcd_port.c         # -> component/ui/disp (vsf_disp_t bridge, IO stub + panel vtable)
 )
 
 # vsf_add_sources(

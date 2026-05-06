@@ -254,4 +254,9 @@
 #   define VSF_ESPIDF_CFG_USE_USB_DEVICE        DISABLED
 #endif
 
+// LCD panel (IO + vendor panels bridged to vsf_disp_t)
+#ifndef VSF_ESPIDF_CFG_USE_LCD
+#   define VSF_ESPIDF_CFG_USE_LCD               DISABLED
+#endif
+
 #endif      // __VSF_ESPIDF_CFG_H__

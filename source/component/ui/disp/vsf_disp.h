@@ -173,6 +173,11 @@ typedef struct vk_disp_param_t {
 
 typedef void (*vk_disp_on_ready_t)(vk_disp_t *disp);
 
+// ui_data  -- opaque context pointer, set by caller before init / refresh /
+//             fini.  Retrieved by ui_on_ready callback to wake the waiting
+//             task when the operation completes.
+// ui_on_ready -- completion callback, invoked by driver via vk_disp_on_ready()
+//             when init, refresh, or fini finishes.
 vsf_class(vk_disp_t) {
     public_member(
         const vk_disp_param_t   param;
@@ -232,6 +237,23 @@ extern const vk_disp_drv_t vk_disp_dummy_drv;
 extern const vk_disp_drv_t vk_disp_cvrt_drv;
 
 /*============================ PROTOTYPES ====================================*/
+
+/*
+ * vk_disp_init / vk_disp_fini / vk_disp_refresh are asynchronous: they
+ * return before the operation completes.  The driver signals completion
+ * by calling vk_disp_on_ready(pthis), which invokes the ui_on_ready
+ * callback registered on the vk_disp_t.
+ *
+ * Typical synchronous-init pattern:
+ *   1. Set disp->ui_data = <your context, e.g. esp_lcd_panel_impl_t *>
+ *   2. Set disp->ui_on_ready = <your callback>
+ *   3. Call vk_disp_init(disp) or vk_disp_refresh(disp, ...)
+ *   4. vsf_thread_wfe(<your event>)  -- blocks until ui_on_ready fires
+ *
+ * The ui_on_ready callback receives the vk_disp_t * and can retrieve
+ * the waiting context from disp->ui_data, then post the wake event
+ * via vsf_eda_post_evt().
+ */
 
 extern vsf_err_t vk_disp_init(vk_disp_t *pthis);
 extern void vk_disp_fini(vk_disp_t *pthis);
