@@ -40,6 +40,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "utilities/compiler/compiler.h"
+
 /* USB descriptor types.  Guarded so they are only included once whether
  * the application or the VSF port layer pulls them in first. */
 #ifndef __USB_COMMON_H__
@@ -53,7 +55,7 @@
         uint8_t  bLength;
         uint8_t  bDescriptorType;
         uint8_t  bString[];
-    } __attribute__((packed)) usb_str_desc_t;
+    } VSF_CAL_PACKED usb_str_desc_t;
 #endif
 
 #ifdef __cplusplus
@@ -199,7 +201,7 @@ typedef struct {
     uint16_t wValue;
     uint16_t wIndex;
     uint16_t wLength;
-} __attribute__((packed)) usb_setup_packet_t;
+} VSF_CAL_PACKED usb_setup_packet_t;
 
 /*============================ PROTOTYPES ====================================*/
 

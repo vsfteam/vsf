@@ -30,6 +30,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "utilities/compiler/compiler.h"
+
 #include "esp_err.h"
 
 #ifdef __cplusplus
@@ -87,13 +89,7 @@ typedef struct {
 /*============================ PROTOTYPES ====================================*/
 
 /* Reboot via vsf_arch_reset(). Never returns. */
-#if defined(__GNUC__) || defined(__clang__)
-void esp_restart(void) __attribute__((noreturn));
-#elif defined(_MSC_VER)
-__declspec(noreturn) void esp_restart(void);
-#else
-void esp_restart(void);
-#endif
+VSF_CAL_NO_RETURN void esp_restart(void);
 
 /* Last reset reason. The VSF port records ESP_RST_SW when a reboot is
  * initiated via esp_restart(); otherwise returns ESP_RST_POWERON. */
