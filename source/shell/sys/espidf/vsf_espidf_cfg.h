@@ -244,4 +244,9 @@
 #   define VSF_ESPIDF_CFG_USE_DRIVER_ADC        DISABLED
 #endif
 
+// USB Host (bridged to vsf_usbh)
+#ifndef VSF_ESPIDF_CFG_USE_USB_HOST
+#   define VSF_ESPIDF_CFG_USE_USB_HOST          DISABLED
+#endif
+
 #endif      // __VSF_ESPIDF_CFG_H__

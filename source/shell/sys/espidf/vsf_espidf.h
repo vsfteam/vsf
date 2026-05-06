@@ -36,6 +36,10 @@
 #   include "./include/esp_flash.h"
 #endif
 
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+#   include "component/usb/host/vsf_usbh.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -169,6 +173,21 @@ typedef struct vsf_espidf_gptimer_cfg_t {
 } vsf_espidf_gptimer_cfg_t;
 #endif
 
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+// USB Host sub-system configuration.
+//
+// The board layer provides a pre-configured vk_usbh_t with the HCD
+// driver, PHY setup, interrupt routing etc. already set according to
+// the actual hardware environment. The espidf shim adds the ESP-IDF
+// bridge class driver on top and manages the client/device model.
+//
+//   usbh  Board-owned vk_usbh_t instance. NULL -> usb_host_install()
+//         returns ESP_ERR_INVALID_STATE.
+typedef struct vsf_espidf_usb_host_cfg_t {
+    vk_usbh_t                  *usbh;
+} vsf_espidf_usb_host_cfg_t;
+#endif
+
 typedef struct vsf_espidf_cfg_t {
 #if VSF_HAL_USE_RNG == ENABLED
     vsf_rng_t *rng;
@@ -194,6 +213,9 @@ typedef struct vsf_espidf_cfg_t {
 #if VSF_ESPIDF_CFG_USE_DRIVER_ADC == ENABLED
     vsf_espidf_adc_cfg_t       adc;
 #endif
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+    vsf_espidf_usb_host_cfg_t  usb_host;
+#endif
 } vsf_espidf_cfg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -209,6 +231,10 @@ extern void vsf_espidf_init(const vsf_espidf_cfg_t *cfg);
 // via vsf_espidf_init(), or NULL if none was provided (callers should
 // fall back to their own default).
 extern vsf_rng_t * vsf_espidf_get_rng(void);
+#endif
+
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+extern vk_usbh_t * vsf_espidf_get_usbh(void);
 #endif
 
 #ifdef __cplusplus

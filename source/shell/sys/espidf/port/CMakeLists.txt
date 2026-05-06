@@ -31,6 +31,7 @@ vsf_add_sources(
     driver_adc_port.c      # -> vsf_template_adc.h (oneshot only)
     esp_netif_port.c       # -> component/tcpip/netdrv + lwip raw API
     esp_http_client_port.c # -> component/tcpip/protocol/http/client + mbedtls TLS
+    usb_host_port.c        # -> component/usb/host (vsf_usbh bridge)
 )
 
 # vsf_add_sources(

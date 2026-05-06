@@ -39,6 +39,9 @@ static struct {
 #if VSF_HAL_USE_RNG == ENABLED
     vsf_rng_t  *rng;
 #endif
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+    vk_usbh_t  *usbh;
+#endif
 } __vsf_espidf = { 0 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -57,6 +60,10 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
     __vsf_espidf.rng = (cfg != NULL) ? cfg->rng : NULL;
 #endif
     __vsf_espidf.is_inited = true;
+
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+    __vsf_espidf.usbh = (cfg != NULL) ? cfg->usb_host.usbh : NULL;
+#endif
 
     // Per-module init hooks. Only modules with visible init state are
     // chained here; esp_err/esp_log/esp_system/esp_ringbuf are stateless
@@ -123,6 +130,11 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
     vsf_espidf_netif_init();
     vsf_trace_info("vsf_espidf_init: after netif_init"VSF_TRACE_CFG_LINEEND);
 #endif
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+    // USB Host is initialized lazily by the application via usb_host_install().
+    // The caller-supplied vk_usbh_t (with user-selected HCD driver already set)
+    // is stored during vsf_espidf_init() and consumed by usb_host_install().
+#endif
     // TODO:
     //   vsf_espidf_nvs_init();
 }
@@ -131,6 +143,13 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
 vsf_rng_t * vsf_espidf_get_rng(void)
 {
     return __vsf_espidf.rng;
+}
+#endif
+
+#if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
+vk_usbh_t * vsf_espidf_get_usbh(void)
+{
+    return __vsf_espidf.usbh;
 }
 #endif
 
