@@ -37,8 +37,6 @@
 #include "esp_lcd_types.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
-#include "esp_lcd_io_spi.h"
-#include "esp_lcd_io_i2c.h"
 #include "esp_lcd_panel_vsf.h"
 
 #include "component/ui/vsf_ui_cfg.h"
@@ -316,24 +314,6 @@ esp_err_t esp_lcd_panel_draw_bitmap_2d(
 }
 
 /*============================ IO LAYER STUBS ================================*/
-
-esp_err_t esp_lcd_new_panel_io_spi(
-    esp_lcd_spi_bus_handle_t            bus,
-    const esp_lcd_panel_io_spi_config_t *io_config,
-    esp_lcd_panel_io_handle_t           *ret_io)
-{
-    (void)bus; (void)io_config; (void)ret_io;
-    return ESP_ERR_NOT_SUPPORTED;
-}
-
-esp_err_t esp_lcd_new_panel_io_i2c(
-    i2c_master_bus_handle_t             bus,
-    const esp_lcd_panel_io_i2c_config_t *io_config,
-    esp_lcd_panel_io_handle_t           *ret_io)
-{
-    (void)bus; (void)io_config; (void)ret_io;
-    return ESP_ERR_NOT_SUPPORTED;
-}
 
 esp_err_t esp_lcd_panel_io_rx_param(
     esp_lcd_panel_io_handle_t io, int lcd_cmd,

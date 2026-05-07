@@ -18,17 +18,25 @@
 /*
  * Port implementation for "esp_ringbuf.h" on VSF.
  *
- * Initial drop: fully supports RINGBUF_TYPE_BYTEBUF. For NOSPLIT /
- * ALLOWSPLIT the ring buffer is created successfully but is treated as
- * a byte buffer; item framing (length prefix on each message) is a
- * planned follow-up.
+ * Implements all three ring buffer types with the same four-pointer
+ * storage model and embedded ItemHeader_t as the upstream ESP-IDF
+ * ringbuf.c reference:
  *
- * Concurrency: the VSF ESP-IDF sub-system currently has no SMP target
- * and on the Windows host the primary use case is single-threaded tests.
- * Access is guarded by vsf_protect(int)/vsf_unprotect to support calls
- * from timer callbacks. Blocking on empty/full is NOT modeled: the
- * ticks_to_wait parameter is accepted for API compatibility but waits
- * are polled immediately.
+ *   RINGBUF_TYPE_BYTEBUF    – byte stream, zero-copy return,
+ *                              single outstanding read at a time.
+ *   RINGBUF_TYPE_NOSPLIT    – item-oriented, never splits items at
+ *                              wrap boundary (uses dummy item padding).
+ *   RINGBUF_TYPE_ALLOWSPLIT – item-oriented, may split items at wrap
+ *                              boundary (rbITEM_SPLIT_FLAG).
+ *
+ * Blocking (ticks_to_wait) is supported when VSF_USE_KERNEL is enabled:
+ * two counting semaphores (data_sem / space_sem) provide level-triggered
+ * wakeups with deadline tracking. Without the kernel the port remains
+ * poll-only and the ticks parameter is ignored.
+ *
+ * Concurrency: critical sections use vsf_protect_int() / vsf_unprotect_int()
+ * which is sufficient for timer-callback vs main-thread scenarios on the
+ * current single-core host targets.
  */
 
 /*============================ INCLUDES ======================================*/
@@ -50,47 +58,483 @@
 
 #include <string.h>
 
+/*============================ MACROS ========================================*/
+
+#define rbALIGN_MASK            0x03u
+#define rbALIGN_SIZE(x)         (((x) + rbALIGN_MASK) & ~rbALIGN_MASK)
+#define rbCHECK_ALIGNED(p)      ((((size_t)(p)) & rbALIGN_MASK) == 0)
+
+#define rbHEADER_SIZE           sizeof(ItemHeader_t)
+
+/* Ring buffer flags (uxRingbufferFlags) */
+#define rbALLOW_SPLIT_FLAG      ((uint32_t)1)
+#define rbBYTE_BUFFER_FLAG      ((uint32_t)2)
+#define rbBUFFER_FULL_FLAG      ((uint32_t)4)
+
+/* Per-item flags (uxItemFlags) */
+#define rbITEM_FREE_FLAG        ((uint32_t)1)
+#define rbITEM_DUMMY_DATA_FLAG  ((uint32_t)2)
+#define rbITEM_SPLIT_FLAG       ((uint32_t)4)
+#define rbITEM_WRITTEN_FLAG     ((uint32_t)8)
+
+#if VSF_USE_KERNEL == ENABLED
+#   define __RB_SEM_MAX         0x7FFFu
+#   define __rb_wake_data(rb)   vsf_eda_sem_post(&(rb)->data_sem)
+#   define __rb_wake_space(rb)  vsf_eda_sem_post(&(rb)->space_sem)
+#   define __rb_cancel(rb)      do {                         \
+        vsf_eda_sync_cancel(&(rb)->data_sem);                \
+        vsf_eda_sync_cancel(&(rb)->space_sem);               \
+    } while (0)
+#else
+#   define __rb_wake_data(rb)   ((void)0)
+#   define __rb_wake_space(rb)  ((void)0)
+#   define __rb_cancel(rb)      ((void)0)
+#endif
+
 /*============================ TYPES =========================================*/
 
+typedef struct {
+    size_t          xItemLen;
+    uint32_t        uxItemFlags;
+} ItemHeader_t;
+
 struct __vsf_espidf_ringbuf {
-    uint8_t *           buf;
-    size_t              capacity;
-    size_t              head;   /*!< write cursor                             */
-    size_t              tail;   /*!< read cursor                              */
-    size_t              count;  /*!< bytes currently stored                   */
-    RingbufferType_t    type;
+    uint8_t *       pucHead;
+    uint8_t *       pucTail;
+    uint8_t *       pucAcquire;
+    uint8_t *       pucWrite;
+    uint8_t *       pucRead;
+    uint8_t *       pucFree;
+    size_t          xSize;
+    size_t          xMaxItemSize;
+    size_t          xItemsWaiting;
+    uint32_t        uxRingbufferFlags;
+#if VSF_USE_KERNEL == ENABLED
+    vsf_sem_t       data_sem;
+    vsf_sem_t       space_sem;
+#endif
 };
 
-/* Per-receive envelope: we allocate a contiguous copy for the caller and
- * include a small header so vRingbufferReturnItem() can free it safely. */
+/*============================ LOCAL HELPERS =================================*/
+
+/* ---------- free-space & capacity queries (caller holds lock) ------------- */
+
+static size_t prvGetFreeSize(struct __vsf_espidf_ringbuf *rb)
+{
+    if (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) {
+        return 0;
+    }
+    ptrdiff_t free = rb->pucFree - rb->pucAcquire;
+    if (free <= 0) {
+        free += rb->xSize;
+    }
+    return (size_t)free;
+}
+
+/* ---------- fit checks (caller holds lock) -------------------------------- */
+
+static bool prvCheckItemFitsByteBuf(struct __vsf_espidf_ringbuf *rb,
+                                    size_t xItemSize)
+{
+    return prvGetFreeSize(rb) >= xItemSize;
+}
+
+static bool prvCheckItemFitsDefault(struct __vsf_espidf_ringbuf *rb,
+                                    size_t xItemSize)
+{
+    size_t xTotalItemSize = rbALIGN_SIZE(xItemSize) + rbHEADER_SIZE;
+
+    if (rb->pucAcquire == rb->pucFree) {
+        return (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) ? false : true;
+    }
+    if (rb->pucFree > rb->pucAcquire) {
+        return xTotalItemSize <= (size_t)(rb->pucFree - rb->pucAcquire);
+    }
+    if (xTotalItemSize <= (size_t)(rb->pucTail - rb->pucAcquire)) {
+        return true;
+    }
+    if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+        return (xTotalItemSize + rbHEADER_SIZE)
+               <= (size_t)((rb->pucFree - rb->pucHead)
+                         + (rb->pucTail - rb->pucAcquire));
+    }
+    return xTotalItemSize <= (size_t)(rb->pucFree - rb->pucHead);
+}
+
+/* ---------- item-availability check (caller holds lock) ------------------- */
+
+static bool prvCheckItemAvail(struct __vsf_espidf_ringbuf *rb)
+{
+    if ((rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG)
+            && rb->pucRead != rb->pucFree) {
+        return false;
+    }
+    if ((rb->xItemsWaiting > 0)
+            && ((rb->pucRead != rb->pucWrite)
+                || (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG))) {
+        if ((rb->uxRingbufferFlags
+                & (rbBYTE_BUFFER_FLAG | rbALLOW_SPLIT_FLAG)) == 0) {
+            ItemHeader_t *pxHeader = (ItemHeader_t *)rb->pucRead;
+            if ((pxHeader->uxItemFlags & rbITEM_WRITTEN_FLAG) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+/* ---------- max-item-size helpers (caller holds lock) --------------------- */
+
+static size_t prvGetCurMaxSizeNoSplit(struct __vsf_espidf_ringbuf *rb)
+{
+    ptrdiff_t free;
+    if (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) {
+        return 0;
+    }
+    if (rb->pucAcquire < rb->pucFree) {
+        free = rb->pucFree - rb->pucAcquire;
+    } else {
+        ptrdiff_t s1 = rb->pucTail - rb->pucAcquire;
+        ptrdiff_t s2 = rb->pucFree - rb->pucHead;
+        free = (s1 > s2) ? s1 : s2;
+    }
+    free -= rbHEADER_SIZE;
+    if (free < 0) return 0;
+    if ((size_t)free > rb->xMaxItemSize) return rb->xMaxItemSize;
+    return (size_t)free;
+}
+
+static size_t prvGetCurMaxSizeAllowSplit(struct __vsf_espidf_ringbuf *rb)
+{
+    ptrdiff_t free;
+    if (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) {
+        return 0;
+    }
+    if (rb->pucAcquire == rb->pucHead && rb->pucFree == rb->pucHead) {
+        free = (ptrdiff_t)(rb->xSize) - rbHEADER_SIZE;
+    } else if (rb->pucAcquire < rb->pucFree) {
+        free = (rb->pucFree - rb->pucAcquire) - rbHEADER_SIZE;
+    } else {
+        free = (rb->pucFree - rb->pucHead)
+             + (rb->pucTail - rb->pucAcquire)
+             - (rbHEADER_SIZE * 2);
+    }
+    if (free < 0) return 0;
+    if ((size_t)free > rb->xMaxItemSize) return rb->xMaxItemSize;
+    return (size_t)free;
+}
+
+static size_t prvGetCurMaxSizeByteBuf(struct __vsf_espidf_ringbuf *rb)
+{
+    if (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) {
+        return 0;
+    }
+    ptrdiff_t free = rb->pucFree - rb->pucAcquire;
+    if (free <= 0) free += rb->xSize;
+    return (size_t)free;
+}
+
+/* ---------- copy-to-buffer (caller holds lock) ---------------------------- */
+
+static void prvCopyItemByteBuf(struct __vsf_espidf_ringbuf *rb,
+                               const uint8_t *pucItem, size_t xItemSize)
+{
+    size_t xRemLen = (size_t)(rb->pucTail - rb->pucAcquire);
+    if (xRemLen < xItemSize) {
+        memcpy(rb->pucAcquire, pucItem, xRemLen);
+        rb->xItemsWaiting += xRemLen;
+        pucItem += xRemLen;
+        xItemSize -= xRemLen;
+        rb->pucAcquire = rb->pucHead;
+    }
+    memcpy(rb->pucAcquire, pucItem, xItemSize);
+    rb->xItemsWaiting += xItemSize;
+    rb->pucAcquire += xItemSize;
+    if (rb->pucAcquire == rb->pucTail) {
+        rb->pucAcquire = rb->pucHead;
+    }
+    if (rb->pucAcquire == rb->pucFree) {
+        rb->uxRingbufferFlags |= rbBUFFER_FULL_FLAG;
+    }
+    rb->pucWrite = rb->pucAcquire;
+}
+
+static void prvCopyItemNoSplit(struct __vsf_espidf_ringbuf *rb,
+                               const uint8_t *pucItem, size_t xItemSize)
+{
+    size_t xAlignedItemSize = rbALIGN_SIZE(xItemSize);
+    size_t xRemLen = (size_t)(rb->pucTail - rb->pucAcquire);
+
+    if (xRemLen < xAlignedItemSize + rbHEADER_SIZE) {
+        ItemHeader_t *pxDummy = (ItemHeader_t *)rb->pucAcquire;
+        pxDummy->uxItemFlags = rbITEM_DUMMY_DATA_FLAG;
+        pxDummy->xItemLen = 0;
+        rb->pucAcquire = rb->pucHead;
+    }
+
+    ItemHeader_t *pxHeader = (ItemHeader_t *)rb->pucAcquire;
+    pxHeader->xItemLen = xItemSize;
+    pxHeader->uxItemFlags = rbITEM_WRITTEN_FLAG;
+    rb->pucAcquire += rbHEADER_SIZE;
+    memcpy(rb->pucAcquire, pucItem, xItemSize);
+    rb->pucAcquire += xAlignedItemSize;
+    rb->xItemsWaiting++;
+
+    if ((size_t)(rb->pucTail - rb->pucAcquire) < rbHEADER_SIZE) {
+        rb->pucAcquire = rb->pucHead;
+    }
+    if (rb->pucAcquire == rb->pucFree) {
+        rb->uxRingbufferFlags |= rbBUFFER_FULL_FLAG;
+    }
+    rb->pucWrite = rb->pucAcquire;
+}
+
+static void prvCopyItemAllowSplit(struct __vsf_espidf_ringbuf *rb,
+                                  const uint8_t *pucItem, size_t xItemSize)
+{
+    size_t xAlignedItemSize = rbALIGN_SIZE(xItemSize);
+    size_t xRemLen = (size_t)(rb->pucTail - rb->pucAcquire);
+
+    if (xRemLen < xAlignedItemSize + rbHEADER_SIZE) {
+        ItemHeader_t *pxFirstHeader = (ItemHeader_t *)rb->pucAcquire;
+        pxFirstHeader->uxItemFlags = 0;
+        pxFirstHeader->xItemLen = xRemLen - rbHEADER_SIZE;
+        rb->pucAcquire += rbHEADER_SIZE;
+        xRemLen -= rbHEADER_SIZE;
+        if (xRemLen > 0) {
+            memcpy(rb->pucAcquire, pucItem, xRemLen);
+            rb->xItemsWaiting++;
+            pucItem += xRemLen;
+            xItemSize -= xRemLen;
+            xAlignedItemSize -= xRemLen;
+            pxFirstHeader->uxItemFlags |= rbITEM_SPLIT_FLAG;
+        } else {
+            pxFirstHeader->uxItemFlags |= rbITEM_DUMMY_DATA_FLAG;
+        }
+        rb->pucAcquire = rb->pucHead;
+    }
+
+    ItemHeader_t *pxSecondHeader = (ItemHeader_t *)rb->pucAcquire;
+    pxSecondHeader->xItemLen = xItemSize;
+    pxSecondHeader->uxItemFlags = 0;
+    rb->pucAcquire += rbHEADER_SIZE;
+    memcpy(rb->pucAcquire, pucItem, xItemSize);
+    rb->xItemsWaiting++;
+    rb->pucAcquire += xAlignedItemSize;
+
+    if ((size_t)(rb->pucTail - rb->pucAcquire) < rbHEADER_SIZE) {
+        rb->pucAcquire = rb->pucHead;
+    }
+    if (rb->pucAcquire == rb->pucFree) {
+        rb->uxRingbufferFlags |= rbBUFFER_FULL_FLAG;
+    }
+    rb->pucWrite = rb->pucAcquire;
+}
+
+/* ---------- get-from-buffer (caller holds lock) --------------------------- */
+
+static void * prvGetItemDefault(struct __vsf_espidf_ringbuf *rb,
+                                bool *pxIsSplit, size_t *pxItemSize)
+{
+    ItemHeader_t *pxHeader = (ItemHeader_t *)rb->pucRead;
+    uint8_t *pcReturn;
+
+    if (pxHeader->uxItemFlags & rbITEM_DUMMY_DATA_FLAG) {
+        rb->pucRead = rb->pucHead;
+        pxHeader = (ItemHeader_t *)rb->pucRead;
+    }
+    pcReturn = rb->pucRead + rbHEADER_SIZE;
+    *pxItemSize = pxHeader->xItemLen;
+    rb->xItemsWaiting--;
+    *pxIsSplit = (pxHeader->uxItemFlags & rbITEM_SPLIT_FLAG) ? true : false;
+
+    rb->pucRead += rbHEADER_SIZE + rbALIGN_SIZE(pxHeader->xItemLen);
+    if ((size_t)(rb->pucTail - rb->pucRead) < rbHEADER_SIZE) {
+        rb->pucRead = rb->pucHead;
+    }
+    return (void *)pcReturn;
+}
+
+static void * prvGetItemByteBuf(struct __vsf_espidf_ringbuf *rb,
+                                size_t xMaxSize, size_t *pxItemSize)
+{
+    uint8_t *ret = rb->pucRead;
+
+    if ((rb->pucRead > rb->pucWrite)
+            || (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG)) {
+        size_t contig = (size_t)(rb->pucTail - rb->pucRead);
+        if (xMaxSize == 0 || contig <= xMaxSize) {
+            *pxItemSize = contig;
+            rb->xItemsWaiting -= contig;
+            rb->pucRead = rb->pucHead;
+        } else {
+            *pxItemSize = xMaxSize;
+            rb->xItemsWaiting -= xMaxSize;
+            rb->pucRead += xMaxSize;
+        }
+    } else {
+        size_t contig = (size_t)(rb->pucWrite - rb->pucRead);
+        if (xMaxSize == 0 || contig <= xMaxSize) {
+            *pxItemSize = contig;
+            rb->xItemsWaiting -= contig;
+            rb->pucRead = rb->pucWrite;
+        } else {
+            *pxItemSize = xMaxSize;
+            rb->xItemsWaiting -= xMaxSize;
+            rb->pucRead += xMaxSize;
+        }
+    }
+    return (void *)ret;
+}
+
+/* ---------- return-to-buffer (caller holds lock) -------------------------- */
+
+static void prvReturnItemDefault(struct __vsf_espidf_ringbuf *rb,
+                                 uint8_t *pucItem)
+{
+    ItemHeader_t *pxCurHeader = (ItemHeader_t *)(pucItem - rbHEADER_SIZE);
+    pxCurHeader->uxItemFlags &= ~rbITEM_SPLIT_FLAG;
+    pxCurHeader->uxItemFlags |= rbITEM_FREE_FLAG;
+
+    bool allow_advance =
+        ((rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) ? true : false)
+        || ((rb->xItemsWaiting == 0) ? true : false);
+    bool freed_any = false;
+
+    pxCurHeader = (ItemHeader_t *)rb->pucFree;
+    size_t limit = rb->xSize / rbHEADER_SIZE + 4;
+    while (limit-- && ((pxCurHeader->uxItemFlags
+                & (rbITEM_FREE_FLAG | rbITEM_DUMMY_DATA_FLAG)) != 0)
+            && ((rb->pucFree != rb->pucRead) || allow_advance)) {
+
+        allow_advance = false;
+        freed_any = true;
+
+        if (pxCurHeader->uxItemFlags & rbITEM_DUMMY_DATA_FLAG) {
+            pxCurHeader->uxItemFlags |= rbITEM_FREE_FLAG;
+            rb->pucFree = rb->pucHead;
+        } else {
+            size_t step = rbALIGN_SIZE(pxCurHeader->xItemLen);
+            rb->pucFree += step + rbHEADER_SIZE;
+        }
+        if ((size_t)(rb->pucTail - rb->pucFree) < rbHEADER_SIZE) {
+            rb->pucFree = rb->pucHead;
+        }
+        pxCurHeader = (ItemHeader_t *)rb->pucFree;
+    }
+
+    if ((rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) && freed_any) {
+        rb->uxRingbufferFlags &= ~rbBUFFER_FULL_FLAG;
+    }
+}
+
+static void prvReturnItemByteBuf(struct __vsf_espidf_ringbuf *rb,
+                                 uint8_t *pucItem)
+{
+    (void)pucItem;
+    rb->pucFree = rb->pucRead;
+    if (rb->uxRingbufferFlags & rbBUFFER_FULL_FLAG) {
+        rb->uxRingbufferFlags &= ~rbBUFFER_FULL_FLAG;
+    }
+}
+
+/* ---------- blocking helpers (kernel available only) ---------------------- */
+
+#if VSF_USE_KERNEL == ENABLED
+
+static void __rb_sem_init(struct __vsf_espidf_ringbuf *rb)
+{
+    vsf_eda_sem_init(&rb->data_sem,  0, __RB_SEM_MAX);
+    vsf_eda_sem_init(&rb->space_sem, 0, __RB_SEM_MAX);
+}
+
 typedef struct {
-    uint32_t            magic;
-    size_t              size;
-    /* payload[] follows */
-} __vsf_espidf_rx_item_t;
+    bool            infinite;
+    uint32_t        deadline_ms;
+} __rb_deadline_t;
 
-#define __VSF_ESPIDF_RX_MAGIC       0x72627831u     // 'rbx1'
+static void __rb_deadline_init(__rb_deadline_t *d, TickType_t ticks)
+{
+    if (ticks == portMAX_DELAY) {
+        d->infinite = true;
+        d->deadline_ms = 0;
+    } else {
+        d->infinite = false;
+        d->deadline_ms = vsf_systimer_get_ms() + (uint32_t)ticks;
+    }
+}
 
-/*============================ IMPLEMENTATION ================================*/
+static vsf_timeout_tick_t __rb_deadline_remaining(const __rb_deadline_t *d)
+{
+    if (d->infinite) {
+        return (vsf_timeout_tick_t)-1;
+    }
+    uint32_t now = vsf_systimer_get_ms();
+    if ((int32_t)(d->deadline_ms - now) <= 0) {
+        return 0;
+    }
+    return vsf_systimer_ms_to_tick(d->deadline_ms - now);
+}
+
+#endif /* VSF_USE_KERNEL */
+
+/*============================ INITIALIZATION ================================*/
+
+static void prvInitializeNewRingbuffer(size_t xBufferSize,
+                                       RingbufferType_t xBufferType,
+                                       struct __vsf_espidf_ringbuf *rb,
+                                       uint8_t *pucStorage)
+{
+    rb->pucHead = pucStorage;
+    rb->pucTail = pucStorage + xBufferSize;
+    rb->pucFree = pucStorage;
+    rb->pucRead = pucStorage;
+    rb->pucWrite = pucStorage;
+    rb->pucAcquire = pucStorage;
+    rb->xSize = xBufferSize;
+    rb->xItemsWaiting = 0;
+    rb->uxRingbufferFlags = 0;
+
+    if (xBufferType == RINGBUF_TYPE_NOSPLIT) {
+        rb->xMaxItemSize = rbALIGN_SIZE(rb->xSize / 2) - rbHEADER_SIZE;
+    } else if (xBufferType == RINGBUF_TYPE_ALLOWSPLIT) {
+        rb->uxRingbufferFlags |= rbALLOW_SPLIT_FLAG;
+        rb->xMaxItemSize = rb->xSize - (rbHEADER_SIZE * 2);
+    } else {
+        rb->uxRingbufferFlags |= rbBYTE_BUFFER_FLAG;
+        rb->xMaxItemSize = rb->xSize;
+    }
+
+#if VSF_USE_KERNEL == ENABLED
+    __rb_sem_init(rb);
+#endif
+}
+
+/*============================ PUBLIC API ====================================*/
 
 RingbufHandle_t xRingbufferCreate(size_t buffer_size, RingbufferType_t type)
 {
     if (buffer_size == 0) {
         return NULL;
     }
-    RingbufHandle_t rb = (RingbufHandle_t)vsf_heap_malloc(sizeof(*rb));
+    if (type != RINGBUF_TYPE_BYTEBUF) {
+        buffer_size = rbALIGN_SIZE(buffer_size);
+    }
+
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)vsf_heap_malloc(sizeof(*rb));
     if (rb == NULL) {
         return NULL;
     }
-    rb->buf = (uint8_t *)vsf_heap_malloc(buffer_size);
-    if (rb->buf == NULL) {
+    uint8_t *storage = (uint8_t *)vsf_heap_malloc(buffer_size);
+    if (storage == NULL) {
         vsf_heap_free(rb);
         return NULL;
     }
-    rb->capacity = buffer_size;
-    rb->head = rb->tail = rb->count = 0;
-    rb->type = type;
-    return rb;
+    memset(storage, 0, buffer_size);
+    prvInitializeNewRingbuffer(buffer_size, type, rb, storage);
+    return (RingbufHandle_t)rb;
 }
 
 void vRingbufferDelete(RingbufHandle_t handle)
@@ -98,121 +542,222 @@ void vRingbufferDelete(RingbufHandle_t handle)
     if (handle == NULL) {
         return;
     }
-    if (handle->buf != NULL) {
-        vsf_heap_free(handle->buf);
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    __rb_cancel(rb);
+
+    if (rb->pucHead != NULL) {
+        vsf_heap_free(rb->pucHead);
     }
-    vsf_heap_free(handle);
+    vsf_heap_free(rb);
 }
 
 BaseType_t xRingbufferSend(RingbufHandle_t handle, const void *data,
                             size_t data_size, TickType_t ticks_to_wait)
 {
-    (void)ticks_to_wait;        // poll-only on host port
+    if (handle == NULL) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
 
-    if ((handle == NULL) || (data == NULL) || (data_size == 0)) {
+    bool is_bytebuf = (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) != 0;
+    if (is_bytebuf && data_size == 0) {
+        return pdTRUE;
+    }
+    if ((data == NULL) || (data_size == 0)) {
+        return pdFALSE;
+    }
+    if (data_size > rb->xMaxItemSize) {
         return pdFALSE;
     }
 
+#if VSF_USE_KERNEL == ENABLED
+    __rb_deadline_t dl;
+    __rb_deadline_init(&dl, ticks_to_wait);
+
+    for (;;) {
+        vsf_protect_t orig = vsf_protect_int();
+        bool fits;
+        if (is_bytebuf) {
+            fits = prvCheckItemFitsByteBuf(rb, data_size);
+        } else {
+            fits = prvCheckItemFitsDefault(rb, data_size);
+        }
+        if (fits) {
+            if (is_bytebuf) {
+                prvCopyItemByteBuf(rb, (const uint8_t *)data, data_size);
+            } else if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+                prvCopyItemAllowSplit(rb, (const uint8_t *)data, data_size);
+            } else {
+                prvCopyItemNoSplit(rb, (const uint8_t *)data, data_size);
+            }
+            vsf_unprotect_int(orig);
+            __rb_wake_data(rb);
+            return pdTRUE;
+        }
+        vsf_unprotect_int(orig);
+
+        vsf_timeout_tick_t rem = __rb_deadline_remaining(&dl);
+        if (rem == 0 && !dl.infinite) {
+            break;
+        }
+        (void)vsf_thread_sem_pend(&rb->space_sem, rem);
+    }
+    return pdFALSE;
+#else
+    (void)ticks_to_wait;
+
     vsf_protect_t orig = vsf_protect_int();
-    if ((handle->capacity - handle->count) < data_size) {
+    bool fits;
+    if (is_bytebuf) {
+        fits = prvCheckItemFitsByteBuf(rb, data_size);
+    } else {
+        fits = prvCheckItemFitsDefault(rb, data_size);
+    }
+    if (!fits) {
         vsf_unprotect_int(orig);
         return pdFALSE;
     }
-    const uint8_t *src = (const uint8_t *)data;
-    size_t first = handle->capacity - handle->head;
-    if (first >= data_size) {
-        memcpy(handle->buf + handle->head, src, data_size);
-        handle->head += data_size;
-        if (handle->head == handle->capacity) {
-            handle->head = 0;
-        }
+    if (is_bytebuf) {
+        prvCopyItemByteBuf(rb, (const uint8_t *)data, data_size);
+    } else if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+        prvCopyItemAllowSplit(rb, (const uint8_t *)data, data_size);
     } else {
-        memcpy(handle->buf + handle->head, src, first);
-        memcpy(handle->buf, src + first, data_size - first);
-        handle->head = data_size - first;
+        prvCopyItemNoSplit(rb, (const uint8_t *)data, data_size);
     }
-    handle->count += data_size;
     vsf_unprotect_int(orig);
     return pdTRUE;
-}
-
-static void * __vsf_espidf_rb_receive_core(RingbufHandle_t handle,
-                                            size_t *item_size, size_t cap)
-{
-    if ((handle == NULL) || (item_size == NULL) || (cap == 0)) {
-        return NULL;
-    }
-    vsf_protect_t orig = vsf_protect_int();
-    size_t avail = handle->count;
-    if (avail == 0) {
-        vsf_unprotect_int(orig);
-        return NULL;
-    }
-    size_t take = (avail < cap) ? avail : cap;
-
-    __vsf_espidf_rx_item_t *item =
-        (__vsf_espidf_rx_item_t *)vsf_heap_malloc(sizeof(*item) + take);
-    if (item == NULL) {
-        vsf_unprotect_int(orig);
-        return NULL;
-    }
-    item->magic = __VSF_ESPIDF_RX_MAGIC;
-    item->size  = take;
-
-    uint8_t *dst = (uint8_t *)(item + 1);
-    size_t first = handle->capacity - handle->tail;
-    if (first >= take) {
-        memcpy(dst, handle->buf + handle->tail, take);
-        handle->tail += take;
-        if (handle->tail == handle->capacity) {
-            handle->tail = 0;
-        }
-    } else {
-        memcpy(dst, handle->buf + handle->tail, first);
-        memcpy(dst + first, handle->buf, take - first);
-        handle->tail = take - first;
-    }
-    handle->count -= take;
-    vsf_unprotect_int(orig);
-
-    *item_size = take;
-    return dst;
+#endif
 }
 
 void * xRingbufferReceive(RingbufHandle_t handle, size_t *item_size,
                             TickType_t ticks_to_wait)
 {
-    (void)ticks_to_wait;
-    if (handle == NULL) {
+    if ((handle == NULL) || (item_size == NULL)) {
         return NULL;
     }
-    return __vsf_espidf_rb_receive_core(handle, item_size, handle->capacity);
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+        vsf_trace_error("xRingbufferReceive called on ALLOWSPLIT handle;"
+                        " use xRingbufferReceiveSplit"
+                        VSF_TRACE_CFG_LINEEND);
+        return NULL;
+    }
+
+    bool is_bytebuf = (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) != 0;
+
+#if VSF_USE_KERNEL == ENABLED
+    __rb_deadline_t dl;
+    __rb_deadline_init(&dl, ticks_to_wait);
+
+    for (;;) {
+        vsf_protect_t orig = vsf_protect_int();
+        if (prvCheckItemAvail(rb)) {
+            void *ret;
+            if (is_bytebuf) {
+                ret = prvGetItemByteBuf(rb, 0, item_size);
+            } else {
+                bool split;
+                ret = prvGetItemDefault(rb, &split, item_size);
+                (void)split;
+            }
+            vsf_unprotect_int(orig);
+            return ret;
+        }
+        vsf_unprotect_int(orig);
+
+        vsf_timeout_tick_t rem = __rb_deadline_remaining(&dl);
+        if (rem == 0 && !dl.infinite) {
+            break;
+        }
+        (void)vsf_thread_sem_pend(&rb->data_sem, rem);
+    }
+    return NULL;
+#else
+    (void)ticks_to_wait;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (!prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return NULL;
+    }
+    void *ret;
+    if (is_bytebuf) {
+        ret = prvGetItemByteBuf(rb, 0, item_size);
+    } else {
+        bool split;
+        ret = prvGetItemDefault(rb, &split, item_size);
+        (void)split;
+    }
+    vsf_unprotect_int(orig);
+    return ret;
+#endif
 }
 
 void * xRingbufferReceiveUpTo(RingbufHandle_t handle, size_t *item_size,
                                 TickType_t ticks_to_wait, size_t wanted_size)
 {
+    if ((handle == NULL) || (item_size == NULL) || (wanted_size == 0)) {
+        return NULL;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+#if VSF_USE_KERNEL == ENABLED
+    __rb_deadline_t dl;
+    __rb_deadline_init(&dl, ticks_to_wait);
+
+    for (;;) {
+        vsf_protect_t orig = vsf_protect_int();
+        if (prvCheckItemAvail(rb)) {
+            void *ret = prvGetItemByteBuf(rb, wanted_size, item_size);
+            vsf_unprotect_int(orig);
+            return ret;
+        }
+        vsf_unprotect_int(orig);
+
+        vsf_timeout_tick_t rem = __rb_deadline_remaining(&dl);
+        if (rem == 0 && !dl.infinite) {
+            break;
+        }
+        (void)vsf_thread_sem_pend(&rb->data_sem, rem);
+    }
+    return NULL;
+#else
     (void)ticks_to_wait;
-    return __vsf_espidf_rb_receive_core(handle, item_size, wanted_size);
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (!prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return NULL;
+    }
+    void *ret = prvGetItemByteBuf(rb, wanted_size, item_size);
+    vsf_unprotect_int(orig);
+    return ret;
+#endif
 }
 
 void vRingbufferReturnItem(RingbufHandle_t handle, void *item)
 {
-    (void)handle;
-    if (item == NULL) {
+    if ((handle == NULL) || (item == NULL)) {
         return;
     }
-    __vsf_espidf_rx_item_t *hdr =
-        (__vsf_espidf_rx_item_t *)((uint8_t *)item - sizeof(*hdr));
-    if (hdr->magic != __VSF_ESPIDF_RX_MAGIC) {
-        // Do not free foreign pointers. Log once through trace so caller
-        // can notice the misuse in development.
-        vsf_trace_error("vRingbufferReturnItem: bad magic on %p"
-                        VSF_TRACE_CFG_LINEEND, item);
-        return;
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) {
+        prvReturnItemByteBuf(rb, (uint8_t *)item);
+    } else {
+        prvReturnItemDefault(rb, (uint8_t *)item);
     }
-    hdr->magic = 0;     // poison
-    vsf_heap_free(hdr);
+    vsf_unprotect_int(orig);
+
+    __rb_wake_space(rb);
 }
 
 size_t xRingbufferGetCurFreeSize(RingbufHandle_t handle)
@@ -220,8 +765,18 @@ size_t xRingbufferGetCurFreeSize(RingbufHandle_t handle)
     if (handle == NULL) {
         return 0;
     }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
     vsf_protect_t orig = vsf_protect_int();
-    size_t free = handle->capacity - handle->count;
+    size_t free;
+    if (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) {
+        free = prvGetCurMaxSizeByteBuf(rb);
+    } else if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+        free = prvGetCurMaxSizeAllowSplit(rb);
+    } else {
+        free = prvGetCurMaxSizeNoSplit(rb);
+    }
     vsf_unprotect_int(orig);
     return free;
 }
@@ -231,15 +786,91 @@ size_t xRingbufferGetCurFilledSize(RingbufHandle_t handle)
     if (handle == NULL) {
         return 0;
     }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
     vsf_protect_t orig = vsf_protect_int();
-    size_t used = handle->count;
+    size_t filled = rb->xItemsWaiting;
     vsf_unprotect_int(orig);
-    return used;
+    return filled;
 }
 
 size_t xRingbufferGetMaxItemSize(RingbufHandle_t handle)
 {
-    return (handle != NULL) ? handle->capacity : 0;
+    if (handle == NULL) {
+        return 0;
+    }
+    return ((struct __vsf_espidf_ringbuf *)handle)->xMaxItemSize;
+}
+
+BaseType_t xRingbufferReceiveSplit(RingbufHandle_t handle,
+                                    void **ppvHeadItem,
+                                    void **ppvTailItem,
+                                    size_t *pxHeadItemSize,
+                                    size_t *pxTailItemSize,
+                                    TickType_t ticks_to_wait)
+{
+    if ((handle == NULL) || (ppvHeadItem == NULL) || (ppvTailItem == NULL)
+            || (pxHeadItemSize == NULL) || (pxTailItemSize == NULL)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    *ppvHeadItem = NULL;
+    *ppvTailItem = NULL;
+
+#if VSF_USE_KERNEL == ENABLED
+    __rb_deadline_t dl;
+    __rb_deadline_init(&dl, ticks_to_wait);
+
+    for (;;) {
+        vsf_protect_t orig = vsf_protect_int();
+        if (prvCheckItemAvail(rb)) {
+            bool is_split = false;
+            *ppvHeadItem = prvGetItemDefault(rb, &is_split, pxHeadItemSize);
+            if (is_split) {
+                bool no_split;
+                *ppvTailItem = prvGetItemDefault(rb, &no_split,
+                                                 pxTailItemSize);
+                (void)no_split;
+            } else {
+                *ppvTailItem = NULL;
+                *pxTailItemSize = 0;
+            }
+            vsf_unprotect_int(orig);
+            return pdTRUE;
+        }
+        vsf_unprotect_int(orig);
+
+        vsf_timeout_tick_t rem = __rb_deadline_remaining(&dl);
+        if (rem == 0 && !dl.infinite) {
+            break;
+        }
+        (void)vsf_thread_sem_pend(&rb->data_sem, rem);
+    }
+    return pdFALSE;
+#else
+    (void)ticks_to_wait;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (!prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return pdFALSE;
+    }
+    bool is_split = false;
+    *ppvHeadItem = prvGetItemDefault(rb, &is_split, pxHeadItemSize);
+    if (is_split) {
+        bool no_split;
+        *ppvTailItem = prvGetItemDefault(rb, &no_split, pxTailItemSize);
+        (void)no_split;
+    } else {
+        *ppvTailItem = NULL;
+        *pxTailItemSize = 0;
+    }
+    vsf_unprotect_int(orig);
+    return pdTRUE;
+#endif
 }
 
 #endif      // VSF_USE_ESPIDF && VSF_ESPIDF_CFG_USE_RINGBUF

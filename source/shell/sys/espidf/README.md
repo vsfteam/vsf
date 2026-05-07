@@ -279,7 +279,7 @@ as of this writing.
 
 ### Missing ESP-IDF infrastructure layers
 
-- **HAL layer** — All 35 `esp_hal_*` components are absent. VSF uses its own `hal/driver/common/template/` abstraction instead.
+- **HAL layer** — All 35 `esp_hal_*`components (e.g. `esp_hal_gpio`, `esp_hal_uart`) are not implemented, and are NOT needed by this subsystem. VSF's espidf compatibility layer targets the `driver/*.h` API level (application-facing APIs such as `gpio_set_level()`, `uart_write_bytes()`), not the HAL `_ll.h` level that `esp_hal_*` provides. The HAL role is fulfilled by VSF's own `hal/driver/common/template/vsf_template_*.h` abstraction, which each `driver/*.h` port header bridges to directly. Application code using this subsystem never includes `hal/*.h` headers, so the absence of `esp_hal_*` is a deliberate architectural choice, not a gap.
 - **esp_common** — Only `esp_err.h` is provided; missing `esp_check.h`, `esp_compiler.h`, `esp_attr.h`, `esp_macros.h`, `esp_idf_version.h`, `esp_assert.h`.
 - **esp_log extensions** — Missing `esp_log_buffer.h`, `esp_log_color.h`, `esp_log_timestamp.h`, etc.
 - **esp_heap_caps extensions** — Missing `esp_heap_caps_init.h`, `esp_heap_task_info.h`, `esp_heap_trace.h`, `multi_heap.h`.

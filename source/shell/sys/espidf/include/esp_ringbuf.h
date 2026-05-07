@@ -21,10 +21,11 @@
  * Authored from the ESP-IDF v5.x public API reference only. No ESP-IDF /
  * FreeRTOS source code or data is copied.
  *
- * This initial drop supports RINGBUF_TYPE_BYTEBUF end-to-end. The split /
- * no-split item-oriented modes are accepted by xRingbufferCreate() but
- * currently fall back to byte-buffer behavior; their item framing contract
- * will be honored in a follow-up as tests are added.
+ * All three ring buffer types are fully implemented: BYTEBUF (byte stream,
+ * zero-copy), NOSPLIT (item-oriented with dummy padding at wrap), and
+ * ALLOWSPLIT (item-oriented with split items at wrap). Blocking support
+ * (ticks_to_wait) is provided when VSF_USE_KERNEL is enabled; without the
+ * kernel the port operates poll-only.
  *
  * Because VSF's ESP-IDF port does not include a full FreeRTOS layer, this
  * header exposes a minimal subset of the FreeRTOS value types that the
@@ -85,28 +86,46 @@ RingbufHandle_t xRingbufferCreate(size_t buffer_size, RingbufferType_t type);
 /* Release a previously created ring buffer. Passing NULL is a no-op. */
 void vRingbufferDelete(RingbufHandle_t handle);
 
-/* Enqueue `data_size` bytes. Returns pdTRUE on success, pdFALSE if there
- * is not enough free space. The VSF port's timeout semantics are poll-only
- * on the host (no task blocking); any non-zero ticks value is treated as
- * a single in-place retry. */
+/* Enqueue `data_size` bytes (or a single item for NOSPLIT/ALLOWSPLIT).
+ * Returns pdTRUE on success, pdFALSE if there is insufficient space or the
+ * item exceeds xRingbufferGetMaxItemSize(). When VSF_USE_KERNEL is enabled
+ * the caller blocks up to ticks_to_wait when the buffer is full; without
+ * the kernel the port operates poll-only (ticks_to_wait is ignored). */
 BaseType_t xRingbufferSend(RingbufHandle_t handle, const void *data,
                             size_t data_size, TickType_t ticks_to_wait);
 
-/* Pull up to `max_size` bytes from the buffer, copying internally so the
- * caller does not need to invoke vRingbufferReturnItem(). Returns NULL if
- * nothing is available. On success sets *item_size to the number of bytes
- * copied. The returned pointer must be released via vPortFree()-compatible
- * means; in this port it is allocated from the VSF heap and must be freed
- * with vRingbufferReturnItem(). */
+/* Receive the next item (NOSPLIT/ALLOWSPLIT) or all available contiguous
+ * bytes (BYTEBUF). Returns a zero-copy pointer into the ring buffer; the
+ * caller must release it with vRingbufferReturnItem(). On success sets
+ * *item_size to the payload length. Returns NULL if no data is available.
+ * When VSF_USE_KERNEL is enabled the caller blocks up to ticks_to_wait
+ * when the buffer is empty. */
 void * xRingbufferReceive(RingbufHandle_t handle, size_t *item_size,
                             TickType_t ticks_to_wait);
 
-/* Same as xRingbufferReceive() but caps the number of bytes returned. */
+/* Same as xRingbufferReceive() but for BYTEBUF caps the returned byte
+ * count at wanted_size. */
 void * xRingbufferReceiveUpTo(RingbufHandle_t handle, size_t *item_size,
                                 TickType_t ticks_to_wait, size_t wanted_size);
 
-/* Release a buffer previously returned by xRingbufferReceive(). */
+/* Release a pointer previously returned by xRingbufferReceive() or
+ * xRingbufferReceiveSplit(). For NOSPLIT/ALLOWSPLIT buffers this marks
+ * the item as free within the ring; for BYTEBUF it advances the free
+ * pointer to the read pointer. */
 void vRingbufferReturnItem(RingbufHandle_t handle, void *item);
+
+/* Retrieve a possibly-split item from an allow-split ring buffer. Only
+ * valid for RINGBUF_TYPE_ALLOWSPLIT handles. On success, *ppvHeadItem
+ * and *ppvTailItem point into the ring buffer (zero-copy) and
+ * *pxHeadItemSize / *pxTailItemSize are set accordingly. If the item is
+ * not split, *ppvTailItem is NULL. Each non-NULL pointer must be returned
+ * individually via vRingbufferReturnItem(). */
+BaseType_t xRingbufferReceiveSplit(RingbufHandle_t handle,
+                                   void **ppvHeadItem,
+                                   void **ppvTailItem,
+                                   size_t *pxHeadItemSize,
+                                   size_t *pxTailItemSize,
+                                   TickType_t ticks_to_wait);
 
 /* Bytes currently free for writing. */
 size_t xRingbufferGetCurFreeSize(RingbufHandle_t handle);
@@ -114,7 +133,9 @@ size_t xRingbufferGetCurFreeSize(RingbufHandle_t handle);
 /* Bytes currently queued for reading. */
 size_t xRingbufferGetCurFilledSize(RingbufHandle_t handle);
 
-/* Total buffer capacity in bytes as passed to xRingbufferCreate(). */
+/* Maximum item size that can currently be sent. For BYTEBUF this equals
+ * the free byte count; for NOSPLIT/ALLOWSPLIT it accounts for per-item
+ * header overhead and contiguous space constraints. */
 size_t xRingbufferGetMaxItemSize(RingbufHandle_t handle);
 
 #ifdef __cplusplus
