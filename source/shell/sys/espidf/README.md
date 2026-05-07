@@ -46,7 +46,7 @@ espidf/
 | `esp_event.h` | FreeRTOS shim (`xQueue` + `xTaskCreate`) | `esp_event_port.c` | 500 | no deprecated event API |
 | `esp_timer.h` | `vsf_callback_timer` | `esp_timer_port.c` | 172 | |
 | `esp_system.h` | VSF reset + entropy + heap stats | `esp_system_port.c` | 226 | |
-| `esp_ringbuf.h` | byte ring buffer on vsf_heap | `esp_ringbuf_port.c` | 217 | bytebuf only; item framing planned |
+| `esp_ringbuf.h` | four-pointer ring buffer on vsf_heap | `esp_ringbuf_port.c` | ~1500 | all 3 types (BYTEBUF/NOSPLIT/ALLOWSPLIT); blocking + ISR + QueueSet |
 | `esp_heap_caps.h` | `service/heap` (caps collapsed) | `esp_heap_caps_port.c` | 249 | no heap tracing or multi_heap |
 
 ### Stage 2 — Storage & filesystem
@@ -113,7 +113,7 @@ and the espidf LCD shim is agnostic to the concrete driver type.
 | `esp_event.h` | `kernel/vsf_eda` |
 | `esp_timer.h` | `kernel/vsf_timq` + `vsf_callback_timer` |
 | `esp_system.h` (restart/reset_reason/random) | VSF reset + entropy |
-| xRingbuffer (`esp_ringbuf.h`) | `service/fifo`, `service/pbuf`, `service/simple_stream` |
+| xRingbuffer (`esp_ringbuf.h`) | four-pointer ring buffer + `vsf_sem_t` for blocking |
 | `esp_heap_caps.h` | `service/heap` + `service/pool` (caps collapsed) |
 | `esp_partition.h` | `component/mal` (`vsf_mal`) |
 | `nvs_flash.h` / `nvs.h` | KV layered on partition or littlefs |
@@ -124,7 +124,7 @@ and the espidf LCD shim is agnostic to the concrete driver type.
 | `esp_http_client.h` | `component/tcpip/protocol/http/client` |
 | cJSON / esp_json | not shimmed — applications include cJSON directly |
 | pthread | `shell/sys/linux` pthread |
-| FreeRTOS FreeRTOS.h, queue, event_groups | VSF FreeRTOS compat layer |
+| FreeRTOS FreeRTOS.h, queue, event_groups, QueueSet | VSF FreeRTOS compat layer |
 | `esp_netif.h` | `component/tcpip/netdrv` + lwIP glue |
 | `driver/gptimer` | `hal/driver/common/template/vsf_template_timer.h` (pool-injected) |
 | `driver/gpio` | `hal/driver/common/template/vsf_template_gpio.h` (global io_mapper) |
@@ -150,6 +150,7 @@ VSF_ESPIDF_CFG_USE_EVENT             (core, default ON)
 VSF_ESPIDF_CFG_USE_TIMER             (core, default ON)
 VSF_ESPIDF_CFG_USE_SYSTEM            (core, default ON)
 VSF_ESPIDF_CFG_USE_RINGBUF           (core, default ON)
+VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET  (requires VSF_USE_FREERTOS)
 VSF_ESPIDF_CFG_USE_HEAP_CAPS         (core, default ON)
 VSF_ESPIDF_CFG_USE_PARTITION         (storage)
 VSF_ESPIDF_CFG_USE_NVS               (storage)
@@ -268,7 +269,7 @@ as of this writing.
 | `esp_vfs` | `esp_vfs_register()` / `esp_vfs_unregister()` / `esp_vfs_register_fd_range()` are stubs returning `ESP_ERR_NOT_SUPPORTED`. VSF uses native VFS via `vk_fs_mount`. |
 | `esp_flash` | Encrypted read/write returns `ESP_ERR_NOT_SUPPORTED`. No SPI flash chip drivers. No memory-mapped access. |
 | `esp_partition` | `esp_partition_munmap()` returns `ESP_ERR_NOT_SUPPORTED` (VSF mim_mal lacks `VSF_MAL_LOCAL_BUFFER`). |
-| `esp_ringbuf` | Item-framed ring buffers (NOSPLIT/ALLOWSPLIT) are treated as byte buffers; per-message length prefix not yet implemented. |
+| `esp_ringbuf` | `xRingbufferAddToQueueSetRead` / `xRingbufferRemoveFromQueueSetRead` requires VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET and the VSF FreeRTOS shim (`VSF_USE_FREERTOS`). QueueSet notification is deferred outside the ringbuf critical section to avoid lock nesting (mirrors ESP-IDF upstream behaviour). |
 | `esp_netif` | DHCP server, PPP, Bridge, SLAAC return `ESP_ERR_NOT_SUPPORTED`. No `esp_netif_sntp.h`. |
 | `esp_http_client` | `get_chunk_length()`, `write()`, `open()`, `fetch_headers()`, `flush_response()`, `get_and_clear_last_tls_error()` return `ESP_ERR_NOT_SUPPORTED`. Async mode not implemented. Digest auth only in FULL profile. |
 | `esp_event` | No deprecated event loop API (`esp_event_loop.h`). |

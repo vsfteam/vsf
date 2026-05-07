@@ -256,7 +256,12 @@
 
 // LCD panel (IO + vendor panels bridged to vsf_disp_t)
 #ifndef VSF_ESPIDF_CFG_USE_LCD
-#   define VSF_ESPIDF_CFG_USE_LCD               DISABLED
+#   define VSF_ESPIDF_CFG_USE_LCD                DISABLED
+#endif
+// Ringbuf QueueSet integration (xRingbufferAddToQueueSetRead / ...).
+// Requires VSF_USE_FREERTOS and VSF_FREERTOS_CFG_USE_QUEUESET.
+#ifndef VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET
+#   define VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET  DISABLED
 #endif
 
 #endif      // __VSF_ESPIDF_CFG_H__

@@ -80,6 +80,11 @@
 #ifndef VSF_FREERTOS_CFG_USE_STREAM_BUFFER
 #   define VSF_FREERTOS_CFG_USE_STREAM_BUFFER   DISABLED
 #endif
+// QueueSet (xQueueCreateSet / xQueueSelectFromSet / ...).
+// Requires VSF_FREERTOS_CFG_USE_QUEUE == ENABLED.
+#ifndef VSF_FREERTOS_CFG_USE_QUEUESET
+#   define VSF_FREERTOS_CFG_USE_QUEUESET        DISABLED
+#endif
 // Critical section & scheduler-suspend primitives
 // (vTaskEnterCritical / vTaskSuspendAll / portENTER_CRITICAL / ...).
 // portmacro.h unconditionally exposes the macros; this switch gates

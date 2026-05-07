@@ -70,6 +70,12 @@ typedef uint32_t        TickType_t;     /*!< FreeRTOS tick counter type.      */
 #   endif
 #endif      // __VSF_ESPIDF_FREERTOS_TYPES_DEFINED__
 
+#ifndef __VSF_FREERTOS_QUEUESET_TYPES_DEFINED__
+#define __VSF_FREERTOS_QUEUESET_TYPES_DEFINED__
+typedef void * QueueSetHandle_t;
+typedef void * QueueSetMemberHandle_t;
+#endif
+
 typedef enum {
     RINGBUF_TYPE_NOSPLIT    = 0,    /*!< Item-oriented, no split at wrap     */
     RINGBUF_TYPE_ALLOWSPLIT = 1,    /*!< Item-oriented, may wrap             */
@@ -228,6 +234,25 @@ BaseType_t xRingbufferGetStaticBuffer(RingbufHandle_t handle,
  * the caps-resolved heap for freeing; otherwise identical to
  * vRingbufferDelete(). */
 void vRingbufferDeleteWithCaps(RingbufHandle_t handle);
+
+/* Add a ring buffer to a QueueSet so that data arrival can be detected
+ * via xQueueSelectFromSet(). Only one QueueSet per ring buffer. Rejected
+ * if the ring buffer already belongs to a set or has data available. */
+BaseType_t xRingbufferAddToQueueSetRead(RingbufHandle_t handle,
+                                        QueueSetHandle_t xQueueSet);
+
+/* Remove a ring buffer from its current QueueSet. Rejected if the set
+ * argument does not match or data is currently available to read. */
+BaseType_t xRingbufferRemoveFromQueueSetRead(RingbufHandle_t handle,
+                                              QueueSetHandle_t xQueueSet);
+
+/* Identify whether a QueueSet member (returned by xQueueSelectFromSet)
+ * corresponds to a given ring buffer handle. */
+static inline BaseType_t xRingbufferCanRead(RingbufHandle_t xRingbuffer,
+                                            QueueSetMemberHandle_t xMember)
+{
+    return (xMember == (QueueSetMemberHandle_t)xRingbuffer) ? pdTRUE : pdFALSE;
+}
 
 #ifdef __cplusplus
 }

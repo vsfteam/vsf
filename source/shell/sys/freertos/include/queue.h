@@ -32,7 +32,7 @@
 //   xQueueReset
 //
 // Not covered yet (add on demand):
-//   xQueueSendToFront / xQueuePeek / QueueSet / static variants.
+//   xQueueSendToFront / xQueuePeek.
 
 #ifndef __VSF_FREERTOS_QUEUE_H__
 #define __VSF_FREERTOS_QUEUE_H__
@@ -58,6 +58,14 @@ extern "C" {
 vsf_dcl_class(StaticQueue_t)
 typedef StaticQueue_t * QueueHandle_t;
 
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+#ifndef __VSF_FREERTOS_QUEUESET_TYPES_DEFINED__
+#   define __VSF_FREERTOS_QUEUESET_TYPES_DEFINED__
+typedef void * QueueSetHandle_t;
+typedef void * QueueSetMemberHandle_t;
+#endif
+#endif
+
 vsf_class(StaticQueue_t) {
     private_member(
         // vsf_eda_queue_t MUST stay first in the layout: the kernel
@@ -74,6 +82,10 @@ vsf_class(StaticQueue_t) {
         bool        is_storage_static; // item storage is user-owned
 
         uint8_t *   node_buffer;    // ring storage (heap or user-supplied)
+
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+        QueueSetHandle_t pxQueueSetContainer;   // NULL if not in a set
+#endif
     )
 };
 
@@ -130,6 +142,24 @@ extern UBaseType_t   uxQueueSpacesAvailable(QueueHandle_t xQueue);
 
 // Discard all pending items. Returns pdPASS.
 extern BaseType_t    xQueueReset(QueueHandle_t xQueue);
+
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+// ── QueueSet (queue of member pointers) ─────────────────────────────────
+
+extern QueueSetHandle_t xQueueCreateSet(const UBaseType_t uxEventQueueLength);
+
+extern BaseType_t xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,
+                                 QueueSetHandle_t xQueueSet);
+
+extern BaseType_t xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,
+                                      QueueSetHandle_t xQueueSet);
+
+extern QueueSetMemberHandle_t xQueueSelectFromSet(QueueSetHandle_t xQueueSet,
+                                                  TickType_t xTicksToWait);
+
+extern QueueSetMemberHandle_t xQueueSelectFromSetFromISR(
+                                      QueueSetHandle_t xQueueSet);
+#endif
 
 #ifdef __cplusplus
 }

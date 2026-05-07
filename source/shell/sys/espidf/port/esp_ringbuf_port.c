@@ -60,6 +60,10 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+#   include "queue.h"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define rbALIGN_MASK            0x03u
@@ -128,6 +132,9 @@ struct __vsf_espidf_ringbuf {
     bool            is_static;
 #if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
     vsf_heap_t *    heap;
+#endif
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+    void *          xQueueSet;
 #endif
 };
 
@@ -556,6 +563,9 @@ static void prvInitializeNewRingbuffer(size_t xBufferSize,
     rb->xItemsWaiting = 0;
     rb->uxRingbufferFlags = 0;
     rb->is_static = false;
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+    rb->xQueueSet = NULL;
+#endif
 
     if (xBufferType == RINGBUF_TYPE_NOSPLIT) {
         rb->xMaxItemSize = rbALIGN_SIZE(rb->xSize / 2) - rbHEADER_SIZE;
@@ -672,7 +682,15 @@ BaseType_t xRingbufferSend(RingbufHandle_t handle, const void *data,
                 prvCopyItemNoSplit(rb, (const uint8_t *)data, data_size);
             }
             vsf_unprotect_int(orig);
-            __rb_wake_data(rb);
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+            if (rb->xQueueSet != NULL) {
+                (void)xQueueSend((QueueHandle_t)rb->xQueueSet,
+                                 (const void *)&rb, 0);
+            } else
+#endif
+            {
+                __rb_wake_data(rb);
+            }
             return pdTRUE;
         }
         vsf_unprotect_int(orig);
@@ -706,6 +724,12 @@ BaseType_t xRingbufferSend(RingbufHandle_t handle, const void *data,
         prvCopyItemNoSplit(rb, (const uint8_t *)data, data_size);
     }
     vsf_unprotect_int(orig);
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+    if (rb->xQueueSet != NULL) {
+        (void)xQueueSend((QueueHandle_t)rb->xQueueSet,
+                         (const void *)&rb, 0);
+    }
+#endif
     return pdTRUE;
 #endif
 }
@@ -1001,7 +1025,16 @@ BaseType_t xRingbufferSendFromISR(RingbufHandle_t handle,
     }
     vsf_unprotect_int(orig);
 
-    __rb_wake_data_isr(rb, pxHigherPriorityTaskWoken);
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+    if (rb->xQueueSet != NULL) {
+        (void)xQueueSendFromISR((QueueHandle_t)rb->xQueueSet,
+                                (const void *)&rb,
+                                pxHigherPriorityTaskWoken);
+    } else
+#endif
+    {
+        __rb_wake_data_isr(rb, pxHigherPriorityTaskWoken);
+    }
     return pdTRUE;
 }
 
@@ -1203,7 +1236,15 @@ BaseType_t xRingbufferSendComplete(RingbufHandle_t handle, void *pvItem)
     prvSendItemDoneNoSplit(rb, (uint8_t *)pvItem);
     vsf_unprotect_int(orig);
 
-    __rb_wake_data(rb);
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+    if (rb->xQueueSet != NULL) {
+        (void)xQueueSend((QueueHandle_t)rb->xQueueSet,
+                         (const void *)&rb, 0);
+    } else
+#endif
+    {
+        __rb_wake_data(rb);
+    }
     return pdTRUE;
 }
 
@@ -1429,5 +1470,50 @@ void vRingbufferDeleteWithCaps(RingbufHandle_t handle)
     // cleanup automatically.
     vRingbufferDelete(handle);
 }
+
+#if VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET == ENABLED
+
+BaseType_t xRingbufferAddToQueueSetRead(RingbufHandle_t handle,
+                                        QueueSetHandle_t xQueueSet)
+{
+    if ((handle == NULL) || (xQueueSet == NULL)) {
+        return pdFALSE;
+    }
+    if ((QueueSetHandle_t)handle == xQueueSet) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if ((rb->xQueueSet != NULL) || prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return pdFALSE;
+    }
+    rb->xQueueSet = (void *)xQueueSet;
+    vsf_unprotect_int(orig);
+    return pdTRUE;
+}
+
+BaseType_t xRingbufferRemoveFromQueueSetRead(RingbufHandle_t handle,
+                                              QueueSetHandle_t xQueueSet)
+{
+    if ((handle == NULL) || (xQueueSet == NULL)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if ((rb->xQueueSet != (void *)xQueueSet) || prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return pdFALSE;
+    }
+    rb->xQueueSet = NULL;
+    vsf_unprotect_int(orig);
+    return pdTRUE;
+}
+
+#endif      // VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET
 
 #endif      // VSF_USE_ESPIDF && VSF_ESPIDF_CFG_USE_RINGBUF

@@ -183,7 +183,13 @@ BaseType_t xQueueSend(QueueHandle_t xQueue, const void *pvItemToQueue,
 
     // Fast path: if a slot is already free we land here.
     if (VSF_ERR_NONE == vsf_eda_queue_send(&xQueue->use_as__vsf_eda_queue_t,
-                                           (void *)pvItemToQueue, timeout)) {
+                                            (void *)pvItemToQueue, timeout)) {
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+        if (xQueue->pxQueueSetContainer != NULL) {
+            xQueueSend((QueueHandle_t)xQueue->pxQueueSetContainer,
+                       &xQueue, 0);
+        }
+#endif
         return pdTRUE;
     }
 
@@ -204,7 +210,16 @@ BaseType_t xQueueSend(QueueHandle_t xQueue, const void *pvItemToQueue,
             break;
         }
     }
-    return (reason == VSF_SYNC_GET) ? pdTRUE : pdFAIL;
+    if (reason == VSF_SYNC_GET) {
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+        if (xQueue->pxQueueSetContainer != NULL) {
+            xQueueSend((QueueHandle_t)xQueue->pxQueueSetContainer,
+                       &xQueue, 0);
+        }
+#endif
+        return pdTRUE;
+    }
+    return pdFAIL;
 }
 
 // FreeRTOS contract: xQueueSendFromISR MUST be called from a real ISR
@@ -226,12 +241,18 @@ BaseType_t xQueueSendFromISR(QueueHandle_t xQueue, const void *pvItemToQueue,
         return pdFAIL;
     }
     vsf_err_t err = vsf_eda_queue_send_isr(&xQueue->use_as__vsf_eda_queue_t,
-                                           (void *)pvItemToQueue);
+                                            (void *)pvItemToQueue);
+    BaseType_t woken = (err == VSF_ERR_NONE) ? pdTRUE : pdFALSE;
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+    if ((err == VSF_ERR_NONE) && (xQueue->pxQueueSetContainer != NULL)) {
+        BaseType_t woken2 = pdFALSE;
+        (void)xQueueSendFromISR((QueueHandle_t)xQueue->pxQueueSetContainer,
+                                &xQueue, &woken2);
+        if (woken2 == pdTRUE) { woken = pdTRUE; }
+    }
+#endif
     if (pxHigherPriorityTaskWoken != NULL) {
-        // Best-effort: if ISR send succeeds a waiter may have been queued
-        // for resume. The VSF scheduler handles the real yield, so this is
-        // purely informational for FreeRTOS-style callers.
-        *pxHigherPriorityTaskWoken = (err == VSF_ERR_NONE) ? pdTRUE : pdFALSE;
+        *pxHigherPriorityTaskWoken = woken;
     }
     return (err == VSF_ERR_NONE) ? pdTRUE : pdFAIL;
 }
@@ -327,5 +348,60 @@ BaseType_t xQueueReset(QueueHandle_t xQueue)
                        (uint_fast16_t)xQueue->node_num);
     return pdPASS;
 }
+
+#if VSF_FREERTOS_CFG_USE_QUEUESET == ENABLED
+
+QueueSetHandle_t xQueueCreateSet(const UBaseType_t uxEventQueueLength)
+{
+    return xQueueCreate(uxEventQueueLength, (UBaseType_t)sizeof(void *));
+}
+
+BaseType_t xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,
+                          QueueSetHandle_t xQueueSet)
+{
+    if ((xQueueOrSemaphore == NULL) || (xQueueSet == NULL)) {
+        return pdFALSE;
+    }
+    if ((QueueSetHandle_t)xQueueOrSemaphore == xQueueSet) {
+        return pdFALSE;
+    }
+    StaticQueue_t *pxQueue = (StaticQueue_t *)xQueueOrSemaphore;
+    if (pxQueue->pxQueueSetContainer != NULL) {
+        return pdFALSE;
+    }
+    pxQueue->pxQueueSetContainer = xQueueSet;
+    return pdTRUE;
+}
+
+BaseType_t xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,
+                               QueueSetHandle_t xQueueSet)
+{
+    if ((xQueueOrSemaphore == NULL) || (xQueueSet == NULL)) {
+        return pdFALSE;
+    }
+    StaticQueue_t *pxQueue = (StaticQueue_t *)xQueueOrSemaphore;
+    if (pxQueue->pxQueueSetContainer != xQueueSet) {
+        return pdFALSE;
+    }
+    pxQueue->pxQueueSetContainer = NULL;
+    return pdTRUE;
+}
+
+QueueSetMemberHandle_t xQueueSelectFromSet(QueueSetHandle_t xQueueSet,
+                                           TickType_t xTicksToWait)
+{
+    QueueSetMemberHandle_t xReturn = NULL;
+    (void)xQueueReceive((QueueHandle_t)xQueueSet, &xReturn, xTicksToWait);
+    return xReturn;
+}
+
+QueueSetMemberHandle_t xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet)
+{
+    QueueSetMemberHandle_t xReturn = NULL;
+    (void)xQueueReceiveFromISR((QueueHandle_t)xQueueSet, &xReturn, NULL);
+    return xReturn;
+}
+
+#endif      // VSF_FREERTOS_CFG_USE_QUEUESET
 
 #endif      // VSF_USE_FREERTOS && VSF_FREERTOS_CFG_USE_QUEUE
