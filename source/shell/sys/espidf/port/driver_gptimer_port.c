@@ -72,8 +72,11 @@ struct gptimer_t {
     uint8_t                  fsm;
     uint8_t                  has_alarm : 1;
     uint8_t                  auto_reload : 1;
+    uint8_t                  count_down : 1;/*!< GPTIMER_COUNT_DOWN               */
     uint32_t                 resolution_hz; /*!< requested / effective            */
     uint64_t                 alarm_count;   /*!< programmed via set_alarm_action  */
+    uint64_t                 reload_count;  /*!< auto_reload reload value         */
+    uint64_t                 alarm_fire_count; /*!< captured alarm event count    */
 
     gptimer_alarm_cb_t       on_alarm;
     void                    *user_ctx;
@@ -150,11 +153,21 @@ static void __gptimer_isr_thunk(void *target_ptr,
         return;
     }
 
+    h->alarm_fire_count++;
+
+    uint32_t cnt = vsf_timer_get_counter(h->hw);
     gptimer_alarm_event_data_t edata = {
-        .count_value = h->alarm_count,   // best-effort: backend cannot sample
+        .count_value = cnt,
         .alarm_value = h->alarm_count,
     };
     (void)h->on_alarm(h, &edata, h->user_ctx);
+
+    if (h->auto_reload && (h->reload_count != 0)) {
+#ifdef VSF_TIMER_SET_COUNTER_IMMEDIATE
+        vsf_timer_set_counter(h->hw, (uint32_t)h->reload_count,
+                              VSF_TIMER_SET_COUNTER_IMMEDIATE);
+#endif
+    }
 }
 
 // Program the underlying vsf_timer and (re-)arm IRQ reporting.
@@ -191,9 +204,6 @@ esp_err_t gptimer_new_timer(const gptimer_config_t *config,
     if ((config == NULL) || (ret_timer == NULL)) {
         return ESP_ERR_INVALID_ARG;
     }
-    if (config->direction == GPTIMER_COUNT_DOWN) {
-        return ESP_ERR_NOT_SUPPORTED;
-    }
     if (config->resolution_hz == 0) {
         return ESP_ERR_INVALID_ARG;
     }
@@ -217,6 +227,7 @@ esp_err_t gptimer_new_timer(const gptimer_config_t *config,
     h->pool_idx      = (uint16_t)idx;
     h->fsm           = GPTIMER_FSM_INIT;
     h->resolution_hz = config->resolution_hz;
+    h->count_down    = (uint8_t)(config->direction == GPTIMER_COUNT_DOWN);
 
     *ret_timer = h;
     return ESP_OK;
@@ -266,9 +277,10 @@ esp_err_t gptimer_set_alarm_action(gptimer_handle_t timer,
         if (timer->has_alarm && (timer->fsm != GPTIMER_FSM_INIT)) {
             vsf_timer_irq_disable(timer->hw, VSF_TIMER_IRQ_MASK_OVERFLOW);
         }
-        timer->has_alarm   = false;
-        timer->auto_reload = false;
-        timer->alarm_count = 0;
+        timer->has_alarm     = false;
+        timer->auto_reload   = false;
+        timer->alarm_count   = 0;
+        timer->reload_count  = 0;
         return ESP_OK;
     }
 
@@ -276,9 +288,10 @@ esp_err_t gptimer_set_alarm_action(gptimer_handle_t timer,
         return ESP_ERR_INVALID_ARG;
     }
 
-    timer->alarm_count = config->alarm_count;
-    timer->auto_reload = (uint8_t)config->flags.auto_reload_on_alarm;
-    timer->has_alarm   = 1;
+    timer->alarm_count  = config->alarm_count;
+    timer->reload_count = config->reload_count;
+    timer->auto_reload  = (uint8_t)config->flags.auto_reload_on_alarm;
+    timer->has_alarm    = 1;
 
     // If the timer is already running, apply the new period on the fly.
     // Otherwise the next enable()/start() will pick it up.
@@ -379,22 +392,26 @@ esp_err_t gptimer_stop(gptimer_handle_t timer)
 
 esp_err_t gptimer_set_raw_count(gptimer_handle_t timer, uint64_t value)
 {
-    // VSF's generic timer template has no set_counter API (only period
-    // reprogramming). Expose as NOT_SUPPORTED; applications that rely on
-    // this must use a back-end that extends the template.
-    (void)timer;
+    if (timer == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+#ifdef VSF_TIMER_SET_COUNTER_IMMEDIATE
+    vsf_err_t err = vsf_timer_set_counter(timer->hw, (uint32_t)value,
+                                          VSF_TIMER_SET_COUNTER_IMMEDIATE);
+    return (err == VSF_ERR_NONE) ? ESP_OK : ESP_ERR_NOT_SUPPORTED;
+#else
     (void)value;
     return ESP_ERR_NOT_SUPPORTED;
+#endif
 }
 
 esp_err_t gptimer_get_raw_count(gptimer_handle_t timer, uint64_t *value)
 {
-    (void)timer;
-    if (value == NULL) {
+    if ((timer == NULL) || (value == NULL)) {
         return ESP_ERR_INVALID_ARG;
     }
-    *value = 0;
-    return ESP_ERR_NOT_SUPPORTED;
+    *value = (uint64_t)vsf_timer_get_counter(timer->hw);
+    return ESP_OK;
 }
 
 esp_err_t gptimer_get_resolution(gptimer_handle_t timer, uint32_t *out_resolution)
@@ -408,12 +425,11 @@ esp_err_t gptimer_get_resolution(gptimer_handle_t timer, uint32_t *out_resolutio
 
 esp_err_t gptimer_get_captured_count(gptimer_handle_t timer, uint64_t *value)
 {
-    (void)timer;
-    if (value == NULL) {
+    if ((timer == NULL) || (value == NULL)) {
         return ESP_ERR_INVALID_ARG;
     }
-    *value = 0;
-    return ESP_ERR_NOT_SUPPORTED;
+    *value = timer->alarm_fire_count;
+    return ESP_OK;
 }
 
 #endif      // VSF_USE_ESPIDF && VSF_ESPIDF_CFG_USE_DRIVER_GPTIMER
