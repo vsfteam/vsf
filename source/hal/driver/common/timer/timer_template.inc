@@ -69,6 +69,14 @@
 #   define  VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL              VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL
 #endif
 
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_API_GET_COUNTER
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_GET_COUNTER               DISABLED
+#endif
+
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_API_SET_COUNTER
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_SET_COUNTER               DISABLED
+#endif
+
 #ifdef VSF_TIMER_CFG_IMP_REMAP_PREFIX
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CTRL
@@ -79,6 +87,8 @@
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_START
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_STOP
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL
+#   undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_COUNTER
+#   undef VSF_TIMER_CFG_REIMPLEMENT_API_SET_COUNTER
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
@@ -90,6 +100,8 @@
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_START      ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_STOP       ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL               ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_GET_COUNTER                ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_SET_COUNTER                ENABLED
 #endif
 
 #if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -125,6 +137,8 @@
 #   define vsf_real_timer_channel_request_start  VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_request_start)
 #   define vsf_real_timer_channel_request_stop   VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_request_stop)
 #   define vsf_real_timer_channel_ctrl           VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_ctrl)
+#   define vsf_real_timer_get_counter            VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _get_counter)
+#   define vsf_real_timer_set_counter            VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _set_counter)
 #else
 #   define vsf_real_timer_t                      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)
 #   define vsf_real_timer_capability             VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
@@ -138,6 +152,8 @@
 #   define vsf_real_timer_channel_request_start  VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_request_start)
 #   define vsf_real_timer_channel_request_stop   VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_request_stop)
 #   define vsf_real_timer_channel_ctrl           VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)
+#   define vsf_real_timer_get_counter            VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_counter)
+#   define vsf_real_timer_set_counter            VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_set_counter)
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -258,6 +274,30 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 }
 #endif
 
+#if VSF_TIMER_CFG_REIMPLEMENT_API_GET_COUNTER == DISABLED
+uint32_t vsf_real_timer_get_counter(vsf_real_timer_t *timer_ptr)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_API_SET_COUNTER == DISABLED
+vsf_err_t vsf_real_timer_set_counter(vsf_real_timer_t *timer_ptr, uint32_t value,
+                                      vsf_timer_set_counter_mode_t mode)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    (void)value;
+    (void)mode;
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY
@@ -269,8 +309,11 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_STATUS
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_SET_COUNTER_MODE
 #undef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_COUNTER
+#undef VSF_TIMER_CFG_REIMPLEMENT_API_SET_COUNTER
 #undef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN
 #undef VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM
@@ -287,6 +330,8 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #undef vsf_real_timer_channel_request_start
 #undef vsf_real_timer_channel_request_stop
 #undef vsf_real_timer_channel_ctrl
+#undef vsf_real_timer_get_counter
+#undef vsf_real_timer_set_counter
 
 /*============================ MACROS ========================================*/
 
@@ -307,6 +352,8 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #   define vsf_imp_timer_channel_ctrl       VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)
 #   define vsf_imp_timer_ctrl               VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_ctrl)
 #   define vsf_imp_timer_get_configuration  VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)
+#   define vsf_imp_timer_get_counter         VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_counter)
+#   define vsf_imp_timer_set_counter         VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_set_counter)
 
 #   define vsf_remap_timer_t                VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_t)
 #   define vsf_remap_timer_init             VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_init)
@@ -323,6 +370,8 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #   define vsf_remap_timer_channel_ctrl     VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_channel_ctrl)
 #   define vsf_remap_timer_ctrl             VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_ctrl)
 #   define vsf_remap_timer_get_configuration VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_get_configuration)
+#   define vsf_remap_timer_get_counter       VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_get_counter)
+#   define vsf_remap_timer_set_counter       VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_set_counter)
 
 #   define VSF_TIMER_CFG_IMP_REMAP_FUNCTIONS                                                                          \
         vsf_err_t vsf_imp_timer_init(vsf_imp_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)                            \
@@ -402,6 +451,17 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
         {                                                                                                             \
             VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
             return vsf_remap_timer_get_configuration(timer_ptr, cfg_ptr);                                             \
+        }                                                                                                             \
+        uint32_t vsf_imp_timer_get_counter(vsf_imp_timer_t *timer_ptr)                                                \
+        {                                                                                                             \
+            VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
+            return vsf_remap_timer_get_counter(timer_ptr);                                                            \
+        }                                                                                                             \
+        vsf_err_t vsf_imp_timer_set_counter(vsf_imp_timer_t *timer_ptr, uint32_t value,                              \
+                                            vsf_timer_set_counter_mode_t mode)                                        \
+        {                                                                                                             \
+            VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
+            return vsf_remap_timer_set_counter(timer_ptr, value, mode);                                                \
         }
 #endif
 
@@ -453,6 +513,8 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #undef vsf_imp_timer_channel_ctrl
 #undef vsf_imp_timer_ctrl
 #undef vsf_imp_timer_get_configuration
+#undef vsf_imp_timer_get_counter
+#undef vsf_imp_timer_set_counter
 
 #undef vsf_remap_timer_t
 #undef vsf_remap_timer_init
@@ -468,6 +530,8 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #undef vsf_remap_timer_channel_ctrl
 #undef vsf_remap_timer_ctrl
 #undef vsf_remap_timer_get_configuration
+#undef vsf_remap_timer_get_counter
+#undef vsf_remap_timer_set_counter
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
@@ -678,10 +742,31 @@ VSF_HAL_CHECK_UNIQUE_CUSTOM(
 );
 #endif  /* VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE */
 
+/* ==================== SET COUNTER MODE UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_TIMER_CFG_SET_COUNTER_MODE_CHECK_UNIQUE
+
+/* Check set_counter mode uniqueness — optional members probed via #ifdef
+ * Placeholder: __VSF_TIMER_SET_COUNTER_MODE_DUMMY
+ * Optional (driver-defined): VSF_TIMER_SET_COUNTER_IMMEDIATE, VSF_TIMER_SET_COUNTER_PRELOAD
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_SET_COUNTER_MODE_CHECK_UNIQUE,
+    __VSF_TIMER_SET_COUNTER_MODE_DUMMY
+#ifdef VSF_TIMER_SET_COUNTER_IMMEDIATE
+    , VSF_TIMER_SET_COUNTER_IMMEDIATE
+#endif
+#ifdef VSF_TIMER_SET_COUNTER_PRELOAD
+    , VSF_TIMER_SET_COUNTER_PRELOAD
+#endif
+);
+#endif  /* VSF_TIMER_CFG_SET_COUNTER_MODE_CHECK_UNIQUE */
+
 #undef VSF_TIMER_CFG_MODE_CHECK_UNIQUE
 #undef VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE
 #undef VSF_TIMER_CFG_CTRL_CHECK_UNIQUE
 #undef VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE
+#undef VSF_TIMER_CFG_SET_COUNTER_MODE_CHECK_UNIQUE
 #undef VSF_TIMER_CUSTOM_MODE_VALUES
 #undef VSF_TIMER_CUSTOM_IRQ_MASK_VALUES
 #undef VSF_TIMER_CUSTOM_CTRL_VALUES

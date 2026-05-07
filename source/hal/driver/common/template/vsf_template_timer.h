@@ -258,10 +258,12 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,               VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_irq_mask_t,  timer, irq_clear,             VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_irq_mask_t,   timer, irq_clear,             VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_status_t,     timer, status,                VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint32_t period) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,               timer, get_counter,           VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_counter,           VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint32_t value, vsf_timer_set_counter_mode_t mode) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_ctrl_t ctrl, void* param) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_config,        VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel, vsf_timer_channel_cfg_t *channel_cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_start,         VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel) \
@@ -701,6 +703,30 @@ typedef struct vsf_timer_channel_request_t {
 } vsf_timer_channel_request_t;
 #endif
 
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_SET_COUNTER_MODE == DISABLED
+/**
+ \~english
+ @brief Counter write mode for vsf_timer_set_counter().
+
+ Optional members (not defined by default — a driver adds them when its
+ hardware supports the mode; each member also exposes a same-name \#define
+ so callers can probe via \#ifdef at compile time):
+   - VSF_TIMER_SET_COUNTER_IMMEDIATE : write takes effect immediately.
+   - VSF_TIMER_SET_COUNTER_PRELOAD   : write deferred to the next UPDATE event.
+
+ \~chinese
+ @brief vsf_timer_set_counter() 的计数器写入模式。
+
+ 可选成员（默认不定义 — 驱动在硬件支持时自行添加；每个成员同时提供
+ 同名 #define 宏，调用方可通过 #ifdef 在编译期探测）：
+   - VSF_TIMER_SET_COUNTER_IMMEDIATE : 写入立即生效。
+   - VSF_TIMER_SET_COUNTER_PRELOAD   : 等待下一次 UPDATE 事件时生效。
+ */
+typedef enum vsf_timer_set_counter_mode_t {
+    __VSF_TIMER_SET_COUNTER_MODE_DUMMY = 0,
+} vsf_timer_set_counter_mode_t;
+#endif
+
 /**
  * \~english
  * @brief TIMER status information structure
@@ -941,6 +967,44 @@ extern vsf_err_t vsf_timer_get_configuration(vsf_timer_t *timer_ptr, vsf_timer_c
 extern vsf_err_t vsf_timer_set_period(vsf_timer_t *timer_ptr, uint32_t period);
 
 /**
+ \~english
+ @brief Read the current counter value from the running timer.
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @return uint32_t: current counter value in resolution ticks.
+
+ \~chinese
+ @brief 读取正在运行的定时器的当前计数器值。
+ @param[in] timer_ptr: 指向结构体 @ref vsf_timer_t 的指针
+ @return uint32_t: 当前计数器值（分辨率 tick 为单位）。
+ */
+uint32_t vsf_timer_get_counter(vsf_timer_t *timer_ptr);
+
+/**
+ \~english
+ @brief Write a value into the running timer's counter register.
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @param[in] value: counter value to set, in resolution ticks
+ @param[in] mode: when the write takes effect —
+                  VSF_TIMER_SET_COUNTER_IMMEDIATE: immediately;
+                  VSF_TIMER_SET_COUNTER_PRELOAD: at the next UPDATE event.
+ @return vsf_err_t: VSF_ERR_NONE on success;
+                    VSF_ERR_NOT_SUPPORT when the driver or hardware does not
+                    support the requested mode.
+
+ \~chinese
+ @brief 向正在运行的定时器计数器寄存器写入一个值。
+ @param[in] timer_ptr: 指向结构体 @ref vsf_timer_t 的指针
+ @param[in] value: 要设置的计数器值（分辨率 tick 为单位）
+ @param[in] mode: 写入生效时机 —
+                  VSF_TIMER_SET_COUNTER_IMMEDIATE: 立即生效；
+                  VSF_TIMER_SET_COUNTER_PRELOAD: 下一次 UPDATE 事件时生效。
+ @return vsf_err_t: 成功返回 VSF_ERR_NONE；
+                    驱动或硬件不支持请求的模式时返回 VSF_ERR_NOT_SUPPORT。
+ */
+vsf_err_t vsf_timer_set_counter(vsf_timer_t *timer_ptr, uint32_t value,
+                                 vsf_timer_set_counter_mode_t mode);
+
+/**
  * \~english
  * @brief Execute a control command on the TIMER instance
  * @param[in,out] timer_ptr: Pointer to TIMER instance structure @ref vsf_timer_t
@@ -1102,6 +1166,8 @@ extern vsf_err_t vsf_timer_channel_ctrl(vsf_timer_t *timer_ptr, uint8_t channel,
 #   define vsf_timer_irq_disable(__TIME, ...)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable)          ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_irq_clear(__TIME, ...)             VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_clear)            ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_set_period(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_period)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_get_counter(__TIME)                VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_get_counter)          ((__vsf_timer_t *)(__TIME))
+#   define vsf_timer_set_counter(__TIME, ...)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_counter)          ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_ctrl(__TIME, ...)                  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_ctrl)                 ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_channel_config(__TIME, ...)        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_config)       ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_channel_start(__TIME, ...)         VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_start)        ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)

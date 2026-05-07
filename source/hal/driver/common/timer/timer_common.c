@@ -124,6 +124,25 @@ vsf_err_t vsf_timer_set_period(vsf_timer_t *timer_ptr, uint32_t period)
     return timer_ptr->op->set_period(timer_ptr, period);
 }
 
+uint32_t vsf_timer_get_counter(vsf_timer_t *timer_ptr)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->get_counter != NULL);
+
+    return timer_ptr->op->get_counter(timer_ptr);
+}
+
+vsf_err_t vsf_timer_set_counter(vsf_timer_t *timer_ptr, uint32_t value,
+                                  vsf_timer_set_counter_mode_t mode)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->set_counter != NULL);
+
+    return timer_ptr->op->set_counter(timer_ptr, value, mode);
+}
+
 vsf_err_t vsf_timer_ctrl(vsf_timer_t *timer_ptr, vsf_timer_ctrl_t ctrl, void *param)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
