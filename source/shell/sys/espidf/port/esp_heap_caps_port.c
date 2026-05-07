@@ -47,6 +47,8 @@
 
 #include "esp_heap_caps.h"
 
+#include "../vsf_espidf.h"
+
 #if !defined(VSF_USE_HEAP) || VSF_USE_HEAP != ENABLED
 #   error "esp_heap_caps port requires VSF_USE_HEAP == ENABLED"
 #endif
@@ -86,6 +88,13 @@ void *heap_caps_malloc(size_t size, uint32_t caps)
 {
     if (!__caps_is_valid(caps) || (size == 0)) {
         return NULL;
+    }
+    vsf_heap_t *(*cb)(uint32_t) = vsf_espidf_get_caps_to_heap();
+    if (cb != NULL) {
+        vsf_heap_t *heap = cb(caps);
+        if (heap != NULL) {
+            return __vsf_heap_malloc_aligned(heap, size, VSF_HEAP_ALIGN);
+        }
     }
     return vsf_heap_malloc(size);
 }

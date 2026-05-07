@@ -45,6 +45,9 @@ static struct {
 #if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
     vk_usbd_dev_t *usbd;
 #endif
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+    vsf_heap_t *(*caps_to_heap)(uint32_t caps);
+#endif
 } __vsf_espidf = { 0 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -69,6 +72,9 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
 #endif
 #if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
     __vsf_espidf.usbd = (cfg != NULL) ? cfg->usb_device.usbd : NULL;
+#endif
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+    __vsf_espidf.caps_to_heap = (cfg != NULL) ? cfg->caps_to_heap : NULL;
 #endif
 
     // Per-module init hooks. Only modules with visible init state are
@@ -168,6 +174,13 @@ vk_usbh_t * vsf_espidf_get_usbh(void)
 vk_usbd_dev_t * vsf_espidf_get_usbd(void)
 {
     return __vsf_espidf.usbd;
+}
+#endif
+
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+vsf_heap_t *(*vsf_espidf_get_caps_to_heap(void))(uint32_t caps)
+{
+    return __vsf_espidf.caps_to_heap;
 }
 #endif
 

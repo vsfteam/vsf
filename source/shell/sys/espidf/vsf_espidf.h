@@ -26,6 +26,13 @@
 
 #if VSF_USE_ESPIDF == ENABLED
 
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+#   if !defined(VSF_USE_HEAP) || VSF_USE_HEAP != ENABLED
+#       error "VSF_ESPIDF_CFG_USE_HEAP_CAPS requires VSF_USE_HEAP"
+#   endif
+#   include "service/heap/vsf_heap.h"
+#endif
+
 #if VSF_ESPIDF_CFG_USE_PARTITION == ENABLED
 #   include "component/mal/vsf_mal.h"
 #   include "./include/esp_partition.h"
@@ -238,6 +245,13 @@ typedef struct vsf_espidf_cfg_t {
 #if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
     vsf_espidf_usb_device_cfg_t  usb_device;
 #endif
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+    /* Optional callback to map an ESP-IDF heap_caps bitmask to a VS F
+     * heap instance. When non-NULL, heap_caps_malloc() and
+     * xRingbufferCreateWithCaps() route allocations through the
+     * returned heap. If NULL, the default flat heap is used. */
+    vsf_heap_t *(*caps_to_heap)(uint32_t caps);
+#endif
 } vsf_espidf_cfg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -261,6 +275,10 @@ extern vk_usbh_t * vsf_espidf_get_usbh(void);
 
 #if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
 extern vk_usbd_dev_t * vsf_espidf_get_usbd(void);
+#endif
+
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+extern vsf_heap_t *(*vsf_espidf_get_caps_to_heap(void))(uint32_t caps);
 #endif
 
 #ifdef __cplusplus

@@ -57,6 +57,8 @@
 #endif
 
 #include <string.h>
+#include <inttypes.h>
+#include <stdio.h>
 
 /*============================ MACROS ========================================*/
 
@@ -81,14 +83,24 @@
 #   define __RB_SEM_MAX         0x7FFFu
 #   define __rb_wake_data(rb)   vsf_eda_sem_post(&(rb)->data_sem)
 #   define __rb_wake_space(rb)  vsf_eda_sem_post(&(rb)->space_sem)
+#   define __rb_wake_data_isr(rb, w)   do { \
+        vsf_eda_sem_post_isr(&(rb)->data_sem); \
+        if ((w) != NULL) *(w) = pdTRUE; \
+    } while (0)
+#   define __rb_wake_space_isr(rb, w)  do { \
+        vsf_eda_sem_post_isr(&(rb)->space_sem); \
+        if ((w) != NULL) *(w) = pdTRUE; \
+    } while (0)
 #   define __rb_cancel(rb)      do {                         \
         vsf_eda_sync_cancel(&(rb)->data_sem);                \
         vsf_eda_sync_cancel(&(rb)->space_sem);               \
     } while (0)
 #else
-#   define __rb_wake_data(rb)   ((void)0)
-#   define __rb_wake_space(rb)  ((void)0)
-#   define __rb_cancel(rb)      ((void)0)
+#   define __rb_wake_data(rb)       ((void)0)
+#   define __rb_wake_space(rb)      ((void)0)
+#   define __rb_wake_data_isr(rb,w) ((void)0)
+#   define __rb_wake_space_isr(rb,w)((void)0)
+#   define __rb_cancel(rb)          ((void)0)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -113,7 +125,19 @@ struct __vsf_espidf_ringbuf {
     vsf_sem_t       data_sem;
     vsf_sem_t       space_sem;
 #endif
+    bool            is_static;
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+    vsf_heap_t *    heap;
+#endif
 };
+
+/* StaticRingbuffer_t must be at least as large as the control block. */
+#ifdef __STDC_VERSION__
+#  if __STDC_VERSION__ >= 201112L
+     _Static_assert(sizeof(StaticRingbuffer_t) >= sizeof(struct __vsf_espidf_ringbuf),
+                    "StaticRingbuffer_t too small for platform");
+#  endif
+#endif
 
 /*============================ LOCAL HELPERS =================================*/
 
@@ -260,8 +284,8 @@ static void prvCopyItemByteBuf(struct __vsf_espidf_ringbuf *rb,
     rb->pucWrite = rb->pucAcquire;
 }
 
-static void prvCopyItemNoSplit(struct __vsf_espidf_ringbuf *rb,
-                               const uint8_t *pucItem, size_t xItemSize)
+static void * prvAcquireItemNoSplit(struct __vsf_espidf_ringbuf *rb,
+                                      size_t xItemSize)
 {
     size_t xAlignedItemSize = rbALIGN_SIZE(xItemSize);
     size_t xRemLen = (size_t)(rb->pucTail - rb->pucAcquire);
@@ -275,11 +299,9 @@ static void prvCopyItemNoSplit(struct __vsf_espidf_ringbuf *rb,
 
     ItemHeader_t *pxHeader = (ItemHeader_t *)rb->pucAcquire;
     pxHeader->xItemLen = xItemSize;
-    pxHeader->uxItemFlags = rbITEM_WRITTEN_FLAG;
-    rb->pucAcquire += rbHEADER_SIZE;
-    memcpy(rb->pucAcquire, pucItem, xItemSize);
-    rb->pucAcquire += xAlignedItemSize;
-    rb->xItemsWaiting++;
+    pxHeader->uxItemFlags = 0;
+    uint8_t *item_addr = rb->pucAcquire + rbHEADER_SIZE;
+    rb->pucAcquire += rbHEADER_SIZE + xAlignedItemSize;
 
     if ((size_t)(rb->pucTail - rb->pucAcquire) < rbHEADER_SIZE) {
         rb->pucAcquire = rb->pucHead;
@@ -287,7 +309,45 @@ static void prvCopyItemNoSplit(struct __vsf_espidf_ringbuf *rb,
     if (rb->pucAcquire == rb->pucFree) {
         rb->uxRingbufferFlags |= rbBUFFER_FULL_FLAG;
     }
-    rb->pucWrite = rb->pucAcquire;
+    return (void *)item_addr;
+}
+
+static void prvSendItemDoneNoSplit(struct __vsf_espidf_ringbuf *rb,
+                                    uint8_t *pucItem)
+{
+    ItemHeader_t *pxCurHeader = (ItemHeader_t *)(pucItem - rbHEADER_SIZE);
+    pxCurHeader->uxItemFlags &= ~rbITEM_SPLIT_FLAG;
+    pxCurHeader->uxItemFlags |= rbITEM_WRITTEN_FLAG;
+
+    rb->xItemsWaiting++;
+
+    pxCurHeader = (ItemHeader_t *)rb->pucWrite;
+    while (((pxCurHeader->uxItemFlags & rbITEM_WRITTEN_FLAG)
+            || (pxCurHeader->uxItemFlags & rbITEM_DUMMY_DATA_FLAG))
+            && (rb->pucWrite != rb->pucAcquire)) {
+        if (pxCurHeader->uxItemFlags & rbITEM_DUMMY_DATA_FLAG) {
+            pxCurHeader->uxItemFlags |= rbITEM_WRITTEN_FLAG;
+            rb->pucWrite = rb->pucHead;
+        } else {
+            size_t step = rbALIGN_SIZE(pxCurHeader->xItemLen);
+            rb->pucWrite += step + rbHEADER_SIZE;
+        }
+        if ((size_t)(rb->pucTail - rb->pucWrite) < rbHEADER_SIZE) {
+            rb->pucWrite = rb->pucHead;
+        }
+        if (rb->pucWrite == rb->pucAcquire) {
+            break;
+        }
+        pxCurHeader = (ItemHeader_t *)rb->pucWrite;
+    }
+}
+
+static void prvCopyItemNoSplit(struct __vsf_espidf_ringbuf *rb,
+                               const uint8_t *pucItem, size_t xItemSize)
+{
+    uint8_t *item_addr = (uint8_t *)prvAcquireItemNoSplit(rb, xItemSize);
+    memcpy(item_addr, pucItem, xItemSize);
+    prvSendItemDoneNoSplit(rb, item_addr);
 }
 
 static void prvCopyItemAllowSplit(struct __vsf_espidf_ringbuf *rb,
@@ -495,6 +555,7 @@ static void prvInitializeNewRingbuffer(size_t xBufferSize,
     rb->xSize = xBufferSize;
     rb->xItemsWaiting = 0;
     rb->uxRingbufferFlags = 0;
+    rb->is_static = false;
 
     if (xBufferType == RINGBUF_TYPE_NOSPLIT) {
         rb->xMaxItemSize = rbALIGN_SIZE(rb->xSize / 2) - rbHEADER_SIZE;
@@ -527,6 +588,7 @@ RingbufHandle_t xRingbufferCreate(size_t buffer_size, RingbufferType_t type)
     if (rb == NULL) {
         return NULL;
     }
+    memset(rb, 0, sizeof(*rb));
     uint8_t *storage = (uint8_t *)vsf_heap_malloc(buffer_size);
     if (storage == NULL) {
         vsf_heap_free(rb);
@@ -547,10 +609,26 @@ void vRingbufferDelete(RingbufHandle_t handle)
 
     __rb_cancel(rb);
 
-    if (rb->pucHead != NULL) {
-        vsf_heap_free(rb->pucHead);
+    if (!rb->is_static) {
+        if (rb->pucHead != NULL) {
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+            if (rb->heap != NULL) {
+                __vsf_heap_free(rb->heap, rb->pucHead);
+            } else
+#endif
+            {
+                vsf_heap_free(rb->pucHead);
+            }
+        }
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+        if (rb->heap != NULL) {
+            __vsf_heap_free(rb->heap, rb);
+        } else
+#endif
+        {
+            vsf_heap_free(rb);
+        }
     }
-    vsf_heap_free(rb);
 }
 
 BaseType_t xRingbufferSend(RingbufHandle_t handle, const void *data,
@@ -871,6 +949,485 @@ BaseType_t xRingbufferReceiveSplit(RingbufHandle_t handle,
     vsf_unprotect_int(orig);
     return pdTRUE;
 #endif
+}
+
+RingbufHandle_t xRingbufferCreateNoSplit(size_t xItemSize, size_t xItemNum)
+{
+    return xRingbufferCreate(
+        (rbALIGN_SIZE(xItemSize) + rbHEADER_SIZE) * xItemNum,
+        RINGBUF_TYPE_NOSPLIT);
+}
+
+/* ---------- ISR variants (no blocking) ---------------------------------- */
+
+BaseType_t xRingbufferSendFromISR(RingbufHandle_t handle,
+                                   const void *data, size_t data_size,
+                                   BaseType_t *pxHigherPriorityTaskWoken)
+{
+    if (pxHigherPriorityTaskWoken != NULL) {
+        *pxHigherPriorityTaskWoken = pdFALSE;
+    }
+    if ((handle == NULL) || (data == NULL) || (data_size == 0)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    bool is_bytebuf = (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) != 0;
+    if (is_bytebuf && data_size == 0) {
+        return pdTRUE;
+    }
+    if (data_size > rb->xMaxItemSize) {
+        return pdFALSE;
+    }
+
+    vsf_protect_t orig = vsf_protect_int();
+    bool fits;
+    if (is_bytebuf) {
+        fits = prvCheckItemFitsByteBuf(rb, data_size);
+    } else {
+        fits = prvCheckItemFitsDefault(rb, data_size);
+    }
+    if (!fits) {
+        vsf_unprotect_int(orig);
+        return pdFALSE;
+    }
+    if (is_bytebuf) {
+        prvCopyItemByteBuf(rb, (const uint8_t *)data, data_size);
+    } else if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+        prvCopyItemAllowSplit(rb, (const uint8_t *)data, data_size);
+    } else {
+        prvCopyItemNoSplit(rb, (const uint8_t *)data, data_size);
+    }
+    vsf_unprotect_int(orig);
+
+    __rb_wake_data_isr(rb, pxHigherPriorityTaskWoken);
+    return pdTRUE;
+}
+
+void * xRingbufferReceiveFromISR(RingbufHandle_t handle,
+                                  size_t *item_size,
+                                  BaseType_t *pxHigherPriorityTaskWoken)
+{
+    if (pxHigherPriorityTaskWoken != NULL) {
+        *pxHigherPriorityTaskWoken = pdFALSE;
+    }
+    if ((handle == NULL) || (item_size == NULL)) {
+        return NULL;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    if (rb->uxRingbufferFlags & rbALLOW_SPLIT_FLAG) {
+        return NULL;
+    }
+    bool is_bytebuf = (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) != 0;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (!prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return NULL;
+    }
+    void *ret;
+    if (is_bytebuf) {
+        ret = prvGetItemByteBuf(rb, 0, item_size);
+    } else {
+        bool split;
+        ret = prvGetItemDefault(rb, &split, item_size);
+        (void)split;
+    }
+    vsf_unprotect_int(orig);
+
+    __rb_wake_space_isr(rb, pxHigherPriorityTaskWoken);
+    return ret;
+}
+
+void * xRingbufferReceiveUpToFromISR(RingbufHandle_t handle,
+                                      size_t *item_size, size_t wanted_size,
+                                      BaseType_t *pxHigherPriorityTaskWoken)
+{
+    if (pxHigherPriorityTaskWoken != NULL) {
+        *pxHigherPriorityTaskWoken = pdFALSE;
+    }
+    if ((handle == NULL) || (item_size == NULL) || (wanted_size == 0)) {
+        return NULL;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (!prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return NULL;
+    }
+    void *ret = prvGetItemByteBuf(rb, wanted_size, item_size);
+    vsf_unprotect_int(orig);
+
+    __rb_wake_space_isr(rb, pxHigherPriorityTaskWoken);
+    return ret;
+}
+
+BaseType_t xRingbufferReceiveSplitFromISR(RingbufHandle_t handle,
+                                           void **ppvHeadItem,
+                                           void **ppvTailItem,
+                                           size_t *pxHeadItemSize,
+                                           size_t *pxTailItemSize,
+                                           BaseType_t *pxHigherPriorityTaskWoken)
+{
+    if (pxHigherPriorityTaskWoken != NULL) {
+        *pxHigherPriorityTaskWoken = pdFALSE;
+    }
+    if ((handle == NULL) || (ppvHeadItem == NULL) || (ppvTailItem == NULL)
+            || (pxHeadItemSize == NULL) || (pxTailItemSize == NULL)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    *ppvHeadItem = NULL;
+    *ppvTailItem = NULL;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (!prvCheckItemAvail(rb)) {
+        vsf_unprotect_int(orig);
+        return pdFALSE;
+    }
+    bool is_split = false;
+    *ppvHeadItem = prvGetItemDefault(rb, &is_split, pxHeadItemSize);
+    if (is_split) {
+        bool no_split;
+        *ppvTailItem = prvGetItemDefault(rb, &no_split, pxTailItemSize);
+        (void)no_split;
+    } else {
+        *ppvTailItem = NULL;
+        *pxTailItemSize = 0;
+    }
+    vsf_unprotect_int(orig);
+
+    __rb_wake_space_isr(rb, pxHigherPriorityTaskWoken);
+    return pdTRUE;
+}
+
+void vRingbufferReturnItemFromISR(RingbufHandle_t handle, void *item,
+                                   BaseType_t *pxHigherPriorityTaskWoken)
+{
+    if (pxHigherPriorityTaskWoken != NULL) {
+        *pxHigherPriorityTaskWoken = pdFALSE;
+    }
+    if ((handle == NULL) || (item == NULL)) {
+        return;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (rb->uxRingbufferFlags & rbBYTE_BUFFER_FLAG) {
+        prvReturnItemByteBuf(rb, (uint8_t *)item);
+    } else {
+        prvReturnItemDefault(rb, (uint8_t *)item);
+    }
+    vsf_unprotect_int(orig);
+
+    __rb_wake_space_isr(rb, pxHigherPriorityTaskWoken);
+}
+
+/* ---------- Two-phase send (NOSPLIT only) ------------------------------- */
+
+BaseType_t xRingbufferSendAcquire(RingbufHandle_t handle, void **ppvItem,
+                                   size_t xItemSize, TickType_t ticks_to_wait)
+{
+    if ((handle == NULL) || (ppvItem == NULL)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    if ((rb->uxRingbufferFlags & (rbBYTE_BUFFER_FLAG | rbALLOW_SPLIT_FLAG))
+            != 0) {
+        return pdFALSE;
+    }
+    if (xItemSize > rb->xMaxItemSize) {
+        return pdFALSE;
+    }
+
+    *ppvItem = NULL;
+
+#if VSF_USE_KERNEL == ENABLED
+    __rb_deadline_t dl;
+    __rb_deadline_init(&dl, ticks_to_wait);
+
+    for (;;) {
+        vsf_protect_t orig = vsf_protect_int();
+        if (prvCheckItemFitsDefault(rb, xItemSize)) {
+            *ppvItem = prvAcquireItemNoSplit(rb, xItemSize);
+            vsf_unprotect_int(orig);
+            return pdTRUE;
+        }
+        vsf_unprotect_int(orig);
+
+        vsf_timeout_tick_t rem = __rb_deadline_remaining(&dl);
+        if (rem == 0 && !dl.infinite) {
+            break;
+        }
+        (void)vsf_thread_sem_pend(&rb->space_sem, rem);
+    }
+    return pdFALSE;
+#else
+    (void)ticks_to_wait;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (prvCheckItemFitsDefault(rb, xItemSize)) {
+        *ppvItem = prvAcquireItemNoSplit(rb, xItemSize);
+        vsf_unprotect_int(orig);
+        return pdTRUE;
+    }
+    vsf_unprotect_int(orig);
+    return pdFALSE;
+#endif
+}
+
+BaseType_t xRingbufferSendComplete(RingbufHandle_t handle, void *pvItem)
+{
+    if ((handle == NULL) || (pvItem == NULL)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    if ((rb->uxRingbufferFlags & (rbBYTE_BUFFER_FLAG | rbALLOW_SPLIT_FLAG))
+            != 0) {
+        return pdFALSE;
+    }
+
+    vsf_protect_t orig = vsf_protect_int();
+    prvSendItemDoneNoSplit(rb, (uint8_t *)pvItem);
+    vsf_unprotect_int(orig);
+
+    __rb_wake_data(rb);
+    return pdTRUE;
+}
+
+/* ---------- Debug helpers ----------------------------------------------- */
+
+esp_err_t vRingbufferReset(RingbufHandle_t handle)
+{
+    if (handle == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if ((rb->pucAcquire != rb->pucWrite)
+            || (rb->pucRead != rb->pucFree)) {
+        vsf_unprotect_int(orig);
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    rb->pucAcquire = rb->pucHead;
+    rb->pucWrite   = rb->pucHead;
+    rb->pucRead    = rb->pucHead;
+    rb->pucFree    = rb->pucHead;
+    rb->xItemsWaiting = 0;
+    rb->uxRingbufferFlags &= ~rbBUFFER_FULL_FLAG;
+    vsf_unprotect_int(orig);
+
+    __rb_wake_space(rb);
+    return ESP_OK;
+}
+
+void vRingbufferGetInfo(RingbufHandle_t handle,
+                         UBaseType_t *uxFree, UBaseType_t *uxRead,
+                         UBaseType_t *uxWrite, UBaseType_t *uxAcquire,
+                         UBaseType_t *uxItemsWaiting)
+{
+    if (handle == NULL) {
+        return;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (uxFree != NULL) {
+        *uxFree = (UBaseType_t)(rb->pucFree - rb->pucHead);
+    }
+    if (uxRead != NULL) {
+        *uxRead = (UBaseType_t)(rb->pucRead - rb->pucHead);
+    }
+    if (uxWrite != NULL) {
+        *uxWrite = (UBaseType_t)(rb->pucWrite - rb->pucHead);
+    }
+    if (uxAcquire != NULL) {
+        *uxAcquire = (UBaseType_t)(rb->pucAcquire - rb->pucHead);
+    }
+    if (uxItemsWaiting != NULL) {
+        *uxItemsWaiting = (UBaseType_t)(rb->xItemsWaiting);
+    }
+    vsf_unprotect_int(orig);
+}
+
+void xRingbufferPrintInfo(RingbufHandle_t handle)
+{
+    if (handle == NULL) {
+        return;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+
+    uint32_t flags = rb->uxRingbufferFlags;
+    printf("RingBuffer Size: %" PRId32 ", FreeSize: %" PRId32 "\n"
+           "  Read: %" PRId32 ", Free: %" PRId32 ", Write: %" PRId32
+           ", Acquire: %" PRId32 ", Waiting: %" PRId32
+           ", Flags: 0x%" PRIx32 " [",
+           (int32_t)rb->xSize,
+           (int32_t)prvGetFreeSize(rb),
+           (int32_t)(rb->pucRead - rb->pucHead),
+           (int32_t)(rb->pucFree - rb->pucHead),
+           (int32_t)(rb->pucWrite - rb->pucHead),
+           (int32_t)(rb->pucAcquire - rb->pucHead),
+           (int32_t)rb->xItemsWaiting,
+           flags);
+
+    if (flags) {
+        if (flags & rbALLOW_SPLIT_FLAG)  printf(" [ALLOW_SPLIT]");
+        if (flags & rbBYTE_BUFFER_FLAG)  printf(" [BYTE_BUFFER]");
+        if (flags & rbBUFFER_FULL_FLAG)  printf(" [FULL]");
+    }
+    printf(" ]\n  Items:\n");
+
+    uint8_t *ptr = rb->pucHead;
+    size_t max_steps = (rb->xSize / rbHEADER_SIZE) + 4;
+    for (size_t steps = 0;
+         ptr + rbHEADER_SIZE <= rb->pucTail && steps < max_steps;
+         ++steps) {
+        unsigned offset = (unsigned)(ptr - rb->pucHead);
+        ItemHeader_t *hdr = (ItemHeader_t *)ptr;
+        unsigned item_flags = hdr->uxItemFlags;
+        unsigned item_len   = (unsigned)hdr->xItemLen;
+        printf("  [%4u] Size: %u Flags: 0x%x [", offset, item_len, item_flags);
+
+        if (item_len > rb->xMaxItemSize
+                && !(item_flags & rbITEM_DUMMY_DATA_FLAG)) {
+            printf(" [INVALID HEADER or UNUSED SPACE]\n");
+            break;
+        }
+        if (item_flags) {
+            if (item_flags & rbITEM_FREE_FLAG)    printf(" [FREE]");
+            if (item_flags & rbITEM_DUMMY_DATA_FLAG) printf(" [DUMMY]");
+            if (item_flags & rbITEM_SPLIT_FLAG)   printf(" [SPLIT]");
+            if (item_flags & rbITEM_WRITTEN_FLAG) printf(" [WRITTEN]");
+        }
+        printf(" ]\n");
+
+        if (item_flags & rbITEM_DUMMY_DATA_FLAG) {
+            ptr = rb->pucHead;
+        } else {
+            size_t step = rbHEADER_SIZE + rbALIGN_SIZE(item_len);
+            if (step == 0) break;
+            ptr += step;
+        }
+        if (ptr == rb->pucHead) break;
+    }
+}
+
+/* ---------- Static / caps allocation ------------------------------------ */
+
+RingbufHandle_t xRingbufferCreateStatic(size_t buffer_size,
+                                         RingbufferType_t type,
+                                         uint8_t *pucStorage,
+                                         StaticRingbuffer_t *pxStatic)
+{
+    if ((buffer_size == 0) || (pucStorage == NULL) || (pxStatic == NULL)) {
+        return NULL;
+    }
+    if (type != RINGBUF_TYPE_BYTEBUF) {
+        buffer_size = rbALIGN_SIZE(buffer_size);
+    }
+
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)pxStatic;
+    memset(rb, 0, sizeof(*rb));
+    memset(pucStorage, 0, buffer_size);
+    prvInitializeNewRingbuffer(buffer_size, type, rb, pucStorage);
+    rb->is_static = true;
+    return (RingbufHandle_t)rb;
+}
+
+BaseType_t xRingbufferGetStaticBuffer(RingbufHandle_t handle,
+                                       uint8_t **ppucStorage,
+                                       StaticRingbuffer_t **ppxStatic)
+{
+    if ((handle == NULL) || (ppucStorage == NULL) || (ppxStatic == NULL)) {
+        return pdFALSE;
+    }
+    struct __vsf_espidf_ringbuf *rb =
+        (struct __vsf_espidf_ringbuf *)handle;
+    if (!rb->is_static) {
+        return pdFALSE;
+    }
+    *ppucStorage = rb->pucHead;
+    *ppxStatic   = (StaticRingbuffer_t *)rb;
+    return pdTRUE;
+}
+
+RingbufHandle_t xRingbufferCreateWithCaps(size_t buffer_size,
+                                           RingbufferType_t type,
+                                           UBaseType_t uxMemoryCaps)
+{
+    if (buffer_size == 0) {
+        return NULL;
+    }
+    if (type != RINGBUF_TYPE_BYTEBUF) {
+        buffer_size = rbALIGN_SIZE(buffer_size);
+    }
+
+    vsf_heap_t *heap = NULL;
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+    vsf_heap_t *(*cb)(uint32_t) = vsf_espidf_get_caps_to_heap();
+    if (cb != NULL) {
+        heap = cb((uint32_t)uxMemoryCaps);
+    }
+#endif
+
+    struct __vsf_espidf_ringbuf *rb;
+    uint8_t *storage;
+    if (heap != NULL) {
+        rb      = (struct __vsf_espidf_ringbuf *)
+                  __vsf_heap_malloc_aligned(heap, sizeof(*rb),
+                                            VSF_HEAP_ALIGN);
+        storage = (uint8_t *)
+                  __vsf_heap_malloc_aligned(heap, buffer_size,
+                                            VSF_HEAP_ALIGN);
+    } else {
+        rb      = (struct __vsf_espidf_ringbuf *)
+                  vsf_heap_malloc(sizeof(*rb));
+        storage = (uint8_t *)vsf_heap_malloc(buffer_size);
+    }
+
+    if ((rb == NULL) || (storage == NULL)) {
+        if (storage != NULL) {
+            if (heap) __vsf_heap_free(heap, storage);
+            else      vsf_heap_free(storage);
+        }
+        if (rb != NULL) {
+            if (heap) __vsf_heap_free(heap, rb);
+            else      vsf_heap_free(rb);
+        }
+        return NULL;
+    }
+    memset(storage, 0, buffer_size);
+    prvInitializeNewRingbuffer(buffer_size, type, rb, storage);
+#if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
+    rb->heap = heap;
+#endif
+    return (RingbufHandle_t)rb;
+}
+
+void vRingbufferDeleteWithCaps(RingbufHandle_t handle)
+{
+    // Same as vRingbufferDelete — the stored heap pointer handles caps
+    // cleanup automatically.
+    vRingbufferDelete(handle);
 }
 
 #endif      // VSF_USE_ESPIDF && VSF_ESPIDF_CFG_USE_RINGBUF

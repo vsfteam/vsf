@@ -40,6 +40,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "esp_err.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,6 +51,7 @@ extern "C" {
 #ifndef __VSF_ESPIDF_FREERTOS_TYPES_DEFINED__
 #define __VSF_ESPIDF_FREERTOS_TYPES_DEFINED__
 typedef long            BaseType_t;     /*!< FreeRTOS portable signed word.   */
+typedef unsigned long   UBaseType_t;    /*!< FreeRTOS unsigned signed word.  */
 typedef uint32_t        TickType_t;     /*!< FreeRTOS tick counter type.      */
 #   ifndef pdTRUE
 #       define pdTRUE       ((BaseType_t)1)
@@ -75,6 +78,12 @@ typedef enum {
 
 struct __vsf_espidf_ringbuf;
 typedef struct __vsf_espidf_ringbuf * RingbufHandle_t;
+
+/* Placeholder large enough for the internal control block on all
+ * supported platforms. Use xRingbufferCreateStatic() to initialise. */
+typedef struct {
+    uint64_t _[64];
+} StaticRingbuffer_t;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -137,6 +146,88 @@ size_t xRingbufferGetCurFilledSize(RingbufHandle_t handle);
  * the free byte count; for NOSPLIT/ALLOWSPLIT it accounts for per-item
  * header overhead and contiguous space constraints. */
 size_t xRingbufferGetMaxItemSize(RingbufHandle_t handle);
+
+/* Convenience constructor for a NOSPLIT ring buffer with space for
+ * xItemNum items of xItemSize bytes each. */
+RingbufHandle_t xRingbufferCreateNoSplit(size_t xItemSize, size_t xItemNum);
+
+/* ISR-compatible send. Non-blocking; if the buffer is full, returns
+ * pdFALSE immediately. If a task was woken, *pxHigherPriorityTaskWoken
+ * is set to pdTRUE (may be NULL). */
+BaseType_t xRingbufferSendFromISR(RingbufHandle_t handle, const void *data,
+                                   size_t data_size,
+                                   BaseType_t *pxHigherPriorityTaskWoken);
+
+/* ISR-compatible receive. Not valid for ALLOWSPLIT buffers. */
+void * xRingbufferReceiveFromISR(RingbufHandle_t handle, size_t *item_size,
+                                  BaseType_t *pxHigherPriorityTaskWoken);
+
+/* ISR-compatible receive-up-to. Byte buffers only. */
+void * xRingbufferReceiveUpToFromISR(RingbufHandle_t handle,
+                                      size_t *item_size, size_t wanted_size,
+                                      BaseType_t *pxHigherPriorityTaskWoken);
+
+/* ISR-compatible split receive. Allow-split buffers only. */
+BaseType_t xRingbufferReceiveSplitFromISR(RingbufHandle_t handle,
+                                           void **ppvHeadItem,
+                                           void **ppvTailItem,
+                                           size_t *pxHeadItemSize,
+                                           size_t *pxTailItemSize,
+                                           BaseType_t *pxHigherPriorityTaskWoken);
+
+/* ISR-compatible return item. */
+void vRingbufferReturnItemFromISR(RingbufHandle_t handle, void *item,
+                                   BaseType_t *pxHigherPriorityTaskWoken);
+
+/* Acquire space in a NOSPLIT buffer without writing data. Only valid
+ * for RINGBUF_TYPE_NOSPLIT. Call xRingbufferSendComplete to finalize. */
+BaseType_t xRingbufferSendAcquire(RingbufHandle_t handle, void **ppvItem,
+                                   size_t xItemSize, TickType_t ticks_to_wait);
+
+/* Complete an acquire previously made with xRingbufferSendAcquire.
+ * Marks the item as written, making it available to readers. */
+BaseType_t xRingbufferSendComplete(RingbufHandle_t handle, void *pvItem);
+
+/* Reset a ring buffer to its initial empty state. Returns ESP_OK on
+ * success, ESP_ERR_INVALID_STATE if there are outstanding reads/writes. */
+esp_err_t vRingbufferReset(RingbufHandle_t handle);
+
+/* Read back the internal cursor positions (all in bytes from pucHead).
+ * Any pointer argument may be NULL to skip that field. */
+void vRingbufferGetInfo(RingbufHandle_t handle,
+                         UBaseType_t *uxFree, UBaseType_t *uxRead,
+                         UBaseType_t *uxWrite, UBaseType_t *uxAcquire,
+                         UBaseType_t *uxItemsWaiting);
+
+/* Print a human-readable snapshot of the ring buffer state to stdout.
+ * Intended for debugging; uses printf. */
+void xRingbufferPrintInfo(RingbufHandle_t handle);
+
+/* Allocate a ring buffer with explicit memory caps. The caps bitmask
+ * is resolved via the vsf_espidf_cfg_t::caps_to_heap callback when
+ * set; otherwise the default heap is used. */
+RingbufHandle_t xRingbufferCreateWithCaps(size_t buffer_size,
+                                           RingbufferType_t type,
+                                           UBaseType_t uxMemoryCaps);
+
+/* Create a ring buffer using caller-supplied storage. The control
+ * block (StaticRingbuffer_t) and data buffer must outlive the handle. */
+RingbufHandle_t xRingbufferCreateStatic(size_t buffer_size,
+                                         RingbufferType_t type,
+                                         uint8_t *pucRingbufferStorage,
+                                         StaticRingbuffer_t *pxStaticRingbuffer);
+
+/* Retrieve the original storage pointers from a statically-allocated
+ * ring buffer. Returns pdFALSE if the buffer was not created via
+ * xRingbufferCreateStatic. */
+BaseType_t xRingbufferGetStaticBuffer(RingbufHandle_t handle,
+                                       uint8_t **ppucRingbufferStorage,
+                                       StaticRingbuffer_t **ppxStaticRingbuffer);
+
+/* Delete a ring buffer created with xRingbufferCreateWithCaps(). Uses
+ * the caps-resolved heap for freeing; otherwise identical to
+ * vRingbufferDelete(). */
+void vRingbufferDeleteWithCaps(RingbufHandle_t handle);
 
 #ifdef __cplusplus
 }
