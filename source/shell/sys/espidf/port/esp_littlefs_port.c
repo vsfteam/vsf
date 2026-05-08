@@ -47,6 +47,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define __VSF_LITTLEFS_CLASS_IMPLEMENT
 #include "component/fs/vsf_fs.h"
@@ -188,7 +190,9 @@ esp_err_t esp_vfs_littlefs_register(const esp_vfs_littlefs_conf_t *conf)
         return ESP_OK;
     }
 
+    (void)mkdir(slot->base_path, 0777);
     if (mount(NULL, slot->base_path, &vk_lfs_op, 0, fsinfo) != 0) {
+        (void)rmdir(slot->base_path);
         __lfs_slot_free(slot);
         return ESP_FAIL;
     }
@@ -204,6 +208,7 @@ esp_err_t esp_vfs_littlefs_unregister(const char *partition_label)
     // umount is a best-effort: if it fails (e.g. dont_mount instance),
     // we still clean up the slot so the caller can re-register.
     (void)umount(slot->base_path);
+    (void)rmdir(slot->base_path);
     __lfs_slot_free(slot);
     return ESP_OK;
 }

@@ -469,7 +469,9 @@ esp_err_t esp_vfs_register_fs(const char *base_path, const esp_vfs_fs_ops_t *vfs
         return ESP_FAIL;
     }
 
+    (void)mkdir(base_path, 0777);
     if (mount(NULL, base_path, &__bridge_fs_op, 0, &e->fsinfo) != 0) {
+        (void)rmdir(base_path);
         if (e->own_ops) vsf_heap_free((void *)e->ops);
         memset(e, 0, sizeof(*e));
         return ESP_FAIL;
@@ -483,6 +485,7 @@ esp_err_t esp_vfs_unregister_fs(const char *base_path)
     vfs_entry_t *e = find_entry(base_path);
     if (!e) return ESP_ERR_INVALID_STATE;
     if (e->fsinfo.mounted) { (void)umount(base_path); e->fsinfo.mounted = false; }
+    (void)rmdir(base_path);
     if (e->own_ops) { vsf_heap_free((void *)e->ops); e->own_ops = false; }
     memset(e, 0, sizeof(*e));
     return ESP_OK;
