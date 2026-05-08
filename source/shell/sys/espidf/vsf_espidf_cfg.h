@@ -104,6 +104,27 @@
 #ifndef VSF_ESPIDF_CFG_USE_VFS
 #   define VSF_ESPIDF_CFG_USE_VFS               DISABLED
 #endif
+// Maximum number of concurrently registered VFS entries (base paths).
+#ifndef VSF_ESPIDF_CFG_VFS_MAX_REGISTERED
+#   define VSF_ESPIDF_CFG_VFS_MAX_REGISTERED    8
+#endif
+// Maximum open file descriptors per VFS entry (for fd translation).
+#ifndef VSF_ESPIDF_CFG_VFS_MAX_FDS
+#   define VSF_ESPIDF_CFG_VFS_MAX_FDS           16
+#endif
+// ESP-IDF CONFIG_VFS_SUPPORT_DIR equivalent.  Controls whether directory
+// related ops (stat, link, opendir, readdir, mkdir, ...) are compiled.
+#ifndef VSF_ESPIDF_CFG_VFS_SUPPORT_DIR
+#   define VSF_ESPIDF_CFG_VFS_SUPPORT_DIR       ENABLED
+#endif
+// ESP-IDF CONFIG_VFS_SUPPORT_SELECT equivalent.
+#ifndef VSF_ESPIDF_CFG_VFS_SUPPORT_SELECT
+#   define VSF_ESPIDF_CFG_VFS_SUPPORT_SELECT    DISABLED
+#endif
+// ESP-IDF CONFIG_VFS_SUPPORT_TERMIOS equivalent.
+#ifndef VSF_ESPIDF_CFG_VFS_SUPPORT_TERMIOS
+#   define VSF_ESPIDF_CFG_VFS_SUPPORT_TERMIOS   DISABLED
+#endif
 #ifndef VSF_ESPIDF_CFG_USE_LITTLEFS
 #   define VSF_ESPIDF_CFG_USE_LITTLEFS          DISABLED
 #endif
