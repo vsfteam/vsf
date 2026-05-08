@@ -20,16 +20,6 @@
 
 /*============================ MACROS ========================================*/
 
-// Maximum number of NVS partitions that can be initialised concurrently.
-#ifndef __NVS_MAX_STORES
-#   define __NVS_MAX_STORES         4
-#endif
-
-// Maximum number of handles that may be open at the same time.
-#ifndef __NVS_MAX_HANDLES
-#   define __NVS_MAX_HANDLES        16
-#endif
-
 // Maximum total serialised size per store (arbitrary safety limit).
 #ifndef __NVS_MAX_SERIAL_SIZE
 #   define __NVS_MAX_SERIAL_SIZE    (64u * 1024u)
@@ -122,7 +112,7 @@ typedef struct __nvs_kv_t {
 
 // Per-partition store.
 typedef struct __nvs_store_t {
-    bool                    in_use;
+    struct __nvs_store_t   *next;
     bool                    dirty;          // RAM differs from flash
     char                    part_label[NVS_PART_NAME_MAX_SIZE];
     const esp_partition_t  *partition;
@@ -131,7 +121,7 @@ typedef struct __nvs_store_t {
 
 // Per-handle context.
 typedef struct __nvs_handle_ctx_t {
-    bool                in_use;
+    struct __nvs_handle_ctx_t *next;
     nvs_open_mode_t     mode;
     __nvs_store_t      *store;
     char                ns[NVS_NS_NAME_MAX_SIZE];
@@ -148,8 +138,8 @@ typedef struct nvs_opaque_iterator_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __nvs_store_t       __nvs_stores[__NVS_MAX_STORES];
-static __nvs_handle_ctx_t  __nvs_handles[__NVS_MAX_HANDLES];
+static __nvs_store_t      *__nvs_store_head;
+static __nvs_handle_ctx_t *__nvs_handle_head;
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -190,24 +180,38 @@ static bool __nvs_validate_ns(const char *ns)
 // Find a store by partition label.
 static __nvs_store_t * __nvs_find_store(const char *label)
 {
-    for (int i = 0; i < __NVS_MAX_STORES; i++) {
-        if (__nvs_stores[i].in_use
-                && strcmp(__nvs_stores[i].part_label, label) == 0) {
-            return &__nvs_stores[i];
+    for (__nvs_store_t *s = __nvs_store_head; s != NULL; s = s->next) {
+        if (strcmp(s->part_label, label) == 0) {
+            return s;
         }
     }
     return NULL;
 }
 
-// Allocate an empty store slot.
+// Allocate a new store node and prepend to the list.
 static __nvs_store_t * __nvs_alloc_store(void)
 {
-    for (int i = 0; i < __NVS_MAX_STORES; i++) {
-        if (!__nvs_stores[i].in_use) {
-            return &__nvs_stores[i];
+    __nvs_store_t *store;
+    store = (__nvs_store_t *)vsf_heap_malloc(sizeof(*store));
+    if (store == NULL) { return NULL; }
+    memset(store, 0, sizeof(*store));
+    store->next = __nvs_store_head;
+    __nvs_store_head = store;
+    return store;
+}
+
+// Remove and free a store from the linked list.
+static void __nvs_free_store(__nvs_store_t *store)
+{
+    __nvs_store_t **pp = &__nvs_store_head;
+    while (*pp != NULL) {
+        if (*pp == store) {
+            *pp = store->next;
+            vsf_heap_free(store);
+            return;
         }
+        pp = &(*pp)->next;
     }
-    return NULL;
 }
 
 // Find a KV entry by namespace + key in a store.
@@ -285,10 +289,12 @@ static size_t __nvs_count_ns(__nvs_store_t *store)
 // Handle validation.
 static __nvs_handle_ctx_t * __nvs_get_handle(nvs_handle_t h)
 {
-    uint32_t idx = h - 1;
-    if (idx >= __NVS_MAX_HANDLES) { return NULL; }
-    __nvs_handle_ctx_t *ctx = &__nvs_handles[idx];
-    return ctx->in_use ? ctx : NULL;
+    // nvs_handle_t stores the pointer to __nvs_handle_ctx_t.
+    __nvs_handle_ctx_t *ctx = (__nvs_handle_ctx_t *)(uintptr_t)h;
+    for (__nvs_handle_ctx_t *c = __nvs_handle_head; c != NULL; c = c->next) {
+        if (c == ctx) { return ctx; }
+    }
+    return NULL;
 }
 
 // ---------------------------------------------------------------------------
@@ -459,8 +465,6 @@ static esp_err_t __nvs_init_partition(const char *label,
     __nvs_store_t *store = __nvs_alloc_store();
     if (store == NULL) { return ESP_ERR_NO_MEM; }
 
-    memset(store, 0, sizeof(*store));
-    store->in_use    = true;
     store->partition = part;
     strncpy(store->part_label, use_label, NVS_PART_NAME_MAX_SIZE - 1);
 
@@ -490,13 +494,22 @@ static esp_err_t __nvs_deinit_partition(const char *label)
     if (store == NULL) { return ESP_ERR_NVS_NOT_INITIALIZED; }
 
     // Close all handles that reference this store.
-    for (int i = 0; i < __NVS_MAX_HANDLES; i++) {
-        if (__nvs_handles[i].in_use && __nvs_handles[i].store == store) {
-            __nvs_handles[i].in_use = false;
+    __nvs_handle_ctx_t *h = __nvs_handle_head;
+    while (h != NULL) {
+        __nvs_handle_ctx_t *next = h->next;
+        if (h->store == store) {
+            // Remove from list.
+            __nvs_handle_ctx_t **pp = &__nvs_handle_head;
+            while (*pp != NULL) {
+                if (*pp == h) { *pp = h->next; break; }
+                pp = &(*pp)->next;
+            }
+            vsf_heap_free(h);
         }
+        h = next;
     }
     __nvs_free_all_kv(store);
-    store->in_use = false;
+    __nvs_free_store(store);
     return ESP_OK;
 }
 
@@ -582,26 +595,33 @@ esp_err_t nvs_open_from_partition(const char *part_name,
     __nvs_store_t *store = __nvs_find_store(part_name);
     if (store == NULL) { return ESP_ERR_NVS_NOT_INITIALIZED; }
 
-    // Allocate a handle slot.
-    for (int i = 0; i < __NVS_MAX_HANDLES; i++) {
-        if (!__nvs_handles[i].in_use) {
-            __nvs_handles[i].in_use = true;
-            __nvs_handles[i].mode   = open_mode;
-            __nvs_handles[i].store  = store;
-            strncpy(__nvs_handles[i].ns, namespace_name,
-                    NVS_NS_NAME_MAX_SIZE - 1);
-            __nvs_handles[i].ns[NVS_NS_NAME_MAX_SIZE - 1] = '\0';
-            *out_handle = (nvs_handle_t)(i + 1);
-            return ESP_OK;
-        }
-    }
-    return ESP_ERR_NO_MEM;
+    // Allocate a handle dynamically.
+    __nvs_handle_ctx_t *ctx;
+    ctx = (__nvs_handle_ctx_t *)vsf_heap_malloc(sizeof(*ctx));
+    if (ctx == NULL) { return ESP_ERR_NO_MEM; }
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->mode   = open_mode;
+    ctx->store  = store;
+    strncpy(ctx->ns, namespace_name, NVS_NS_NAME_MAX_SIZE - 1);
+    ctx->ns[NVS_NS_NAME_MAX_SIZE - 1] = '\0';
+
+    ctx->next = __nvs_handle_head;
+    __nvs_handle_head = ctx;
+
+    *out_handle = (nvs_handle_t)(uintptr_t)ctx;
+    return ESP_OK;
 }
 
 void nvs_close(nvs_handle_t handle)
 {
     __nvs_handle_ctx_t *ctx = __nvs_get_handle(handle);
-    if (ctx != NULL) { ctx->in_use = false; }
+    if (ctx == NULL) { return; }
+    __nvs_handle_ctx_t **pp = &__nvs_handle_head;
+    while (*pp != NULL) {
+        if (*pp == ctx) { *pp = ctx->next; break; }
+        pp = &(*pp)->next;
+    }
+    vsf_heap_free(ctx);
 }
 
 esp_err_t nvs_commit(nvs_handle_t handle)

@@ -99,6 +99,8 @@ char * esp_log_system_timestamp(void);
 #endif
 
 /* Check both compile-time and run-time gates. */
+#define ESP_LOG_ENABLED(level)           ((level) <= LOG_LOCAL_LEVEL)
+
 #define ESP_LOG_LEVEL_LOCAL(level, tag, format, ...)                        \
     do {                                                                    \
         if ((level) <= LOG_LOCAL_LEVEL) {                                   \

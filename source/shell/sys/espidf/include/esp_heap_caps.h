@@ -37,6 +37,7 @@
 #include <stdbool.h>
 
 #include "esp_err.h"
+#include "multi_heap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,19 +64,6 @@ extern "C" {
 #define MALLOC_CAP_RTCRAM               (1u << 16)
 #define MALLOC_CAP_TCM                  (1u << 17)
 #define MALLOC_CAP_INVALID              (1u << 31)
-
-/*============================ TYPES =========================================*/
-
-/* Public layout taken from ESP-IDF v5.x API reference. */
-typedef struct multi_heap_info {
-    size_t total_free_bytes;
-    size_t total_allocated_bytes;
-    size_t largest_free_block;
-    size_t minimum_free_bytes;
-    size_t allocated_blocks;
-    size_t free_blocks;
-    size_t total_blocks;
-} multi_heap_info_t;
 
 /*============================ PROTOTYPES ====================================*/
 

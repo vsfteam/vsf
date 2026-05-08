@@ -27,11 +27,11 @@ espidf/
 ├── vsf_espidf_cfg.h           # feature switches + IDF baseline version
 ├── vsf_espidf.c               # sub-system init + per-module init chain
 ├── README.md                  # <-- this file
-├── include/                   # clean-room ESP-IDF public headers (34 files)
+├── include/                   # clean-room ESP-IDF public headers (48 files)
 │   ├── README.md
 │   ├── driver/                # driver/*.h
 │   └── usb/                   # usb/*.h
-└── port/                      # ESP-IDF-API -> VSF-internal glue (25 port files)
+└── port/                      # ESP-IDF-API -> VSF-internal glue (30 port files)
     └── CMakeLists.txt
 ```
 
@@ -47,7 +47,11 @@ espidf/
 | `esp_timer.h` | `vsf_callback_timer` | `esp_timer_port.c` | 172 | |
 | `esp_system.h` | VSF reset + entropy + heap stats | `esp_system_port.c` | 226 | |
 | `esp_ringbuf.h` | four-pointer ring buffer on vsf_heap | `esp_ringbuf_port.c` | ~1500 | all 3 types (BYTEBUF/NOSPLIT/ALLOWSPLIT); blocking + ISR + QueueSet |
-| `esp_heap_caps.h` | `service/heap` (caps collapsed) | `esp_heap_caps_port.c` | 249 | no heap tracing or multi_heap |
+| `esp_heap_caps.h` | `service/heap` (caps collapsed + registry) | `esp_heap_caps_port.c` + `esp_heap_caps_init_port.c` | 249+110 | `multi_heap.h` wraps `__vsf_heap_*` instance API; `heap_caps_add_region()` adds registered per-caps heaps |
+| `esp_common/` | header-only (clean-room) | — | ~350 | `esp_compiler.h`, `esp_macros.h`, `esp_attr.h`, `esp_check.h`, `esp_assert.h`, `esp_bit_defs.h`, `esp_types.h`, `esp_idf_version.h` + `sdkconfig.h` |
+| `esp_log_buffer.h` | `service/trace` via `esp_log_write` | `esp_log_buffer_port.c` | 65 | `ESP_LOG_BUFFER_HEX` / `CHAR` / `HEXDUMP` |
+| `esp_vfs_eventfd.h` | VSF Linux `eventfd()` | `esp_vfs_eventfd_port.c` | 44 | register/unregister pass-through; `eventfd()` from VSF Linux |
+| `esp_vfs_semihost.h` | header-only stub | `esp_vfs_semihost_port.c` | 24 | returns `ESP_ERR_NOT_SUPPORTED` (VSF disables semihosting) |
 
 ### Stage 2 — Storage & filesystem
 
@@ -255,7 +259,7 @@ as of this writing.
 | Driver | Implemented | Missing sub-APIs |
 |---|---|---|
 | GPIO | `gpio.h` | `rtc_io.h`, `lp_io.h`, `dedic_gpio.h`, `gpio_etm.h`, `gpio_filter.h`, ISR/intr |
-| GPTimer | `gptimer.h` | `gptimer_etm.h`, `get_resolution()`, `get_captured_count()`, `set_alarm_action()` |
+| GPTimer | `gptimer.h` | `gptimer_etm.h` |
 | I2C | `i2c_master.h` | `i2c_slave.h`; legacy `driver/i2c.h` |
 | SPI | `spi_master.h` | `spi_common.h`, `spi_slave.h`, `spi_slave_hd.h` |
 | UART | `uart.h` | `uart_select.h`, `uart_vfs.h`, `uart_wakeup.h`, `uhci.h`, pin muxing |
@@ -281,10 +285,10 @@ as of this writing.
 ### Missing ESP-IDF infrastructure layers
 
 - **HAL layer** — All 35 `esp_hal_*`components (e.g. `esp_hal_gpio`, `esp_hal_uart`) are not implemented, and are NOT needed by this subsystem. VSF's espidf compatibility layer targets the `driver/*.h` API level (application-facing APIs such as `gpio_set_level()`, `uart_write_bytes()`), not the HAL `_ll.h` level that `esp_hal_*` provides. The HAL role is fulfilled by VSF's own `hal/driver/common/template/vsf_template_*.h` abstraction, which each `driver/*.h` port header bridges to directly. Application code using this subsystem never includes `hal/*.h` headers, so the absence of `esp_hal_*` is a deliberate architectural choice, not a gap.
-- **esp_common** — Only `esp_err.h` is provided; missing `esp_check.h`, `esp_compiler.h`, `esp_attr.h`, `esp_macros.h`, `esp_idf_version.h`, `esp_assert.h`.
-- **esp_log extensions** — Missing `esp_log_buffer.h`, `esp_log_color.h`, `esp_log_timestamp.h`, etc.
-- **esp_heap_caps extensions** — Missing `esp_heap_caps_init.h`, `esp_heap_task_info.h`, `esp_heap_trace.h`, `multi_heap.h`.
-- **esp_vfs extensions** — Missing `esp_vfs_dev.h`, `esp_vfs_eventfd.h`, `esp_vfs_semihost.h`.
+- **esp_common** — Core headers complete (`esp_compiler.h`, `esp_macros.h`, `esp_attr.h`, `esp_check.h`, `esp_assert.h`, `esp_bit_defs.h`, `esp_types.h`, `esp_idf_version.h`, `sdkconfig.h`). Missing: `esp_fault.h` (ESP hardware FI countermeasures — out of scope).
+- **esp_log extensions** — `esp_log_buffer.h` implemented. Missing: `esp_log_color.h`, `esp_log_timestamp.h` (user-direct API — defer).
+- **esp_heap_caps extensions** — `multi_heap.h` + `esp_heap_caps_init.h` implemented (instance heaps via `__vsf_heap_*`, caps registry via `heap_caps_add_region`). Missing: `esp_heap_task_info.h`, `esp_heap_trace.h` (debugging, deferred).
+- **esp_vfs extensions** — `esp_vfs_eventfd.h` (bridges VSF Linux eventfd) + `esp_vfs_semihost.h` (NOT_SUPPORTED stub) implemented. Missing: `esp_vfs_dev.h`.
 - **soc** — Missing all SoC capability / peripheral definition headers.
 
 ## Validation

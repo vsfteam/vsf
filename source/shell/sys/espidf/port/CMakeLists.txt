@@ -34,6 +34,11 @@ vsf_add_sources(
     usb_host_port.c        # -> component/usb/host (vsf_usbh bridge)
     usb_device_port.c      # -> component/usb/device (vsf_usbd bridge)
     esp_lcd_port.c         # -> component/ui/disp (vsf_disp_t bridge, IO stub + panel vtable)
+    multi_heap_port.c      # -> multi_heap.h -> __vsf_heap_* instance API
+    esp_heap_caps_init_port.c # -> heap_caps_add_region / caps registry
+    esp_log_buffer_port.c  # -> esp_log_buffer.h hex/char/hexdump formatting
+    esp_vfs_eventfd_port.c # -> esp_vfs_eventfd.h bridge to VSF Linux eventfd
+    esp_vfs_semihost_port.c # -> esp_vfs_semihost.h NOT_SUPPORTED stub
 )
 
 # vsf_add_sources(
