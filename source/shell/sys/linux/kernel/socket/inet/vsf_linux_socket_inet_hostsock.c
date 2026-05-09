@@ -131,10 +131,11 @@ vsf_class(vsf_linux_trigger_t) {
 };
 extern void vsf_linux_trigger_init(vsf_linux_trigger_t *trig);
 
-// from errno.h
+// from sys/reent.h
 #define VSF_LINUX_ERRNO_EAGAIN          11
-extern int * __vsf_linux_errno(void);
-#define vsf_linux_errno                 (*__vsf_linux_errno())
+struct vsf_linux_reent { int _errno; };
+extern struct vsf_linux_reent * __vsf_linux_getreent(void);
+#define vsf_linux_errno                 (__vsf_linux_getreent()->_errno)
 
 // from time.h
 #ifndef __SUSECONDS_T

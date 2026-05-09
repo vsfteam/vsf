@@ -357,8 +357,8 @@
 #   ifndef VSF_LINUX_APPLET_USE_TERMIOS
 #       define VSF_LINUX_APPLET_USE_TERMIOS     ENABLED
 #   endif
-#   ifndef VSF_LINUX_APPLET_USE_ERRNO
-#       define VSF_LINUX_APPLET_USE_ERRNO       ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_REENT
+#       define VSF_LINUX_APPLET_USE_REENT       ENABLED
 #   endif
 
 #   if !defined(VSF_LINUX_APPLET_USE_LIBUSB) && VSF_LINUX_USE_LIBUSB == ENABLED
@@ -494,7 +494,7 @@ typedef struct vsf_linux_vplt_t {
 
     // unix
     void *unistd_vplt;
-    void *errno_vplt;
+    void *reent_vplt;
     void *signal_vplt;
     void *pthread_vplt;
     void *poll_vplt;

@@ -34,11 +34,13 @@
 #   include "./include/dirent.h"
 #   include "./include/termios.h"
 #   include "./include/sys/time.h"
+#   include "./include/sys/reent.h"
 #else
 #   include <signal.h>
 #   include <dirent.h>
 #   include <termios.h>
 #   include <sys/time.h>
+#   include <sys/reent.h>
 #endif
 
 #include "./kernel/fs/vsf_linux_fs.h"
@@ -182,7 +184,7 @@ vsf_class(vsf_linux_thread_t) {
         implement(vsf_thread_cb_t)
         const vsf_linux_thread_op_t *op;
 
-        int __errno;
+        struct _reent __reent;
         // for gethostbyname, etc
         int __h_errno;
     )
@@ -581,9 +583,6 @@ extern int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig);
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc
 extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
-
-extern int vsf_linux_get_errno(void);
-extern void vsf_linux_set_errno(int err);
 
 #ifdef __cplusplus
 }

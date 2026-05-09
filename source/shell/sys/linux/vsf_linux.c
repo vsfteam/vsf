@@ -773,11 +773,11 @@ int vsf_linux_create_fhs(void)
     return vsf_linux_create_fhs_user();
 }
 
-int * __vsf_linux_errno(void)
+struct _reent * __vsf_linux_getreent(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     VSF_LINUX_ASSERT(thread != NULL);
-    return &thread->__errno;
+    return &thread->__reent;
 }
 
 int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in)
@@ -5091,11 +5091,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt = {
 };
 #endif
 
-#if VSF_LINUX_APPLET_USE_ERRNO == ENABLED && !defined(__VSF_APPLET__)
-__VSF_VPLT_DECORATOR__ vsf_linux_errno_vplt_t vsf_linux_errno_vplt = {
-    VSF_APPLET_VPLT_INFO(vsf_linux_errno_vplt_t, 0, 0, true),
+#if VSF_LINUX_APPLET_USE_REENT == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_reent_vplt_t, 0, 0, true),
 
-    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_getreent),
 };
 #endif
 
@@ -5591,8 +5591,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd_vplt        = (void *)&vsf_linux_unistd_vplt,
 #endif
-#if VSF_LINUX_APPLET_USE_ERRNO == ENABLED
-    .errno_vplt         = (void *)&vsf_linux_errno_vplt,
+#if VSF_LINUX_APPLET_USE_REENT == ENABLED
+    .reent_vplt         = (void *)&vsf_linux_reent_vplt,
 #endif
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
     .signal_vplt        = (void *)&vsf_linux_signal_vplt,
