@@ -285,4 +285,10 @@
 #   define VSF_ESPIDF_CFG_RINGBUF_USE_FREERTOS_QUEUESET  DISABLED
 #endif
 
+// Application tracing (esp_apptrace_* API).
+// Virtual transport: up-channel -> stdout, down-channel <- stdin.
+#ifndef VSF_ESPIDF_CFG_USE_APP_TRACE
+#   define VSF_ESPIDF_CFG_USE_APP_TRACE         DISABLED
+#endif
+
 #endif      // __VSF_ESPIDF_CFG_H__

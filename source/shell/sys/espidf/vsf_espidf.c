@@ -82,25 +82,18 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
     // from the sub-system perspective.
 #if VSF_ESPIDF_CFG_USE_TIMER == ENABLED
     extern esp_err_t esp_timer_init(void);
-    vsf_trace_info("vsf_espidf_init: before esp_timer_init"VSF_TRACE_CFG_LINEEND);
     (void)esp_timer_init();
-    vsf_trace_info("vsf_espidf_init: after esp_timer_init"VSF_TRACE_CFG_LINEEND);
 #endif
 #if VSF_ESPIDF_CFG_USE_EVENT == ENABLED
     extern esp_err_t esp_event_loop_create_default(void);
-    vsf_trace_info("vsf_espidf_init: before esp_event_loop_create_default"VSF_TRACE_CFG_LINEEND);
     (void)esp_event_loop_create_default();
-    vsf_trace_info("vsf_espidf_init: after esp_event_loop_create_default"VSF_TRACE_CFG_LINEEND);
 #endif
 #if VSF_ESPIDF_CFG_USE_PARTITION == ENABLED
     extern void vsf_espidf_partition_init(const vsf_espidf_partition_cfg_t *cfg);
-    vsf_trace_info("vsf_espidf_init: before partition_init"VSF_TRACE_CFG_LINEEND);
     vsf_espidf_partition_init((cfg != NULL) ? &cfg->partition : NULL);
-    vsf_trace_info("vsf_espidf_init: after partition_init"VSF_TRACE_CFG_LINEEND);
 #endif
 #if VSF_ESPIDF_CFG_USE_ESP_FLASH == ENABLED
     extern void vsf_espidf_esp_flash_init(vk_mal_t *root_mal);
-    vsf_trace_info("vsf_espidf_init: before esp_flash_init"VSF_TRACE_CFG_LINEEND);
     vsf_espidf_esp_flash_init(
 #   if VSF_ESPIDF_CFG_USE_PARTITION == ENABLED
             (cfg != NULL) ? cfg->partition.root_mal : NULL
@@ -108,7 +101,6 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
             NULL
 #   endif
     );
-    vsf_trace_info("vsf_espidf_init: after esp_flash_init"VSF_TRACE_CFG_LINEEND);
 #endif
 #if VSF_ESPIDF_CFG_USE_DRIVER_GPTIMER == ENABLED
     extern void vsf_espidf_gptimer_init(const vsf_espidf_gptimer_cfg_t *cfg);
@@ -134,13 +126,13 @@ void vsf_espidf_init(const vsf_espidf_cfg_t *cfg)
     extern void vsf_espidf_adc_init(const vsf_espidf_adc_cfg_t *cfg);
     vsf_espidf_adc_init((cfg != NULL) ? &cfg->adc : NULL);
 #endif
+#if VSF_ESPIDF_CFG_USE_APP_TRACE == ENABLED
+    extern void vsf_espidf_app_trace_init(const vsf_espidf_app_trace_cfg_t *cfg);
+    vsf_espidf_app_trace_init((cfg != NULL) ? &cfg->app_trace : NULL);
+#endif
 #if VSF_ESPIDF_CFG_USE_NETIF == ENABLED
     extern void vsf_espidf_netif_init(void);
-    vsf_trace_info("vsf_espidf_init: before netif_init"VSF_TRACE_CFG_LINEEND);
-    vsf_trace_info("vsf_espidf_init: VSF_OS_CFG_PRIORITY_NUM=%d VSF_ARCH_SWI_NUM=%d VSF_SWI_NUM=%d"VSF_TRACE_CFG_LINEEND,
-                   (int)VSF_OS_CFG_PRIORITY_NUM, (int)VSF_ARCH_SWI_NUM, (int)VSF_SWI_NUM);
     vsf_espidf_netif_init();
-    vsf_trace_info("vsf_espidf_init: after netif_init"VSF_TRACE_CFG_LINEEND);
 #endif
 #if VSF_ESPIDF_CFG_USE_USB_HOST == ENABLED
     // USB Host is initialized lazily by the application via usb_host_install().

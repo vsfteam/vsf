@@ -113,6 +113,7 @@ typedef struct nvs_opaque_iterator_t *nvs_iterator_t;
 typedef struct {
     size_t  used_entries;
     size_t  free_entries;
+    size_t  available_entries;
     size_t  total_entries;
     size_t  namespace_count;
 } nvs_stats_t;

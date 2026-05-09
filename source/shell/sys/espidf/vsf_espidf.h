@@ -51,6 +51,10 @@
 #   include "component/usb/device/vsf_usbd.h"
 #endif
 
+#if VSF_ESPIDF_CFG_USE_APP_TRACE == ENABLED
+#   include <stdio.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -214,6 +218,16 @@ typedef struct vsf_espidf_usb_device_cfg_t {
 } vsf_espidf_usb_device_cfg_t;
 #endif
 
+#if VSF_ESPIDF_CFG_USE_APP_TRACE == ENABLED
+// Application trace sub-system configuration.
+//   up_stream    FILE* for up-channel (target -> host) output. NULL -> stdout.
+//   down_stream  FILE* for down-channel (host -> target) input. NULL -> stdin.
+typedef struct vsf_espidf_app_trace_cfg_t {
+    FILE                       *up_stream;
+    FILE                       *down_stream;
+} vsf_espidf_app_trace_cfg_t;
+#endif
+
 typedef struct vsf_espidf_cfg_t {
 #if VSF_HAL_USE_RNG == ENABLED
     vsf_rng_t *rng;
@@ -244,6 +258,9 @@ typedef struct vsf_espidf_cfg_t {
 #endif
 #if VSF_ESPIDF_CFG_USE_USB_DEVICE == ENABLED
     vsf_espidf_usb_device_cfg_t  usb_device;
+#endif
+#if VSF_ESPIDF_CFG_USE_APP_TRACE == ENABLED
+    vsf_espidf_app_trace_cfg_t  app_trace;
 #endif
 #if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
     /* Optional callback to map an ESP-IDF heap_caps bitmask to a VS F
@@ -279,6 +296,11 @@ extern vk_usbd_dev_t * vsf_espidf_get_usbd(void);
 
 #if VSF_ESPIDF_CFG_USE_HEAP_CAPS == ENABLED
 extern vsf_heap_t *(*vsf_espidf_get_caps_to_heap(void))(uint32_t caps);
+#endif
+
+#if VSF_ESPIDF_CFG_USE_APP_TRACE == ENABLED
+extern void vsf_espidf_app_trace_init(const vsf_espidf_app_trace_cfg_t *cfg);
+extern const vsf_espidf_app_trace_cfg_t *vsf_espidf_get_app_trace_cfg(void);
 #endif
 
 #ifdef __cplusplus

@@ -45,6 +45,8 @@
 #endif
 
 #include <string.h>
+#include <stdio.h>
+#include <inttypes.h>
 
 /*============================ TYPES =========================================*/
 
@@ -193,6 +195,79 @@ esp_err_t esp_timer_delete(esp_timer_handle_t timer)
 bool esp_timer_is_active(esp_timer_handle_t timer)
 {
     return (timer != NULL) && timer->is_active;
+}
+
+static esp_err_t __esp_timer_start_at(esp_timer_handle_t timer,
+                                       uint64_t period_us,
+                                       uint64_t start_at_us)
+{
+    int64_t now_us = esp_timer_get_time();
+    int64_t delta_us = (int64_t)(start_at_us - (uint64_t)now_us);
+    if (delta_us < 0) {
+        delta_us = 0;
+    }
+    timer->period_us = period_us;
+    timer->is_active = true;
+    if (VSF_ERR_NONE != vsf_callback_timer_add_us(&timer->timer,
+                                                    (uint_fast32_t)delta_us)) {
+        timer->is_active = false;
+        timer->period_us = 0;
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
+
+esp_err_t esp_timer_start_periodic_at(esp_timer_handle_t timer,
+                                       uint64_t period_us,
+                                       uint64_t start_at_us)
+{
+    if ((timer == NULL) || (period_us == 0)) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    if (timer->is_active) {
+        return ESP_ERR_INVALID_STATE;
+    }
+    return __esp_timer_start_at(timer, period_us, start_at_us);
+}
+
+esp_err_t esp_timer_start_once_at(esp_timer_handle_t timer,
+                                   uint64_t timeout_at_us)
+{
+    if (timer == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    if (timer->is_active) {
+        return ESP_ERR_INVALID_STATE;
+    }
+    return __esp_timer_start_at(timer, 0, timeout_at_us);
+}
+
+esp_err_t esp_timer_restart_at(esp_timer_handle_t timer,
+                                uint64_t new_period_us,
+                                uint64_t start_at_us)
+{
+    if ((timer == NULL) || (new_period_us == 0)) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    if (timer->is_active) {
+        vsf_callback_timer_remove(&timer->timer);
+        timer->is_active = false;
+    }
+    if (timer->callback == NULL) {
+        return ESP_ERR_INVALID_STATE;
+    }
+    vsf_callback_timer_init(&timer->timer);
+    timer->timer.on_timer = __vsf_espidf_timer_on_timer;
+    return __esp_timer_start_at(timer, new_period_us, start_at_us);
+}
+
+esp_err_t esp_timer_dump(FILE *stream)
+{
+    if (stream == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    fprintf(stream, "esp_timer_dump: not implemented on VSF\n");
+    return ESP_OK;
 }
 
 #endif      // VSF_USE_ESPIDF && VSF_ESPIDF_CFG_USE_TIMER

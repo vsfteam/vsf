@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #include "esp_err.h"
 
@@ -91,6 +92,20 @@ esp_err_t esp_timer_delete(esp_timer_handle_t timer);
 
 /* Query whether the timer is currently armed. */
 bool esp_timer_is_active(esp_timer_handle_t timer);
+
+/* Arm the periodic timer to fire every period_us starting at absolute
+ * time start_at_us (microseconds since boot). */
+esp_err_t esp_timer_start_periodic_at(esp_timer_handle_t timer, uint64_t period_us, uint64_t start_at_us);
+
+/* Arm the one-shot timer to fire at absolute time timeout_at_us. */
+esp_err_t esp_timer_start_once_at(esp_timer_handle_t timer, uint64_t timeout_at_us);
+
+/* Stop the periodic timer (if running), update its period, and re-arm
+ * to fire at absolute time start_at_us. */
+esp_err_t esp_timer_restart_at(esp_timer_handle_t timer, uint64_t new_period_us, uint64_t start_at_us);
+
+/* Dump all active timers to the given FILE stream (mainly for debugging). */
+esp_err_t esp_timer_dump(FILE *stream);
 
 #ifdef __cplusplus
 }

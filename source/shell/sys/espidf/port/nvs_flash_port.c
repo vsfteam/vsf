@@ -832,8 +832,9 @@ esp_err_t nvs_get_stats(const char *part_name, nvs_stats_t *nvs_stats)
                     + 4u;
     nvs_stats->total_entries = store->partition->size / sizeof(__nvs_disk_entry_t);
     nvs_stats->free_entries  = (used_est < store->partition->size)
-                             ? (store->partition->size - used_est) / sizeof(__nvs_disk_entry_t)
-                             : 0;
+                              ? (store->partition->size - used_est) / sizeof(__nvs_disk_entry_t)
+                              : 0;
+    nvs_stats->available_entries = nvs_stats->free_entries;
     return ESP_OK;
 }
 
