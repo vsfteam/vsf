@@ -142,20 +142,20 @@ static void __frt_sb_write_header(uint8_t *dst, uint32_t len)
 
 // Snapshot of "remaining timeout" bookkeeping. FreeRTOS ticks map 1:1 to
 // ms in this shim (see pdMS_TO_TICKS), so the stored deadline uses the
-// same unit as xTaskGetTickCount / vsf_systimer_get_ms.
+// same unit as xTaskGetTickCount / vsf_systimer_get_tick.
 typedef struct {
     bool            infinite;
-    uint32_t        deadline_ms;
+    TickType_t      deadline;
 } __frt_deadline_t;
 
 static void __frt_deadline_init(__frt_deadline_t *d, TickType_t ticks)
 {
     if (ticks == portMAX_DELAY) {
         d->infinite = true;
-        d->deadline_ms = 0;
+        d->deadline = 0;
     } else {
         d->infinite = false;
-        d->deadline_ms = vsf_systimer_get_ms() + (uint32_t)ticks;
+        d->deadline = vsf_systimer_get_tick() + (uint32_t)ticks;
     }
 }
 
@@ -167,11 +167,11 @@ static vsf_timeout_tick_t __frt_deadline_remaining(const __frt_deadline_t *d)
     if (d->infinite) {
         return (vsf_timeout_tick_t)-1;
     }
-    uint32_t now = vsf_systimer_get_ms();
-    if ((int32_t)(d->deadline_ms - now) <= 0) {
+    TickType_t now = vsf_systimer_get_tick();
+    if (d->deadline <= now) {
         return 0;
     }
-    return vsf_systimer_ms_to_tick(d->deadline_ms - now);
+    return d->deadline - now;
 }
 
 /*============================ CORE: STREAM BUFFER ===========================*/

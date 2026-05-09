@@ -196,8 +196,7 @@ uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,
     }
 
     vsf_timeout_tick_t timeout = (xTicksToWait == portMAX_DELAY)
-            ? (vsf_timeout_tick_t)-1
-            : vsf_systimer_ms_to_tick((uint32_t)xTicksToWait);
+            ? (vsf_timeout_tick_t)-1 : xTicksToWait;
 
     vsf_sync_reason_t reason = vsf_thread_sem_pend(&ft->notify_sem, timeout);
     if (reason != VSF_SYNC_GET) {
@@ -250,8 +249,7 @@ BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
     vsf_unprotect_sched(orig);
 
     vsf_timeout_tick_t timeout = (xTicksToWait == portMAX_DELAY)
-            ? (vsf_timeout_tick_t)-1
-            : vsf_systimer_ms_to_tick((uint32_t)xTicksToWait);
+            ? (vsf_timeout_tick_t)-1 : xTicksToWait;
 
     vsf_sync_reason_t reason = vsf_thread_sem_pend(&ft->notify_sem, timeout);
     if (reason != VSF_SYNC_GET) {

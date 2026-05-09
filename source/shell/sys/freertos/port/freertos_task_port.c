@@ -66,7 +66,7 @@
 static void __freertos_task_wrapper(vsf_thread_cb_t *cb)
 {
     StaticTask_t *ft = (StaticTask_t *)
-        ((uint8_t *)cb - offsetof(StaticTask_t, thread_cb));
+        vsf_container_of(cb, StaticTask_t, use_as__vsf_thread_cb_t);
     if (ft->entry != NULL) {
         ft->entry(ft->arg);
     }
@@ -80,7 +80,7 @@ static void __freertos_task_wrapper(vsf_thread_cb_t *cb)
 static void __freertos_task_wrapper(vsf_thread_t *t)
 {
     StaticTask_t *ft = (StaticTask_t *)
-        ((uint8_t *)t - offsetof(StaticTask_t, thread));
+        vsf_container_of(t, StaticTask_t, use_as__vsf_thread_t);
     if (ft->entry != NULL) {
         ft->entry(ft->arg);
     }
@@ -88,10 +88,20 @@ static void __freertos_task_wrapper(vsf_thread_t *t)
 }
 #endif
 
+static void __freertos_task_on_terminate(vsf_eda_t *eda)
+{
+    StaticTask_t *ft = (StaticTask_t *)eda;
+    if (!ft->is_stack_static) {
+        vsf_heap_free(ft->stack);
+    }
+    if (!ft->is_static) {
+        vsf_heap_free(ft);
+    }
+}
+
 void vTaskDelay(const TickType_t xTicksToDelay)
 {
-    // pdMS_TO_TICKS(ms) == ms in this shim, so the incoming tick is in ms.
-    vsf_thread_delay(vsf_systimer_ms_to_tick((uint_fast32_t)xTicksToDelay));
+    vsf_thread_delay(xTicksToDelay);
 }
 
 void vTaskDelayUntil(TickType_t * const pxPreviousWakeTime,
@@ -106,13 +116,13 @@ void vTaskDelayUntil(TickType_t * const pxPreviousWakeTime,
     // Signed compare handles tick counter wrap.
     int32_t delta = (int32_t)(next - now);
     if (delta > 0) {
-        vsf_thread_delay(vsf_systimer_ms_to_tick((uint_fast32_t)delta));
+        vsf_thread_delay(delta);
     }
 }
 
 TickType_t xTaskGetTickCount(void)
 {
-    return (TickType_t)vsf_systimer_tick_to_ms(vsf_systimer_get_tick());
+    return vsf_systimer_get_tick();
 }
 
 TickType_t xTaskGetTickCountFromISR(void)
@@ -159,13 +169,14 @@ static vsf_err_t __frt_task_spawn(StaticTask_t *ft)
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-    ft->thread_cb.entry      = (vsf_thread_entry_t *)__freertos_task_wrapper;
-    ft->thread_cb.stack      = ft->stack;
-    ft->thread_cb.stack_size = ft->stack_bytes;
-    return vsf_thread_start(&ft->thread, &ft->thread_cb,
+    ft->entry             = (vsf_thread_entry_t *)__freertos_task_wrapper;
+    ft->on_terminate      = __freertos_task_on_terminate;
+    ft->stack             = ft->stack;
+    return vsf_thread_start(&ft->use_as__vsf_thread_t, &ft->use_as__vsf_thread_cb_t,
                             VSF_FREERTOS_CFG_DEFAULT_VSF_PRIO);
 #else
     ft->thread.entry      = (vsf_thread_entry_t *)__freertos_task_wrapper;
+    ft->on_terminate      = __freertos_task_on_terminate;
     ft->thread.stack      = ft->stack;
     ft->thread.stack_size = ft->stack_bytes;
     return vsf_thread_start(&ft->thread,
@@ -173,6 +184,7 @@ static vsf_err_t __frt_task_spawn(StaticTask_t *ft)
 #endif
 }
 
+VSF_CAL_WEAK(xTaskCreate)
 BaseType_t xTaskCreate(TaskFunction_t pxTaskCode,
                        const char * const pcName,
                        const uint32_t usStackDepth,
@@ -190,8 +202,7 @@ BaseType_t xTaskCreate(TaskFunction_t pxTaskCode,
 
     uint32_t stack_bytes = __frt_task_round_stack(usStackDepth);
 
-    StaticTask_t *ft =
-        (StaticTask_t *)vsf_heap_malloc(sizeof(*ft));
+    StaticTask_t *ft = (StaticTask_t *)vsf_heap_malloc(sizeof(*ft));
     if (ft == NULL) {
         if (pxCreatedTask != NULL) { *pxCreatedTask = NULL; }
         return pdFAIL;
@@ -203,10 +214,10 @@ BaseType_t xTaskCreate(TaskFunction_t pxTaskCode,
         return pdFAIL;
     }
     memset(ft, 0, sizeof(*ft));
-    ft->entry           = (void (*)(void *))pxTaskCode;
+    ft->freertos_entry  = (void (*)(void *))pxTaskCode;
     ft->arg             = pvParameters;
     ft->stack           = stack;
-    ft->stack_bytes     = stack_bytes;
+    ft->stack_size      = stack_bytes;
     ft->is_static       = false;
     ft->is_stack_static = false;
 
@@ -222,6 +233,7 @@ BaseType_t xTaskCreate(TaskFunction_t pxTaskCode,
     return pdPASS;
 }
 
+VSF_CAL_WEAK(xTaskCreateStatic)
 TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
                                const char * const pcName,
                                const uint32_t ulStackDepth,
@@ -263,10 +275,10 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
 
     StaticTask_t *ft = (StaticTask_t *)pxTaskBuffer;
     memset(ft, 0, sizeof(*ft));
-    ft->entry           = (void (*)(void *))pxTaskCode;
+    ft->freertos_entry  = (void (*)(void *))pxTaskCode;
     ft->arg             = pvParameters;
     ft->stack           = (void *)puxStackBuffer;
-    ft->stack_bytes     = ulStackDepth;
+    ft->stack_size      = ulStackDepth;
     ft->is_static       = true;
     ft->is_stack_static = true;
 
@@ -277,6 +289,7 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
     return (TaskHandle_t)ft;
 }
 
+VSF_CAL_WEAK(vTaskDelete)
 void vTaskDelete(TaskHandle_t xTaskToDelete)
 {
     if (xTaskToDelete == NULL) {
@@ -289,6 +302,7 @@ void vTaskDelete(TaskHandle_t xTaskToDelete)
     (void)xTaskToDelete;
 }
 
+VSF_CAL_WEAK(xTaskGetCurrentTaskHandle)
 TaskHandle_t xTaskGetCurrentTaskHandle(void)
 {
     // The opaque handle we expose to FreeRTOS callers is the vsf_thread_t *

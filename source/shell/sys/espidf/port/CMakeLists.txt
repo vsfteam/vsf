@@ -8,6 +8,11 @@
 # internally by its component's VSF_ESPIDF_CFG_USE_* switch, so listing a file
 # here is safe even before the component's switch is enabled.
 
+target_include_directories(${VSF_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${VSF_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/argtable3)
+target_include_directories(${VSF_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/linenoise)
+target_include_directories(${VSF_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/console)
+
 vsf_add_sources(
     esp_err_port.c         # -> pure header + 2 diagnostic helpers
     esp_log_port.c         # -> service/trace (vsf_trace)
@@ -39,6 +44,23 @@ vsf_add_sources(
     esp_log_buffer_port.c  # -> esp_log_buffer.h hex/char/hexdump formatting
     esp_vfs_eventfd_port.c # -> esp_vfs_eventfd.h bridge to VSF Linux eventfd
     esp_vfs_semihost_port.c # -> esp_vfs_semihost.h NOT_SUPPORTED stub
+    esp_console_port.c     # -> esp_console.h (REPL + command dispatch + argtable3 + linenoise)
+    freertos_task_port.c   # -> FreeRTOS task on VSF Linux thread (overrides weak shim)
+    linenoise/linenoise.c             # -> linenoise line editing library
+    argtable3/argtable3.c             # -> argtable3 argument parsing library (core)
+    argtable3/arg_utils.c             # -> argtable3 xmalloc/xfree wrappers
+    argtable3/arg_str.c               # -> argtable3 string argument type
+    argtable3/arg_int.c               # -> argtable3 integer argument type
+    argtable3/arg_dbl.c               # -> argtable3 double argument type
+    argtable3/arg_lit.c               # -> argtable3 literal argument type
+    argtable3/arg_rex.c               # -> argtable3 regex argument type
+    argtable3/arg_rem.c               # -> argtable3 remark argument type
+    argtable3/arg_file.c              # -> argtable3 file argument type
+    argtable3/arg_date.c              # -> argtable3 date argument type
+    argtable3/arg_end.c               # -> argtable3 end marker type
+    argtable3/arg_dstr.c              # -> argtable3 dynamic string type
+    argtable3/arg_cmd.c               # -> argtable3 sub-command type
+    argtable3/arg_hashtable.c         # -> argtable3 hash table
 )
 
 # vsf_add_sources(

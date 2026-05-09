@@ -73,8 +73,8 @@ extern "C" {
 
 // Tick->ms conversion. In this shim 1 tick == 1 ms so pdMS_TO_TICKS is the
 // identity; the underlying sleep still uses systimer ticks via vsf_thread.
-#define pdMS_TO_TICKS(xTimeInMs)        ((TickType_t)(xTimeInMs))
-#define pdTICKS_TO_MS(xTicks)           ((uint32_t)(xTicks))
+#define pdMS_TO_TICKS(xTimeInMs)        ((TickType_t)vsf_systimer_ms_to_tick(xTimeInMs))
+#define pdTICKS_TO_MS(xTicks)           ((uint32_t)vsf_systimer_tick_to_ms(xTicks))
 
 /*============================ ASSERT ========================================*/
 

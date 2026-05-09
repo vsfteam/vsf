@@ -181,8 +181,7 @@ BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore, TickType_t xTicksToWait)
     }
 
     vsf_timeout_tick_t timeout = (xTicksToWait == portMAX_DELAY)
-            ? (vsf_timeout_tick_t)-1
-            : vsf_systimer_ms_to_tick((uint32_t)xTicksToWait);
+            ? (vsf_timeout_tick_t)-1 : xTicksToWait;
 
     vsf_sync_reason_t reason;
     if (xSemaphore->kind == __FRT_SEM_KIND_SEM) {

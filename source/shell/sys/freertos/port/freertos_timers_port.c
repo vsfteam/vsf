@@ -141,8 +141,7 @@ static void __frt_timer_daemon(void *arg)
 
         // Re-arm only if the user has not disarmed us during the callback.
         if (t->auto_reload && t->is_active) {
-            vsf_systimer_tick_t tk =
-                vsf_systimer_ms_to_tick((uint_fast32_t)t->period_ticks);
+            vsf_systimer_tick_t tk = t->period_ticks;
             vsf_callback_timer_add(&t->cb_timer, tk);
         }
     }
@@ -266,10 +265,8 @@ BaseType_t xTimerStart(TimerHandle_t xTimer, TickType_t xTicksToWait)
     // from the current tick -- caller who wants "reset" semantics calls
     // xTimerReset explicitly (which goes through the same path).
     vsf_callback_timer_remove(&t->cb_timer);
-    vsf_systimer_tick_t tk =
-        vsf_systimer_ms_to_tick((uint_fast32_t)t->period_ticks);
     t->is_active = true;
-    vsf_callback_timer_add(&t->cb_timer, tk);
+    vsf_callback_timer_add(&t->cb_timer, t->period_ticks);
     return pdPASS;
 }
 
@@ -282,10 +279,8 @@ BaseType_t xTimerStartFromISR(TimerHandle_t xTimer,
     if (xTimer == NULL) { return pdFAIL; }
     StaticTimer_t *t = (StaticTimer_t *)xTimer;
     vsf_callback_timer_remove_isr(&t->cb_timer);
-    vsf_systimer_tick_t tk =
-        vsf_systimer_ms_to_tick((uint_fast32_t)t->period_ticks);
     t->is_active = true;
-    vsf_callback_timer_add_isr(&t->cb_timer, tk);
+    vsf_callback_timer_add_isr(&t->cb_timer, t->period_ticks);
     return pdPASS;
 }
 
@@ -333,10 +328,8 @@ BaseType_t xTimerChangePeriod(TimerHandle_t xTimer,
     StaticTimer_t *t = (StaticTimer_t *)xTimer;
     vsf_callback_timer_remove(&t->cb_timer);
     t->period_ticks = xNewPeriod;
-    vsf_systimer_tick_t tk =
-        vsf_systimer_ms_to_tick((uint_fast32_t)xNewPeriod);
     t->is_active = true;
-    vsf_callback_timer_add(&t->cb_timer, tk);
+    vsf_callback_timer_add(&t->cb_timer, xNewPeriod);
     return pdPASS;
 }
 
@@ -351,10 +344,8 @@ BaseType_t xTimerChangePeriodFromISR(TimerHandle_t xTimer,
     StaticTimer_t *t = (StaticTimer_t *)xTimer;
     vsf_callback_timer_remove_isr(&t->cb_timer);
     t->period_ticks = xNewPeriod;
-    vsf_systimer_tick_t tk =
-        vsf_systimer_ms_to_tick((uint_fast32_t)xNewPeriod);
     t->is_active = true;
-    vsf_callback_timer_add_isr(&t->cb_timer, tk);
+    vsf_callback_timer_add_isr(&t->cb_timer, xNewPeriod);
     return pdPASS;
 }
 

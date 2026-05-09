@@ -50,9 +50,13 @@ extern "C" {
 
 #ifndef __VSF_ESPIDF_FREERTOS_TYPES_DEFINED__
 #define __VSF_ESPIDF_FREERTOS_TYPES_DEFINED__
-typedef long            BaseType_t;     /*!< FreeRTOS portable signed word.   */
-typedef unsigned long   UBaseType_t;    /*!< FreeRTOS unsigned signed word.  */
-typedef uint32_t        TickType_t;     /*!< FreeRTOS tick counter type.      */
+
+// for vsf_systimer_tick_t
+#   include "kernel/vsf_kernel.h"
+
+typedef long                BaseType_t;     /*!< FreeRTOS portable signed word.   */
+typedef unsigned long       UBaseType_t;    /*!< FreeRTOS unsigned signed word.  */
+typedef vsf_systimer_tick_t TickType_t;     /*!< FreeRTOS tick counter type.      */
 #   ifndef pdTRUE
 #       define pdTRUE       ((BaseType_t)1)
 #   endif
@@ -66,7 +70,7 @@ typedef uint32_t        TickType_t;     /*!< FreeRTOS tick counter type.      */
 #       define pdFAIL       pdFALSE
 #   endif
 #   ifndef portMAX_DELAY
-#       define portMAX_DELAY    ((TickType_t)0xFFFFFFFFu)
+#       define portMAX_DELAY    ((TickType_t)-1)
 #   endif
 #endif      // __VSF_ESPIDF_FREERTOS_TYPES_DEFINED__
 

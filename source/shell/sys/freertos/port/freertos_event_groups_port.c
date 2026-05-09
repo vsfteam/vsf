@@ -219,8 +219,7 @@ EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
         reason = VSF_SYNC_TIMEOUT;
     } else {
         vsf_timeout_tick_t timeout = (xTicksToWait == portMAX_DELAY)
-                ? (vsf_timeout_tick_t)-1
-                : vsf_systimer_ms_to_tick((uint32_t)xTicksToWait);
+                ? (vsf_timeout_tick_t)-1 : xTicksToWait;
         reason = vsf_thread_bmpevt_pend(&eg->bmp, &pender, timeout);
     }
 

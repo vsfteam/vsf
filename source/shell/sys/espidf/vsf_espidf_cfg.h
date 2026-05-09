@@ -291,4 +291,9 @@
 #   define VSF_ESPIDF_CFG_USE_APP_TRACE         DISABLED
 #endif
 
+// Console (REPL + command registration + argtable3 + linenoise).
+#ifndef VSF_ESPIDF_CFG_USE_CONSOLE
+#   define VSF_ESPIDF_CFG_USE_CONSOLE           DISABLED
+#endif
+
 #endif      // __VSF_ESPIDF_CFG_H__

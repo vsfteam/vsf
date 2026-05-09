@@ -30,6 +30,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+// for vsf_systimer_tick_t
+#include "kernel/vsf_kernel.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,11 +42,9 @@ extern "C" {
 typedef long                    BaseType_t;
 typedef unsigned long           UBaseType_t;
 
-// A tick is a systimer tick in the VSF shim. 32-bit matches FreeRTOS with
-// configUSE_16_BIT_TICKS == 0.
-typedef uint32_t                TickType_t;
+typedef vsf_systimer_tick_t     TickType_t;
 #ifndef portMAX_DELAY
-#   define portMAX_DELAY        ((TickType_t)0xFFFFFFFFUL)
+#   define portMAX_DELAY        ((TickType_t)-1)
 #endif
 
 // StackType_t is documented as "the type used by the stack". FreeRTOS

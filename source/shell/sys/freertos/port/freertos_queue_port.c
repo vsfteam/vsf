@@ -178,8 +178,7 @@ BaseType_t xQueueSend(QueueHandle_t xQueue, const void *pvItemToQueue,
     }
 
     vsf_timeout_tick_t timeout = (xTicksToWait == portMAX_DELAY)
-            ? (vsf_timeout_tick_t)-1
-            : vsf_systimer_ms_to_tick((uint32_t)xTicksToWait);
+            ? (vsf_timeout_tick_t)-1 : xTicksToWait;
 
     // Fast path: if a slot is already free we land here.
     if (VSF_ERR_NONE == vsf_eda_queue_send(&xQueue->use_as__vsf_eda_queue_t,
@@ -265,8 +264,7 @@ BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer,
     }
 
     vsf_timeout_tick_t timeout = (xTicksToWait == portMAX_DELAY)
-            ? (vsf_timeout_tick_t)-1
-            : vsf_systimer_ms_to_tick((uint32_t)xTicksToWait);
+            ? (vsf_timeout_tick_t)-1 : xTicksToWait;
 
     // dequeue callback treats its arg as the caller buffer; pass pvBuffer
     // directly. The `void **` parameter shape is inherited from the eda

@@ -19,7 +19,7 @@
 //
 // Scope of the initial MVP:
 //  - vTaskDelay / vTaskDelayUntil      (cooperative sleep via vsf_thread)
-//  - xTaskGetTickCount                 (vsf_systimer_get_ms)
+//  - xTaskGetTickCount                 (vsf_systimer_get_tick)
 //  - taskYIELD                         (vsf_thread_yield)
 //  - xTaskCreate / xTaskCreateStatic   (spawn a vsf_thread worker)
 //  - vTaskDelete                       (self-termination / best-effort)
@@ -48,14 +48,6 @@ vsf_dcl_class(StaticTask_t)
 typedef StaticTask_t *          TaskHandle_t;
 typedef void (*TaskFunction_t)(void *);
 
-// Conditional field helpers. vsf_class(...) { private_member(...) } is a
-// single macro invocation, so we cannot place #if inside its argument list
-// portably; these stage the optional members into empty / non-empty text.
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   define __VSF_FREERTOS_TASK_THREAD_CB_FIELD   vsf_thread_cb_t     thread_cb;
-#else
-#   define __VSF_FREERTOS_TASK_THREAD_CB_FIELD
-#endif
 #if VSF_FREERTOS_CFG_USE_NOTIFY == ENABLED
 #   define __VSF_FREERTOS_TASK_NOTIFY_FIELDS                                   \
         vsf_sem_t           notify_sem;                                        \
@@ -72,12 +64,10 @@ typedef void (*TaskFunction_t)(void *);
 // round-trip sound.
 vsf_class(StaticTask_t) {
     private_member(
-        vsf_thread_t        thread;
-        __VSF_FREERTOS_TASK_THREAD_CB_FIELD
+        implement(vsf_thread_t)
+        implement(vsf_thread_cb_t)
         void              (*entry)(void *);
         void *              arg;
-        void *              stack;
-        uint32_t            stack_bytes;
         // Ownership flags for zero-heap xTaskCreateStatic: when set, the
         // corresponding storage was supplied by the caller and must NOT
         // be released to the heap.
