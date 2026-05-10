@@ -10,6 +10,7 @@
 #endif
 // for stdint.h
 #include "utilities/vsf_utilities.h"
+#include <sys/ioctl.h>
 
 #ifdef __cplusplus
 extern "C" {

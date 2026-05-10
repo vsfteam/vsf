@@ -22,6 +22,7 @@ extern "C" {
 #define SIOCSIFNAME     0x8923      /* set interface name       */
 #define SIOCSIFHWADDR   0x8924      /* set hardware address     */
 #define SIOCGIFHWADDR   0x8927      /* Get hardware address	    */
+#define SIOCGIFINDEX    0x8933      /* name -> if_index mapping */
 
 #ifdef __cplusplus
 }
