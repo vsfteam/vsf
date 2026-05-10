@@ -245,9 +245,9 @@ extern const vk_disp_drv_t vk_disp_cvrt_drv;
  * callback registered on the vk_disp_t.
  *
  * Typical synchronous-init pattern:
- *   1. Set disp->ui_data = <your context, e.g. esp_lcd_panel_impl_t *>
+ *   1. Set disp->ui_data = <your context pointer>
  *   2. Set disp->ui_on_ready = <your callback>
- *   3. Call vk_disp_init(disp) or vk_disp_refresh(disp, ...)
+ *   3. Call vk_disp_init(disp)
  *   4. vsf_thread_wfe(<your event>)  -- blocks until ui_on_ready fires
  *
  * The ui_on_ready callback receives the vk_disp_t * and can retrieve
@@ -255,8 +255,28 @@ extern const vk_disp_drv_t vk_disp_cvrt_drv;
  * via vsf_eda_post_evt().
  */
 
+/**
+ * @brief Initialize a display instance (asynchronous)
+ * @param[in] pthis: a pointer to structure @ref vk_disp_t
+ * @return vsf_err_t: VSF_ERR_NONE if initialization started successfully, otherwise returns error code
+ * @note Completion is signaled via the ui_on_ready callback.
+ */
 extern vsf_err_t vk_disp_init(vk_disp_t *pthis);
+/**
+ * @brief Deinitialize a display instance (asynchronous)
+ * @param[in] pthis: a pointer to structure @ref vk_disp_t
+ * @note Completion is signaled via the ui_on_ready callback.
+ */
 extern void vk_disp_fini(vk_disp_t *pthis);
+/**
+ * @brief Refresh a display area (asynchronous)
+ * @param[in] pthis: a pointer to structure @ref vk_disp_t
+ * @param[in] area: a pointer to structure @ref vk_disp_area_t specifying the region to refresh
+ * @param[in] disp_buff: pointer to the display buffer containing pixel data
+ * @return vsf_err_t: VSF_ERR_NONE if refresh started successfully, otherwise returns error code
+ * @pre vk_disp_init must have been called and its asynchronous completion
+ *      signaled via ui_on_ready before calling this function.
+ */
 extern vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 #ifdef __VSF_DISP_CLASS_INHERIT__
