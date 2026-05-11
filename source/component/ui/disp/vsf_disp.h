@@ -272,7 +272,11 @@ extern void vk_disp_fini(vk_disp_t *pthis);
  * @brief Refresh a display area (asynchronous)
  * @param[in] pthis: a pointer to structure @ref vk_disp_t
  * @param[in] area: a pointer to structure @ref vk_disp_area_t specifying the region to refresh
- * @param[in] disp_buff: pointer to the display buffer containing pixel data
+ * @param[in] disp_buff: pointer to the pixel data for the area.
+ *            Pixels must be tightly packed per row: row stride equals
+ *            area->size.x * bytes_per_pixel.  The buffer only needs to
+ *            cover the area, NOT the full screen — rows are contiguous
+ *            without any padding to the display width.
  * @return vsf_err_t: VSF_ERR_NONE if refresh started successfully, otherwise returns error code
  * @pre vk_disp_init must have been called and its asynchronous completion
  *      signaled via ui_on_ready before calling this function.
