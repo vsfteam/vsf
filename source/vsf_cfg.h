@@ -83,7 +83,7 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 #endif
 
 #if     (defined(VSF_DEBUGGER_CFG_CONSOLE) && (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED))\
-    ||  (defined(VSF_CFG_DEBUG_STREAM_TX_T) && (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED))\
+    ||  (defined(VSF_CFG_DEBUG_STREAM_TX_T) && !defined(VSF_CFG_DEBUG_STREAM_TX) && (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED))\
     ||  (defined(VSF_DEBUGGER_CFG_CONSOLE) && defined(VSF_CFG_DEBUG_STREAM_TX_T))
 #   error "please enable one of VSF_HAL_USE_DEBUG_STREAM/VSF_DEBUGGER_CFG_CONSOLE/VSF_CFG_DEBUG_STREAM_TX_T"
 #endif

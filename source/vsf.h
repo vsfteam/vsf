@@ -79,7 +79,10 @@ extern "C" {
         ||  (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED)\
         ||  defined(VSF_CFG_DEBUG_STREAM_TX_T)
     // use default debug stream from debugger/hardware debug uart/user
-#       if VSF_USE_SIMPLE_STREAM == ENABLED
+#       if defined(VSF_CFG_DEBUG_STREAM_TX)
+#           define vsf_start_trace(...)                                         \
+                vsf_trace_init(((vsf_stream_t *)&VSF_CFG_DEBUG_STREAM_TX, ##__VA_ARGS__))
+#       elif VSF_USE_SIMPLE_STREAM == ENABLED
 #           define vsf_start_trace(...)                                         \
                 vsf_trace_init(((vsf_stream_t *)&VSF_DEBUG_STREAM_TX, ##__VA_ARGS__))
 #       elif VSF_USE_STREAM == ENABLED
@@ -106,14 +109,22 @@ extern "C" {
 #   ifdef VSF_CFG_DEBUG_STREAM_TX_DECLARE
 VSF_CFG_DEBUG_STREAM_TX_DECLARE
 #   endif
+#   ifdef VSF_CFG_DEBUG_STREAM_TX
+extern VSF_CFG_DEBUG_STREAM_TX_T VSF_CFG_DEBUG_STREAM_TX;
+#   else
 extern VSF_CFG_DEBUG_STREAM_TX_T VSF_DEBUG_STREAM_TX;
+#   endif
 #endif
 
 #ifdef VSF_CFG_DEBUG_STREAM_RX_T
 #   ifdef VSF_CFG_DEBUG_STREAM_RX_DECLARE
 VSF_CFG_DEBUG_STREAM_RX_DECLARE
 #   endif
+#   ifdef VSF_CFG_DEBUG_STREAM_RX
+extern VSF_CFG_DEBUG_STREAM_RX_T VSF_CFG_DEBUG_STREAM_RX;
+#   else
 extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
+#endif
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
