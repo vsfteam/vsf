@@ -105,9 +105,14 @@ int __vsf_arch_trace(int level, const char *format, ...)
         size = vsnprintf(buff, sizeof(buff), format, ap);
     va_end(ap);
 
-    if (size <= sizeof(buff)) {
-        DWORD wsize;
-        WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), buff, size, &wsize, NULL);
+    if (size > 0 && (uint32_t)size <= sizeof(buff)) {
+        HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD wsize = 0, mode;
+        if (GetConsoleMode(h, &mode)) {
+            WriteConsoleA(h, buff, (DWORD)size, &wsize, NULL);
+        } else {
+            WriteFile(h, buff, (DWORD)size, &wsize, NULL);
+        }
     }
     return size;
 #else
