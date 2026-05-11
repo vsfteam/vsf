@@ -239,20 +239,26 @@ extern const vk_disp_drv_t vk_disp_cvrt_drv;
 /*============================ PROTOTYPES ====================================*/
 
 /*
- * vk_disp_init / vk_disp_fini / vk_disp_refresh are asynchronous: they
- * return before the operation completes.  The driver signals completion
- * by calling vk_disp_on_ready(pthis), which invokes the ui_on_ready
- * callback registered on the vk_disp_t.
+ * vk_disp_init / vk_disp_fini / vk_disp_refresh are asynchronous.
+ * The driver signals completion by calling vk_disp_on_ready(pthis),
+ * which invokes the ui_on_ready callback registered on the vk_disp_t.
  *
- * Typical synchronous-init pattern:
+ * NOTE: The ui_on_ready callback may fire either synchronously (within
+ * the call to vk_disp_init/refresh itself) or asynchronously (after the
+ * call returns), depending on the driver implementation.  Callers must
+ * handle both cases.
+ *
+ * Typical usage pattern:
  *   1. Set disp->ui_data = <your context pointer>
  *   2. Set disp->ui_on_ready = <your callback>
  *   3. Call vk_disp_init(disp)
- *   4. vsf_thread_wfe(<your event>)  -- blocks until ui_on_ready fires
+ *   4. Wait disp->ui_on_ready being called
+ *   5. Set disp->ui_on_ready if necessary
+ *   6. Call vk_disp_refresh(disp, ...)
+ *   7. Wait disp->ui_on_ready being called
  *
  * The ui_on_ready callback receives the vk_disp_t * and can retrieve
- * the waiting context from disp->ui_data, then post the wake event
- * via vsf_eda_post_evt().
+ * the waiting context from disp->ui_data, and will never be changed by display driver.
  */
 
 /**
