@@ -247,7 +247,7 @@ vsf_flash_irq_mask_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)(
     if (irq_mask_out & (1 << 5)) {
         irq_mask_out |= 1 << ((flash_ptr->erase0_write1 << 1) + 1);
     }
-    irq_mask_out &= flash_ptr->irq_mask;
+    irq_mask_out &= irq_mask;
     return irq_mask_out;
 }
 
