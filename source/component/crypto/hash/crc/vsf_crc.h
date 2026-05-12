@@ -48,6 +48,7 @@ typedef struct vsf_crc_t {
 
 extern const vsf_crc_t vsf_crc8_ccitt;
 extern const vsf_crc_t vsf_crc16_ccitt;
+extern const vsf_crc_t vsf_crc16_ibm;      // poly: x^16 + x^15 + x^2 + 1 (0x8005)
 
 /*============================ PROTOTYPES ====================================*/
 
