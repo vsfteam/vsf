@@ -30,6 +30,9 @@
 #if VSF_USE_MENUSYS == ENABLED
 #   include "./menusys/vsf_menusys.h"
 #endif
+#if VSF_USE_FBCON == ENABLED
+#   include "./fbcon/vsf_fbcon.h"
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
