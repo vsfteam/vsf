@@ -21,6 +21,8 @@ typedef struct vsf_linux_reent_vplt_t {
     vsf_vplt_info_t info;
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_getreent);
+    // implement __vsf_linux_errno for compatibility because older image need this
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_errno);
 } vsf_linux_reent_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt;
@@ -50,9 +52,15 @@ VSF_LINUX_APPLET_REENT_IMP(__vsf_linux_getreent, struct _reent *, void) {
     return VSF_LINUX_APPLET_REENT_ENTRY(__vsf_linux_getreent)();
 }
 
+VSF_LINUX_APPLET_REENT_IMP(__vsf_linux_errno, int *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_REENT_ENTRY(__vsf_linux_errno)();
+}
+
 #else
 
 extern struct _reent *__vsf_linux_getreent(void);
+extern int * __vsf_linux_errno(void);
 
 #endif
 

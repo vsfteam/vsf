@@ -780,6 +780,11 @@ struct _reent * __vsf_linux_getreent(void)
     return &thread->__reent;
 }
 
+int * __vsf_linux_errno(void)
+{
+    return &errno;
+}
+
 int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in)
 {
     char working_dir[PATH_MAX];
@@ -5096,6 +5101,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_reent_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_getreent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
 };
 #endif
 
