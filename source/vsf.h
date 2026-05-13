@@ -74,7 +74,7 @@ extern "C" {
 #   endif
 #endif
 
-#if VSF_USE_TRACE == ENABLED
+#if VSF_USE_TRACE == ENABLED && VSF_USE_SIMPLE_STREAM == ENABLED
 #   if      defined(VSF_DEBUGGER_CFG_CONSOLE)                                   \
         ||  (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED)\
         ||  defined(VSF_CFG_DEBUG_STREAM_TX_T)
@@ -105,6 +105,8 @@ extern "C" {
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+
 #ifdef VSF_CFG_DEBUG_STREAM_TX_T
 #   ifdef VSF_CFG_DEBUG_STREAM_TX_DECLARE
 VSF_CFG_DEBUG_STREAM_TX_DECLARE
@@ -124,7 +126,9 @@ VSF_CFG_DEBUG_STREAM_RX_DECLARE
 extern VSF_CFG_DEBUG_STREAM_RX_T VSF_CFG_DEBUG_STREAM_RX;
 #   else
 extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
+#   endif
 #endif
+
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
