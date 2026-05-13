@@ -290,15 +290,11 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
         ||  (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL)) {
         // in DMA mode, no need to check request queue
         if (!dwcotg_hcd->dma_en) {
-            if (dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
-                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
-                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-                channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
-                // skip delay
-            } else {
-//                VSF_USB_ASSERT(false);
-//                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-            }
+            // use same register write sequence regardless of gnptxsts:
+            //  multiple AHB bus writes provide implicit delay for CHDIS to take effect
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
         } else {
             // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
             //  If CHENA is set here, there is possibility that the channel is enabled after halt,
@@ -308,15 +304,11 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
     } else {
         // in DMA mode, no need to check request queue
         if (!dwcotg_hcd->dma_en) {
-            if (dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
-                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
-                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-                channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
-                // skip delay
-            } else {
-//                VSF_USB_ASSERT(false);
-//                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-            }
+            // use same register write sequence regardless of hptxsts:
+            //  multiple AHB bus writes provide implicit delay for CHDIS to take effect
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
         } else {
             // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
             //  If CHENA is set here, there is possibility that the channel is enabled after halt,
@@ -446,13 +438,34 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 
     if (!dwcotg_hcd->dma_en && !dir_in1out0 && (dwcotg_urb->current_size > 0)) {
         bool is_periodic = (pipe.type == USB_ENDPOINT_XFER_ISOC) || (pipe.type == USB_ENDPOINT_XFER_INT);
-        VSF_USB_ASSERT( (   is_periodic
-                        &&  ((dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) << 2) >= size)
-                    ||  (   !is_periodic
-                        &&  ((dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) << 2) >= size));
+        uint32_t fifo_avail;
+        if (is_periodic) {
+            fifo_avail = (dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) << 2;
+            uint32_t fifo_depth = (dwcotg_hcd->reg.global_regs->hptxfsiz >> 16) << 2;
+            if (fifo_avail > fifo_depth) fifo_avail = fifo_depth;
+        } else {
+            fifo_avail = (dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) << 2;
+            uint32_t fifo_depth = (dwcotg_hcd->reg.global_regs->gnptxfsiz >> 16) << 2;
+            if (fifo_avail > fifo_depth) fifo_avail = fifo_depth;
+        }
+
+        // write up to available FIFO space; align to 4 bytes for intermediate chunks
+        uint32_t write_size = (fifo_avail < size) ? (fifo_avail & ~3UL) : size;
         uint32_t *fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
-        for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
+        for (uint_fast16_t i = 0; i < write_size; i += 4, buffer += 4) {
             *fifo_reg = get_unaligned_le32(buffer);
+        }
+        dwcotg_urb->pos = write_size;
+
+        if (write_size < size) {
+            // remaining data to write: enable TX FIFO empty interrupt for chunked refill
+            vsf_protect_t orig = vsf_protect_int();
+            if (is_periodic) {
+                dwcotg_hcd->reg.global_regs->gintmsk |= USB_OTG_GINTMSK_PTXFEM;
+            } else {
+                dwcotg_hcd->reg.global_regs->gintmsk |= USB_OTG_GINTMSK_NPTXFEM;
+            }
+            vsf_unprotect_int(orig);
         }
     }
 }
@@ -958,6 +971,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
     vsf_trace_debug("dwcotg_hcd.channel%d: interrupt %08X" VSF_TRACE_CFG_LINEEND, channel_idx, channel_intsts);
 #endif
     if (channel_intsts & USB_OTG_HCINT_CHH) {
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+        vsf_trace_debug("dwcotg_hcd.channel%d: halt %08X" VSF_TRACE_CFG_LINEEND, channel_idx, channel_intsts);
+#endif
         vsf_protect_t orig = vsf_protect_int();
             dwcotg_hcd->reg.host.global_regs->haintmsk &= ~(1 << channel_idx);
         vsf_unprotect_int(orig);
@@ -1096,6 +1112,20 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
 #endif
                 {
                 __reactivate_channel:
+                    // CHH handler cleared hcintmsk and haintmsk, restore them for retry
+                    if (dwcotg_hcd->dma_en) {
+                        channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+                    } else {
+                        channel_regs->hcintmsk = USB_OTG_HCINTMSK_XFRCM | USB_OTG_HCINTMSK_NAKM
+                                            |   USB_OTG_HCINTMSK_TXERRM | USB_OTG_HCINTMSK_BBERRM
+                                            |   USB_OTG_HCINTMSK_FRMORM | USB_OTG_HCINTMSK_DTERRM
+                                            |   USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+                    }
+                    {
+                        vsf_protect_t __orig = vsf_protect_int();
+                            dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << channel_idx;
+                        vsf_unprotect_int(__orig);
+                    }
                     channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
                     channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
                 }
@@ -1217,6 +1247,10 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
                 __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
             } else {
+                // w1c: clear NAK bit first to prevent infinite ISR re-entry
+                //  HCINT is level-sensitive, if NAK stays set with NAKM enabled,
+                //  the channel interrupt fires again immediately after return
+                channel_regs->hcint = USB_OTG_HCINT_NAK;
                 channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             }
         } else {
@@ -1383,6 +1417,42 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     }
     if (intsts & USB_OTG_GINTSTS_NPTXFE) {
         *intsts_reg = USB_OTG_GINTSTS_NPTXFE;
+
+        bool has_pending = false;
+
+        for (uint_fast8_t i = 0; i < dwcotg_hcd->ep_num; i++) {
+            if (!(dwcotg_hcd->ep_mask & (1 << i))) continue;
+
+            vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[i];
+            if (urb == NULL || urb->pipe.dir_in1out0) continue;
+            if (urb->pipe.type == USB_ENDPOINT_XFER_ISOC || urb->pipe.type == USB_ENDPOINT_XFER_INT) continue;
+
+            vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+            // skip if URB's actual channel doesn't match this slot
+            //  (stale/duplicate urb[] entry can cause data written to wrong dfifo)
+            if (dwcotg_urb->channel_idx != i) continue;
+
+            uint32_t remaining = dwcotg_urb->current_size - dwcotg_urb->pos;
+            if (remaining == 0) continue;
+
+            uint32_t max_chunk = urb->pipe.size;
+            uint32_t write_size = (remaining > max_chunk) ? max_chunk : remaining;
+
+            uint8_t *buffer = (uint8_t *)urb->buffer + dwcotg_urb->pos;
+            uint32_t *fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[i];
+            for (uint_fast16_t j = 0; j < write_size; j += 4, buffer += 4) {
+                *fifo_reg = get_unaligned_le32(buffer);
+            }
+            dwcotg_urb->pos += write_size;
+
+            if (dwcotg_urb->pos < dwcotg_urb->current_size) {
+                has_pending = true;
+            }
+        }
+
+        if (!has_pending) {
+            dwcotg_hcd->reg.global_regs->gintmsk &= ~USB_OTG_GINTMSK_NPTXFEM;
+        }
     }
 #if VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB != ENABLED
     if (intsts & USB_OTG_GINTSTS_HPRTINT) {
