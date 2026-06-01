@@ -7,10 +7,10 @@
 对 code agent 说：
 
 ```
-安装 document/agent/skills/ 下的 vsf-bench 和 vsf-hal-driver 到项目 skills
+用软链接安装 document/agent/skills/ 下的 vsf-bench 和 vsf-hal-driver 到项目 skills
 ```
 
-Agent 会自动识别 `SKILL.md` 入口，默认安装为项目级 skill（仅当前项目生效）。
+Agent 会自动识别 `SKILL.md` 入口，**用软链接（`ln -s` / `New-Item -ItemType Junction`）而非复制**，这样多项目共享同一份 skill、升级时自动同步。
 
 如果需要在所有项目中使用，告诉 agent "安装到用户 skills" 即可。
 
