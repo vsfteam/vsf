@@ -73,3 +73,6 @@
 [submodule "source/hal/driver/Artery/AT32F402_405/common/vendor"]
 	path = source/hal/driver/Artery/AT32F402_405/common/vendor
 	url = https://github.com/ArteryTek/AT32F402_405_Firmware_Library.git
+[submodule "source/hal/driver/RaspberryPi/RP2040/vendor"]
+	path = source/hal/driver/RaspberryPi/RP2040/vendor
+	url = https://github.com/raspberrypi/pico-sdk.git
