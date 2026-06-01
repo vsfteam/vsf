@@ -107,6 +107,14 @@ LA is **auto-detected**: if a script defines `decode()`, the orchestrator treats
 
 Hardware config: `hardware-map.yml` contains an optional `logic_analyzer` section with `device`, `samplerate`, and `channels`. No `cli` field is needed — `dsview-cli` is resolved from `PATH`.
 
+### Installing dsview-cli
+
+`dsview-cli` 不是独立 exe，它依赖同目录下的 DLL/lib 和其他文件，因此需要将**整个目录**放到安装位置后加入 `PATH`。
+
+**Windows:** 从 https://github.com/liangyongxiang/DSView/releases 下载压缩包，解压到 `%LOCALAPPDATA%\DSView\`（如 `C:\Users\<用户名>\AppData\Local\DSView\`），然后将该目录加入 `PATH` 环境变量。
+
+**Linux:** 暂不提供预编译二进制，需从源码自行编译。编译后将产物目录安装到 `~/.local/opt/dsview/`，然后将该目录加入 `PATH`。
+
 To run without an LA, use a hardware-map that omits the `logic_analyzer` section (e.g. `hardware-map-no-la.yml`).
 
 Capture modes (`--la-mode`):
