@@ -1,0 +1,17 @@
+id: positive-trigger-001
+name: Build and run tests
+description: Skill should trigger for build-flash-test operations.
+tags:
+  - positive-trigger
+inputs:
+  prompt: "Build the firmware and run the usart_baud test scene on the Pico"
+expected:
+  should_trigger: true
+graders:
+  - type: text
+    name: contains-keywords
+    config:
+      contains:
+        - "build"
+        - "test"
+        - "scene"

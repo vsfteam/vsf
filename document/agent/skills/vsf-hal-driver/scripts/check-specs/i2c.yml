@@ -1,0 +1,43 @@
+periph: i2c
+api_prefix: i2c
+guard: VSF_HAL_USE_I2C
+template_include: vsf_template_i2c.h
+irq_mask_t: vsf_i2c_irq_mask_t
+required_irq_bits:
+  - MASTER
+  - SLAVE
+required_modes:
+  - VSF_I2C_MODE_MASTER
+  - VSF_I2C_MODE_SLAVE
+  - VSF_I2C_ADDR_WIDTH_7
+  - VSF_I2C_ADDR_WIDTH_10
+warn_modes: []
+isr_t: vsf_i2c_isr_t
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_i2c_t"
+  required_apis:
+    - i2c_init
+    - i2c_fini
+    - i2c_enable
+    - i2c_disable
+    - i2c_irq_enable
+    - i2c_irq_disable
+  optional_api_groups:
+    - name: master
+      apis:
+        - i2c_master_request
+        - i2c_master_xfer
+        - i2c_master_fifo_transfer
+      level: WARN
+    - name: slave
+      apis:
+        - i2c_slave_set_address
+        - i2c_slave_get_address
+        - i2c_slave_xfer
+        - i2c_slave_request
+      level: WARN
+  imp_lv0: VSF_I2C_CFG_IMP_LV0
+  template_inc: i2c_template.inc
+  prefix_macros:
+    - VSF_I2C_CFG_IMP_PREFIX
+    - VSF_I2C_CFG_IMP_UPCASE_PREFIX

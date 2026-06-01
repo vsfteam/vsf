@@ -1,0 +1,108 @@
+# VSF HAL driver quality rules — pattern-based checks.
+#
+# YAML schema:
+#   id:                  rule identifier, used for inline suppression
+#                        `// quality: allow-<id>`
+#   patterns:            list of regex patterns — finding fires if ANY match
+#   skip_in_imp_lv0:     if true (default), skip lines inside IMP_LV0 macro
+#                        definition blocks
+#   message:             one-line description of the violation
+#   reference:           optional pointer to REFERENCE.md section
+
+rules:
+  - id: hardcoded-instance-name
+    node_type: identifier
+    patterns:
+      - '^VSF_HW_[A-Z]+\d+_(?!(?:SIZE|SECTOR_SIZE|PAGE_SIZE|BLOCK_SIZE|XIP_BASE|SECTOR_NUM|CHANNEL_NUM|CHANNEL_COUNT|PER_INSTANCE)$)[A-Z_]+$'
+    skip_in_imp_lv0: true
+    message: >-
+      per-instance literal (VSF_HW_<P><N>_*) outside IMP_LV0 —
+      should expand via VSF_MCONNECT(..., __IDX, ...)
+    reference: Per-instance parameterization in device.h
+
+  - id: instance-index-branch
+    patterns:
+      - '\bif\s*\(\s*\w*(?:idx|index|inst|instance)\w*\s*==\s*\d'
+      - '\bswitch\s*\(\s*\w*(?:idx|index|inst|instance)\w*\s*\)'
+      - '==\s*&?[a-z]+\d+_hw\b|\b[a-z]+\d+_hw\s*==\s*&?\w'
+    skip_in_imp_lv0: true
+    message: >-
+      branching on instance index — parameterize the difference
+      in device.h as a per-instance macro instead
+    reference: Per-instance parameterization in device.h
+
+  - id: hardcoded-irq
+    node_type: identifier
+    patterns:
+      - '^(?!VSF_HW_)[A-Z][A-Za-z0-9_]*_(?:IRQn|IRQHandler)$'
+    skip_in_imp_lv0: true
+    message: >-
+      literal IRQ name — should come from VSF_HW_<P><N>_IRQN macro
+      via IMP_LV0
+    reference: Per-instance parameterization in device.h
+
+  - id: hardcoded-reset
+    node_type: identifier
+    patterns:
+      - '^RESETS_RESET_[A-Z][A-Z0-9_]*_(?:LSB|MSB|BITS|MASK|RESET|ACCESS)$'
+      - '^(?:RESET|RST)_[A-Z]+\d+$'
+      - '^(?:RESET|RST)_(?:ADC|BUSCTRL|DMA|JTAG|PWM|RTC|SYSCFG|SYSINFO|TBMAN|TIMER|USBCTRL|PLL_SYS|PLL_USB|IO_BANK\d|IO_QSPI|PADS_BANK\d|PADS_QSPI)$'
+    skip_in_imp_lv0: true
+    message: >-
+      literal reset bit / register — pass it through as a per-instance
+      macro (VSF_HW_<P><N>_RST_BIT)
+    reference: Per-instance parameterization in device.h
+
+  - id: hardcoded-clock
+    node_type: identifier
+    patterns:
+      - '^(?:CLK|CLOCK)_[A-Z]+\d+$'
+      - '^RCC_[A-Z0-9_]*EN$'
+    skip_in_imp_lv0: true
+    message: >-
+      literal clock gate — parameterize as a per-instance macro
+      (VSF_HW_<P><N>_CLK_BIT or similar)
+    reference: Per-instance parameterization in device.h
+
+  - id: missing-vsf-mconnect
+    patterns:
+      - '\b(?:vsf_err_t|fsm_rt_t|void|uint\w+_t|int\w+_t|bool|vsf_\w+)\s+vsf_hw_[a-z]+_[a-z_]+\s*\('
+    skip_in_imp_lv0: true
+    message: >-
+      function definition uses hardcoded `vsf_hw_<periph>_` prefix —
+      wrap with VSF_MCONNECT(VSF_..._CFG_IMP_PREFIX, _<api>)
+    reference: Macro prefix convention
+
+  - id: pinmux-in-driver
+    node_types: [identifier, field_expression]
+    patterns:
+      - '^gpio_set_function$'
+      - '^io_bank0_hw\s*->'
+      - '^sio_hw\s*->\s*gpio_oe$'
+      - '^vsf_gpio_port_config_pins$'
+    skip_in_imp_lv0: false
+    message: pinmux call in peripheral driver — move to board file
+    reference: Board wiring
+
+  - id: bare-void-cast
+    patterns:
+      - '\(void\)\s*([a-zA-Z_]\w*)\s*;'
+    skip_in_imp_lv0: false
+    message: bare (void)param cast — use VSF_UNUSED_PARAM(param) instead
+    reference: Unused parameter convention
+
+  - id: debug-logging
+    patterns:
+      - '\b(?:vsf_trace_info|vsf_trace_debug|vsf_trace_warning|vsf_trace_error|printf)\s*\('
+    skip_in_imp_lv0: false
+    message: debug/trace call in driver — remove before marking driver complete
+    reference: No debug logging in final driver
+
+  - id: magic-count-number
+    patterns:
+      - '\bVSF_HAL_ASSERT\s*\([^)]*?\b(?:channel|ch|inst|instance|port|pin)\b[^)]*?[<>]=?\s*[2-9]\b'
+    skip_in_imp_lv0: false
+    message: >-
+      magic number in count bound — use
+      VSF_HW_<PERIPH>_CHANNEL_COUNT or similar
+    reference: 'Convention 13: No magic numbers'

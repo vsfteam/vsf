@@ -1,0 +1,16 @@
+id: positive-trigger-001
+name: Create UART driver for new chip
+description: Skill should trigger when asked to create a HAL driver for a new chip.
+tags:
+  - positive-trigger
+inputs:
+  prompt: "I need to port the UART driver for a new STM32 chip to VSF HAL"
+expected:
+  should_trigger: true
+graders:
+  - type: text
+    name: contains-keywords
+    config:
+      contains:
+        - "STM32"
+        - "chip"

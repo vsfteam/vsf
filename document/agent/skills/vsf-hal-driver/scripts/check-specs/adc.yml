@@ -1,0 +1,35 @@
+periph: adc
+api_prefix: adc
+guard: VSF_HAL_USE_ADC
+template_include: vsf_template_adc.h
+irq_mask_t: vsf_adc_irq_mask_t
+required_irq_bits: []
+warn_irq_bits:
+  - CPL
+required_modes: []
+warn_modes: []
+isr_t: vsf_adc_isr_t
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_adc_t"
+  required_apis:
+    - adc_init
+    - adc_fini
+    - adc_enable
+    - adc_disable
+    - adc_irq_enable
+    - adc_irq_disable
+  optional_api_groups:
+    - name: conversion
+      apis:
+        - adc_channel_request_once
+        - adc_channel_request
+        - adc_start
+        - adc_stop
+        - adc_read
+        - adc_calibrate
+      level: FAIL
+  imp_lv0: VSF_ADC_CFG_IMP_LV0
+  template_inc: adc_template.inc
+  prefix_macros:
+    - VSF_ADC_CFG_IMP_PREFIX
+    - VSF_ADC_CFG_IMP_UPCASE_PREFIX

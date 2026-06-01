@@ -1,0 +1,38 @@
+periph: timer
+api_prefix: timer
+guard: VSF_HAL_USE_TIMER
+template_include: vsf_template_timer.h
+irq_mask_t: vsf_timer_irq_mask_t
+required_irq_bits:
+  - OVERFLOW
+required_modes:
+  - VSF_TIMER_BASE_ONESHOT
+  - VSF_TIMER_BASE_CONTINUES
+isr_t: vsf_timer_isr_t
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_timer_t"
+  required_apis:
+    - timer_init
+    - timer_fini
+    - timer_enable
+    - timer_disable
+    - timer_irq_enable
+    - timer_irq_disable
+    - timer_irq_clear
+    - timer_status
+    - timer_capability
+    - timer_set_period
+    - timer_channel_config
+    - timer_channel_start
+    - timer_channel_stop
+  lifecycle_apis:
+    - timer_get_configuration
+    - timer_ctrl
+    - timer_channel_request_start
+    - timer_channel_request_stop
+    - timer_channel_ctrl
+  imp_lv0: VSF_TIMER_CFG_IMP_LV0
+  template_inc: timer_template.inc
+  prefix_macros:
+    - VSF_TIMER_CFG_IMP_PREFIX
+    - VSF_TIMER_CFG_IMP_UPCASE_PREFIX
