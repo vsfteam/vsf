@@ -15,41 +15,39 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_RP2040_UART_H__
-#define __HAL_DRIVER_RP2040_UART_H__
+#ifndef __HAL_DRIVER_RP2040_PWM_H__
+#define __HAL_DRIVER_RP2040_PWM_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_USART == ENABLED
+#if VSF_HAL_USE_PWM == ENABLED
 
 #include "../__device.h"
 
-// PL011 irq_mask is 11-bit, DMA request IRQs start from bit16
-enum {
-    VSF_USART_IRQ_MASK_TX_CPL       = (0x1ul << 16),
-    VSF_USART_IRQ_MASK_RX_CPL       = (0x1ul << 17),
-};
-
-#include "hal/driver/IPCore/ARM/PL011/vsf_pl011_uart.h"
-
 /*============================ MACROS ========================================*/
 
-#define VSF_USART_IRQ_MASK_TX_CPL          VSF_USART_IRQ_MASK_TX_CPL
-#define VSF_USART_IRQ_MASK_RX_CPL          VSF_USART_IRQ_MASK_RX_CPL
+/* RP2040 PWM: 8 slices, each with 2 channels (A/B).
+ * VSF models each slice as one PWM instance with 2 channels.
+ *
+ * Hardware reference:
+ *   - pwm_hw->slice[0..7].csr  : control (EN, PH_CORRECT, A_INV, B_INV)
+ *   - pwm_hw->slice[0..7].div  : clock divider (INT[11:4] + FRAC[3:0])
+ *   - pwm_hw->slice[0..7].ctr  : counter
+ *   - pwm_hw->slice[0..7].cc   : compare (A[15:0], B[31:16])
+ *   - pwm_hw->slice[0..7].top  : wrap value
+ *   - pwm_hw->en               : alias of all CSR.EN bits
+ *
+ * Clock: runs from clk_sys (125 MHz default).
+ */
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ INCLUDES ======================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
+
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-/*============================ IMPLEMENTATION ================================*/
-
-/*============================ IMPLEMENTATION ================================*/
-
-#endif
-#endif
+#endif      /* VSF_HAL_USE_PWM */
+#endif      /* __HAL_DRIVER_RP2040_PWM_H__ */
 /* EOF */

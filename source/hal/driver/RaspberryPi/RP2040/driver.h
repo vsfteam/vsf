@@ -30,11 +30,21 @@
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 #   include "./device.h"
 
-// for enum clock_index
+// for clock_num_t
 #   include "hardware/structs/clocks.h"
 
+#   include "gpio/gpio.h"
 #   include "i2c/i2c.h"
 #   include "uart/uart.h"
+#   include "rtc/rtc.h"
+#   include "flash/flash.h"
+#   include "wdt/wdt.h"
+#   include "adc/adc.h"
+#   include "pwm/pwm.h"
+#   include "timer/timer.h"
+#   include "spi/spi.h"
+#   include "rng/rng.h"
+#   include "dma/dma.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -137,6 +147,14 @@
 #   include "hal/driver/common/usart/usart_template.h"
 #endif
 
+#if VSF_HAL_USE_DMA == ENABLED
+#   include "hal/driver/common/template/vsf_template_dma.h"
+
+#   define VSF_DMA_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_DMA_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/dma/dma_template.h"
+#endif
+
 #if VSF_HAL_USE_WDT == ENABLED
 //#   define VSF_WDT_CFG_REIMPLEMENT_TYPE_MODE              ENABLED
 #   include "hal/driver/common/template/vsf_template_wdt.h"
@@ -153,8 +171,8 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
-extern uint32_t clock_get_hz(enum clock_index clk_index);
+extern bool clock_configure(clock_num_t clk_index, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
+extern uint32_t clock_get_hz(clock_num_t clk_index);
 
 #   endif   // __HAL_DRIVER_RASPBERRYPI_RP2040_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__

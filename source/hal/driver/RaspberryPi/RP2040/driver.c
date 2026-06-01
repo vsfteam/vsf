@@ -25,10 +25,13 @@
 #include "hardware/platform_defs.h"
 #include "hardware/address_mapped.h"
 #include "hardware/regs/resets.h"
+#include "hardware/regs/watchdog.h"
 #include "hardware/structs/xosc.h"
 #include "hardware/structs/clocks.h"
 #include "hardware/structs/pll.h"
 #include "hardware/structs/resets.h"
+#include "hardware/structs/watchdog.h"
+
 
 /*============================ MACROS ========================================*/
 
@@ -38,6 +41,22 @@
 
 #define KHZ 1000
 #define MHZ 1000000
+
+#ifndef PICO_PLL_VCO_MIN_FREQ_KHZ
+#   ifdef PICO_PLL_VCO_MIN_FREQ_HZ
+#       define PICO_PLL_VCO_MIN_FREQ_KHZ    (PICO_PLL_VCO_MIN_FREQ_HZ / KHZ)
+#   else
+#       define PICO_PLL_VCO_MIN_FREQ_KHZ    (750 * KHZ)
+#   endif
+#endif
+
+#ifndef PICO_PLL_VCO_MAX_FREQ_KHZ
+#   ifdef PICO_PLL_VCO_MAX_FREQ_HZ
+#       define PICO_PLL_VCO_MAX_FREQ_KHZ    (PICO_PLL_VCO_MAX_FREQ_HZ / KHZ)
+#   else
+#       define PICO_PLL_VCO_MAX_FREQ_KHZ    (1600 * KHZ)
+#   endif
+#endif
 
 /// \tag::pll_settings[]
 //
@@ -82,6 +101,34 @@
 #endif // SYS_CLK_KHZ == 125000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
 #if !defined(PLL_SYS_VCO_FREQ_KHZ) || !defined(PLL_SYS_POSTDIV1) || !defined(PLL_SYS_POSTDIV2)
 #error PLL_SYS_VCO_FREQ_KHZ, PLL_SYS_POSTDIV1 and PLL_SYS_POSTDIV2 must all be specified when using custom clock setup
+#endif
+
+#ifndef USB_CLK_KHZ
+#   ifdef USB_CLK_HZ
+#       define USB_CLK_KHZ                    (USB_CLK_HZ / KHZ)
+#   else
+#       define USB_CLK_KHZ                    48000
+#   endif
+#endif
+
+#ifndef PLL_USB_REFDIV
+#define PLL_USB_REFDIV                        PLL_COMMON_REFDIV
+#endif
+
+#ifndef PLL_USB_VCO_FREQ_KHZ
+#   ifdef PLL_USB_VCO_FREQ_HZ
+#       define PLL_USB_VCO_FREQ_KHZ           (PLL_USB_VCO_FREQ_HZ / KHZ)
+#   else
+#       define PLL_USB_VCO_FREQ_KHZ           (1200 * KHZ)
+#   endif
+#endif
+
+#ifndef PLL_USB_POSTDIV1
+#define PLL_USB_POSTDIV1                      5
+#endif
+
+#ifndef PLL_USB_POSTDIV2
+#define PLL_USB_POSTDIV2                      5
 #endif
 
 /*******************************************************************************
@@ -252,12 +299,12 @@ static uint32_t configured_freq[CLK_COUNT];
 // - An auxiliary (glitchy) mux, whose output glitches when switched, but has
 //   no constraints on its inputs
 // Not all clocks have both types of mux.
-static inline bool has_glitchless_mux(enum clock_index clk_index) {
+static inline bool has_glitchless_mux(clock_num_t clk_index) {
     return clk_index == clk_sys || clk_index == clk_ref;
 }
 
 /// \tag::clock_configure[]
-bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq) {
+bool clock_configure(clock_num_t clk_index, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq) {
     uint32_t div;
 
     assert(src_freq >= freq);
@@ -331,7 +378,7 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
 /// \end::clock_configure[]
 
 /// \tag::clock_get_hz[]
-uint32_t clock_get_hz(enum clock_index clk_index) {
+uint32_t clock_get_hz(clock_num_t clk_index) {
     return configured_freq[clk_index];
 }
 /// \end::clock_get_hz[]
@@ -388,8 +435,7 @@ bool vsf_driver_init(void)
 
     /// \tag::pll_init[]
     pll_init(pll_sys_hw, PLL_COMMON_REFDIV, PLL_SYS_VCO_FREQ_KHZ * KHZ, PLL_SYS_POSTDIV1, PLL_SYS_POSTDIV2);
-// initialize usb pll in usb module when required
-//    pll_init(pll_usb_hw, PLL_COMMON_REFDIV, PLL_USB_VCO_FREQ_KHZ * KHZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
+    pll_init(pll_usb_hw, PLL_USB_REFDIV, PLL_USB_VCO_FREQ_KHZ * KHZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
     /// \end::pll_init[]
 
     /// \tag::configure_clk_sys[]
@@ -409,7 +455,33 @@ bool vsf_driver_init(void)
                     SYS_CLK_KHZ * KHZ,
                     SYS_CLK_KHZ * KHZ);
 
+    clock_configure(clk_usb,
+                    0,
+                    CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                    USB_CLK_KHZ * KHZ,
+                    USB_CLK_KHZ * KHZ);
+
+    clock_configure(clk_adc,
+                    0,
+                    CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                    USB_CLK_KHZ * KHZ,
+                    USB_CLK_KHZ * KHZ);
+
+    clock_configure(clk_rtc,
+                    0,
+                    CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                    USB_CLK_KHZ * KHZ,
+                    (USB_CLK_KHZ * KHZ) / 1024);
+
     unreset_block_wait(RESETS_RESET_BITS);
+
+    // Start the watchdog tick generator. On RP2040 this also drives the
+    // timer block's 1MHz time base; without it `timer_hw->timerawl` does not
+    // increment at the expected rate and any busy_wait_us / alarm timing is
+    // wrong by orders of magnitude. clk_ref runs at XOSC_KHZ (12000kHz) on
+    // boot, so divider = XOSC_KHZ / 1000 = 12 produces a 1MHz tick.
+    watchdog_hw->tick = (XOSC_KHZ / 1000) | WATCHDOG_TICK_ENABLE_BITS;
+
     return true;
 }
 

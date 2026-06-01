@@ -15,41 +15,39 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_RP2040_UART_H__
-#define __HAL_DRIVER_RP2040_UART_H__
+#ifndef __HAL_DRIVER_RASPBERRYPI_RP2040_TIMER_H__
+#define __HAL_DRIVER_RASPBERRYPI_RP2040_TIMER_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_USART == ENABLED
+#if VSF_HAL_USE_TIMER == ENABLED
 
 #include "../__device.h"
 
-// PL011 irq_mask is 11-bit, DMA request IRQs start from bit16
-enum {
-    VSF_USART_IRQ_MASK_TX_CPL       = (0x1ul << 16),
-    VSF_USART_IRQ_MASK_RX_CPL       = (0x1ul << 17),
-};
-
-#include "hal/driver/IPCore/ARM/PL011/vsf_pl011_uart.h"
-
 /*============================ MACROS ========================================*/
 
-#define VSF_USART_IRQ_MASK_TX_CPL          VSF_USART_IRQ_MASK_TX_CPL
-#define VSF_USART_IRQ_MASK_RX_CPL          VSF_USART_IRQ_MASK_RX_CPL
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK         ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE     ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef enum vsf_timer_irq_mask_t {
+    VSF_TIMER_IRQ_MASK_OVERFLOW = (0x01 << 0),
+} vsf_timer_irq_mask_t;
+
+typedef enum vsf_timer_channel_mode_t {
+    VSF_TIMER_CHANNEL_MODE_BASE = (0x00 << 0),
+    VSF_TIMER_BASE_ONESHOT      = (0x00 << 5),
+    VSF_TIMER_BASE_CONTINUES    = (0x01 << 5),
+} vsf_timer_channel_mode_t;
+
 /*============================ INCLUDES ======================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ INCLUDES ======================================*/
+#include "hal/driver/common/template/vsf_template_timer.h"
 /*============================ PROTOTYPES ====================================*/
 
-/*============================ IMPLEMENTATION ================================*/
-
-/*============================ IMPLEMENTATION ================================*/
-
-#endif
-#endif
+#endif      // VSF_HAL_USE_TIMER
+#endif      // __HAL_DRIVER_RASPBERRYPI_RP2040_TIMER_H__
 /* EOF */

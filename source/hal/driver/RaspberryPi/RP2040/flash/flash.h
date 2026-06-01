@@ -15,41 +15,26 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_RP2040_UART_H__
-#define __HAL_DRIVER_RP2040_UART_H__
+#ifndef __HAL_DRIVER_RP2040_FLASH_H__
+#define __HAL_DRIVER_RP2040_FLASH_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_USART == ENABLED
+#if VSF_HAL_USE_FLASH == ENABLED
 
 #include "../__device.h"
 
-// PL011 irq_mask is 11-bit, DMA request IRQs start from bit16
-enum {
-    VSF_USART_IRQ_MASK_TX_CPL       = (0x1ul << 16),
-    VSF_USART_IRQ_MASK_RX_CPL       = (0x1ul << 17),
-};
-
-#include "hal/driver/IPCore/ARM/PL011/vsf_pl011_uart.h"
-
 /*============================ MACROS ========================================*/
-
-#define VSF_USART_IRQ_MASK_TX_CPL          VSF_USART_IRQ_MASK_TX_CPL
-#define VSF_USART_IRQ_MASK_RX_CPL          VSF_USART_IRQ_MASK_RX_CPL
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ IMPLEMENTATION ================================*/
 
-/*============================ IMPLEMENTATION ================================*/
-
-#endif
-#endif
+#endif      /* VSF_HAL_USE_FLASH */
+#endif      /* __HAL_DRIVER_RP2040_FLASH_H__ */
 /* EOF */
