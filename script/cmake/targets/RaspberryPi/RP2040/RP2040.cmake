@@ -22,4 +22,5 @@ list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
     ${PICO_SDK_PATH}/src/rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Include
     ${PICO_SDK_PATH}/src/rp2_common/hardware_base/include
     ${PICO_SDK_PATH}/src/rp2_common/pico_platform/include
+    ${CMAKE_BINARY_DIR}/generated/pico_base
 )
