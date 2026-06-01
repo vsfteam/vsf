@@ -1,0 +1,36 @@
+[project]
+name = "vsf-bench"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "pyserial",
+]
+
+[project.scripts]
+vsf-bench       = "vsf_bench.cli.run:main"
+vsf-bench-build = "vsf_bench.cli.build:main"
+vsf-bench-flash = "vsf_bench.cli.flash:main"
+vsf-bench-test  = "vsf_bench.cli.test:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+# The project root is the package: pyproject.toml lives next to __init__.py
+# and the subpackage directories (cli/, instruments/, runners/). Map the
+# vsf_bench package to "." so setuptools picks up the contents in place.
+[tool.setuptools]
+packages = [
+    "vsf_bench",
+    "vsf_bench.cli",
+    "vsf_bench.instruments",
+    "vsf_bench.runners",
+    "vsf_bench.builders",
+]
+
+[tool.setuptools.package-dir]
+"vsf_bench" = "."
+"vsf_bench.cli" = "cli"
+"vsf_bench.instruments" = "instruments"
+"vsf_bench.runners" = "runners"
