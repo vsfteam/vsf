@@ -1,0 +1,73 @@
+periph: uart
+api_prefix: usart
+guard: VSF_HAL_USE_USART
+template_include: vsf_template_usart.h
+irq_mask_t: vsf_usart_irq_mask_t
+required_irq_bits:
+  - TX
+  - RX
+warn_irq_bits:
+  - TX_CPL
+  - RX_CPL
+required_modes:
+  - VSF_USART_NO_PARITY
+  - VSF_USART_EVEN_PARITY
+  - VSF_USART_ODD_PARITY
+  - VSF_USART_1_STOPBIT
+  - VSF_USART_8_BIT_LENGTH
+  - VSF_USART_NO_HWCONTROL
+  - VSF_USART_TX_ENABLE
+  - VSF_USART_RX_ENABLE
+  - VSF_USART_TX_FIFO_THRESHOLD_EMPTY
+  - VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+warn_modes:
+  - VSF_USART_9_BIT_LENGTH
+  - VSF_USART_1_5_STOPBIT
+  - VSF_USART_0_5_STOPBIT
+  - VSF_USART_10_BIT_LENGTH
+  - VSF_USART_SYNC_CLOCK_ENABLE
+  - VSF_USART_SYNC_CLOCK_DISABLE
+  - VSF_USART_HALF_DUPLEX_ENABLE
+  - VSF_USART_HALF_DUPLEX_DISABLE
+isr_t: vsf_usart_isr_t
+warn_irq_defines:
+  - VSF_USART_IRQ_MASK_RX_TIMEOUT
+  - VSF_USART_IRQ_MASK_CTS
+  - VSF_USART_IRQ_MASK_FRAME_ERR
+  - VSF_USART_IRQ_MASK_BREAK_ERR
+  - VSF_USART_IRQ_MASK_PARITY_ERR
+  - VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+  - VSF_USART_IRQ_MASK_RX_IDLE
+warn_ctrl_defines:
+  - VSF_USART_CTRL_SEND_BREAK
+  - VSF_USART_CTRL_SET_BREAK
+  - VSF_USART_CTRL_CLEAR_BREAK
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_usart_t"
+  required_apis:
+    - usart_init
+    - usart_fini
+    - usart_enable
+    - usart_disable
+    - usart_irq_enable
+    - usart_irq_disable
+    - usart_status
+    - usart_rxfifo_get_data_count
+    - usart_rxfifo_read
+    - usart_txfifo_get_free_count
+    - usart_txfifo_write
+  imp_lv0: VSF_USART_CFG_IMP_LV0
+  template_inc: usart_template.inc
+  prefix_macros:
+    - VSF_USART_CFG_IMP_PREFIX
+    - VSF_USART_CFG_IMP_UPCASE_PREFIX
+  optional_api_groups:
+    - name: DMA
+      apis:
+        - usart_request_rx
+        - usart_request_tx
+        - usart_cancel_rx
+        - usart_cancel_tx
+        - usart_get_rx_count
+        - usart_get_tx_count
+      level: WARN

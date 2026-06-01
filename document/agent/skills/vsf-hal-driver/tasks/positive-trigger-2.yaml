@@ -1,0 +1,16 @@
+id: positive-trigger-002
+name: Fix SPI driver bug
+description: Skill should trigger when asked to fix or modify an existing HAL driver.
+tags:
+  - positive-trigger
+inputs:
+  prompt: "How do I approach debugging a VSF HAL SPI driver that returns wrong data?"
+expected:
+  should_trigger: true
+graders:
+  - type: text
+    name: contains-keywords
+    config:
+      contains:
+        - "SPI"
+        - "driver"

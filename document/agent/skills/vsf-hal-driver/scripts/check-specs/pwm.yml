@@ -1,0 +1,34 @@
+periph: pwm
+api_prefix: pwm
+guard: VSF_HAL_USE_PWM
+template_include: vsf_template_pwm.h
+irq_mask_t: vsf_pwm_irq_mask_t
+required_irq_bits: []
+warn_irq_bits:
+  - CPL
+required_modes: []
+warn_modes: []
+isr_t: vsf_pwm_isr_t
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_pwm_t"
+  required_apis:
+    - pwm_init
+    - pwm_fini
+    - pwm_enable
+    - pwm_disable
+  lifecycle_apis:
+    - pwm_irq_enable
+    - pwm_irq_disable
+  optional_api_groups:
+    - name: set
+      apis:
+        - pwm_set
+        - pwm_config_channel
+        - pwm_set_duty
+        - pwm_set_period
+      level: FAIL
+  imp_lv0: VSF_PWM_CFG_IMP_LV0
+  template_inc: pwm_template.inc
+  prefix_macros:
+    - VSF_PWM_CFG_IMP_PREFIX
+    - VSF_PWM_CFG_IMP_UPCASE_PREFIX

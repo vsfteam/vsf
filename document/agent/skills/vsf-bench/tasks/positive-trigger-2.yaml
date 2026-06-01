@@ -1,0 +1,17 @@
+id: positive-trigger-002
+name: Flash firmware to hardware
+description: Skill should trigger for flashing operations.
+tags:
+  - positive-trigger
+inputs:
+  prompt: "Flash the compiled uf2 file to the RP2040 board"
+expected:
+  should_trigger: true
+graders:
+  - type: text
+    name: contains-keywords
+    config:
+      contains:
+        - "flash"
+        - "firmware"
+        - "board"

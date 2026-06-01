@@ -1,0 +1,3 @@
+uart:
+  macro_suffix: USART
+  template_dir: usart

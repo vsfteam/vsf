@@ -1,0 +1,18 @@
+id: negative-trigger-001
+name: Port HAL driver
+description: Skill should NOT trigger for driver porting — vsf-hal-driver handles that.
+tags:
+  - negative-trigger
+inputs:
+  prompt: "I need to port the I2C driver for RP2040 to VSF HAL"
+expected:
+  should_trigger: false
+graders:
+  - type: text
+    name: omits-skill-keywords
+    config:
+      not_contains:
+        - "build"
+        - "flash"
+        - "test"
+        - "scene"

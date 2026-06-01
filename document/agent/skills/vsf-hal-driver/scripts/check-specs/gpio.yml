@@ -1,0 +1,37 @@
+periph: gpio
+api_prefix: gpio
+guard: VSF_HAL_USE_GPIO
+template_include: vsf_template_gpio.h
+irq_mask_t: null
+required_irq_bits: []
+required_modes:
+  - VSF_GPIO_INPUT
+  - VSF_GPIO_OUTPUT_PUSH_PULL
+  - VSF_GPIO_OUTPUT_OPEN_DRAIN
+  - VSF_GPIO_AF
+  - VSF_GPIO_ANALOG
+  - VSF_GPIO_EXTI
+warn_modes:
+  - VSF_GPIO_PULL_UP
+  - VSF_GPIO_PULL_DOWN
+  - VSF_GPIO_NO_PULL_UP_DOWN
+isr_t: vsf_gpio_exti_isr_handler_t
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_gpio_t"
+  required_apis:
+    - gpio_set
+    - gpio_clear
+    - gpio_read
+    - gpio_port_config_pins
+  lifecycle_apis:
+    - gpio_init
+    - gpio_fini
+    - gpio_enable
+    - gpio_disable
+    - gpio_irq_enable
+    - gpio_irq_disable
+  imp_lv0: VSF_GPIO_CFG_IMP_LV0
+  template_inc: gpio_template.inc
+  prefix_macros:
+    - VSF_GPIO_CFG_IMP_PREFIX
+    - VSF_GPIO_CFG_IMP_UPCASE_PREFIX

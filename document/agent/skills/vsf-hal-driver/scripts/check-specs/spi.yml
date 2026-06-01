@@ -1,0 +1,47 @@
+periph: spi
+api_prefix: spi
+guard: VSF_HAL_USE_SPI
+template_include: vsf_template_spi.h
+irq_mask_t: vsf_spi_irq_mask_t
+required_irq_bits: []
+warn_irq_bits:
+  - TX
+  - RX
+required_modes: []
+warn_modes:
+  - VSF_SPI_MODE_0
+  - VSF_SPI_MODE_1
+  - VSF_SPI_MODE_2
+  - VSF_SPI_MODE_3
+  - VSF_SPI_DATASIZE_8
+  - VSF_SPI_DATASIZE_16
+  - VSF_SPI_MSB_FIRST
+  - VSF_SPI_LSB_FIRST
+isr_t: vsf_spi_isr_t
+source:
+  struct_pattern: "typedef\\s+struct\\s+\\w*.*_spi_t"
+  required_apis:
+    - spi_init
+    - spi_fini
+    - spi_enable
+    - spi_disable
+    - spi_irq_enable
+    - spi_irq_disable
+  optional_api_groups:
+    - name: transfer
+      apis:
+        - spi_fifo_transfer
+        - spi_request_transfer
+        - spi_master_xfer
+        - spi_slave_xfer
+      level: FAIL
+    - name: status
+      apis:
+        - spi_status
+        - spi_capability
+      level: WARN
+  imp_lv0: VSF_SPI_CFG_IMP_LV0
+  template_inc: spi_template.inc
+  prefix_macros:
+    - VSF_SPI_CFG_IMP_PREFIX
+    - VSF_SPI_CFG_IMP_UPCASE_PREFIX

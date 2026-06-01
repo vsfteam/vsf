@@ -1,0 +1,18 @@
+id: negative-trigger-001
+name: Build and flash firmware
+description: Skill should NOT trigger for build/flash/test operations — vsf-bench handles those.
+tags:
+  - negative-trigger
+inputs:
+  prompt: "Build the firmware and flash it to the Pico board"
+expected:
+  should_trigger: false
+graders:
+  - type: text
+    name: omits-skill-keywords
+    config:
+      not_contains:
+        - "port"
+        - "driver"
+        - "HAL"
+        - "implement"
