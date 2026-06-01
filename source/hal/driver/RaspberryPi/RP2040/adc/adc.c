@@ -73,7 +73,7 @@ static inline void __vsf_hw_adc_irq_clear_pending(adc_hw_t *reg)
 vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_init)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr,
     vsf_adc_cfg_t *cfg_ptr
-)
+)   // no clock gate: RP2040 ADC has no per-instance clock gate; clk_adc configured globally in driver.c
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
@@ -427,7 +427,8 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
                                         __IDX, _REG),                           \
         .rst_bit = VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX,     \
                                 _RST_BIT),                                      \
-        .irqn    = VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX, _IRQN), \
+        .irqn =                                                                 \
+            VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX, _IRQN),    \
         __HAL_OP};                                                              \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX,  \
                                    _IRQHandler)(void) {                         \
