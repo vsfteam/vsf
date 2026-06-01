@@ -121,5 +121,23 @@ vsf_err_t vsf_remapped_pwm_ctrl(vsf_remapped_pwm_t *pwm, vsf_pwm_ctrl_t ctrl, vo
     return vsf_pwm_ctrl(pwm->target, ctrl, param);
 }
 
+void vsf_remapped_pwm_irq_enable(vsf_remapped_pwm_t *pwm, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((pwm != NULL) && (pwm->target != NULL));
+    vsf_pwm_irq_enable(pwm->target, irq_mask);
+}
+
+void vsf_remapped_pwm_irq_disable(vsf_remapped_pwm_t *pwm, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((pwm != NULL) && (pwm->target != NULL));
+    vsf_pwm_irq_disable(pwm->target, irq_mask);
+}
+
+vsf_pwm_irq_mask_t vsf_remapped_pwm_irq_clear(vsf_remapped_pwm_t *pwm, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((pwm != NULL) && (pwm->target != NULL));
+    return vsf_pwm_irq_clear(pwm->target, irq_mask);
+}
+
 #endif
 #endif

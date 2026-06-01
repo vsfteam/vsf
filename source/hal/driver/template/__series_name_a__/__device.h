@@ -37,8 +37,8 @@
 //  ARM:        __CPU_ARM__
 //  Riscv:      __CPU_RV__
 //  ......
-#   ifndef __CPU_ARM__
-#       define __CPU_ARM__
+#   ifndef ${ARCH_MACRO}
+#       define ${ARCH_MACRO}
 #   endif
 #else      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 

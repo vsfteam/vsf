@@ -117,6 +117,33 @@ vsf_err_t vsf_pwm_ctrl(vsf_pwm_t *pwm_ptr, vsf_pwm_ctrl_t ctrl, void *param)
     return pwm_ptr->op->ctrl(pwm_ptr, ctrl, param);
 }
 
+void vsf_pwm_irq_enable(vsf_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->irq_enable != NULL);
+
+    pwm_ptr->op->irq_enable(pwm_ptr, irq_mask);
+}
+
+void vsf_pwm_irq_disable(vsf_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->irq_disable != NULL);
+
+    pwm_ptr->op->irq_disable(pwm_ptr, irq_mask);
+}
+
+vsf_pwm_irq_mask_t vsf_pwm_irq_clear(vsf_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->irq_clear != NULL);
+
+    return pwm_ptr->op->irq_clear(pwm_ptr, irq_mask);
+}
+
 #endif /* VSF_PWM_CFG_MULTI_CLASS == ENABLED */
 
 

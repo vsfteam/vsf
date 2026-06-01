@@ -332,6 +332,9 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,                  VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,          VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    /* exti_irq APIs: may return VSF_ERR_NOT_SUPPORT when the hardware GPIO driver
+     * does not implement EXTI via GPIO. Users should fall back to the dedicated EXTI
+     * interface (vsf_template_exti.h) when GPIO-based EXTI is unavailable. */     \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
@@ -362,17 +365,33 @@ typedef uint16_t vsf_gpio_alternate_function_t;
  * \~english
  * @brief Predefined VSF GPIO modes that can be reimplemented in specific hal drivers.
  *
+ * When VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE is ENABLED, the hardware driver MUST
+ * encode mode bits to directly match hardware register bit positions. This allows
+ * zero-cost translation from mode enum to register writes. Each mode bit field
+ * should be documented with its source register and bit range.
+ *
+ * Example (RP2040 IO_BANK0):
+ *   [4:0]   FUNCSEL   — IO_BANK0 GPIOn_CTRL
+ *   [9:8]   OUTOVER   — IO_BANK0 GPIOn_CTRL
+ *   [13:12] OEOVER    — IO_BANK0 GPIOn_CTRL
+ *   [17:16] INOVER    — IO_BANK0 GPIOn_CTRL
+ *   [21:20] PULL      — PADS_BANK0 (driver-mapped)
+ *   [29:28] IRQOVER   — IO_BANK0 GPIOn_CTRL
+ *
  * \~chinese
  * @brief 预定义的 VSF GPIO 模式，可以在具体的 hal 驱动重新实现。
  *
- * \~english
- * Even if the hardware doesn't support these features, these modes must be implemented:
- * If the IO supports more modes, We can implement it in the hardware driver.
- * If we add a new mode in the hardware driver, then we also need to define the
- * macro VSF_GPIO_MODE_MASK, whose value is the OR of the value of all modes.
- * \~chinese
- * 即使硬件不支持这些功能，但是这些模式是必须实现的。
- * 如果硬件驱动里我们添加了新的模式，那么也需要定义宏 VSF_GPIO_MODE_MASK，它的值是所有模式的值的或。
+ * 当 VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE 为 ENABLED 时，硬件驱动必须将模式位编码
+ * 为直接匹配硬件寄存器位位置。这允许从模式枚举到寄存器写入的零成本转换。每个模式
+ * 位字段应记录其源寄存器和位范围。
+ *
+ * 示例 (RP2040 IO_BANK0):
+ *   [4:0]   FUNCSEL   — IO_BANK0 GPIOn_CTRL
+ *   [9:8]   OUTOVER   — IO_BANK0 GPIOn_CTRL
+ *   [13:12] OEOVER    — IO_BANK0 GPIOn_CTRL
+ *   [17:16] INOVER    — IO_BANK0 GPIOn_CTRL
+ *   [21:20] PULL      — PADS_BANK0 (驱动内部映射)
+ *   [29:28] IRQOVER   — IO_BANK0 GPIOn_CTRL
  *
  * - INPUT/OUTPUT
  *  - VSF_GPIO_INPUT

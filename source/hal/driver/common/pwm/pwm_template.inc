@@ -29,6 +29,18 @@
 #   define  VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_IRQ_ENABLE
+#   define  VSF_PWM_CFG_REIMPLEMENT_API_IRQ_ENABLE              DISABLED
+#endif
+
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_IRQ_DISABLE
+#   define  VSF_PWM_CFG_REIMPLEMENT_API_IRQ_DISABLE             DISABLED
+#endif
+
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define  VSF_PWM_CFG_REIMPLEMENT_API_IRQ_CLEAR               DISABLED
+#endif
+
 #ifndef VSF_PWM_CFG_REIMPLEMENT_API_CTRL
 #   define  VSF_PWM_CFG_REIMPLEMENT_API_CTRL                    DISABLED
 #endif
@@ -56,6 +68,9 @@
 #   define vsf_real_pwm_set                    VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _set)
 #   define vsf_real_pwm_get_freq               VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _get_freq)
 #   define vsf_real_pwm_capability             VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_pwm_irq_enable             VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _irq_enable)
+#   define vsf_real_pwm_irq_disable            VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _irq_disable)
+#   define vsf_real_pwm_irq_clear              VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _irq_clear)
 #   define vsf_real_pwm_ctrl                   VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _ctrl)
 #   define vsf_real_pwm_get_configuration      VSF_MCONNECT(VSF_PWM_CFG_IMP_DEVICE_PREFIX, _get_configuration)
 #else
@@ -63,6 +78,9 @@
 #   define vsf_real_pwm_set                    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
 #   define vsf_real_pwm_get_freq               VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
 #   define vsf_real_pwm_capability             VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)
+#   define vsf_real_pwm_irq_enable             VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_irq_enable)
+#   define vsf_real_pwm_irq_disable            VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_irq_disable)
+#   define vsf_real_pwm_irq_clear              VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_irq_clear)
 #   define vsf_real_pwm_ctrl                   VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_ctrl)
 #   define vsf_real_pwm_get_configuration      VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)
 #endif
@@ -108,12 +126,40 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 }
 #endif
 
+#if VSF_PWM_CFG_REIMPLEMENT_API_IRQ_ENABLE == DISABLED
+void vsf_real_pwm_irq_enable(vsf_real_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    VSF_HAL_ASSERT(0);
+}
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_API_IRQ_DISABLE == DISABLED
+void vsf_real_pwm_irq_disable(vsf_real_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    VSF_HAL_ASSERT(0);
+}
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_pwm_irq_mask_t vsf_real_pwm_irq_clear(vsf_real_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #undef VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG
 #undef VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_PWM_CFG_REIMPLEMENT_API_IRQ_ENABLE
+#undef VSF_PWM_CFG_REIMPLEMENT_API_IRQ_DISABLE
+#undef VSF_PWM_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef VSF_PWM_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_PWM_CFG_CAPABILITY_MAX_FREQ
@@ -122,6 +168,9 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 #undef vsf_real_pwm_set
 #undef vsf_real_pwm_get_freq
 #undef vsf_real_pwm_capability
+#undef vsf_real_pwm_irq_enable
+#undef vsf_real_pwm_irq_disable
+#undef vsf_real_pwm_irq_clear
 #undef vsf_real_pwm_ctrl
 #undef vsf_real_pwm_get_configuration
 
@@ -138,6 +187,9 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 #   define vsf_imp_pwm_set                  VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
 #   define vsf_imp_pwm_get_freq             VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
 #   define vsf_imp_pwm_get_configuration    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)
+#   define vsf_imp_pwm_irq_enable           VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_irq_enable)
+#   define vsf_imp_pwm_irq_disable          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_irq_disable)
+#   define vsf_imp_pwm_irq_clear            VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_irq_clear)
 #   define vsf_imp_pwm_ctrl                 VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_ctrl)
 
 #   define vsf_remap_pwm_t                  VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_t)
@@ -149,6 +201,9 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 #   define vsf_remap_pwm_set                VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_set)
 #   define vsf_remap_pwm_get_freq           VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_get_freq)
 #   define vsf_remap_pwm_get_configuration  VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_get_configuration)
+#   define vsf_remap_pwm_irq_enable         VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_irq_enable)
+#   define vsf_remap_pwm_irq_disable        VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_irq_disable)
+#   define vsf_remap_pwm_irq_clear          VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_irq_clear)
 #   define vsf_remap_pwm_ctrl               VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_ctrl)
 
 #   define VSF_PWM_CFG_IMP_REMAP_FUNCTIONS                                                                   \
@@ -193,6 +248,21 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
         {                                                                                          \
             VSF_HAL_ASSERT(pwm_ptr != NULL);                                                       \
             return vsf_remap_pwm_get_configuration(pwm_ptr, cfg_ptr);                              \
+        }                                                                                          \
+        void vsf_imp_pwm_irq_enable(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)           \
+        {                                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                                       \
+            vsf_remap_pwm_irq_enable(pwm_ptr, irq_mask);                                           \
+        }                                                                                          \
+        void vsf_imp_pwm_irq_disable(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)          \
+        {                                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                                       \
+            vsf_remap_pwm_irq_disable(pwm_ptr, irq_mask);                                          \
+        }                                                                                          \
+        vsf_pwm_irq_mask_t vsf_imp_pwm_irq_clear(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask) \
+        {                                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                                       \
+            return vsf_remap_pwm_irq_clear(pwm_ptr, irq_mask);                                     \
         }                                                                                          \
         vsf_err_t vsf_imp_pwm_ctrl(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_ctrl_t ctrl, void *param)       \
         {                                                                                          \
@@ -245,6 +315,9 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 #undef vsf_imp_pwm_set
 #undef vsf_imp_pwm_get_freq
 #undef vsf_imp_pwm_get_configuration
+#undef vsf_imp_pwm_irq_enable
+#undef vsf_imp_pwm_irq_disable
+#undef vsf_imp_pwm_irq_clear
 #undef vsf_imp_pwm_ctrl
 
 #undef vsf_remap_pwm_t
@@ -256,6 +329,9 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 #undef vsf_remap_pwm_set
 #undef vsf_remap_pwm_get_freq
 #undef vsf_remap_pwm_get_configuration
+#undef vsf_remap_pwm_irq_enable
+#undef vsf_remap_pwm_irq_disable
+#undef vsf_remap_pwm_irq_clear
 #undef vsf_remap_pwm_ctrl
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME

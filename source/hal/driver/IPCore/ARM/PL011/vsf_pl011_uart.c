@@ -30,6 +30,13 @@
 #include "vsf_pl011_uart_reg.h"
 
 /*============================ MACROS ========================================*/
+
+// PL011 baud rate divisor:  baudrate = clk_hz / (OVERSAMPLE * BAUDDIV)
+// with BAUDDIV = BAUD_IBRD + BAUD_FBRD/64. BAUD_IBRD is a 16-bit register
+// (1..PL011_BAUD_IBRD_MAX).
+#define PL011_BAUD_OVERSAMPLE       16u
+#define PL011_BAUD_IBRD_MAX         65535u
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -42,6 +49,13 @@ vsf_err_t vsf_pl011_usart_init(vsf_pl011_usart_t *pl011_usart_ptr, vsf_usart_cfg
     vsf_pl011_usart_reg_t *reg = pl011_usart_ptr->reg;
     pl011_usart_ptr->isr = cfg_ptr->isr;
 
+    // baudrate range check (see PL011_BAUD_* macros above for the formula).
+    if ((cfg_ptr->baudrate == 0)
+     || (cfg_ptr->baudrate > clk_hz / PL011_BAUD_OVERSAMPLE)
+     || (cfg_ptr->baudrate < clk_hz / (PL011_BAUD_OVERSAMPLE * PL011_BAUD_IBRD_MAX))) {
+        return VSF_ERR_INVALID_RANGE;
+    }
+
     // bardrate
     uint32_t baud_rate_div = (8 * clk_hz / cfg_ptr->baudrate);
     uint32_t baud_ibrd = baud_rate_div >> 7;
@@ -49,8 +63,8 @@ vsf_err_t vsf_pl011_usart_init(vsf_pl011_usart_t *pl011_usart_ptr, vsf_usart_cfg
     if (baud_ibrd == 0) {
         baud_ibrd = 1;
         baud_fbrd = 0;
-    } else if (baud_ibrd >= 65535) {
-        baud_ibrd = 65535;
+    } else if (baud_ibrd >= PL011_BAUD_IBRD_MAX) {
+        baud_ibrd = PL011_BAUD_IBRD_MAX;
         baud_fbrd = 0;
     }  else {
         baud_fbrd = ((baud_rate_div & 0x7f) + 1) / 2;
@@ -61,7 +75,16 @@ vsf_err_t vsf_pl011_usart_init(vsf_pl011_usart_t *pl011_usart_ptr, vsf_usart_cfg
     // mode | FEN(Enable FIFOs, bit4)
     reg->UARTLCR_H.VALUE = (cfg_ptr->mode & PL011_USART_MODE_MASK) | (1 << 4);
     // enable
-    reg->UARTCR.VALUE = (cfg_ptr->mode >> 8) & PL011_USART_ENABLE_MASK;
+    reg->UARTCR.VALUE = (cfg_ptr->mode & PL011_USART_ENABLE_MASK) >> 8;
+
+    // FIFO thresholds: VSF encoding (0,1,2) → PL011 TXIFLSEL/RXIFLSEL
+    // TX: 0→1/8, 1→1/2, 2→3/4  (0→0, 1→2, 2→3)
+    // RX: 0→1/8, 1→1/2, 2→7/8  (0→0, 1→2, 2→4) — 7/8 is the closest
+    //     PL011 gets to "FULL" on a 32-byte FIFO (28 bytes).
+    static const uint8_t __pl011_txiflsel[4] = {0, 2, 3, 0};
+    static const uint8_t __pl011_rxiflsel[4] = {0, 2, 4, 0};
+    reg->UARTIFLS.VALUE = __pl011_txiflsel[(cfg_ptr->mode >> 8) & 3]
+                        | (__pl011_rxiflsel[(cfg_ptr->mode >> 10) & 3] << 3);
 
     return VSF_ERR_NONE;
 }
@@ -78,8 +101,8 @@ vsf_usart_capability_t vsf_pl011_usart_capability(vsf_pl011_usart_t *pl011_usart
     VSF_HAL_ASSERT(NULL != pl011_usart_ptr);
     return (vsf_usart_capability_t){
         .irq_mask               = PL011_USART_IRQ_MASK,
-        .max_baudrate           = clk_hz / 1,
-        .min_baudrate           = clk_hz / 65535,
+        .max_baudrate           = clk_hz / PL011_BAUD_OVERSAMPLE,
+        .min_baudrate           = clk_hz / (PL011_BAUD_OVERSAMPLE * PL011_BAUD_IBRD_MAX),
         .min_data_bits          = 5,
         .max_data_bits          = 8,
         .txfifo_depth           = 32,
@@ -192,7 +215,7 @@ void vsf_pl011_usart_irqhandler(vsf_pl011_usart_t *pl011_usart_ptr)
     vsf_usart_irq_mask_t mask = reg->UARTMIS.VALUE;
     reg->UARTICR.VALUE = mask;
     if (mask && (pl011_usart_ptr->isr.handler_fn != NULL)) {
-        pl011_usart_ptr->isr.handler_fn(pl011_usart_ptr, pl011_usart_ptr->isr.target_ptr, mask);
+        pl011_usart_ptr->isr.handler_fn(pl011_usart_ptr->isr.target_ptr, (vsf_usart_t *)pl011_usart_ptr, mask);
     }
 }
 
