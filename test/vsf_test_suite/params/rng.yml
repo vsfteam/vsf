@@ -1,0 +1,5 @@
+rng_basic:
+  name: rng_basic
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, word_count: 16}

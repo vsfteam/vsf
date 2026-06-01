@@ -1,0 +1,14 @@
+usart_hw_flow_control:
+  name: usart_hw_flow_control
+  suite_timeout_s: 15.0
+  timeout_s: 1.5
+  cases:
+  # PL011 internal LBE loops RTS→CTS, so all three modes can be exercised
+  # without external wiring. Each case checks: init() accepts the mode bits
+  # AND the CTS modem-status IRQ fires when UARTCR.RTS toggles.
+  - idx: 0
+    flow_mode: 'VSF_USART_RTS_HWCONTROL'
+  - idx: 1
+    flow_mode: 'VSF_USART_CTS_HWCONTROL'
+  - idx: 2
+    flow_mode: 'VSF_USART_RTS_CTS_HWCONTROL'

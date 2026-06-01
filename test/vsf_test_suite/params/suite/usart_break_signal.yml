@@ -1,0 +1,10 @@
+usart_break_signal:
+  name: usart_break_signal
+  suite_timeout_s: 15.0
+  dut:
+    channel: uart1_tx
+  timeout_s: 1.5
+  cases:
+  - idx: 0
+    baudrate: 115200
+    hold_ms: 5

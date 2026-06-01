@@ -1,0 +1,126 @@
+rx_mode:
+  name: usart_rx_mode
+  suite_timeout_s: 5.0
+  dut:
+    channel: uart1_rx
+    port: /dev/ttyUSB0
+  payload: "0123456789\r\n"
+  timeout_s: 8.5
+  defaults:
+    baudrate: 115200
+    expect_pass: true
+    host:
+      send:
+        baudrate: 115200
+        num_data_bits: 8
+        num_stop_bits: 1.0
+    la:
+      decode:
+        baudrate: 115200
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  cases:
+  - idx: 0
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: none
+    la:
+      decode:
+        parity_type: none
+  - idx: 1
+    mode:
+    - VSF_USART_EVEN_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: even
+    la:
+      decode:
+        parity_type: even
+  - idx: 2
+    mode:
+    - VSF_USART_ODD_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: odd
+    la:
+      decode:
+        parity_type: odd
+  - idx: 3
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_7_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: none
+        num_data_bits: 7
+    la:
+      decode:
+        parity_type: none
+        num_data_bits: 7
+  - idx: 4
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_6_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: none
+        num_data_bits: 6
+    la:
+      decode:
+        parity_type: none
+        num_data_bits: 6
+  - idx: 5
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_2_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        num_stop_bits: 2.0
+    la:
+      decode:
+        num_stop_bits: 2.0
+  - idx: 6
+    mode:
+    - VSF_USART_EVEN_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_7_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: even
+        num_data_bits: 7
+    la:
+      decode:
+        parity_type: even
+        num_data_bits: 7
+  - idx: 7
+    mode:
+    - VSF_USART_ODD_PARITY
+    - VSF_USART_2_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      send:
+        parity_type: odd
+        num_stop_bits: 2.0
+    la:
+      decode:
+        parity_type: odd
+        num_stop_bits: 2.0

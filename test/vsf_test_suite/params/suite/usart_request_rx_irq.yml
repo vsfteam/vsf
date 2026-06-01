@@ -1,0 +1,13 @@
+request_rx_irq:
+  name: usart_request_rx_irq
+  suite_timeout_s: 5.0
+  cases:
+  - idx: 0
+    refill_target: 4
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0

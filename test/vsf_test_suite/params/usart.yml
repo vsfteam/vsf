@@ -1,0 +1,21 @@
+include:
+  - suite/usart_tx_baud.yml
+  - suite/usart_tx_mode.yml
+  - suite/usart_rx_data.yml
+  - suite/usart_rx_baud.yml
+  - suite/usart_rx_mode.yml
+  - suite/usart_rx_irq.yml
+  - suite/usart_rx_timeout.yml
+  - suite/usart_rx_parity_error.yml
+  - suite/usart_rx_frame_error.yml
+  - suite/usart_rx_break_error.yml
+  - suite/usart_rx_overflow_error.yml
+  - suite/usart_tx_fifo_irq.yml
+  - suite/usart_rx_fifo_irq.yml
+  - suite/usart_request_tx_irq.yml
+  - suite/usart_request_rx_irq.yml
+  - suite/usart_request_cancel.yml
+  - suite/usart_break_signal.yml
+  - suite/usart_hw_flow_control.yml
+  - suite/usart_rx_bulk_irq.yml
+  - suite/usart_rx_fifo_threshold.yml

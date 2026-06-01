@@ -1,0 +1,57 @@
+# I2C test parameters
+# I2C0: GP18=SCL, GP19=SDA  |  I2C1: GP20=SDA, GP21=SCL
+# Both wired together on shared bus to EEPROM at 0x50
+
+i2c_eeprom_rw:
+  name: i2c_eeprom_rw
+  suite_timeout_s: 15.0
+  cases:
+    # Test I2C0 against EEPROM at 0x50
+    - {idx: 0, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x00, data_len: 1,
+       host: {hw_req: i2c_eeprom}}
+    - {idx: 1, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x10, data_len: 4,
+       host: {hw_req: i2c_eeprom}}
+    - {idx: 2, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x20, data_len: 8,
+       host: {hw_req: i2c_eeprom}}
+
+i2c_bus_scan:
+  name: i2c_bus_scan
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, scl_pin: VSF_TEST_PIN_I2C0_SCL, sda_pin: VSF_TEST_PIN_I2C0_SDA,
+       host: {hw_req: i2c_eeprom}}
+    - {idx: 1, scl_pin: VSF_TEST_PIN_I2C1_SCL, sda_pin: VSF_TEST_PIN_I2C1_SDA,
+       host: {hw_req: i2c_eeprom}}
+
+i2c_eeprom_page:
+  name: i2c_eeprom_page
+  suite_timeout_s: 15.0
+  cases:
+    # Page-aligned write: mem_addr=0x18, data_len=8 fits within a single page
+    - {idx: 0, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x18, data_len: 8,
+       host: {hw_req: i2c_eeprom}}
+
+i2c_slave:
+  name: i2c_slave
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, master_i2c_idx: 0, slave_i2c_idx: 1,
+       host: {hw_req: i2c_slave_wiring}}
+
+i2c_eeprom_rw_fifo:
+  name: i2c_eeprom_rw_fifo
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x00, data_len: 1,
+       host: {hw_req: i2c_eeprom}}
+    - {idx: 1, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x10, data_len: 4,
+       host: {hw_req: i2c_eeprom}}
+    - {idx: 2, i2c_idx: 0, eeprom_addr: 0x50, mem_addr: 0x20, data_len: 8,
+       host: {hw_req: i2c_eeprom}}
+
+i2c_slave_fifo:
+  name: i2c_slave_fifo
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, master_i2c_idx: 0, slave_i2c_idx: 1,
+       host: {hw_req: i2c_slave_wiring}}

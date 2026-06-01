@@ -1,0 +1,24 @@
+# DMA test parameters
+
+dma_mem2mem:
+  name: dma_mem2mem
+  suite_timeout_s: 15.0
+  timeout_s: 10.0
+  cases:
+    - { idx: 0, expect_pass: true }
+
+dma_mem2mem_irq:
+  name: dma_mem2mem_irq
+  suite_timeout_s: 15.0
+  timeout_s: 10.0
+  cases:
+    - { idx: 0, expect_pass: true }
+
+dma_scatter_gather:
+  name: dma_scatter_gather
+  suite_timeout_s: 15.0
+  timeout_s: 10.0
+  cases:
+    - { idx: 0, expect_pass: true }
+    - { idx: 1, expect_pass: true }
+    - { idx: 2, expect_pass: true }

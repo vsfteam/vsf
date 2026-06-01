@@ -1,0 +1,33 @@
+rx_break_error:
+  name: usart_rx_break_error
+  suite_timeout_s: 5.0
+  dut:
+    channel: uart1_rx
+    port: /dev/ttyUSB0
+  timeout_s: 1.5
+  defaults:
+    baudrate: 115200
+    expect_pass: true
+    host:
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+    la:
+      decode:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  cases:
+  - idx: 0
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    host:
+      # Use pyserial's send_break() to assert the line low for >= one frame.
+      # The DUT must raise VSF_USART_IRQ_MASK_BREAK_ERR.
+      send_break_ms: 50

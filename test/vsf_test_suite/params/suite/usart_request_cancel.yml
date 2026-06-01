@@ -1,0 +1,9 @@
+request_cancel:
+  name: usart_request_cancel
+  suite_timeout_s: 5.0
+  cases:
+  - idx: 0
+    refill_target: 8
+    cancel_after_us: 2000
+    host:
+      hw_req: uart1+la

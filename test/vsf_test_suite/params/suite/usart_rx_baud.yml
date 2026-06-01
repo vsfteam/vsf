@@ -1,0 +1,90 @@
+rx_baud:
+  name: usart_rx_baud
+  suite_timeout_s: 5.0
+  dut:
+    channel: uart1_rx
+    port: /dev/ttyUSB0
+  payload: "Hello VSF\r\n"
+  timeout_s: 8.5
+  defaults:
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_RX_ENABLE
+    expect_pass: true
+    host:
+      send:
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+    la:
+      decode:
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  cases:
+  - idx: 0
+    baudrate: 9600
+    host:
+      send:
+        baudrate: 9600
+    la:
+      decode:
+        baudrate: 9600
+  - idx: 1
+    baudrate: 19200
+    host:
+      send:
+        baudrate: 19200
+    la:
+      decode:
+        baudrate: 19200
+  - idx: 2
+    baudrate: 38400
+    host:
+      send:
+        baudrate: 38400
+    la:
+      decode:
+        baudrate: 38400
+  - idx: 3
+    baudrate: 57600
+    host:
+      send:
+        baudrate: 57600
+    la:
+      decode:
+        baudrate: 57600
+  - idx: 4
+    baudrate: 115200
+    host:
+      send:
+        baudrate: 115200
+    la:
+      decode:
+        baudrate: 115200
+  - idx: 5
+    baudrate: 230400
+    host:
+      send:
+        baudrate: 230400
+    la:
+      decode:
+        baudrate: 230400
+  - idx: 6
+    baudrate: 460800
+    host:
+      send:
+        baudrate: 460800
+    la:
+      decode:
+        baudrate: 460800
+  - idx: 7
+    baudrate: 921600
+    host:
+      send:
+        baudrate: 921600
+    la:
+      decode:
+        baudrate: 921600
