@@ -33,3 +33,10 @@ CmakeCache.txt
 .cortex-debug.peripherals.state.json
 example/template/project/mdk/mps2_build/.build_log.htm
 example/template/project/mdk/vsf_template.uvguix.gabriel
+
+# for python (host-side test scripts in test/vsf_test/)
+__pycache__/
+*.pyc
+
+# for vsf-bench test run output
+logs/
