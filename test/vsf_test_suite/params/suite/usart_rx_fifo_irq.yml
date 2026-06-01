@@ -1,0 +1,118 @@
+rx_fifo_irq:
+  name: usart_rx_fifo_irq
+  suite_timeout_s: 30.0
+  cases:
+  # Exercise all three PL011 RX FIFO threshold levels. Internal loopback
+  # (UARTCR.LBE) feeds firmware-side TX back into the same UART's RX, so
+  # no external wiring is needed.
+  - idx: 0
+    refill_target: 4
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 1
+    refill_target: 4
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 2
+    refill_target: 4
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  # refill_target variants (HALF_FULL) — values >16 clamped by hardware
+  - idx: 3
+    refill_target: 8
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 4
+    refill_target: 16
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 5
+    refill_target: 32
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 6
+    refill_target: 64
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 7
+    refill_target: 128
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 8
+    refill_target: 256
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 9
+    refill_target: 512
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0
+  - idx: 10
+    refill_target: 1024
+    threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL'
+    host:
+      hw_req: uart1+la+host_send
+      send:
+        baudrate: 115200
+        parity_type: none
+        num_data_bits: 8
+        num_stop_bits: 1.0

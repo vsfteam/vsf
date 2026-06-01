@@ -1,0 +1,16 @@
+# Flash test parameters
+# Test at 256KB offset (safe area, clear of firmware)
+
+flash_erase_program_read:
+  name: flash_erase_program_read
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, offset: 262144, size: 256}
+
+flash_boundary:
+  name: flash_boundary
+  suite_timeout_s: 5.0
+  cases:
+    # Cross-page write: 512 bytes at 256KB offset spans pages 1024-1025.
+    # Both offset and size must be page-aligned (256B) for the driver.
+    - {idx: 0, offset: 262144, size: 512}

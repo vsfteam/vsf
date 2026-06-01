@@ -1,0 +1,19 @@
+# WDT test parameters
+
+wdt_basic:
+  name: wdt_basic
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, timeout_ms: 500, feed_count: 2, feed_interval_ms: 10}
+
+wdt_reboot:
+  name: wdt_reboot
+  suite_timeout_s: 10.0
+  cases:
+    - {idx: 0, timeout_ms: 200}
+
+wdt_timeout_accuracy:
+  name: wdt_timeout_accuracy
+  suite_timeout_s: 10.0
+  cases:
+    - {idx: 0, timeout_ms: 500, tolerance_pct: 10}

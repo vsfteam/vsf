@@ -1,0 +1,12 @@
+rx_fifo_threshold:
+  name: usart_rx_fifo_threshold
+  suite_timeout_s: 5.0
+  dut:
+    channel: uart1_rx
+    port: /dev/ttyUSB0
+  timeout_s: 10.0
+  cases:
+    # PL011 RXIFLSEL mapping: HALF_FULL→1/2 (16 bytes on 32-byte FIFO),
+    # FULL→7/8 (28 bytes — closest PL011 gets to true FULL).
+    - {idx: 0, threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL', expected_bytes: 16}
+    - {idx: 1, threshold_mode: 'VSF_USART_RX_FIFO_THRESHOLD_FULL', expected_bytes: 28}

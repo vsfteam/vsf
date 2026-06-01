@@ -1,0 +1,43 @@
+tx_baud:
+  name: usart_tx_baud
+  suite_timeout_s: 5.0
+  dut:
+    channel: uart1_tx
+  payload: "Hello VSF\r\n"
+  # 11 bytes at 9600 baud = ~11.5 ms; bump drain to 15 ms so the slowest
+  # case doesn't truncate the payload before disable() clears the line.
+  payload_drain_ms: 15
+  timeout_s: 10.5
+  defaults:
+    mode:
+    - VSF_USART_NO_PARITY
+    - VSF_USART_1_STOPBIT
+    - VSF_USART_8_BIT_LENGTH
+    - VSF_USART_TX_ENABLE
+    expect_pass: true
+  cases:
+  - idx: 0
+    baudrate: 9600
+  - idx: 1
+    baudrate: 19200
+  - idx: 2
+    baudrate: 38400
+  - idx: 3
+    baudrate: 57600
+  - idx: 4
+    baudrate: 115200
+  - idx: 5
+    baudrate: 230400
+  - idx: 6
+    baudrate: 460800
+  - idx: 7
+    baudrate: 921600
+  - idx: 8
+    baudrate: 0
+    expect_pass: false
+  - idx: 9
+    baudrate: 100000000
+    expect_pass: false
+  - idx: 10
+    baudrate: 115200
+    data_size_bytes: 1024

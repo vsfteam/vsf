@@ -1,0 +1,22 @@
+# ADC test parameters
+
+adc_oneshot:
+  name: adc_oneshot
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, channel: 0, expected_min: 0, expected_max: 4095}
+
+adc_temperature:
+  name: adc_temperature
+  suite_timeout_s: 5.0
+  cases:
+    # RP2040: 4 external channels + 1 internal temperature sensor (channel 4).
+    # Temperature sensor: V ≈ 0.706V at 27°C, slope ≈ -1.721 mV/°C.
+    # At 3.3V VREF and 12-bit resolution, raw range ~500-1200 covers typical room temp.
+    - {idx: 0, channel_count: 5, sensor_channel: 4, temp_raw_min: 500, temp_raw_max: 1200}
+
+adc_stream:
+  name: adc_stream
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, channel: 4, sample_count: 100, host: {hw_req: none}}

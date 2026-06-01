@@ -1,0 +1,41 @@
+tx_fifo_irq:
+  name: usart_tx_fifo_irq
+  suite_timeout_s: 30.0
+  cases:
+  - idx: 0
+    refill_target: 4
+    host:
+      hw_req: uart1+la
+  # refill_target variants — values >16 clamped by hardware
+  - idx: 1
+    refill_target: 8
+    host:
+      hw_req: uart1+la
+  - idx: 2
+    refill_target: 16
+    host:
+      hw_req: uart1+la
+  - idx: 3
+    refill_target: 32
+    host:
+      hw_req: uart1+la
+  - idx: 4
+    refill_target: 64
+    host:
+      hw_req: uart1+la
+  - idx: 5
+    refill_target: 128
+    host:
+      hw_req: uart1+la
+  - idx: 6
+    refill_target: 256
+    host:
+      hw_req: uart1+la
+  - idx: 7
+    refill_target: 512
+    host:
+      hw_req: uart1+la
+  - idx: 8
+    refill_target: 1024
+    host:
+      hw_req: uart1+la

@@ -1,0 +1,143 @@
+# GPIO test parameters
+# Pin numbers are board-specific macros defined in the board's
+# vsf_test_board_pins.h (e.g. board/pico/vsf_test_board_pins.h).
+
+gpio_output_input:
+  name: gpio_output_input
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin: VSF_TEST_PIN_JUMPER_OUT,    in_pin: VSF_TEST_PIN_JUMPER_IN,     host: {hw_req: none}}
+
+gpio_toggle:
+  name: gpio_toggle
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin: VSF_TEST_PIN_JUMPER_OUT,    in_pin: VSF_TEST_PIN_JUMPER_IN,     host: {hw_req: none}}
+
+gpio_direction:
+  name: gpio_direction
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: none}}
+
+gpio_atomic:
+  name: gpio_atomic
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin: VSF_TEST_PIN_JUMPER_OUT,    in_pin: VSF_TEST_PIN_JUMPER_IN,     host: {hw_req: none}}
+
+gpio_pinmux:
+  name: gpio_pinmux
+  suite_timeout_s: 5.0
+  defaults:
+    baudrate: 115200
+  cases:
+    - {idx: 0, tx_pin: VSF_TEST_PIN_UART1_TX, rx_pin: VSF_TEST_PIN_UART1_RX,
+       host: {hw_req: uart1}}
+
+gpio_multi_pin:
+  name: gpio_multi_pin
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, out_pin_a: VSF_TEST_PIN_MULTI_A, in_pin_a: VSF_TEST_PIN_MULTI_A,
+       out_pin_b: VSF_TEST_PIN_MULTI_B, in_pin_b: VSF_TEST_PIN_MULTI_B,
+       host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin_a: VSF_TEST_PIN_JUMPER_OUT, in_pin_a: VSF_TEST_PIN_JUMPER_IN,
+       out_pin_b: VSF_TEST_PIN_MULTI_C, in_pin_b: VSF_TEST_PIN_MULTI_D,
+       host: {hw_req: none}}
+
+gpio_open_drain:
+  name: gpio_open_drain
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin: VSF_TEST_PIN_JUMPER_OUT,    in_pin: VSF_TEST_PIN_JUMPER_IN,     host: {hw_req: none}}
+
+gpio_toggle_freq:
+  name: gpio_toggle_freq
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_LA_MONITORED, toggle_count: 1000,
+       host: {hw_req: la, la_channel: gp4, min_freq_hz: 1000000}}
+    - {idx: 1, pin: VSF_TEST_PIN_LA_MONITORED, toggle_count: 10000,
+       host: {hw_req: la, la_channel: gp4, min_freq_hz: 1000000}}
+    - {idx: 2, pin: VSF_TEST_PIN_LA_MONITORED, toggle_count: 100000,
+       host: {hw_req: la, la_channel: gp4, min_freq_hz: 1000000}}
+    - {idx: 3, pin: VSF_TEST_PIN_I2C0_SDA, toggle_count: 1000,
+       host: {hw_req: la, la_channel: i2c_sda, min_freq_hz: 1000000}}
+    - {idx: 4, pin: VSF_TEST_PIN_I2C0_SCL, toggle_count: 1000,
+       host: {hw_req: la, la_channel: i2c_scl, min_freq_hz: 1000000}}
+
+gpio_write_throughput:
+  name: gpio_write_throughput
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_LA_MONITORED, duration_us: 10000, host: {hw_req: gpio_loopback}}
+
+gpio_toggle_stress:
+  name: gpio_toggle_stress
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, stress_count: 10000,
+       host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin: VSF_TEST_PIN_JUMPER_OUT,    in_pin: VSF_TEST_PIN_JUMPER_IN,     stress_count: 10000,
+       host: {hw_req: none}}
+
+gpio_concurrent_prio:
+  name: gpio_concurrent_prio
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_CONCURRENT_OUT, in_pin: VSF_TEST_PIN_CONCURRENT_IN, duration_ms: 200,
+       callback_period_us: 100, host: {hw_req: gpio_loopback}}
+
+gpio_exti:
+  name: gpio_exti
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, trigger_mode: 'VSF_GPIO_EXTI_MODE_FALLING',         host: {hw_req: sio_loopback}}
+    - {idx: 1, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, trigger_mode: 'VSF_GPIO_EXTI_MODE_RISING',          host: {hw_req: sio_loopback}}
+    - {idx: 2, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, trigger_mode: 'VSF_GPIO_EXTI_MODE_RISING_FALLING',  host: {hw_req: sio_loopback}}
+    - {idx: 3, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, trigger_mode: 'VSF_GPIO_EXTI_MODE_LOW_LEVEL',       host: {hw_req: sio_loopback}}
+    - {idx: 4, out_pin: VSF_TEST_PIN_SELF_LOOPBACK, in_pin: VSF_TEST_PIN_SELF_LOOPBACK, trigger_mode: 'VSF_GPIO_EXTI_MODE_HIGH_LEVEL',      host: {hw_req: sio_loopback}}
+    - {idx: 5, out_pin: VSF_TEST_PIN_EXTI_ALT_OUT,  in_pin: VSF_TEST_PIN_EXTI_ALT_IN,   trigger_mode: 'VSF_GPIO_EXTI_MODE_FALLING',         host: {hw_req: none}}
+
+gpio_irq_latency:
+  name: gpio_irq_latency
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_SELF_LOOPBACK, max_latency_ns: 50000, host: {hw_req: sio_loopback}}
+
+gpio_irq_lifecycle:
+  name: gpio_irq_lifecycle
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: sio_loopback}}
+
+gpio_systimer_health:
+  name: gpio_systimer_health
+  suite_timeout_s: 5.0
+  timeout_s: 5.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_LA_MONITORED, interval_ms: 10,  toggle_count: 10,
+       host: {hw_req: la, la_channel: gp4, tolerance_pct: 5.0}}
+    - {idx: 1, pin: VSF_TEST_PIN_LA_MONITORED, interval_ms: 50,  toggle_count: 10,
+       host: {hw_req: la, la_channel: gp4, tolerance_pct: 5.0}}
+    - {idx: 2, pin: VSF_TEST_PIN_LA_MONITORED, interval_ms: 100, toggle_count: 5,
+       host: {hw_req: la, la_channel: gp4, tolerance_pct: 5.0}}
+
+gpio_analog_mode:
+  name: gpio_analog_mode
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_SELF_LOOPBACK, host: {hw_req: none}}
+
+gpio_io_check:
+  name: gpio_io_check
+  suite_timeout_s: 5.0
+  timeout_s: 5.0
+  cases:
+    - {idx: 0, pin: VSF_TEST_PIN_UART1_TX, baudrate: 115200, host: {hw_req: la}}
+    - {idx: 1, pin: VSF_TEST_PIN_UART1_RX, baudrate: 115200, host: {hw_req: la}}

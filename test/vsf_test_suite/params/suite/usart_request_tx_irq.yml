@@ -1,0 +1,8 @@
+request_tx_irq:
+  name: usart_request_tx_irq
+  suite_timeout_s: 5.0
+  cases:
+  - idx: 0
+    refill_target: 4
+    host:
+      hw_req: uart1+la

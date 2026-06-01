@@ -1,0 +1,12 @@
+rx_bulk_irq:
+  name: usart_rx_bulk_irq
+  suite_timeout_s: 30.0
+  dut:
+    channel: uart1_rx
+    port: /dev/ttyUSB0
+  timeout_s: 30.0
+  cases:
+    - {idx: 0, data_size_bytes: 64}
+    - {idx: 1, data_size_bytes: 256}
+    - {idx: 2, data_size_bytes: 1024}
+    - {idx: 3, data_size_bytes: 4096}

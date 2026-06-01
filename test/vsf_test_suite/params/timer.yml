@@ -1,0 +1,19 @@
+# Timer test parameters
+
+timer_oneshot:
+  name: timer_oneshot
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, timer_idx: 0, channel: 0, period_us: 50000, host: {hw_req: none}}
+
+timer_periodic:
+  name: timer_periodic
+  suite_timeout_s: 5.0
+  cases:
+    - {idx: 0, timer_idx: 0, channel: 0, period_us: 10000, count: 5, host: {hw_req: none}}
+
+timer_async:
+  name: timer_async
+  suite_timeout_s: 10.0
+  cases:
+    - {idx: 0, timer_idx: 0, channel: 0, period_us: 10000, host: {hw_req: none}}

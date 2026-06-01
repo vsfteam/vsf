@@ -1,0 +1,27 @@
+spi_loopback:
+  name: spi_loopback
+  suite_timeout_s: 15.0
+  cases:
+    # Mode coverage (CPOL/CPHA combinations)
+    - {idx: 0, mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 8}
+    - {idx: 1, mode: VSF_SPI_MODE_1, clock_hz: 1000000, data_len: 8}
+    - {idx: 2, mode: VSF_SPI_MODE_2, clock_hz: 1000000, data_len: 8}
+    - {idx: 3, mode: VSF_SPI_MODE_3, clock_hz: 1000000, data_len: 8}
+    # Clock frequency coverage
+    - {idx: 4, mode: VSF_SPI_MODE_0, clock_hz: 100000,  data_len: 8}
+    - {idx: 5, mode: VSF_SPI_MODE_0, clock_hz: 500000,  data_len: 8}
+    - {idx: 6, mode: VSF_SPI_MODE_0, clock_hz: 2000000, data_len: 8}
+    - {idx: 7, mode: VSF_SPI_MODE_0, clock_hz: 5000000, data_len: 8}
+    # Multi-byte transfer coverage
+    - {idx: 8,  mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 16}
+    - {idx: 9,  mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 64}
+    - {idx: 10, mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 256}
+
+spi_async:
+  name: spi_async
+  suite_timeout_s: 15.0
+  cases:
+    - {idx: 0, mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 16, test_type: 0}
+    - {idx: 1, mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 16, test_type: 1}
+    - {idx: 2, mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 16, test_type: 2}
+    - {idx: 3, mode: VSF_SPI_MODE_0, clock_hz: 1000000, data_len: 256, test_type: 3}
