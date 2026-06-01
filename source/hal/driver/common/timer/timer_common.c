@@ -180,6 +180,25 @@ vsf_err_t vsf_timer_channel_stop(vsf_timer_t *timer_ptr, uint8_t channel)
     return timer_ptr->op->channel_stop(timer_ptr, channel);
 }
 
+vsf_err_t vsf_timer_channel_request_start(vsf_timer_t *timer_ptr, uint8_t channel,
+                                          vsf_timer_channel_request_t *request_ptr)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->channel_request_start != NULL);
+
+    return timer_ptr->op->channel_request_start(timer_ptr, channel, request_ptr);
+}
+
+vsf_err_t vsf_timer_channel_request_stop(vsf_timer_t *timer_ptr, uint8_t channel)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->channel_request_stop != NULL);
+
+    return timer_ptr->op->channel_request_stop(timer_ptr, channel);
+}
+
 vsf_err_t vsf_timer_channel_ctrl(vsf_timer_t *timer_ptr, uint8_t channel,
                                  vsf_timer_channel_ctrl_t ctrl, void *param)
 {

@@ -83,6 +83,18 @@ extern "C" {
 
 /**
  * \~english
+ * @brief Enable macro VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK in specific hardware
+ * drivers to redefine enum @ref vsf_pwm_irq_mask_t.
+ * \~chinese
+ * @brief 在特定硬件驱动中启用宏 VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK 来重新定义枚举
+ * vsf_pwm_irq_mask_t。
+ */
+#ifndef VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#   define VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK      DISABLED
+#endif
+
+/**
+ * \~english
  * @brief Enable macro VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG in specific hardware
  * drivers to redefine struct @ref vsf_pwm_cfg_t. For compatibility, members
  * should not be deleted when redefining. The vsf_pwm_isr_handler_t type also
@@ -153,44 +165,13 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,              VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, set,                  VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)\
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,             VSF_MCONNECT(__prefix_name, _t) *pwm_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,             VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)                    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)                    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_irq_mask_t,    pwm, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_irq_mask_t irq_mask)                    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
-
-#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
-/**
- * \~english
- * @brief PWM configuration structure.
- * Used to configure the PWM generator's frequency settings.
- * \~chinese
- * @brief PWM 配置结构体。
- * 用于配置 PWM 发生器的频率设置。
- */
-typedef struct vsf_pwm_cfg_t {
-    union {
-        /**
-         * \~english
-         * @brief The PWM clock frequency in Hz.
-         * Determines the base time period for the PWM generator.
-         * \~chinese
-         * @brief PWM 时钟频率，单位为 Hz。
-         * 确定 PWM 发生器的基本时间周期。
-         */
-        uint32_t freq;
-
-        /**
-         * \~english
-         * @brief The minimum allowed PWM clock frequency in Hz.
-         * Used when configuring adaptive frequency ranges.
-         * \~chinese
-         * @brief 允许的最小 PWM 时钟频率，单位为 Hz。
-         * 在配置自适应频率范围时使用。
-         */
-        uint32_t min_freq;
-    };
-} vsf_pwm_cfg_t;
-#endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 /**
@@ -226,6 +207,39 @@ typedef struct vsf_pwm_capability_t {
      */
     uint32_t min_freq;
 } vsf_pwm_capability_t;
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
+typedef enum vsf_pwm_irq_mask_t {
+    VSF_PWM_IRQ_MASK_WRAP = (0x01 << 0),
+} vsf_pwm_irq_mask_t;
+#endif
+
+enum {
+    VSF_PWM_IRQ_COUNT         = 1,
+    VSF_PWM_IRQ_ALL_BITS_MASK = VSF_PWM_IRQ_MASK_WRAP,
+};
+
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+typedef struct vsf_pwm_t vsf_pwm_t;
+
+typedef void vsf_pwm_isr_handler_t(void *target_ptr,
+                                   vsf_pwm_t *pwm_ptr,
+                                   vsf_pwm_irq_mask_t irq_mask);
+
+typedef struct vsf_pwm_isr_t {
+    vsf_pwm_isr_handler_t *handler_fn;
+    void *target_ptr;
+    vsf_arch_prio_t prio;
+} vsf_pwm_isr_t;
+
+typedef struct vsf_pwm_cfg_t {
+    union {
+        uint32_t freq;
+        uint32_t min_freq;
+    };
+    vsf_pwm_isr_t isr;
+} vsf_pwm_cfg_t;
 #endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
@@ -407,6 +421,47 @@ extern uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr);
 
 /**
  * \~english
+ * @brief Enable PWM interrupts
+ * @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
+ * @param[in] irq_mask: one or more value of enum @ref vsf_pwm_irq_mask_t
+ *
+ * \~chinese
+ * @brief 启用 PWM 中断
+ * @param[in] pwm_ptr: 指向结构体 @ref vsf_pwm_t 的指针
+ * @param[in] irq_mask: 一个或多个枚举 vsf_pwm_irq_mask_t 的值的按位或
+ */
+extern void vsf_pwm_irq_enable(vsf_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask);
+
+/**
+ * \~english
+ * @brief Disable PWM interrupts
+ * @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
+ * @param[in] irq_mask: one or more value of enum @ref vsf_pwm_irq_mask_t
+ *
+ * \~chinese
+ * @brief 禁用 PWM 中断
+ * @param[in] pwm_ptr: 指向结构体 @ref vsf_pwm_t 的指针
+ * @param[in] irq_mask: 一个或多个枚举 vsf_pwm_irq_mask_t 的值的按位或
+ */
+extern void vsf_pwm_irq_disable(vsf_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask);
+
+/**
+ * \~english
+ * @brief Clear PWM interrupt flags
+ * @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
+ * @param[in] irq_mask: one or more value of enum @ref vsf_pwm_irq_mask_t
+ * @return vsf_pwm_irq_mask_t: the interrupt flags before clearing
+ *
+ * \~chinese
+ * @brief 清除 PWM 中断标志
+ * @param[in] pwm_ptr: 指向结构体 @ref vsf_pwm_t 的指针
+ * @param[in] irq_mask: 一个或多个枚举 vsf_pwm_irq_mask_t 的值的按位或
+ * @return vsf_pwm_irq_mask_t: 清除前的中断标志
+ */
+extern vsf_pwm_irq_mask_t vsf_pwm_irq_clear(vsf_pwm_t *pwm_ptr, vsf_pwm_irq_mask_t irq_mask);
+
+/**
+ * \~english
  * @brief Calls the specified PWM command
  * @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
  * @param[in] ctrl: PWM control command @ref vsf_pwm_ctrl_t
@@ -501,6 +556,9 @@ extern vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr,
 #   define vsf_pwm_capability(__PM)         VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability)       ((__vsf_pwm_t *)(__PM))
 #   define vsf_pwm_set(__PM, ...)           VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set)              ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
 #   define vsf_pwm_get_freq(__PM)           VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_freq)         ((__vsf_pwm_t *)(__PM))
+#   define vsf_pwm_irq_enable(__PM, ...)   VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_irq_enable)       ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
+#   define vsf_pwm_irq_disable(__PM, ...)  VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_irq_disable)      ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
+#   define vsf_pwm_irq_clear(__PM, ...)    VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_irq_clear)        ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
 #endif
 /// @endcond
 
