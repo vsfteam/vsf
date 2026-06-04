@@ -25,8 +25,7 @@
     &&  (   (VSF_DISP_USE_SSD1306 == ENABLED)                                   \
         ||  (VSF_DISP_USE_SSD1316 == ENABLED))
 
-// TODO: osa_hal has been removed, update below
-#include "osa_hal/driver/customised/multiplex_hal/iic/vsf_multiplex_iic.h"
+#include "hal/vsf_hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,9 +41,11 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+#if VSF_HAL_USE_I2C == ENABLED
 typedef struct vsf_disp_solomon_systech_hw_iic_t {
-    void *port;
+    vsf_i2c_t *port;
 } vsf_disp_solomon_systech_hw_iic_t;
+#endif
 
 typedef struct vsf_disp_solomon_systech_hw_spi_t {
     void *port;

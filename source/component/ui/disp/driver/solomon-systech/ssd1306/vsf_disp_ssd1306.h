@@ -72,7 +72,8 @@ extern "C" {
 
 // TODO: add more parameters
 #if VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_IIC
-#   define VSF_DISP_SSD1306_IIC_INIT_SEQ(__LINE, __CONTRAST, __INVERSE, __DIRECTION)\
+#   define VSF_DISP_SSD1306_IIC_INIT_SEQ(__LINE, __CONTRAST, __INVERSE, __DIRECTION,\
+            __OSC_DIV, __PRECHARGE, __COM_PIN, __VCOMH, __CHARGE_PUMP)            \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_DISPLAY_ON(0)),    \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_DISPLAY_START_LINE(0)),\
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_COM_OUTPUT_SCAN_DIRECTION(__DIRECTION)),\
@@ -90,19 +91,19 @@ extern "C" {
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(0),                            \
                                                                                 \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_OSC_DIV),          \
-            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(0xF0),                         \
+            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(__OSC_DIV),                    \
                                                                                 \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_PRECHARGE_PERIOD), \
-            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(0x22),                         \
+            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(__PRECHARGE),                  \
                                                                                 \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_COM_PIN),          \
-            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(0x02),                         \
+            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(__COM_PIN),                    \
                                                                                 \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_VCOMH),            \
-            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(0x20),                         \
+            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(__VCOMH),                      \
                                                                                 \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_CHARGE_PUMP),          \
-            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(0x15),                         \
+            VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(__CHARGE_PUMP),                \
                                                                                 \
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_DISPLAY_ON(1)),    \
                                                                                 \
@@ -122,6 +123,7 @@ vsf_class(vk_disp_ssd1306_t) {
         implement_ex(vsf_disp_solomon_systech_hw_iic_t, hw)
         const uint8_t *init_seq;
         const uint16_t init_seq_len;
+        uint32_t clock_hz;
 #elif VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_SPI
         implement_ex(vsf_disp_solomon_systech_hw_spi_t, hw)
 #elif VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_EBI
@@ -141,6 +143,8 @@ vsf_class(vk_disp_ssd1306_t) {
         bool is_inited;
         bool is_area_set;
 #if VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_IIC
+        bool is_ctrl_sent;
+        uint8_t ctrl_byte;
         uint8_t set_area_cmd_buffer[6 * 2];
 #elif VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_SPI
 #elif VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_EBI
