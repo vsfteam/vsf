@@ -21,7 +21,6 @@
 
 #if VSF_USE_UI == ENABLED && VSF_DISP_USE_SSD1306 == ENABLED
 
-#define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_SSD1306_CLASS_IMPLEMENT
 
@@ -52,15 +51,8 @@ const vk_disp_drv_t vk_disp_drv_ssd1306 = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __ssd1306_i2c_isr(void *target, vsf_i2c_t *i2c, vsf_i2c_irq_mask_t mask)
+static void __vk_disp_ssd1306_state_machine(vk_disp_ssd1306_t *disp_ssd1306, vsf_evt_t evt)
 {
-    vsf_eda_post_evt((vsf_eda_t *)target, VSF_EVT_RETURN);
-}
-
-static void __vk_disp_ssd1306_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
-{
-    vk_disp_ssd1306_t *disp_ssd1306 = vsf_container_of(eda, vk_disp_ssd1306_t, eda);
-
     switch (evt) {
     case VSF_EVT_INIT:
         disp_ssd1306->is_inited = false;
@@ -137,16 +129,18 @@ static void __vk_disp_ssd1306_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
+static void __ssd1306_i2c_isr(void *target, vsf_i2c_t *i2c, vsf_i2c_irq_mask_t mask)
+{
+    vk_disp_ssd1306_t *disp_ssd1306 = (vk_disp_ssd1306_t *)target;
+    __vk_disp_ssd1306_state_machine(disp_ssd1306, VSF_EVT_RETURN);
+}
+
 static vsf_err_t __vk_disp_ssd1306_init(vk_disp_t *pthis)
 {
     vk_disp_ssd1306_t *disp_ssd1306 = (vk_disp_ssd1306_t *)pthis;
     VSF_UI_ASSERT(disp_ssd1306 != NULL);
 
     disp_ssd1306->ctx.refresh.buffer = NULL;
-    disp_ssd1306->eda.fn.evthandler = __vk_disp_ssd1306_evthandler;
-#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    disp_ssd1306->eda.on_terminate = NULL;
-#endif
 
 #if VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_IIC
     vsf_i2c_cfg_t cfg = {
@@ -154,7 +148,7 @@ static vsf_err_t __vk_disp_ssd1306_init(vk_disp_t *pthis)
         .clock_hz = disp_ssd1306->clock_hz,
         .isr = {
             .handler_fn = __ssd1306_i2c_isr,
-            .target_ptr = &disp_ssd1306->eda,
+            .target_ptr = disp_ssd1306,
             .prio = vsf_arch_prio_0,
         },
     };
@@ -165,7 +159,8 @@ static vsf_err_t __vk_disp_ssd1306_init(vk_disp_t *pthis)
     vsf_i2c_irq_enable(disp_ssd1306->hw.port, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE);
 #endif
 
-    return vsf_eda_init(&disp_ssd1306->eda);
+    __vk_disp_ssd1306_state_machine(disp_ssd1306, VSF_EVT_INIT);
+    return VSF_ERR_NONE;
 }
 
 static vsf_err_t __vk_disp_ssd1306_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
@@ -178,7 +173,8 @@ static vsf_err_t __vk_disp_ssd1306_refresh(vk_disp_t *pthis, vk_disp_area_t *are
     disp_ssd1306->ctx.refresh.area.pos.y >>= 3;
     disp_ssd1306->ctx.refresh.area.size.y >>= 3;
     disp_ssd1306->ctx.refresh.buffer = disp_buff;
-    return vsf_eda_post_evt(&disp_ssd1306->eda, VSF_EVT_REFRESH);
+    __vk_disp_ssd1306_state_machine(disp_ssd1306, VSF_EVT_REFRESH);
+    return VSF_ERR_NONE;
 }
 
 #endif

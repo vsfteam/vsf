@@ -132,7 +132,6 @@ vsf_class(vk_disp_ssd1306_t) {
     )
 
     private_member(
-        vsf_eda_t eda;
         struct {
             struct {
                 vk_disp_area_t area;
