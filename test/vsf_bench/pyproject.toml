@@ -10,8 +10,13 @@ dependencies = [
 [project.scripts]
 vsf-bench       = "vsf_bench.cli.run:main"
 vsf-bench-build = "vsf_bench.cli.build:main"
-vsf-bench-flash = "vsf_bench.cli.flash:main"
+vsf-bench-program = "vsf_bench.cli.program:main"
 vsf-bench-test  = "vsf_bench.cli.test:main"
+vsf-bench-debug = "vsf_bench.cli.debug:main"
+
+[project.optional-dependencies]
+debug = ["pyocd"]
+gpio = ["pyftdi"]
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -27,6 +32,8 @@ packages = [
     "vsf_bench.instruments",
     "vsf_bench.runners",
     "vsf_bench.builders",
+    "vsf_bench.capabilities",
+    "vsf_bench.adapters",
 ]
 
 [tool.setuptools.package-dir]
@@ -34,3 +41,5 @@ packages = [
 "vsf_bench.cli" = "cli"
 "vsf_bench.instruments" = "instruments"
 "vsf_bench.runners" = "runners"
+"vsf_bench.capabilities" = "capabilities"
+"vsf_bench.adapters" = "adapters"

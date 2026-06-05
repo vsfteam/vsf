@@ -20,7 +20,8 @@ import os
 import time
 from pathlib import Path
 
-LOCK_DIR = Path("/tmp/vsf-bench-locks")
+import tempfile
+LOCK_DIR = Path(tempfile.gettempdir()) / "vsf-bench-locks"
 
 
 class LockBusyError(RuntimeError):

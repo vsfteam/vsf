@@ -102,3 +102,68 @@ def resolve_suites(
                 )
         return ordered
     return [(name, discovered[name]) for name in sorted(discovered.keys())]
+
+
+# ---------------------------------------------------------------------------
+# PeripheralType auto-gen from vsf_test.h
+# ---------------------------------------------------------------------------
+
+_PERIPHERAL_ENUM_RE = r"^\s*VSF_PERIPHERAL_TYPE_(\w+)\s*(?:=\s*(\d+))?,?"
+
+
+def _find_vsf_test_header() -> Path | None:
+    """Locate vsf_test.h relative to vsf-bench package."""
+    candidates = [
+        # vsf submodule layout
+        Path(__file__).resolve().parent / ".." / ".." / ".." / ".."
+        / "source" / "component" / "test" / "vsf_test" / "vsf_test.h",
+    ]
+    for p in candidates:
+        if p.exists():
+            return p.resolve()
+    return None
+
+
+def generate_peripheral_type_enum() -> type:
+    """Parse ``vsf_test.h`` and return a Python ``PeripheralType`` IntEnum.
+
+    Returns a dynamically created enum whose members match the C enum
+    ``vsf_peripheral_type_t``.  Cached after first call.
+    """
+    import re
+    from enum import IntEnum
+
+    header = _find_vsf_test_header()
+    if header is None:
+        # Fallback: empty enum so import doesn't fail
+        return IntEnum("PeripheralType", {"NONE": 0})
+
+    content = header.read_text(encoding="utf-8", errors="replace")
+    # Find the enum block
+    m = re.search(
+        r"typedef\s+enum\s+vsf_peripheral_type_t\s*\{(.*?)\}\s*vsf_peripheral_type_t",
+        content, re.DOTALL,
+    )
+    if not m:
+        return IntEnum("PeripheralType", {"NONE": 0})
+
+    members: dict[str, int] = {}
+    auto_val = 0
+    for line in m.group(1).splitlines():
+        line = line.strip()
+        if not line or line.startswith("//") or line.startswith("/*"):
+            continue
+        # Match VSF_PERIPHERAL_TYPE_XXX or VSF_PERIPHERAL_TYPE_XXX = N
+        mm = re.match(r"VSF_PERIPHERAL_TYPE_(\w+)\s*(?:=\s*(-?\d+))?\s*,?", line)
+        if mm:
+            name = mm.group(1)
+            if mm.group(2) is not None:
+                auto_val = int(mm.group(2))
+            members[name] = auto_val
+            auto_val += 1
+
+    return IntEnum("PeripheralType", members)  # type: ignore[arg-type]
+
+
+# Module-level cache
+PeripheralType = generate_peripheral_type_enum()

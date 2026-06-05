@@ -5,9 +5,11 @@ import from here. Add new built-in builders here.
 """
 
 from vsf_bench.builders.cmake_builder import CMakeBuilder
+from vsf_bench.builders.iar_builder import IARBuilder
 
 BUILDER_TYPES: dict[str, type] = {
     "cmake": CMakeBuilder,
+    "iar": IARBuilder,
 }
 
 

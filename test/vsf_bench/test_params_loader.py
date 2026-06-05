@@ -179,6 +179,42 @@ def load_yaml_with_includes(
     return _apply_defaults(merged)
 
 
+def validate_test_params(params: dict) -> list[str]:
+    """Validate test_params structure, returning a list of error messages.
+
+    Catches missing required fields, wrong types, empty cases.
+    Returns empty list if valid.
+    """
+    errors = []
+    if not isinstance(params, dict):
+        return ["test_params root must be a dict"]
+
+    for scenario_name, scenario in params.items():
+        if scenario_name == "marker":
+            continue
+        if not isinstance(scenario, dict):
+            errors.append(f"{scenario_name}: must be a dict")
+            continue
+        if "name" not in scenario:
+            errors.append(f"{scenario_name}: missing 'name'")
+        if "cases" not in scenario:
+            errors.append(f"{scenario_name}: missing 'cases'")
+            continue
+        cases = scenario["cases"]
+        if not isinstance(cases, list):
+            errors.append(f"{scenario_name}.cases: must be a list")
+            continue
+        if not cases:
+            errors.append(f"{scenario_name}.cases: empty")
+        for i, case in enumerate(cases):
+            if not isinstance(case, dict):
+                errors.append(f"{scenario_name}.cases[{i}]: must be a dict")
+                continue
+            if "idx" not in case:
+                errors.append(f"{scenario_name}.cases[{i}]: missing 'idx'")
+    return errors
+
+
 def load_test_params(
     test_params_yml: str | Path,
     board_pins_path: str | Path | None = None,

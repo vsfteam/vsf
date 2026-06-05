@@ -28,13 +28,37 @@ def parse_args():
 
 def main():
     args = parse_args()
-    hardware_map_path = (Path(args.board_dir) / "hardware-map.yml").resolve()
+    hardware_map_path = Path(args.hardware_map).resolve()
+
+    # ── Multi-board / --all-boards ──
+    if args.all_boards:
+        if not args.project:
+            print("[vsf-bench-test] Error: --all-boards requires --project", file=sys.stderr)
+            sys.exit(2)
+        try:
+            results = pipeline.run_test_phase_all(
+                hardware_map_path=str(hardware_map_path),
+                project_name=args.project,
+                suite_names=args.suite,
+                la_mode=args.la_mode,
+                log_dir=args.log_dir,
+                trace_level=args.trace_level,
+            )
+        except Exception as e:
+            print(f"[vsf-bench-test] Multi-board error: {e}", file=sys.stderr)
+            sys.exit(1)
+        if not all(results.values()):
+            sys.exit(1)
+        return
+
+    # ── Single board ──
+    board_name = args.board[0] if args.board else None
     test_params_yml = hardware_map_path.parent / "test_params.yml"
     if not test_params_yml.exists():
         test_params_yml = None
 
     try:
-        board = pipeline.load_board(hardware_map_path, board_name=args.board)
+        board = pipeline.load_board(hardware_map_path, board_name=board_name)
     except Exception as e:
         print(f"[vsf-bench-test] Config error: {e}", file=sys.stderr)
         sys.exit(2)

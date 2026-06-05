@@ -91,6 +91,7 @@ def read_framework_windows(
     decode_start_ns: int | None = None,
     decode_end_ns: int | None = None,
     marker_baud: int = 115200,
+    marker_channel: str = "uart0_tx",  # configurable per-board via logic_analyzer config
 ) -> list[CaseWindow]:
     """Per-case windows for both TX and RX scenarios.
 
@@ -98,11 +99,11 @@ def read_framework_windows(
     READY → DONE. Otherwise, windows are bounded by CASE:N → CASE:N+1
     (or END for the last case).
 
-    The marker channel (uart0_tx) is decoded **once per unique capture
-    window** and cached in memory, so calling this function for many
-    suites in a shared-LA run only incurs a single dsview-cli invocation.
+    *marker_channel* can be configured per-board via hardware-map.yml
+    ``logic_analyzer.marker_channel``.  Decoded once per unique capture
+    window and cached.
     """
-    ch = la.channel("uart0_tx")
+    ch = la.channel(marker_channel)
     text, timestamps = _read_marker_channel(
         la, ch, marker_baud, decode_start_ns, decode_end_ns
     )

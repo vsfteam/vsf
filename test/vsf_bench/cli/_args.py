@@ -49,9 +49,20 @@ def add_shared_test_args(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument(
         "--board",
+        action="append",
+        default=None,
+        help="Select target board(s) by name. Repeat for multiple boards, or use --all-boards",
+    )
+    parser.add_argument(
+        "--all-boards",
+        action="store_true",
+        help="Run on all connected boards (from hardware-map.yml)",
+    )
+    parser.add_argument(
+        "--project",
         type=str,
         default=None,
-        help="Select target board by name (or serial port) when multiple are connected",
+        help="Select project by name from hardware-map.yml projects section",
     )
     parser.add_argument(
         "--wait",
@@ -61,7 +72,13 @@ def add_shared_test_args(parser: argparse.ArgumentParser) -> None:
         default=None,
         help="Wait for board lock if busy (optional timeout in seconds)",
     )
-    parser.add_argument("board_dir")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate test_params.yml schema only, do not execute tests",
+    )
+    parser.add_argument("--hardware-map", type=str, required=True,
+                        help="Path to hardware-map.yml")
 
 
 def resolve_shuffle_seed(args, case_specs: list[str]) -> int | None:

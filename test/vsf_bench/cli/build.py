@@ -25,10 +25,11 @@ def main():
     parser.add_argument("board_dir")
     args = parser.parse_args()
 
-    hardware_map_path = Path(args.board_dir) / "hardware-map.yml"
+    hardware_map_path = Path(args.hardware_map)
 
     try:
-        board = pipeline.load_board(hardware_map_path, board_name=args.board)
+        board_name = args.board[0] if args.board else None
+        board = pipeline.load_board(hardware_map_path, board_name=board_name)
     except Exception as e:
         print(f"[vsf-bench-build] Config error: {e}", file=sys.stderr)
         sys.exit(2)
