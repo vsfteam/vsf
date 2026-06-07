@@ -150,6 +150,11 @@ static vsf_err_t __vk_usbd_dfu_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
         case DFU_dfuMANIFEST_SYNC:
             dfu->status.bState = DFU_dfuMANIFEST;
             break;
+        case DFU_dfuMANIFEST:
+            /* DFU 1.1 §7: bitManifestationTolerant=0 — manifestation complete,
+               host will issue USB reset to re-enumerate. */
+            dfu->status.bState = DFU_dfuMANIFEST_WAIT_RESET;
+            break;
         }
         break;
     case USB_DFUREQ_CLRSTATUS:
