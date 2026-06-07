@@ -19,7 +19,7 @@ A suite that fails during `--all` but passes when run alone indicates **state le
 1. Note the first failing suite in the full run (e.g. `pwm_basic`).
 2. Reflash to reset the device:
    ```bash
-   vsf-bench --flash vsf.demo/board/<board>/hardware-map.yml
+   vsf-bench --program vsf.demo/board/<board>/hardware-map.yml
    ```
 3. Run only that suite:
    ```bash

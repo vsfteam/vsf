@@ -25,9 +25,9 @@ vsf-bench --all vsf.demo/board/<board>/ --suite usart_baud --script path/to/cust
 
 # Individual steps
 vsf-bench --build  vsf.demo/board/<board>/
-vsf-bench --flash  vsf.demo/board/<board>/
-vsf-bench --test   vsf.demo/board/<board>/
-vsf-bench --build --flash vsf.demo/board/<board>/
+vsf-bench --program  vsf.demo/board/<board>/
+vsf-bench --test     vsf.demo/board/<board>/
+vsf-bench --build --program vsf.demo/board/<board>/
 vsf-bench --build --test  vsf.demo/board/<board>/
 ```
 
