@@ -53,7 +53,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     aux.close()
     print(f"[PASS] rx_break_error: {len(cases)} case(s) completed")
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None,
            marker_baud: int = 115200, test_params_yml=None) -> None:
@@ -63,10 +63,9 @@ def decode(la: LogicAnalyzerInstrument,
     if not cases:
         return
 
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_rx"))
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_rx"))
 
-    windows = read_framework_windows(
-        la, "usart_rx_break_error",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_rx_break_error",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
         marker_baud=marker_baud,
     )
@@ -75,7 +74,7 @@ def decode(la: LogicAnalyzerInstrument,
     for c in cases:
         assert c.idx in window_by_idx, f"CASE {c.idx}: window missing"
         w = window_by_idx[c.idx]
-        edges = la.read_digital_edges(dut_ch, start_ns=w.start_ns, end_ns=w.end_ns)
+        edges = adapter.read_digital_edges(capture_path, dut_ch, start_ns=w.start_ns, end_ns=w.end_ns)
         # A break is a sustained low level. Find the longest low interval.
         min_break_ns = c.send_break_ms * 1_000_000
         if len(edges) >= 2:

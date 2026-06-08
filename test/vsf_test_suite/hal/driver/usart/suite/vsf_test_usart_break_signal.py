@@ -10,18 +10,21 @@ clocks its own break, so a self-comparison is tautological. The LA
 provides the independent reference.
 """
 
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 
 
 def run(serial: SerialInstrument,
-        la: LogicAnalyzerInstrument | None = None, test_params_yml=None) -> None:
+        adapter: LogicAnalyzer | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
     scenario = params.get("usart_break_signal", {})
     timeout_s = float(scenario.get("timeout_s", 1.5))
     serial.expect_test_summary("usart_break_signal", timeout=timeout_s)
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -30,14 +33,13 @@ def decode(la: LogicAnalyzerInstrument,
     assert len(cases) > 0, "No cases found in test_params"
 
     dut_channel_role = scenario.get("dut", {}).get("channel", "uart1_tx")
-    if dut_channel_role not in la._channels:
+    if dut_channel_role not in channels:
         print(f"[SKIP] usart_break_signal: LA channel role '{dut_channel_role}' "
               f"not in hardware-map.yml")
         return
-    dut_channel = la.channel(dut_channel_role)
+    dut_channel = channels.get(dut_channel_role)
 
-    windows = read_framework_windows(
-        la, "usart_break_signal",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_break_signal",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -52,7 +54,7 @@ def decode(la: LogicAnalyzerInstrument,
                 f"usart_break_signal CASE {idx}: window missing in capture")
         w = window_by_idx[idx]
 
-        edges = la.read_digital_edges(dut_channel, w.start_ns, w.end_ns)
+        edges = adapter.read_digital_edges(capture_path, dut_channel, w.start_ns, w.end_ns)
         # Idle high → SET_BREAK falling → hold → CLEAR_BREAK rising is the
         # primary signal under test. The optional SEND_BREAK auto-pulse may
         # show up as a second fall/rise pair but the precise driver-chosen

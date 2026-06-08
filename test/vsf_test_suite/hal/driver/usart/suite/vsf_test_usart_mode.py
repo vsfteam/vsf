@@ -6,7 +6,10 @@ stop configuration.
 """
 
 from dataclasses import dataclass
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import batch_decode_uart, parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 
 
 
@@ -49,7 +52,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     serial.expect_test_summary("usart_mode", timeout=timeout_s)
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -57,12 +60,11 @@ def decode(la: LogicAnalyzerInstrument,
     cases = _parse_cases(scenario)
     assert len(cases) > 0, "No cases found in test_params"
 
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_tx"))
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_tx"))
     payload = scenario.get("payload", "Hello VSF\r\n").encode()
-    out_dir = la.output_dir
+    out_dir = capture_path.parent
 
-    windows = read_framework_windows(
-        la, "usart_mode",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_mode",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -74,7 +76,7 @@ def decode(la: LogicAnalyzerInstrument,
         cfg: out_dir / f"mode_full_{cfg[1]}_{cfg[2]}_{cfg[3]}.csv"
         for cfg in unique_configs
     }
-    la.batch_decode_uart([
+    batch_decode_uart(adapter, capture_path, [
         (dut_ch, baud, decode_start_ns, decode_end_ns,
          config_to_csv[(baud, par, data, stop)], par, data, stop)
         for (baud, par, data, stop) in unique_configs
@@ -82,7 +84,7 @@ def decode(la: LogicAnalyzerInstrument,
 
     for c in cases:
         w = window_by_idx[c.idx]
-        rows = la.read_csv_rows(config_to_csv[(c.baud, c.decode_parity, c.decode_data, c.decode_stop)])
+        rows = read_csv_rows(config_to_csv[(c.baud, c.decode_parity, c.decode_data, c.decode_stop)])
         got = bytes(b for t, b in rows if w.start_ns <= t < w.end_ns)
         # Sub-byte data lengths transmit only the LSBs — the decoder reports
         # the lowest `decode_data` bits. Mask the reference payload to match.

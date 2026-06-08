@@ -13,15 +13,18 @@ decode skips the assertion and only verifies the firmware trace was
 emitted (per PRD `gpio-toggle-perf` "no LA fallback" path).
 """
 
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 
 
 def run(serial: SerialInstrument,
-        la: LogicAnalyzerInstrument | None = None, test_params_yml=None) -> None:
+        adapter: LogicAnalyzer | None = None, test_params_yml=None) -> None:
     serial.expect_test_summary("gpio_toggle_freq")
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -29,8 +32,7 @@ def decode(la: LogicAnalyzerInstrument,
     cases = list(scenario.get("cases", []))
     assert len(cases) > 0, "No cases found in test_params"
 
-    windows = read_framework_windows(
-        la, "gpio_toggle_freq",
+    windows = read_framework_windows(adapter, channels, capture_path, "gpio_toggle_freq",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -46,14 +48,14 @@ def decode(la: LogicAnalyzerInstrument,
             raise AssertionError(
                 f"gpio_toggle_freq CASE {idx}: case window missing in capture")
 
-        if la_channel not in la._channels:
+        if la_channel not in channels:
             print(f"[SKIP] gpio_toggle_freq CASE {idx}: LA channel role "
                   f"'{la_channel}' not in hardware-map.yml")
             continue
 
         w = window_by_idx[idx]
-        channel = la.channel(la_channel)
-        edges = la.read_digital_edges(channel, w.start_ns, w.end_ns)
+        channel = channels.get(la_channel)
+        edges = adapter.read_digital_edges(capture_path, channel, w.start_ns, w.end_ns)
         if len(edges) < 2:
             print(f"[SKIP] gpio_toggle_freq CASE {idx}: no edges on '{la_channel}' "
                   f"(LA probe not wired)")

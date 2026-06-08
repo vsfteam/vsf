@@ -7,7 +7,10 @@ within each case's firmware-emitted READY → DONE window.
 
 from dataclasses import dataclass
 
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import batch_decode_uart, parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 
 
 @dataclass(frozen=True)
@@ -66,7 +69,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     aux.close()
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -75,12 +78,11 @@ def decode(la: LogicAnalyzerInstrument,
     pass_cases = [c for c in cases if c.expect_pass]
 
     marker_baud = int((params.get("marker", {}) or {}).get("baudrate", 115200))
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_rx"))
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_rx"))
     default_payload = scenario.get("payload", "Hello VSF\r\n").encode()
-    out_dir = la.output_dir
+    out_dir = capture_path.parent
 
-    windows = read_framework_windows(
-        la, "usart_rx_data",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_rx_data",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -88,10 +90,10 @@ def decode(la: LogicAnalyzerInstrument,
         assert c.idx in window_by_idx, f"CASE {c.idx}: window missing"
 
     full_csv = out_dir / f"rx_data_full_{marker_baud}.csv"
-    la.batch_decode_uart([
+    batch_decode_uart(adapter, capture_path, [
         (dut_ch, marker_baud, decode_start_ns, decode_end_ns, full_csv, "none", 8, 1.0)
     ])
-    rows = la.read_csv_rows(full_csv)
+    rows = read_csv_rows(full_csv)
 
     for c in cases:
         if not c.expect_pass:

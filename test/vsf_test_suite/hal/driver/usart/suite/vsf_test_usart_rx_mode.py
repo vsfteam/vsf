@@ -59,7 +59,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     aux.close()
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -67,12 +67,11 @@ def decode(la: LogicAnalyzerInstrument,
     cases = _parse_cases(scenario)
 
     marker_baud = int((params.get("marker", {}) or {}).get("baudrate", 115200))
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_rx"))
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_rx"))
     payload = scenario.get("payload", "0123456789\r\n").encode()
-    out_dir = la.output_dir
+    out_dir = capture_path.parent
 
-    windows = read_framework_windows(
-        la, "usart_rx_mode",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_rx_mode",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -84,7 +83,7 @@ def decode(la: LogicAnalyzerInstrument,
         cfg: out_dir / f"rx_mode_full_{cfg[0]}_{cfg[1]}_{cfg[2]}.csv"
         for cfg in unique_configs
     }
-    la.batch_decode_uart([
+    batch_decode_uart(adapter, capture_path, [
         (dut_ch, marker_baud, decode_start_ns, decode_end_ns,
          config_to_csv[(p, d, s)], p, d, s)
         for (p, d, s) in unique_configs
@@ -92,7 +91,7 @@ def decode(la: LogicAnalyzerInstrument,
 
     for c in cases:
         w = window_by_idx[c.idx]
-        rows = la.read_csv_rows(config_to_csv[(c.decode_parity, c.decode_data, c.decode_stop)])
+        rows = read_csv_rows(config_to_csv[(c.decode_parity, c.decode_data, c.decode_stop)])
         got = bytes(b for t, b in rows if w.start_ns <= t < w.end_ns)
         # 5-bit/6-bit/7-bit: on-wire bytes are truncated to N LSBs.
         if c.decode_data < 8:

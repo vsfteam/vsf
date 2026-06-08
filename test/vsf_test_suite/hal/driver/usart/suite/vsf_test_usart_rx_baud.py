@@ -14,7 +14,10 @@ MIN_BAUDRATE = RP2040_CLK_PERI // (16 * 65535)
 MAX_BAUDRATE = RP2040_CLK_PERI // 16
 
 
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import batch_decode_uart, parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 def _expect_pass(baud: int) -> bool:
     return baud != 0 and MIN_BAUDRATE <= baud <= MAX_BAUDRATE
 
@@ -62,7 +65,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     aux.close()
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -72,12 +75,11 @@ def decode(la: LogicAnalyzerInstrument,
     if not pass_cases:
         return
 
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_rx"))
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_rx"))
     payload = scenario.get("payload", "Hello VSF\r\n").encode()
-    out_dir = la.output_dir
+    out_dir = capture_path.parent
 
-    windows = read_framework_windows(
-        la, "usart_rx_baud",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_rx_baud",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -86,7 +88,7 @@ def decode(la: LogicAnalyzerInstrument,
 
     pass_baudrates = sorted({c.baud for c in pass_cases})
     config_to_csv = {b: out_dir / f"rx_baud_full_{b}.csv" for b in pass_baudrates}
-    la.batch_decode_uart([
+    batch_decode_uart(adapter, capture_path, [
         (dut_ch, b, decode_start_ns, decode_end_ns,
          config_to_csv[b], "none", 8, 1.0)
         for b in pass_baudrates
@@ -94,7 +96,7 @@ def decode(la: LogicAnalyzerInstrument,
 
     for c in pass_cases:
         w = window_by_idx[c.idx]
-        rows = la.read_csv_rows(config_to_csv[c.baud])
+        rows = read_csv_rows(config_to_csv[c.baud])
         got = bytes(b for t, b in rows if w.start_ns <= t < w.end_ns)
         assert got == payload, (
             f"CASE {c.idx} baud={c.baud}: expected {payload!r}, got {got!r}"

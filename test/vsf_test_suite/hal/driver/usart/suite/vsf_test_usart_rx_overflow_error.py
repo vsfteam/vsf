@@ -53,7 +53,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     aux.close()
     print(f"[PASS] rx_overflow_error: {len(cases)} case(s) completed")
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None,
            marker_baud: int = 115200, test_params_yml=None) -> None:
@@ -63,21 +63,20 @@ def decode(la: LogicAnalyzerInstrument,
     if not cases:
         return
 
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_rx"))
-    out_dir = la.output_dir
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_rx"))
+    out_dir = capture_path.parent
 
-    windows = read_framework_windows(
-        la, "usart_rx_overflow_error",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_rx_overflow_error",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
         marker_baud=marker_baud,
     )
     window_by_idx = {w.case_idx: w for w in windows}
 
     full_csv = out_dir / f"rx_overflow_error_full_{marker_baud}.csv"
-    la.batch_decode_uart([
+    batch_decode_uart(adapter, capture_path, [
         (dut_ch, marker_baud, decode_start_ns, decode_end_ns, full_csv, "none", 8, 1.0)
     ])
-    rows = la.read_csv_rows(full_csv)
+    rows = read_csv_rows(full_csv)
 
     for c in cases:
         assert c.idx in window_by_idx, f"CASE {c.idx}: window missing"

@@ -15,18 +15,21 @@ decode falls back to skipping the LA assertion and only verifies the
 firmware-side trace was emitted.
 """
 
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 
 
 def run(serial: SerialInstrument,
-        la: LogicAnalyzerInstrument | None = None, test_params_yml=None) -> None:
+        adapter: LogicAnalyzer | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
     scenario = params.get("gpio_systimer_health", {})
     timeout_s = float(scenario.get("timeout_s", 5.0))
     serial.expect_test_summary("gpio_systimer_health", timeout=timeout_s)
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -34,8 +37,7 @@ def decode(la: LogicAnalyzerInstrument,
     cases = list(scenario.get("cases", []))
     assert len(cases) > 0, "No cases found in test_params"
 
-    windows = read_framework_windows(
-        la, "gpio_systimer_health",
+    windows = read_framework_windows(adapter, channels, capture_path, "gpio_systimer_health",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -55,14 +57,14 @@ def decode(la: LogicAnalyzerInstrument,
         # Resolve channel role; if not configured, skip LA assertion (PRD's
         # "no LA fallback" path — firmware ran successfully but no external
         # reference is available).
-        if la_channel not in la._channels:
+        if la_channel not in channels:
             print(f"[SKIP] gpio_systimer_health CASE {idx}: LA channel role "
                   f"'{la_channel}' not in hardware-map.yml")
             continue
-        channel = la.channel(la_channel)
+        channel = channels.get(la_channel)
 
         w = window_by_idx[idx]
-        edges = la.read_digital_edges(channel, w.start_ns, w.end_ns)
+        edges = adapter.read_digital_edges(capture_path, channel, w.start_ns, w.end_ns)
         if len(edges) < 2:
             print(f"[SKIP] gpio_systimer_health CASE {idx}: no edges on '{la_channel}' "
                   f"(LA probe not wired)")

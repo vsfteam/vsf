@@ -8,7 +8,10 @@ after the shared LA capture is stopped and validates per-case payloads.
 """
 
 from dataclasses import dataclass
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument, load_test_params
+from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+from vsf_bench.utils import batch_decode_uart, parse_uart_csv, read_csv_rows
+from vsf_bench.config import UARTConfig
 
 
 RP2040_CLK_PERI = 125_000_000
@@ -50,7 +53,7 @@ def run(serial: SerialInstrument, test_params_yml=None):
     serial.expect_test_summary("usart_baud", timeout=timeout_s)
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -58,12 +61,11 @@ def decode(la: LogicAnalyzerInstrument,
     cases = _parse_cases(scenario)
     assert len(cases) > 0, "No cases found in test_params"
 
-    dut_ch = la.channel(scenario.get("dut", {}).get("channel", "uart1_tx"))
+    dut_ch = channels.get(scenario.get("dut", {}).get("channel", "uart1_tx"))
     default_payload = scenario.get("payload", "Hello VSF\r\n").encode()
-    out_dir = la.output_dir
+    out_dir = capture_path.parent
 
-    windows = read_framework_windows(
-        la, "usart_baud",
+    windows = read_framework_windows(adapter, channels, capture_path, "usart_baud",
         decode_start_ns=decode_start_ns, decode_end_ns=decode_end_ns,
     )
     window_by_idx = {w.case_idx: w for w in windows}
@@ -73,7 +75,7 @@ def decode(la: LogicAnalyzerInstrument,
             assert c.idx in window_by_idx, f"CASE {c.idx} baud={c.baud}: window missing"
 
     pass_baudrates = sorted({c.baud for c in cases if _expect_pass(c.baud)})
-    la.batch_decode_uart([
+    batch_decode_uart(adapter, capture_path, [
         (dut_ch, baud, decode_start_ns, decode_end_ns,
          out_dir / f"baud_full_{baud}.csv", "none", 8, 1.0)
         for baud in pass_baudrates
@@ -84,7 +86,7 @@ def decode(la: LogicAnalyzerInstrument,
             print(f"[PASS] CASE {c.idx}  baud={c.baud:>7}  expected fail (init error)")
             continue
         w = window_by_idx[c.idx]
-        rows = la.read_csv_rows(out_dir / f"baud_full_{c.baud}.csv")
+        rows = read_csv_rows(out_dir / f"baud_full_{c.baud}.csv")
         got = bytes(b for t, b in rows if w.start_ns <= t < w.end_ns)
         payload = _gen_pattern(c.data_size_bytes) if c.data_size_bytes > 0 else default_payload
         assert got == payload, (

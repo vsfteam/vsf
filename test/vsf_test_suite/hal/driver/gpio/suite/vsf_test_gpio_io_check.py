@@ -19,14 +19,14 @@ BAUDRATE = 115200
 
 
 def run(serial: SerialInstrument,
-        la: LogicAnalyzerInstrument | None = None, test_params_yml=None) -> None:
+        adapter: LogicAnalyzer | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
     scenario = params.get("gpio_io_check", {})
     timeout_s = float(scenario.get("timeout_s", 5.0))
     serial.expect_test_summary("gpio_io_check", timeout=timeout_s)
 
 
-def decode(la: LogicAnalyzerInstrument,
+def decode(adapter: LogicAnalyzer, channels: dict, capture_path: Path,
            decode_start_ns: int | None = None,
            decode_end_ns: int | None = None, test_params_yml=None) -> None:
     params = load_test_params(test_params_yml)
@@ -43,14 +43,13 @@ def decode(la: LogicAnalyzerInstrument,
         expected[pin] = 0x50 + pin
 
     # Decode UART on every LA channel
-    out_dir = la.output_dir
+    out_dir = capture_path.parent
     channel_bytes: dict[str, list[int]] = {}
-    for ch_name in la._channels:
-        ch = la.channel(ch_name)
+    for ch_name in channels:
+        ch = channels.get(ch_name)
         csv_path = out_dir / f"io_check_{ch_name}.csv"
-        la.decode_uart(ch, BAUDRATE, decode_start_ns, decode_end_ns,
-                       csv_path, "none", 8, 1.0)
-        rows = la.read_csv_rows(csv_path)
+        adapter.decode_uart(capture_path, ch, UARTConfig(baudrate=BAUDRATE), decode_start_ns, decode_end_ns, csv_path, "none", 8, 1.0)
+        rows = read_csv_rows(csv_path)
         channel_bytes[ch_name] = [b for t, b in rows]
 
     # Cross-reference: each expected byte must appear on exactly one channel.
