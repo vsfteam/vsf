@@ -38,11 +38,11 @@ from vsf_bench.hardware_map import load_board_and_project as _load_board_and_pro
 from vsf_bench.builders.registry import get_builder_class
 from vsf_bench.runners.registry import get_runner_class
 from vsf_bench.serial import SerialInstrument
-from vsf_bench.vsf_test_shell import VsfTestShellProtocol
+from vsf_bench.test.shell import VsfTestShellProtocol
 from vsf_bench.lock import BoardLock, LockBusyError
-from vsf_bench.suite import discover_suites, load_script_module, script_needs_la, resolve_suites
-from vsf_bench.test_params_loader import load_test_params
-from vsf_bench.tee_logger import get_logger as _get_logger
+from vsf_bench.test.suite import discover_suites, load_script_module, script_needs_la, resolve_suites
+from vsf_bench.test.params_loader import load_test_params
+from vsf_bench.utils.tee_logger import get_logger as _get_logger
 
 
 def __log_event(message: str) -> None:
@@ -298,7 +298,7 @@ def la_decode_phase(
     """Decode UART from a .dsl capture file.  Returns .txt path."""
     from vsf_bench.adapters.dsview import DSViewAdapter
     from vsf_bench.config import UARTConfig
-    from vsf_bench.utils import parse_uart_csv
+    from vsf_bench.utils.core import parse_uart_csv
 
     cli = Path("dsview-cli")
     resolved = shutil.which("dsview-cli")
@@ -518,7 +518,7 @@ def run_test_phase(
 
     if any_needs_la:
         marker_baudrate = la_cfg.marker_baudrate
-        from vsf_bench.capture_scene import CaptureScene
+        from vsf_bench.test.scene import CaptureScene
         scene = CaptureScene(la_cfg, cli_path, run_dir, marker_baudrate=marker_baudrate)
         __log_event(f"LA marker baudrate: {marker_baudrate}")
 

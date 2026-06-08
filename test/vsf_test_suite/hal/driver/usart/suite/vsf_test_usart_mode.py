@@ -6,9 +6,9 @@ stop configuration.
 """
 
 from dataclasses import dataclass
-from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.test.marker import read_framework_windows, SerialInstrument, load_test_params
 from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
-from vsf_bench.utils import batch_decode_uart, parse_uart_csv, read_csv_rows
+from vsf_bench.utils.core import batch_decode_uart, parse_uart_csv, read_csv_rows
 from vsf_bench.config import UARTConfig
 
 

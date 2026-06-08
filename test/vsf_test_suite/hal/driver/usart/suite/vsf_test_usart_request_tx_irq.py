@@ -6,7 +6,7 @@ the test framework summary line and asserts all cases passed.
 TX via fifo2req adapter; re-uses UART1.
 """
 
-from vsf_bench import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument
+from vsf_bench.test.marker import read_framework_windows, LogicAnalyzerInstrument, SerialInstrument
 
 
 

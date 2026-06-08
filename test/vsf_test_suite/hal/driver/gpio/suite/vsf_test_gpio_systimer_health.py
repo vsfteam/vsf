@@ -15,9 +15,9 @@ decode falls back to skipping the LA assertion and only verifies the
 firmware-side trace was emitted.
 """
 
-from vsf_bench import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.test.marker import read_framework_windows, SerialInstrument, load_test_params
 from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
-from vsf_bench.utils import parse_uart_csv, read_csv_rows
+from vsf_bench.utils.core import parse_uart_csv, read_csv_rows
 from vsf_bench.config import UARTConfig
 
 
