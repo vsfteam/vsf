@@ -4,6 +4,8 @@ import sys
 import yaml
 from pathlib import Path
 
+import serial.tools.list_ports
+
 from vsf_bench.config import (
     ArtifactConfig,
     BoardConfig,
@@ -16,7 +18,45 @@ from vsf_bench.config import (
     StageConfig,
     UARTConfig,
 )
-from vsf_bench.hwctrl.match_serial import match_serial_port
+def _match_serial_port(match_cfg, label: str = "serial port") -> str:
+    """Resolve a serial port from match criteria (str or dict with vid/pid/serial/desc)."""
+    if isinstance(match_cfg, str):
+        return match_cfg
+
+    vid = match_cfg.get("vid")
+    pid = match_cfg.get("pid")
+    sn = match_cfg.get("serial")
+    desc = match_cfg.get("desc")
+    location = match_cfg.get("location")
+    explicit_port = match_cfg.get("port")
+
+    vid = int(vid) if vid is not None else None
+    pid = int(pid) if pid is not None else None
+
+    candidates = []
+    for port in serial.tools.list_ports.comports():
+        if vid is not None and port.vid != vid:
+            continue
+        if pid is not None and port.pid != pid:
+            continue
+        if sn is not None and sn not in (port.serial_number or ""):
+            continue
+        if desc is not None and desc not in (port.description or ""):
+            continue
+        if location is not None and location not in (port.location or ""):
+            continue
+        candidates.append(port.device)
+
+    if len(candidates) == 0:
+        raise RuntimeError(f"{label}: no port matching criteria")
+    if len(candidates) == 1:
+        return candidates[0]
+    if explicit_port:
+        pn = explicit_port.upper().replace("/", "\\")
+        for c in candidates:
+            if c.upper().replace("/", "\\") == pn:
+                return c
+    raise RuntimeError(f"{label}: {len(candidates)} ports match, use 'port' to disambiguate: {candidates}")
 
 
 def _resolve_yaml_path(value: str, yaml_dir: Path) -> str:
@@ -104,7 +144,7 @@ def _entry_to_board(entry: dict, yaml_dir: Path, hubs: dict | None = None, gpio_
     # ── UART ports ──
     log_raw = entry.get("debug_uart", entry.get("serial", ""))
     if isinstance(log_raw, dict):
-        debug_uart = match_serial_port(log_raw, label=f"board {_derive_board_name(entry)} log UART")
+        debug_uart = _match_serial_port(log_raw, label=f"board {_derive_board_name(entry)} log UART")
         debug_baudrate = log_raw.get("baudrate", entry.get("baud", 0))
     else:
         debug_uart = log_raw
@@ -112,7 +152,7 @@ def _entry_to_board(entry: dict, yaml_dir: Path, hubs: dict | None = None, gpio_
 
     dl_raw = entry.get("program_uart", entry.get("download_serial", ""))
     if isinstance(dl_raw, dict):
-        program_uart = match_serial_port(dl_raw, label=f"board {_derive_board_name(entry)} download UART")
+        program_uart = _match_serial_port(dl_raw, label=f"board {_derive_board_name(entry)} download UART")
     else:
         program_uart = dl_raw
 

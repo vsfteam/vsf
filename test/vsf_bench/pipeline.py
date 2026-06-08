@@ -42,7 +42,7 @@ from vsf_bench.vsf_test_shell import VsfTestShellProtocol
 from vsf_bench.lock import BoardLock, LockBusyError
 from vsf_bench.suite import discover_suites, load_script_module, script_needs_la, resolve_suites
 from vsf_bench.test_params_loader import load_test_params
-from vsf_bench.hwctrl.tee_logger import get_logger as _get_logger
+from vsf_bench.tee_logger import get_logger as _get_logger
 
 
 def __log_event(message: str) -> None:

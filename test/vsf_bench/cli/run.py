@@ -18,7 +18,7 @@ from pathlib import Path
 
 from vsf_bench import pipeline
 from vsf_bench.cli._args import add_shared_test_args, resolve_shuffle_seed
-from vsf_bench.hwctrl.tee_logger import init_logger as _init_logger
+from vsf_bench.tee_logger import init_logger as _init_logger
 from vsf_bench.lock import LockBusyError
 
 
