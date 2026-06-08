@@ -37,11 +37,10 @@ import argparse
 import sys
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError as e:
+import importlib.util
+if importlib.util.find_spec("yaml") is None:
     print("Error: PyYAML is required. Install with: pip install pyyaml", file=sys.stderr)
-    raise SystemExit(1) from e
+    raise SystemExit(1)
 
 from vsf_bench.test_params_loader import load_yaml_with_includes
 
@@ -128,7 +127,7 @@ def _emit_scenario(lines: list[str], scenario_key: str, sc: dict) -> None:
 
     lines.append(f"#ifndef VSF_TEST_{upper}_ENABLE")
     lines.append(f"#   define VSF_TEST_{upper}_ENABLE  ENABLED")
-    lines.append(f"#endif")
+    lines.append("#endif")
     lines.append("")
 
 def _load_yaml_with_includes(yml_path: Path, stack: list[Path] | None = None) -> dict:

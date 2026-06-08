@@ -30,8 +30,8 @@ class StackFrame:
     file: str = ""
     line: int = 0
 
-    def to_dict(self) -> dict:
-        d = {"pc": f"0x{self.pc:08X}"}
+    def to_dict(self) -> dict[str, object]:
+        d: dict[str, object] = {"pc": f"0x{self.pc:08X}"}
         if self.sp:
             d["sp"] = f"0x{self.sp:08X}"
         if self.lr:
@@ -117,7 +117,7 @@ class DebugSession:
     def connect(self):
         """Open pyOCD session.  Raises RuntimeError if pyOCD unavailable."""
         try:
-            from pyocd.core.helpers import ConnectHelper
+            from pyocd.core.helpers import ConnectHelper  # type: ignore[import-not-found]
         except ImportError:
             raise RuntimeError(
                 "pyOCD not installed. Run: pip install pyocd"
@@ -245,17 +245,29 @@ class DebugSession:
             return "NoFault"
 
         names = []
-        if cfsr & (1 << 25): names.append("DIVBYZERO")
-        if cfsr & (1 << 24): names.append("UNALIGNED")
-        if cfsr & (1 << 19): names.append("NOCP")
-        if cfsr & (1 << 18): names.append("UNDEFINSTR")
-        if cfsr & (1 << 17): names.append("INVSTATE")
-        if cfsr & (1 << 12): names.append("INVPC")
-        if cfsr & (1 << 11): names.append("UNSTKERR")
-        if cfsr & (1 << 8):  names.append("UNSTKERR")
-        if cfsr & (1 << 4):  names.append("STKERR")
-        if cfsr & (1 << 3):  names.append("MUNSTKERR")
-        if cfsr & (1 << 1):  names.append("DACCVIOL")
-        if cfsr & (1 << 0):  names.append("IACCVIOL")
+        if cfsr & (1 << 25):
+            names.append("DIVBYZERO")
+        if cfsr & (1 << 24):
+            names.append("UNALIGNED")
+        if cfsr & (1 << 19):
+            names.append("NOCP")
+        if cfsr & (1 << 18):
+            names.append("UNDEFINSTR")
+        if cfsr & (1 << 17):
+            names.append("INVSTATE")
+        if cfsr & (1 << 12):
+            names.append("INVPC")
+        if cfsr & (1 << 11):
+            names.append("UNSTKERR")
+        if cfsr & (1 << 8):
+            names.append("UNSTKERR")
+        if cfsr & (1 << 4):
+            names.append("STKERR")
+        if cfsr & (1 << 3):
+            names.append("MUNSTKERR")
+        if cfsr & (1 << 1):
+            names.append("DACCVIOL")
+        if cfsr & (1 << 0):
+            names.append("IACCVIOL")
 
         return "/".join(names) if names else f"UNKNOWN(0x{cfsr:08X})"

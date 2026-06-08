@@ -36,7 +36,7 @@ def main():
     build_dir = Path(board.build.build_dir)
     if not build_dir.exists():
         print(f"[vsf-bench-program] Build directory missing: {build_dir}", file=sys.stderr)
-        print(f"[vsf-bench-program] Run vsf-bench-build first.", file=sys.stderr)
+        print("[vsf-bench-program] Run vsf-bench-build first.", file=sys.stderr)
         sys.exit(2)
 
     try:

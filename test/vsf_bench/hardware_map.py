@@ -14,6 +14,7 @@ from vsf_bench.config import (
     ProjectConfig,
     RunnerConfig,
     StageConfig,
+    UARTConfig,
 )
 from vsf_bench.hwctrl.match_serial import match_serial_port
 
@@ -95,6 +96,9 @@ def _entry_to_board(entry: dict, yaml_dir: Path, hubs: dict | None = None, gpio_
             samplerate=la_raw.get("samplerate", "10M"),
             capture_duration=float(la_raw.get("capture_duration", 120)),
             channels=la_raw.get("channels", {}),
+            marker_channel=la_raw.get("marker_channel"),
+            marker_baudrate=int(la_raw.get("marker_baudrate", 115200)),
+            marker_uart_params=UARTConfig(**la_raw.get("marker_uart_params", {})),
         )
 
     # ── UART ports ──
@@ -148,6 +152,15 @@ def _entry_to_board(entry: dict, yaml_dir: Path, hubs: dict | None = None, gpio_
         board_pins=_resolve_yaml_path(entry.get("board_pins", ""), yaml_dir),
         name=_derive_board_name(entry),
     )
+
+    # Flat-format entries may embed build/runner info directly on the board
+    if "build" in entry:
+        board.build = _parse_build_config(entry.get("build", {}), yaml_dir)
+    if "runners" in entry:
+        board.runners = _parse_runners(entry.get("runners", {}))
+    if "active_runner" in entry:
+        board.active_runner = entry.get("active_runner", "")
+
     board.validate()
     return board
 
@@ -164,63 +177,20 @@ def _entry_to_project(project_name: str, entry: dict, yaml_dir: Path) -> Project
         active_runner=entry.get("active_runner", ""),
         runners=runners,
         name=project_name,
+        log_dir=entry.get("log_dir", ""),
     )
     project.validate()
     return project
 
 
 # ---------------------------------------------------------------------------
-# Backward-compatible board-centric loaders (used by existing test codepaths)
+# Board-centric loaders
 # ---------------------------------------------------------------------------
-
-def _entry_to_board_legacy(entry: dict, yaml_dir: Path) -> BoardConfig:
-    """Convert one YAML entry (old flat format) to a BoardConfig with embedded
-    build/runner fields for backward compatibility."""
-    build_cfg = entry.get("build", {})
-    build = _parse_build_config(build_cfg, yaml_dir)
-    runners = _parse_runners(entry.get("runners", {}))
-
-    la_cfg = None
-    la_raw = entry.get("logic_analyzer")
-    if la_raw:
-        cli_raw = la_raw.get("cli")
-        la_cfg = LogicAnalyzerConfig(
-            cli=_resolve_yaml_path(cli_raw, yaml_dir) if cli_raw else None,
-            device=la_raw.get("device", "DSLogic"),
-            samplerate=la_raw.get("samplerate", "10M"),
-            capture_duration=float(la_raw.get("capture_duration", 120)),
-            channels=la_raw.get("channels", {}),
-        )
-
-    # Legacy BoardConfig expects active_runner, runners, build
-    # Use setattr to work around the fact that these fields no longer exist
-    # on the canonical BoardConfig.
-    from dataclasses import fields as dc_fields
-    legacy_field_names = {f.name for f in dc_fields(BoardConfig)}
-    kwargs = dict(
-        platform=entry.get("platform", ""),
-        connected=entry.get("connected", True),
-        debug_uart=entry.get("serial", ""),
-        debug_baudrate=entry.get("baud", 0),
-        fixtures=entry.get("fixtures", []),
-        logic_analyzer=la_cfg,
-        board_pins=_resolve_yaml_path(entry.get("board_pins", ""), yaml_dir),
-        name=_derive_board_name(entry),
-    )
-    board = BoardConfig(**kwargs)
-
-    # Attach legacy fields dynamically for backward compat
-    board.active_runner = entry.get("active_runner", "")          # type: ignore[attr-defined]
-    board.runners = runners                                        # type: ignore[attr-defined]
-    board.build = build                                            # type: ignore[attr-defined]
-
-    return board
-
 
 def load(path: str | Path, board_name: str | None = None) -> BoardConfig:
     """Load a connected board from a hardware-map.yml file.
 
-    *board_name=None* → return the first connected board (backward compatible).
+    *board_name=None* → return the first connected board.
     *board_name=<name>* → return the board whose ``name`` / serial port matches.
 
     All relative paths inside the YAML are resolved against the YAML file's
@@ -229,12 +199,16 @@ def load(path: str | Path, board_name: str | None = None) -> BoardConfig:
     p = Path(path)
     yaml_dir = p.parent.resolve()
     with open(p, encoding="utf-8") as f:
-        entries = yaml.safe_load(f)
+        doc = yaml.safe_load(f) or {}
 
-    if not entries:
-        raise RuntimeError(f"No entries in {p}")
+    boards_raw = doc.get("boards", [])
+    if not boards_raw:
+        raise RuntimeError(f"No 'boards' section in {p}")
 
-    connected = [e for e in entries if e.get("connected", False)]
+    hubs = doc.get("smartusb_hubs", {})
+    gpio_adapters = doc.get("gpio_adapters", {})
+
+    connected = [e for e in boards_raw if e.get("connected", False)]
     if not connected:
         raise RuntimeError("No connected board found in hardware-map.yml")
 
@@ -256,19 +230,23 @@ def load(path: str | Path, board_name: str | None = None) -> BoardConfig:
             file=sys.stderr,
         )
 
-    return _entry_to_board_legacy(connected[0], yaml_dir)
+    return _entry_to_board(connected[0], yaml_dir, hubs, gpio_adapters)
 
 
 def load_all(path: str | Path) -> list[BoardConfig]:
-    """Return all connected boards from a hardware-map.yml file (legacy format)."""
+    """Return all connected boards from a hardware-map.yml file."""
     p = Path(path)
     yaml_dir = p.parent.resolve()
     with open(p, encoding="utf-8") as f:
-        entries = yaml.safe_load(f)
+        doc = yaml.safe_load(f) or {}
+
+    boards_raw = doc.get("boards", [])
+    hubs = doc.get("smartusb_hubs", {})
+    gpio_adapters = doc.get("gpio_adapters", {})
 
     return [
-        _entry_to_board_legacy(e, yaml_dir)
-        for e in entries
+        _entry_to_board(e, yaml_dir, hubs, gpio_adapters)
+        for e in boards_raw
         if e.get("connected", False)
     ]
 
@@ -366,8 +344,8 @@ def load_board_and_project(
 def validate_runners(target, build_artifacts=None) -> None:
     """Validate runner params against their class definitions.
 
-    *target* can be a BoardConfig (legacy — runners/build attached dynamically),
-    a ProjectConfig, or any object with ``.runners`` and ``.build`` attributes.
+    *target* can be a ProjectConfig or any object with ``.runners`` and
+    ``.build`` attributes.
 
     Checks REQUIRED_PARAMS, class-specific validate_params(), and artifact
     cross-reference against build.artifacts.

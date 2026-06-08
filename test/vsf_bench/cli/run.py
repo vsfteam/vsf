@@ -28,6 +28,18 @@ def parse_args():
     parser.add_argument("--build", action="store_true")
     parser.add_argument("--program", action="store_true")
     parser.add_argument("--test", action="store_true")
+    parser.add_argument("--la-capture", action="store_true",
+                        help="Capture via logic analyzer (saves .dsl + serial.log)")
+    parser.add_argument("--la-channel", default="CH8",
+                        help="LA channel label (default: CH8)")
+    parser.add_argument("--la-duration", type=float, default=30.0,
+                        help="LA capture duration in seconds (default: 30)")
+    parser.add_argument("--la-decode", action="store_true",
+                        help="Decode UART from a .dsl capture file")
+    parser.add_argument("--la-decode-file", default=None,
+                        help=".dsl file to decode (required for --la-decode without --la-capture)")
+    parser.add_argument("--la-baudrate", type=int, default=2_000_000,
+                        help="UART baud rate for decode (default: 2000000)")
     parser.add_argument("--all", action="store_true")
     parser.add_argument(
         "--pipeline", type=str, default=None,
@@ -47,7 +59,7 @@ def main():
     hw_path = Path(args.hardware_map).resolve()
     from vsf_bench.hardware_map import load_defaults
     _defaults = load_defaults(str(hw_path)) if hw_path.exists() else {}
-    log_dir = args.log_dir or _defaults.get("log_dir")
+    # log_dir resolved later after project is loaded: CLI → project → defaults
 
     # ── --list-pipelines ──
     if args.list_pipelines:
@@ -83,7 +95,7 @@ def main():
             project_map = resolve_pipeline_projects(
                 pipeline_obj, str(hw_path), board_name=board_name,
             )
-            _init_logger(log_dir)
+            _init_logger(args.log_dir or _defaults.get("log_dir"))
         except Exception as e:
             print(f"[vsf-bench] Pipeline error: {e}", file=sys.stderr)
             sys.exit(2)
@@ -94,13 +106,16 @@ def main():
             sys.exit(1)
         return
 
-    # Initialize TeeLogger — use --log-dir, or hardware-map defaults.log_dir
-    _init_logger(log_dir)
-
     hardware_map_path = Path(args.hardware_map).resolve()
     do_build = args.build or args.all
     do_program = args.program or args.all
     do_test = args.test or args.all
+    do_la_capture = args.la_capture
+    do_la_decode = args.la_decode
+
+    test_params_yml = hardware_map_path.parent / "test_params.yml"
+    if not test_params_yml.exists():
+        test_params_yml = None
 
     if not args.project:
         print("[vsf-bench] Error: --project is required", file=sys.stderr)
@@ -114,9 +129,12 @@ def main():
         print(f"[vsf-bench] Config error: {e}", file=sys.stderr)
         sys.exit(2)
 
-    # Load board (only needed for program/test)
+    # Resolve log_dir: CLI → project.log_dir → defaults.log_dir
+    log_dir = args.log_dir or project.log_dir or _defaults.get("log_dir")
+
+    # Load board (only needed for program/test/capture)
     board = None
-    if do_program or do_test:
+    if do_program or do_test or do_la_capture:
         try:
             _board_result = pipeline.load_board(
                 hardware_map_path,
@@ -133,6 +151,11 @@ def main():
             p.setdefault("program_port", board.program_uart)
             p.setdefault("debug_port", board.debug_uart)
             p.setdefault("debug_baudrate", board.debug_baudrate)
+
+    # Create run_dir for this invocation, init TeeLogger inside it
+    tag = board.name if board else "vsf-bench"
+    run_dir = pipeline._mk_run_dir(log_dir, tag)
+    _init_logger(run_dir)
 
     build_config = project.build
 
@@ -166,12 +189,49 @@ def main():
         if do_program:
             if not build_dir.exists():
                 print(f"[vsf-bench] Build directory missing: {build_dir}", file=sys.stderr)
-                print(f"[vsf-bench] Run with --build first.", file=sys.stderr)
+                print("[vsf-bench] Run with --build first.", file=sys.stderr)
                 sys.exit(2)
             try:
                 pipeline.program_phase(board, build_dir, project=project)
             except Exception as e:
                 print(f"[vsf-bench] Program failed: {e}", file=sys.stderr)
+                sys.exit(1)
+
+        if do_la_capture:
+            try:
+                dsl_path = pipeline.la_capture_phase(
+                    board=board,
+                    run_dir=run_dir,
+                    duration=args.la_duration,
+                    channel=args.la_channel,
+                )
+            except Exception as e:
+                print(f"[vsf-bench] LA capture failed: {e}", file=sys.stderr)
+                sys.exit(1)
+
+            if do_la_decode:
+                try:
+                    pipeline.la_decode_phase(
+                        capture_path=dsl_path,
+                        channel=args.la_channel,
+                        baudrate=args.la_baudrate,
+                    )
+                except Exception as e:
+                    print(f"[vsf-bench] LA decode failed: {e}", file=sys.stderr)
+                    sys.exit(1)
+
+        elif do_la_decode:
+            if not args.la_decode_file:
+                print("[vsf-bench] Error: --la-decode requires --la-decode-file", file=sys.stderr)
+                sys.exit(2)
+            try:
+                pipeline.la_decode_phase(
+                    capture_path=Path(args.la_decode_file),
+                    channel=args.la_channel,
+                    baudrate=args.la_baudrate,
+                )
+            except Exception as e:
+                print(f"[vsf-bench] LA decode failed: {e}", file=sys.stderr)
                 sys.exit(1)
 
         if not do_test:

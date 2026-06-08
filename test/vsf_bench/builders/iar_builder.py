@@ -5,7 +5,6 @@ No external script dependency. Locates IarBuild.exe via:
 2. Default install path: ``C:/iar/ewarm-*.*.*/common/bin/IarBuild.exe``
 """
 
-import glob
 import os
 import shutil
 import subprocess

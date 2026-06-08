@@ -4,7 +4,6 @@ Pure functions — no hardware interaction. Testable without a board.
 """
 
 import importlib.util
-import sys
 from pathlib import Path
 
 

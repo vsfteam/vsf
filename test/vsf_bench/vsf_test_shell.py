@@ -13,7 +13,7 @@ Usage::
 
 import time
 
-from vsf_bench.instruments.serial_instrument import SerialInstrument
+from vsf_bench.serial import SerialInstrument
 
 
 class VsfTestShellProtocol:

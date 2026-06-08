@@ -24,6 +24,15 @@ class TestResult(str, Enum):
 
 
 @dataclass
+class UARTConfig:
+    """UART decode parameters."""
+    baudrate: int = 115200
+    parity_type: str = "none"
+    num_data_bits: int = 8
+    num_stop_bits: float = 1.0
+
+
+@dataclass
 class ArtifactConfig:
     name: str
     format: str
@@ -53,6 +62,8 @@ class LogicAnalyzerConfig:
     capture_duration: float = 120.0
     channels: dict[str, str] = field(default_factory=dict)
     marker_channel: str | None = None  # per-board marker UART channel; None falls back to caller default
+    marker_baudrate: int = 115200       # marker UART baud rate
+    marker_uart_params: UARTConfig = field(default_factory=UARTConfig)
 
 
 @dataclass
@@ -62,6 +73,7 @@ class ProjectConfig:
     active_runner: str = ""
     runners: dict[str, RunnerConfig] = field(default_factory=dict)
     name: str = ""
+    log_dir: str = ""                        # project-specific default log directory
 
     def validate(self) -> None:
         missing = []
@@ -120,6 +132,10 @@ class BoardConfig:
     gpio_adapter_serial: str = ""  # resolved from gpio_adapters section
     board_pins: str = ""
     name: str = ""
+    # Flat-format entries may embed project info directly on the board
+    build: BuildConfig | None = None
+    active_runner: str = ""
+    runners: dict[str, RunnerConfig] = field(default_factory=dict)
 
     def validate(self) -> None:
         missing = []

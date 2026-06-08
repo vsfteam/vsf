@@ -5,25 +5,39 @@ Each phase function does one thing and is called by exactly one CLI entry:
   * `build_phase()`  — cmake build (vsf-bench-build)
   * `program_phase()`  — runner flash (vsf-bench-flash)
   * `run_test_phase()` — multi-suite LA-aware test orchestration (vsf-bench-test)
+  * `la_capture_phase()` — standalone LA capture
+  * `la_decode_phase()` — offline LA decode
 
 The unified `vsf-bench` entry (`cli/run.py`) composes these in order based on
-the `--build/--flash/--test/--all` flags.
+the `--build/--flash/--test/--la-capture/--la-decode` flags.
 """
+
+from __future__ import annotations
 
 import inspect
 import json
 import shutil
-import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from vsf_bench.config import (
+        BoardConfig,
+        BuildConfig,
+        LogicAnalyzerConfig,
+        PipelineConfig,
+        ProjectConfig,
+        RunnerConfig,
+        StageConfig,
+    )
 
 from vsf_bench.hardware_map import load as load_hardware_map, validate_runners
 from vsf_bench.hardware_map import load_board_and_project as _load_board_and_project
 from vsf_bench.builders.registry import get_builder_class
 from vsf_bench.runners.registry import get_runner_class
-from vsf_bench.instruments.serial_instrument import SerialInstrument
-from vsf_bench.instruments.logic_analyzer_instrument import LogicAnalyzerInstrument
+from vsf_bench.serial import SerialInstrument
 from vsf_bench.vsf_test_shell import VsfTestShellProtocol
 from vsf_bench.lock import BoardLock, LockBusyError
 from vsf_bench.suite import discover_suites, load_script_module, script_needs_la, resolve_suites
@@ -31,7 +45,7 @@ from vsf_bench.test_params_loader import load_test_params
 from vsf_bench.hwctrl.tee_logger import get_logger as _get_logger
 
 
-def __log_event(message):
+def __log_event(message: str) -> None:
     """Log a vsf-bench event. Uses TeeLogger when available, else print."""
     try:
         _get_logger().event(message)
@@ -40,6 +54,19 @@ def __log_event(message):
         ts = _dt.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         print(f"[{ts}] [vsf-bench] {message}")
 
+
+def _mk_run_dir(log_dir: str | None, tag: str = "vsf-bench") -> Path:
+    """Create timestamped run directory under *log_dir*."""
+    base = Path(log_dir) if log_dir else Path("logs")
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_dir = (base / f"{timestamp}-{tag}").resolve()
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
+
+
+# ---------------------------------------------------------------------------
+# Board / project loading
+# ---------------------------------------------------------------------------
 
 def load_board(hardware_map_path: Path, board_name: str | None = None,
                project_name: str | None = None):
@@ -63,15 +90,9 @@ def load_board(hardware_map_path: Path, board_name: str | None = None,
 
 
 def acquire_board_lock(board, wait_spec=None) -> BoardLock | None:
-    """Acquire the hardware-exclusion lock for *board*.
-
-    *wait_spec=None* → no lock (backward compatible, single-agent mode).
-    *wait_spec=-1.0* → wait indefinitely.
-    *wait_spec>=0* → wait that many seconds, then raise LockBusyError.
-    """
+    lock = BoardLock(board.name)
     if wait_spec is None:
         return None
-    lock = BoardLock(board.name)
     if wait_spec < 0:
         lock.acquire(wait=True)
     else:
@@ -80,12 +101,11 @@ def acquire_board_lock(board, wait_spec=None) -> BoardLock | None:
     return lock
 
 
-def build_phase(build_src) -> Path:
-    """Run the configured build tool → return build_dir. Raises on error.
+# ---------------------------------------------------------------------------
+# Build
+# ---------------------------------------------------------------------------
 
-    *build_src* can be a BoardConfig (legacy, ``.build`` attr) or a
-    ProjectConfig / BuildConfig directly.
-    """
+def build_phase(build_src) -> Path:
     build = getattr(build_src, "build", build_src)
     builder_cls = get_builder_class(build.tool)
     if builder_cls is None:
@@ -97,41 +117,35 @@ def build_phase(build_src) -> Path:
     return build_dir
 
 
+# ---------------------------------------------------------------------------
+# Program
+# ---------------------------------------------------------------------------
+
 def _find_hub_by_addr(hub_addr: int) -> str | None:
-    """Find SmartUSBHub COM port by querying device address."""
     import serial.tools.list_ports
     from smartusbhub import SmartUSBHub
     for port in serial.tools.list_ports.comports():
-        if port.vid != 0x1A86 or port.pid != 0xFE0C:
-            continue
-        try:
-            hub = SmartUSBHub(port.device)
-            addr = hub.get_device_address()
-            hub.disconnect()
-            if addr == hub_addr:
-                return port.device
-        except Exception:
-            continue
+        if port.vid == 0x1A86 and port.pid == 0xFE0C:
+            try:
+                hub = SmartUSBHub(port.device)
+                addr = hub.get_device_address()
+                hub.disconnect()
+                if addr == hub_addr:
+                    return port.device
+            except Exception:
+                continue
     return None
 
 
 def _board_power_cycle(board, delay_off_s: float = 0.5) -> None:
-    """Power-cycle *board* with randomised exponential backoff.
-
-    Encapsulates SmartUSBHub resolution and retry — callers don't need
-    to know about hub COM ports or contention handling.
-    """
     if not board.power:
         raise RuntimeError(f"Board '{board.name}' has no power config")
     if board.power.type != "smartusbhub":
         raise RuntimeError(f"Unsupported power type: {board.power.type}")
 
-    # Resolve SmartUSBHub COM port by querying device address
     hub_com = _find_hub_by_addr(board.power.hub_addr)
     if not hub_com:
-        raise RuntimeError(
-            f"SmartUSBHub with addr 0x{board.power.hub_addr:04X} not found"
-        )
+        raise RuntimeError(f"SmartUSBHub with addr 0x{board.power.hub_addr:04X} not found")
 
     import random as _random
     try:
@@ -164,7 +178,6 @@ def _board_power_cycle(board, delay_off_s: float = 0.5) -> None:
 
 
 def program_phase(board_or_project, build_dir: Path, project=None) -> None:
-    """Power-cycle board (if configured), then run flash runner."""
     board = board_or_project
 
     if project is not None:
@@ -175,8 +188,6 @@ def program_phase(board_or_project, build_dir: Path, project=None) -> None:
         runners = board.runners
 
     runner_cfg = runners[active_runner]
-
-    # Power-cycle before flash.
     runner_cls = get_runner_class(runner_cfg.type)
     if runner_cls is None:
         raise RuntimeError(f"Unknown runner type: {runner_cfg.type}")
@@ -184,28 +195,137 @@ def program_phase(board_or_project, build_dir: Path, project=None) -> None:
 
     with runner:
         _board_power_cycle(board)
-
         __log_event(f"Programming via {active_runner}...")
         runner.flash(build_dir)
 
-    # close() called automatically on exit
     __log_event("Program complete")
+
+
+# ---------------------------------------------------------------------------
+# LA capture (standalone)
+# ---------------------------------------------------------------------------
+
+def _resolve_la_cli(la_cfg):
+    cli = Path(la_cfg.cli) if la_cfg.cli else Path("dsview-cli")
+    if not la_cfg.cli:
+        resolved = shutil.which("dsview-cli")
+        if resolved:
+            cli = Path(resolved)
+    return cli
+
+
+def la_capture_phase(
+    board,
+    run_dir: Path,
+    duration: float = 30.0,
+    channel: str = "CH8",
+) -> Path:
+    """Power-cycle board, capture via LA, capture serial output.
+
+    All artifacts go under *run_dir*.  Returns the .dsl path.
+    """
+    la_cfg = board.logic_analyzer
+    if la_cfg is None:
+        raise RuntimeError(f"Board '{board.name}' has no logic_analyzer config")
+
+    cli = _resolve_la_cli(la_cfg)
+    capture_path = run_dir / f"{board.name}_{channel}.dsl"
+
+    if board.power:
+        _board_power_cycle(board)
+
+    # ── Open serial for debug log capture ──
+    ser_log = run_dir / "serial.log"
+    ser = None
+    if board.debug_uart:
+        try:
+            ser = SerialInstrument(board.debug_uart, board.debug_baudrate)
+            ser.open()
+        except Exception as e:
+            __log_event(f"Serial not available for capture: {e}")
+
+    # ── LA capture ──
+    from vsf_bench.adapters.dsview import DSViewAdapter
+    adapter = DSViewAdapter(cli, la_cfg.device, la_cfg.samplerate, {"capture": channel})
+    adapter.start(capture_path, duration)
+    adapter.wait_until_started()
+    __log_event(f"LA capturing {channel} for {duration}s...")
+
+    t0 = time.monotonic()
+    serial_buf = ""
+    while time.monotonic() - t0 < duration:
+        if ser:
+            try:
+                chunk = ser.read_all(timeout=0.5)
+                if chunk:
+                    serial_buf += chunk
+                    _get_logger().device(chunk.rstrip())
+            except Exception:
+                pass
+
+    if ser:
+        try:
+            remaining = ser.read_all(timeout=1.0)
+            if remaining:
+                serial_buf += remaining
+        except Exception:
+            pass
+
+    adapter.wait(timeout=30)
+    __log_event(f"LA capture done → {capture_path}")
+
+    if ser:
+        ser.close()
+        if serial_buf:
+            # Normalise CRLF → LF (firmware sends \r\n)
+            normalized = serial_buf.replace("\r\n", "\n").replace("\r", "\n")
+            if not normalized.endswith("\n"):
+                normalized += "\n"
+            ser_log.write_bytes(normalized.encode("utf-8"))
+            __log_event(f"Serial log → {ser_log} ({len(normalized)} bytes)")
+
+    return capture_path
+
+
+def la_decode_phase(
+    capture_path: Path,
+    channel: str = "CH8",
+    baudrate: int = 2_000_000,
+    parity_type: str = "none",
+    num_data_bits: int = 8,
+    num_stop_bits: float = 1.0,
+) -> Path:
+    """Decode UART from a .dsl capture file.  Returns .txt path."""
+    from vsf_bench.adapters.dsview import DSViewAdapter
+    from vsf_bench.config import UARTConfig
+    from vsf_bench.utils import parse_uart_csv
+
+    cli = Path("dsview-cli")
+    resolved = shutil.which("dsview-cli")
+    if resolved:
+        cli = Path(resolved)
+
+    adapter = DSViewAdapter(cli, "DSLogic", "10M", {})
+    cfg = UARTConfig(baudrate=baudrate, parity_type=parity_type,
+                     num_data_bits=num_data_bits, num_stop_bits=num_stop_bits)
+    csv = adapter.decode_uart(capture_path, channel, cfg)
+    __log_event(f"LA decode CSV → {csv}")
+    data = parse_uart_csv(csv)
+    text = data.decode("utf-8", errors="replace")
+    output = capture_path.with_suffix(".txt")
+    output.write_text(text, encoding="utf-8")
+    __log_event(f"LA decoded {len(data)} bytes → {output}")
+    return output
 
 
 # ---------------------------------------------------------------------------
 # Test phase
 # ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Helper: scenario lookup (used by _resolve_case_value and _run_script_phase1)
-# ---------------------------------------------------------------------------
+_PHASE1_ACK_TIMEOUT = 2.0
+
 
 def _find_scenario_for_suite(params: dict, suite_name: str) -> tuple[str, dict] | None:
-    """Find YAML scenario key and data for a given suite name.
-
-    Tries direct key match first, then common peripheral-prefix patterns
-    ({peripheral}_{name}, {peripheral}_rx_{name}, {peripheral}_tx_{name}).
-    """
     for key, value in params.items():
         if key == "marker" or not isinstance(value, dict):
             continue
@@ -226,15 +346,9 @@ def _find_scenario_for_suite(params: dict, suite_name: str) -> tuple[str, dict] 
 
 
 def _resolve_case_value(params: dict, suite_name: str, case_value: str) -> int:
-    """Convert a case parameter value (e.g. '921600') to its case index.
-
-    Iterates the matched scenario's cases and checks every field (except
-    'idx', 'host', 'la') for an exact string match.
-    """
     result = _find_scenario_for_suite(params, suite_name)
     if result is None:
         raise ValueError(f"Suite '{suite_name}' not found in test params")
-
     _, scenario = result
     cases = scenario.get("cases", [])
     for case in cases:
@@ -243,10 +357,7 @@ def _resolve_case_value(params: dict, suite_name: str, case_value: str) -> int:
                 continue
             if str(val) == case_value:
                 return case["idx"]
-
-    raise ValueError(
-        f"Case value '{case_value}' not found in suite '{suite_name}'"
-    )
+    raise ValueError(f"Case value '{case_value}' not found in suite '{suite_name}'")
 
 
 def _run_script_phase1(
@@ -256,7 +367,6 @@ def _run_script_phase1(
     ser: SerialInstrument,
     test_params_yml: Path | None = None,
 ) -> bool:
-    """Send trigger, run script.run(). Returns True on PASS."""
     shell = VsfTestShellProtocol(ser)
     case_tag = f".{case}" if case else ""
     cmd = shell.build_run_cmd(suite_name, case)
@@ -265,11 +375,8 @@ def _run_script_phase1(
     __log_event(f"Triggered: {cmd.strip()}")
     t0 = time.perf_counter()
 
-    # vsf-test-shell emits "suite ack: <name>" on successful lookup,
-    # "suite not found: <name>" / "case not found: <case>" otherwise.
-    # Retry once on timeout: stale output from previous suite can delay ack.
     ack = None
-    for attempt, tmo in ((1, 1.0), (2, 2.0)):
+    for attempt, tmo in ((1, 1.0), (2, _PHASE1_ACK_TIMEOUT)):
         ack = shell.expect_suite_ack(timeout=tmo)
         if ack is not None:
             break
@@ -303,11 +410,10 @@ def _run_script_phase1(
         return False
 
 
-def _call_decode(mod, la: LogicAnalyzerInstrument,
+def _call_decode(mod, adapter, channels: dict, capture_path: Path,
                  start_ns: int | None, end_ns: int | None,
                  marker_baud: int = 115200,
                  test_params_yml: Path | None = None) -> None:
-    """Invoke a script's decode() with whichever signature it accepts."""
     sig = inspect.signature(mod.decode)
     params = sig.parameters
     kwargs = {}
@@ -319,28 +425,11 @@ def _call_decode(mod, la: LogicAnalyzerInstrument,
         kwargs["marker_baud"] = marker_baud
     if "test_params_yml" in params:
         kwargs["test_params_yml"] = test_params_yml
-    mod.decode(la, **kwargs)
-
-
-def _new_la(la_cfg, cli_path: Path, capture_path: Path) -> LogicAnalyzerInstrument:
-    return LogicAnalyzerInstrument(
-        cli_path=cli_path,
-        device=la_cfg.device,
-        samplerate=la_cfg.samplerate,
-        channels=la_cfg.channels,
-        capture_path=capture_path,
-    )
-
-
-def _mk_log_dir(log_dir: Path | None, ordered_suites: list[tuple[str, Path | None]]) -> Path:
-    if log_dir:
-        run_dir = log_dir.resolve()
-    else:
-        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        tag = ordered_suites[0][0] if len(ordered_suites) == 1 else "vsf_test_suite"
-        run_dir = Path(f"logs/{timestamp}-{tag}")
-    run_dir.mkdir(parents=True, exist_ok=True)
-    return run_dir
+    if "capture_path" in params:
+        kwargs["capture_path"] = capture_path
+    if "channels" in params:
+        kwargs["channels"] = channels
+    mod.decode(adapter, **kwargs)
 
 
 def run_test_phase(
@@ -354,11 +443,6 @@ def run_test_phase(
     test_params_yml: Path | None = None,
     trace_level: str | None = None,
 ) -> bool:
-    """Run suites against firmware that is already flashed and running.
-
-    Returns True if every suite/case passed (phase1 + decode), False otherwise.
-    Does NOT build or flash — that is the caller's responsibility.
-    """
     discovered = discover_suites()
     ordered_suites = resolve_suites(suite_names, script_override, discovered)
     if not ordered_suites:
@@ -371,17 +455,11 @@ def run_test_phase(
     if case_specs and len(ordered_suites) > 1:
         raise ValueError("--case/--case-index requires exactly one --suite")
 
-    # Resolve non-numeric --case values to indices via YAML lookup
     if case_specs and len(ordered_suites) == 1:
         suite_name = ordered_suites[0][0]
         if test_params_yml is None:
-            raise ValueError(
-                "Non-numeric --case values require --test-params to locate test_params.yml"
-            )
-        params = load_test_params(
-            test_params_yml=test_params_yml,
-            board_pins_path=board.board_pins,
-        )
+            raise ValueError("Non-numeric --case values require --test-params")
+        params = load_test_params(test_params_yml=test_params_yml, board_pins_path=board.board_pins)
         resolved: list[str] = []
         for spec in case_specs:
             if spec.isdigit():
@@ -392,7 +470,8 @@ def run_test_phase(
                 __log_event(f"Resolved --case {spec} -> index {idx}")
         case_specs = resolved
 
-    run_dir = _mk_log_dir(log_dir, ordered_suites)
+    run_dir = _mk_run_dir(str(log_dir) if log_dir else None,
+                          ordered_suites[0][0] if len(ordered_suites) == 1 else "vsf_test_suite")
     log_path = run_dir / "vsf-bench.jsonl"
 
     ser = SerialInstrument(board.debug_uart, board.debug_baudrate, audit_log=log_path)
@@ -409,8 +488,6 @@ def run_test_phase(
                 cli_path = Path(cli_path)
 
     shell = VsfTestShellProtocol(ser)
-
-    # Drain stale boot output, then wait for the shell prompt.
     shell_ready = shell.wait_for_shell_ready()
     if not shell_ready:
         __log_event("Warning: shell not responding, proceeding anyway")
@@ -419,7 +496,6 @@ def run_test_phase(
         shell.set_trace_level(trace_level)
         __log_event(f"Trace level: {trace_level}")
 
-    # When no explicit --suite filter, intersect with what the firmware reports.
     if not suite_names:
         fw_suites = shell.query_firmware_suites()
         if fw_suites:
@@ -440,19 +516,37 @@ def run_test_phase(
     any_needs_la = any(needs for _, _, _, needs in loaded) and la_cfg is not None and cli_path is not None
     overall_pass = True
 
-    if la_mode == "shared" and any_needs_la:
-        overall_pass = _test_loop_shared_la(
-            loaded, ser, la_cfg, cli_path, run_dir, case_specs,
-            board,
-            shuffle_seed=shuffle_seed,
-            test_params_yml=test_params_yml,
-        )
+    if any_needs_la:
+        marker_baudrate = la_cfg.marker_baudrate
+        from vsf_bench.capture_scene import CaptureScene
+        scene = CaptureScene(la_cfg, cli_path, run_dir, marker_baudrate=marker_baudrate)
+        __log_event(f"LA marker baudrate: {marker_baudrate}")
+
+        if la_mode == "shared":
+            overall_pass = scene.run_shared(
+                loaded, ser, case_specs,
+                run_phase1=_run_script_phase1, call_decode=_call_decode,
+                log=__log_event, shuffle_seed=shuffle_seed,
+                test_params_yml=test_params_yml,
+            )
+        else:
+            overall_pass = scene.run_per_suite(
+                loaded, ser, case_specs,
+                run_phase1=_run_script_phase1, call_decode=_call_decode,
+                log=__log_event, shuffle_seed=shuffle_seed,
+                test_params_yml=test_params_yml,
+            )
     else:
-        overall_pass = _test_loop_per_suite(
-            loaded, ser, la_cfg, cli_path, run_dir, case_specs,
-            shuffle_seed=shuffle_seed,
-            test_params_yml=test_params_yml,
-        )
+        for suite_name, _script_path, mod, _needs in loaded:
+            cases_to_run = case_specs if case_specs else [None]
+            for case in cases_to_run:
+                if shuffle_seed is not None and case is None:
+                    __log_event(f"{suite_name}: shuffle seed={shuffle_seed} (host-side only)")
+                case_tag = f".{case}" if case else ""
+                __log_event(f"Suite: {suite_name}{case_tag}")
+                ok = _run_script_phase1(suite_name, case, mod, ser, test_params_yml)
+                if not ok:
+                    overall_pass = False
 
     ser.close()
 
@@ -465,132 +559,7 @@ def run_test_phase(
     __log_event(f"{'PASS' if overall_pass else 'FAIL'} ({elapsed_overall:.3f} s)")
     __log_event(f"Test: {suite_tag} | Log: {log_path}")
 
-    # JUnit XML report
     _write_junit_xml(run_dir, overall_pass, ordered_suites)
-
-    return overall_pass
-
-
-def _test_loop_shared_la(
-    loaded, ser, la_cfg, cli_path, run_dir, case_specs,
-    board,
-    shuffle_seed: int | None = None,
-    test_params_yml: Path | None = None,
-) -> bool:
-    """Shared LA mode: one capture spans the contiguous LA-needing block.
-
-    `la_start_t` is recorded AFTER `wait_until_started()` returns, so it
-    aligns tightly with the dsview-cli capture file's t=0. Each suite's
-    decode window is padded by SHARED_WINDOW_PAD_NS on both sides as a
-    small safety margin for residual scheduler / USB jitter.
-    """
-    SHARED_WINDOW_PAD_NS = 500_000_000  # 500 ms each side
-
-    la_indices = [i for i, (_, _, _, n) in enumerate(loaded) if n]
-    first_la_idx = la_indices[0]
-    last_la_idx = la_indices[-1]
-
-    shared_capture = run_dir / "shared-capture.dsl"
-    shared_la: LogicAnalyzerInstrument | None = None
-    la_start_t: float | None = None
-    suite_windows: list[tuple[str, object, int, int]] = []
-    overall_pass = True
-
-    for i, (suite_name, _script_path, mod, _needs) in enumerate(loaded):
-        if i == first_la_idx:
-            shared_la = _new_la(la_cfg, cli_path, shared_capture)
-            shared_la.start(300.0)
-            shared_la.wait_until_started(timeout=5.0)
-            la_start_t = time.monotonic()
-            __log_event(f"Shared LA started -> {shared_capture}")
-
-        cases_to_run = case_specs if case_specs else [None]
-        for case in cases_to_run:
-            if shuffle_seed is not None and case is None:
-                # Shuffle is host-side only; firmware shell no longer accepts seed
-                __log_event(f"{suite_name}: shuffle seed={shuffle_seed} (host-side only)")
-            case_tag = f".{case}" if case else ""
-            __log_event(f"Suite: {suite_name}{case_tag}")
-            t_start = int((time.monotonic() - la_start_t) * 1e9) if la_start_t is not None else 0
-            ok = _run_script_phase1(suite_name, case, mod, ser, test_params_yml)
-            t_end = int((time.monotonic() - la_start_t) * 1e9) if la_start_t is not None else 0
-            if not ok:
-                overall_pass = False
-            if mod is not None and hasattr(mod, "decode") and shared_la is not None:
-                suite_windows.append((suite_name, mod, t_start, t_end))
-
-        if i == last_la_idx and shared_la is not None:
-            __log_event("Stopping shared LA...")
-            shared_la.stop()
-            try:
-                shared_la.wait(timeout=30.0)
-            except (TimeoutError, RuntimeError) as e:
-                __log_event(f"LA wait warning: {e}")
-
-    for suite_name, mod, t_start, t_end in suite_windows:
-        decode_start = max(0, t_start - SHARED_WINDOW_PAD_NS)
-        decode_end = t_end + SHARED_WINDOW_PAD_NS
-        __log_event(f"Decoding (shared): {suite_name}  window=[{decode_start/1e9:.2f}s,{decode_end/1e9:.2f}s]")
-        t0_decode = time.perf_counter()
-        try:
-            _call_decode(mod, shared_la, decode_start, decode_end, board.debug_baudrate, test_params_yml)
-            elapsed = time.perf_counter() - t0_decode
-            __log_event(f"PASS decode: {suite_name} ({elapsed:.3f} s)")
-        except (AssertionError, RuntimeError, KeyError, AttributeError, FileNotFoundError) as e:
-            elapsed = time.perf_counter() - t0_decode
-            __log_event(f"FAIL decode: {suite_name}: {e} ({elapsed:.3f} s)")
-            overall_pass = False
-
-    return overall_pass
-
-
-def _test_loop_per_suite(
-    loaded, ser, la_cfg, cli_path, run_dir, case_specs,
-    shuffle_seed: int | None = None,
-    test_params_yml: Path | None = None,
-) -> bool:
-    """Per-suite LA mode: one capture per suite (or no LA at all)."""
-    overall_pass = True
-
-    for suite_name, _script_path, mod, needs_la in loaded:
-        cases_to_run = case_specs if case_specs else [None]
-        for case in cases_to_run:
-            case_tag = f".{case}" if case else ""
-            __log_event(f"Suite: {suite_name}{case_tag}")
-            if shuffle_seed is not None and case is None:
-                # Shuffle is host-side only; firmware shell no longer accepts seed
-                __log_event(f"{suite_name}: shuffle seed={shuffle_seed} (host-side only)")
-
-            scene_la: LogicAnalyzerInstrument | None = None
-            if needs_la and la_cfg is not None and cli_path is not None:
-                label = f"{suite_name}{('_' + case) if case else ''}"
-                capture_path = run_dir / f"{label}-capture.dsl"
-                scene_la = _new_la(la_cfg, cli_path, capture_path)
-                scene_la.start(180.0)
-                scene_la.wait_until_started(timeout=5.0)
-
-            ok = _run_script_phase1(suite_name, case, mod, ser, test_params_yml)
-            if not ok:
-                overall_pass = False
-
-            if scene_la is not None:
-                scene_la.stop()
-                try:
-                    scene_la.wait(timeout=15.0)
-                except (TimeoutError, RuntimeError) as e:
-                    __log_event(f"LA wait warning: {e}")
-
-            if ok and mod is not None and hasattr(mod, "decode") and scene_la is not None:
-                t0_decode = time.perf_counter()
-                try:
-                    _call_decode(mod, scene_la, None, None, board.debug_baudrate, test_params_yml)
-                    elapsed = time.perf_counter() - t0_decode
-                    __log_event(f"PASS decode: {suite_name}{case_tag} ({elapsed:.3f} s)")
-                except (AssertionError, RuntimeError, KeyError, AttributeError, FileNotFoundError) as e:
-                    elapsed = time.perf_counter() - t0_decode
-                    __log_event(f"FAIL decode: {suite_name}{case_tag}: {e} ({elapsed:.3f} s)")
-                    overall_pass = False
-
     return overall_pass
 
 
@@ -598,36 +567,27 @@ def _test_loop_per_suite(
 # JUnit XML report
 # ---------------------------------------------------------------------------
 
-def _write_junit_xml(
-    run_dir: Path, overall_pass: bool, suites: list[tuple[str, Path | None]]
-) -> None:
-    """Generate a JUnit XML report at ``run_dir/report.junit.xml``."""
+def _write_junit_xml(run_dir: Path, overall_pass: bool, suites: list[tuple[str, Path | None]]) -> None:
     import xml.etree.ElementTree as ET
     from xml.dom import minidom
 
     n_suites = len(suites)
     testsuite = ET.Element("testsuite", {
-        "name": "vsf-bench",
-        "tests": str(n_suites),
-        "failures": str(0 if overall_pass else 1),
-        "errors": "0",
-        "time": "0",
+        "name": "vsf-bench", "tests": str(n_suites),
+        "failures": str(0 if overall_pass else 1), "errors": "0", "time": "0",
     })
     for suite_name, _ in suites:
         tc = ET.SubElement(testsuite, "testcase", {
-            "name": suite_name,
-            "classname": "vsf.test." + suite_name,
+            "name": suite_name, "classname": "vsf.test." + suite_name,
         })
         if not overall_pass:
             ET.SubElement(tc, "failure", {
-                "message": f"Suite {suite_name}: FAIL",
-                "type": "AssertionError",
+                "message": f"Suite {suite_name}: FAIL", "type": "AssertionError",
             })
 
     xml_str = minidom.parseString(ET.tostring(testsuite)).toprettyxml(indent="  ")
-    report_path = run_dir / "report.junit.xml"
-    report_path.write_text(xml_str)
-    __log_event(f"JUnit XML: {report_path}")
+    (run_dir / "report.junit.xml").write_text(xml_str)
+    __log_event(f"JUnit XML: {run_dir / 'report.junit.xml'}")
 
 
 # ---------------------------------------------------------------------------
@@ -638,19 +598,12 @@ _HANG_CONSECUTIVE_THRESHOLD = 2
 
 
 def _try_hang_recovery(board, hang_count: int) -> bool:
-    """Attempt recovery after *hang_count* consecutive suite timeouts.
-
-    Returns True if recovery was attempted, False if unavailable.
-    """
     if hang_count < _HANG_CONSECUTIVE_THRESHOLD:
         return False
     if not board.power or not board.debug_probe:
         return False
 
-    __log_event(
-        f"Hang detected ({hang_count} consecutive timeouts) — "
-        f"attempting recovery"
-    )
+    __log_event(f"Hang detected ({hang_count} consecutive timeouts) — attempting recovery")
     try:
         _board_power_cycle(board, delay_off_s=1.0)
         __log_event("Recovery: power-cycle OK")
@@ -658,15 +611,10 @@ def _try_hang_recovery(board, hang_count: int) -> bool:
         __log_event(f"Recovery: power-cycle failed — {e}")
         return False
 
-    # Attempt crash dump
     try:
         from vsf_bench.debug import DebugSession
-
         probe_cfg = board.debug_probe
-        with DebugSession(
-            target=probe_cfg.get("target", "cortex_m"),
-            probe=probe_cfg.get("probe"),
-        ) as dbg:
+        with DebugSession(target=probe_cfg.get("target", "cortex_m"), probe=probe_cfg.get("probe")) as dbg:
             dump = dbg.crash_dump()
         __log_event(f"Recovery: crash-dump — {dump.fault_type}")
     except Exception as e:
@@ -685,15 +633,9 @@ def run_pipeline(
     project_map: dict,
     test_params_yml: "Path | None" = None,
 ) -> bool:
-    """Execute a multi-stage build/flash/test pipeline on *board*.
-
-    Returns True when all stages pass. Raises RuntimeError on first failure.
-    Each stage's build_dir is cached so later stages can reuse build output.
-    """
-    build_cache: dict[str, Path] = {}   # project_name → build_dir
+    build_cache: dict[str, Path] = {}
     n_stages = len(pipeline.stages)
 
-    # Populate board-level params that runners need
     for _proj in project_map.values():
         for _rcfg in _proj.runners.values():
             p = _rcfg.params
@@ -706,37 +648,25 @@ def run_pipeline(
 
     for i, stage in enumerate(pipeline.stages, start=1):
         project = project_map[stage.project]
-        __log_event(
-            f"[Stage {i}/{n_stages}] {stage.project}: {' + '.join(stage.actions)}"
-        )
+        __log_event(f"[Stage {i}/{n_stages}] {stage.project}: {' + '.join(stage.actions)}")
 
-        # ── power-cycle before stage ──
         if stage.power_cycle and board.power:
             _board_power_cycle(board)
 
-        # ── build ──
         if "build" in stage.actions:
             build_dir = build_phase(project)
             build_cache[stage.project] = build_dir
 
-        # ── flash ──
         if "flash" in stage.actions:
             build_dir = build_cache.get(stage.project)
             if build_dir is None:
                 build_dir = Path(project.build.build_dir)
                 if not build_dir.exists():
-                    raise RuntimeError(
-                        f"[Stage {i}] build dir missing for "
-                        f"'{stage.project}': {build_dir}"
-                    )
+                    raise RuntimeError(f"[Stage {i}] build dir missing for '{stage.project}': {build_dir}")
             _pipeline_stage_flash(board, project, build_dir, stage)
 
-        # ── test (placeholder) ──
         if "test" in stage.actions:
-            __log_event(
-                f"[Stage {i}] test: skipping "
-                f"(test-in-pipeline not yet implemented)"
-            )
+            __log_event(f"[Stage {i}] test: skipping (test-in-pipeline not yet implemented)")
 
         __log_event(f"[Stage {i}/{n_stages}] {stage.project}: OK")
 
@@ -745,15 +675,9 @@ def run_pipeline(
 
 
 def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
-    """Flash one pipeline stage, applying flash_overrides + wait_for.
-
-    flash_overrides can override: runner name, artifact, params.
-    wait_for: after flash, open serial and wait for regex match.
-    """
     from copy import deepcopy
     from vsf_bench.config import ArtifactConfig
 
-    # Determine runner name (stage override or project default)
     runner_name = stage.flash_overrides.get("runner") if stage.flash_overrides else None
     if runner_name is None:
         runner_name = project.active_runner
@@ -761,25 +685,17 @@ def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
     runner_cfg = project.runners.get(runner_name)
     if runner_cfg is None:
         avail = list(project.runners.keys())
-        raise RuntimeError(
-            f"Runner '{runner_name}' not found in project "
-            f"'{project.name or stage.project}'. Available: {avail}"
-        )
+        raise RuntimeError(f"Runner '{runner_name}' not found in project '{project.name or stage.project}'. Available: {avail}")
 
-    # Patch runner config if flash_overrides modify artifact or params
     if stage.flash_overrides:
         if "artifact" in stage.flash_overrides or "params" in stage.flash_overrides:
             runner_cfg = deepcopy(runner_cfg)
             if "artifact" in stage.flash_overrides:
                 art = stage.flash_overrides["artifact"]
-                runner_cfg.artifact = ArtifactConfig(
-                    name=art["name"],
-                    format=art.get("format", "bin"),
-                )
+                runner_cfg.artifact = ArtifactConfig(name=art["name"], format=art.get("format", "bin"))
             if "params" in stage.flash_overrides:
                 runner_cfg.params.update(stage.flash_overrides["params"])
 
-    # Execute flash via the existing program_phase
     runner_cls = get_runner_class(runner_cfg.type)
     if runner_cls is None:
         raise RuntimeError(f"Unknown runner type: {runner_cfg.type}")
@@ -789,7 +705,6 @@ def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
         runner.flash(build_dir)
     __log_event("Program complete")
 
-    # ── wait_for: open serial, wait for log pattern ──
     if stage.wait_for:
         __log_event(f"Waiting for log pattern: /{stage.wait_for}/")
         ser = SerialInstrument(board.debug_uart, board.debug_baudrate)
@@ -798,10 +713,7 @@ def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
             ser.expect(stage.wait_for, timeout=60.0)
             __log_event(f"Log pattern matched: {stage.wait_for}")
         except TimeoutError:
-            raise RuntimeError(
-                f"Timeout waiting for /{stage.wait_for}/ after flash "
-                f"(board {board.name}, serial {board.debug_uart})"
-            )
+            raise RuntimeError(f"Timeout waiting for /{stage.wait_for}/ after flash (board {board.name}, serial {board.debug_uart})")
         finally:
             ser.close()
 
@@ -811,7 +723,6 @@ def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
 # ---------------------------------------------------------------------------
 
 def _load_all_connected_boards(hardware_map_path: str) -> list:
-    """Return all connected boards from hardware-map.yml."""
     from vsf_bench.hardware_map import load as _load_hw
     import yaml
     with open(hardware_map_path, "r", encoding="utf-8") as f:
@@ -834,10 +745,6 @@ def run_test_phase_all(
     trace_level: str = "debug",
     timeout_per_board: float = 600.0,
 ) -> dict[str, bool]:
-    """Run test phase on all connected boards in parallel.
-
-    Returns ``{board_name: passed}`` dict.
-    """
     from concurrent.futures import ThreadPoolExecutor, as_completed
     from vsf_bench.hardware_map import load_board_and_project
 
@@ -848,9 +755,8 @@ def run_test_phase_all(
     __log_event(f"Multi-board test: {len(boards)} boards, project={project_name}")
 
     def _run_one(board):
-        board_dir = str(Path(hardware_map_path).parent)
         try:
-            lock = acquire_board_lock(board, wait_spec=-1.0)  # wait indefinitely
+            lock = acquire_board_lock(board, wait_spec=-1.0)
         except LockBusyError:
             __log_event(f"[{board.name}] SKIP: board locked")
             return board.name, False
@@ -861,15 +767,10 @@ def run_test_phase_all(
             build_dir = build_phase(project)
             program_phase(board, build_dir, project=project)
             ok = run_test_phase(
-                board=board,
-                suite_names=suite_names,
-                script_override=None,
-                case_specs=[],
-                la_mode=la_mode,
+                board=board, suite_names=suite_names, script_override=None,
+                case_specs=[], la_mode=la_mode,
                 log_dir=Path(log_dir) / board.name if log_dir else None,
-                shuffle_seed=None,
-                test_params_yml=None,
-                trace_level=trace_level,
+                shuffle_seed=None, test_params_yml=None, trace_level=trace_level,
             )
             return board.name, ok
         except Exception as e:
