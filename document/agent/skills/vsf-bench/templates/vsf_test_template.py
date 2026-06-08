@@ -7,10 +7,10 @@ Scripts are auto-discovered by vsf-bench. The orchestrator handles triggering;
 scripts only validate output.
 """
 
-from vsf_bench.instruments.logic_analyzer_instrument import LogicAnalyzerInstrument
-from vsf_bench.instruments.serial_instrument import SerialInstrument
+from vsf_bench.serial import SerialInstrument
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
 
-SCENE_NAME = "<scene_name>"  # replace with actual scene name
+SUITE_NAME = "<suite_name>"  # replace with actual suite name
 
 
 # ---------------------------------------------------------------------------
@@ -18,8 +18,8 @@ SCENE_NAME = "<scene_name>"  # replace with actual scene name
 # Use when the firmware self-reports results and the host only needs to
 # confirm the test summary (no logic analyzer required).
 # ---------------------------------------------------------------------------
-def run(serial: SerialInstrument, la: LogicAnalyzerInstrument | None = None) -> None:
-    serial.expect_test_summary(SCENE_NAME)
+def run(serial: SerialInstrument, la: LogicAnalyzer | None = None) -> None:
+    serial.expect_test_summary(SUITE_NAME)
 
 
 # ---------------------------------------------------------------------------

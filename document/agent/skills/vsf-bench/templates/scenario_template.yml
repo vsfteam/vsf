@@ -1,0 +1,59 @@
+# Template for new vsf-bench scenario (declarative hardware-interaction test).
+#
+# Copy to board/<scenario_name>.yml and adapt.
+# Run:  vsf-bench scenario board/<scenario_name>.yml --board <board>
+#
+# Step primitives available:
+#   power_cycle, power_off, power_on, delay, wait_for, gpio_set,
+#   la_start, la_stop, la_capture, la_decode, run
+
+name: "<scenario_name>"
+description: "<brief description>"
+board: <board_name>          # from hardware-map.yml boards
+
+# GPIO adapter reference (from hardware-map.yml gpio_adapters)
+gpio:
+  adapter: dfu_ftdi
+  pin: 3
+  active_low: true
+
+steps:
+  - power_cycle             # power off→0.5s→on
+  - delay: 1.0              # wait N seconds
+
+  - wait_for:               # multi-pattern serial match
+      expect:
+        - pattern: "READY"
+          verdict: pass     # match → step succeeds, continue
+        - pattern: "ERROR"
+          verdict: fail     # match → step fails, scenario stops
+      timeout: 10           # seconds; timeout = fail
+
+  - gpio_set:               # FT232H IO toggle
+      level: low            # high | low
+      duration: 0.5         # optional, seconds to hold
+
+  # LA explicit start/stop:
+  - la_start: {}            # inherits device/samplerate/channel from board.la
+  - gpio_set: { level: high }
+  - wait_for:
+      expect:
+        - pattern: "COMPLETE"
+          verdict: pass
+      timeout: 30
+  - la_stop: {}
+  - la_decode: { baudrate: 2000000 }
+
+  # Or LA wrapped capture:
+  # - la_capture:
+  #     steps:
+  #       - gpio_set: { level: high }
+  #       - wait_for:
+  #           expect:
+  #             - pattern: "COMPLETE"
+  #               verdict: pass
+  #           timeout: 30
+  # - la_decode: { baudrate: 2000000 }
+
+  # Post-processing shell command:
+  - run: "python analyze.py $RUN_DIR/la-decode-CH8-2000000.csv"
