@@ -5,7 +5,7 @@
 
 Usage::
 
-    from vsf_bench.test.shell import VsfTestShellProtocol
+    from vsf_bench.vsf_test.shell import VsfTestShellProtocol
     shell = VsfTestShellProtocol(ser)
     suites = shell.query_firmware_suites()
     shell.wait_for_shell_ready()
@@ -13,7 +13,7 @@ Usage::
 
 import time
 
-from vsf_bench.serial import SerialInstrument
+from vsf_bench.utils.serial import SerialInstrument
 
 
 class VsfTestShellProtocol:

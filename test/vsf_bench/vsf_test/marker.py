@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
-from vsf_bench.config import UARTConfig
+from vsf_bench.config.models import UARTConfig
 from vsf_bench.utils.core import read_csv_rows
 
 

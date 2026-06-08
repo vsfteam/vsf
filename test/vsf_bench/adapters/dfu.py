@@ -19,7 +19,7 @@ from pathlib import Path
 
 from vsf_bench.capabilities.program import ProgramCapability
 from vsf_bench.capabilities.gpio import GPIO
-from vsf_bench.config import RunnerConfig
+from vsf_bench.config.models import RunnerConfig
 
 
 class DFUAdapter(ProgramCapability):

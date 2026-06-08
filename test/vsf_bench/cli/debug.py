@@ -12,7 +12,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from vsf_bench.hardware_map import load as load_hardware_map
+from vsf_bench.config.map import load as load_hardware_map
 
 
 def parse_args():
@@ -45,7 +45,7 @@ def _resolve_board(hardware_map_path: str, board_name: str | None):
 
 def cmd_crash_dump(board, args):
     """Halt CPU, capture crash context, output JSON."""
-    from vsf_bench.debug import DebugSession
+    from vsf_bench.utils.debug import DebugSession
 
     probe_cfg = board.debug_probe
     target = probe_cfg.get("target", "cortex_m")
@@ -58,7 +58,7 @@ def cmd_crash_dump(board, args):
 
 def cmd_backtrace(board, args):
     """Halt CPU, read current call stack."""
-    from vsf_bench.debug import DebugSession
+    from vsf_bench.utils.debug import DebugSession
 
     probe_cfg = board.debug_probe
     target = probe_cfg.get("target", "cortex_m")
@@ -76,7 +76,7 @@ def cmd_backtrace(board, args):
 
 def cmd_regs(board, args):
     """Halt CPU, dump all core registers."""
-    from vsf_bench.debug import DebugSession
+    from vsf_bench.utils.debug import DebugSession
 
     probe_cfg = board.debug_probe
     target = probe_cfg.get("target", "cortex_m")
@@ -94,7 +94,7 @@ def cmd_regs(board, args):
 
 def cmd_read(board, args):
     """Read a memory block."""
-    from vsf_bench.debug import DebugSession
+    from vsf_bench.utils.debug import DebugSession
 
     addr = int(args.addr, 0)
     length = args.len

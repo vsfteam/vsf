@@ -6,7 +6,7 @@ import threading
 from pathlib import Path
 
 from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
-from vsf_bench.config import UARTConfig
+from vsf_bench.config.models import UARTConfig
 
 
 class DSViewAdapter(LogicAnalyzer):

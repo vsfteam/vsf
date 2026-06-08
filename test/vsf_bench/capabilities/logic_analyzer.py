@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from vsf_bench.config import UARTConfig
+from vsf_bench.config.models import UARTConfig
 
 
 class LogicAnalyzer(ABC):

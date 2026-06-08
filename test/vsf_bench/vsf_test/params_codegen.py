@@ -42,7 +42,7 @@ if importlib.util.find_spec("yaml") is None:
     print("Error: PyYAML is required. Install with: pip install pyyaml", file=sys.stderr)
     raise SystemExit(1)
 
-from vsf_bench.test.params_loader import load_yaml_with_includes
+from vsf_bench.vsf_test.params_loader import load_yaml_with_includes
 
 
 def _format_value(value) -> str:

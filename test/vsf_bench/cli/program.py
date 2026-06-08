@@ -16,7 +16,7 @@ from pathlib import Path
 
 from vsf_bench import pipeline
 from vsf_bench.cli._args import add_shared_test_args
-from vsf_bench.lock import LockBusyError
+from vsf_bench.utils.lock import LockBusyError
 
 
 def main():

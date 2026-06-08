@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from vsf_bench.config import RunnerConfig
+from vsf_bench.config.models import RunnerConfig
 
 
 class ProgramCapability(ABC):

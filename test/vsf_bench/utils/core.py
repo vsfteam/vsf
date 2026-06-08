@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 from typing import Callable
 
-from vsf_bench.serial import SuiteTimeoutError
+from vsf_bench.utils.serial import SuiteTimeoutError
 
 
 def run_with_suite_timeout(
@@ -96,7 +96,7 @@ def batch_decode_uart(adapter, capture_path: Path, specs: list) -> None:
     Each spec is ``(channel, baudrate, start_ns, end_ns, output_csv,
     parity_type, num_data_bits, num_stop_bits)``.
     """
-    from vsf_bench.config import UARTConfig
+    from vsf_bench.config.models import UARTConfig
 
     for ch, baud, s, e, out_csv, parity, data_bits, stop_bits in specs:
         cfg = UARTConfig(baudrate=baud, parity_type=parity,

@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from vsf_bench.config import (
+    from vsf_bench.config.models import (
         BoardConfig,
         BuildConfig,
         LogicAnalyzerConfig,
@@ -33,15 +33,15 @@ if TYPE_CHECKING:
         StageConfig,
     )
 
-from vsf_bench.hardware_map import load as load_hardware_map, validate_runners
-from vsf_bench.hardware_map import load_board_and_project as _load_board_and_project
+from vsf_bench.config.map import load as load_hardware_map, validate_runners
+from vsf_bench.config.map import load_board_and_project as _load_board_and_project
 from vsf_bench.builders.registry import get_builder_class
 from vsf_bench.runners.registry import get_runner_class
-from vsf_bench.serial import SerialInstrument
-from vsf_bench.test.shell import VsfTestShellProtocol
-from vsf_bench.lock import BoardLock, LockBusyError
-from vsf_bench.test.suite import discover_suites, load_script_module, script_needs_la, resolve_suites
-from vsf_bench.test.params_loader import load_test_params
+from vsf_bench.utils.serial import SerialInstrument
+from vsf_bench.vsf_test.shell import VsfTestShellProtocol
+from vsf_bench.utils.lock import BoardLock, LockBusyError
+from vsf_bench.vsf_test.suite import discover_suites, load_script_module, script_needs_la, resolve_suites
+from vsf_bench.vsf_test.params_loader import load_test_params
 from vsf_bench.utils.tee_logger import get_logger as _get_logger
 
 
@@ -297,7 +297,7 @@ def la_decode_phase(
 ) -> Path:
     """Decode UART from a .dsl capture file.  Returns .txt path."""
     from vsf_bench.adapters.dsview import DSViewAdapter
-    from vsf_bench.config import UARTConfig
+    from vsf_bench.config.models import UARTConfig
     from vsf_bench.utils.core import parse_uart_csv
 
     cli = Path("dsview-cli")
@@ -518,7 +518,7 @@ def run_test_phase(
 
     if any_needs_la:
         marker_baudrate = la_cfg.marker_baudrate
-        from vsf_bench.test.scene import CaptureScene
+        from vsf_bench.vsf_test.scene import CaptureScene
         scene = CaptureScene(la_cfg, cli_path, run_dir, marker_baudrate=marker_baudrate)
         __log_event(f"LA marker baudrate: {marker_baudrate}")
 
@@ -612,7 +612,7 @@ def _try_hang_recovery(board, hang_count: int) -> bool:
         return False
 
     try:
-        from vsf_bench.debug import DebugSession
+        from vsf_bench.utils.debug import DebugSession
         probe_cfg = board.debug_probe
         with DebugSession(target=probe_cfg.get("target", "cortex_m"), probe=probe_cfg.get("probe")) as dbg:
             dump = dbg.crash_dump()
@@ -676,7 +676,7 @@ def run_pipeline(
 
 def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
     from copy import deepcopy
-    from vsf_bench.config import ArtifactConfig
+    from vsf_bench.config.models import ArtifactConfig
 
     runner_name = stage.flash_overrides.get("runner") if stage.flash_overrides else None
     if runner_name is None:
@@ -723,7 +723,7 @@ def _pipeline_stage_flash(board, project, build_dir: Path, stage) -> None:
 # ---------------------------------------------------------------------------
 
 def _load_all_connected_boards(hardware_map_path: str) -> list:
-    from vsf_bench.hardware_map import load as _load_hw
+    from vsf_bench.config.map import load as _load_hw
     import yaml
     with open(hardware_map_path, "r", encoding="utf-8") as f:
         raw = yaml.safe_load(f) or {}
@@ -746,7 +746,7 @@ def run_test_phase_all(
     timeout_per_board: float = 600.0,
 ) -> dict[str, bool]:
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    from vsf_bench.hardware_map import load_board_and_project
+    from vsf_bench.config.map import load_board_and_project
 
     boards = _load_all_connected_boards(hardware_map_path)
     if not boards:

@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 from vsf_bench.builders.base import BuildRunner
-from vsf_bench.config import BuildConfig
+from vsf_bench.config.models import BuildConfig
 
 
 class CMakeBuilder(BuildRunner):

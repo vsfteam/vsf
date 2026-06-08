@@ -8,10 +8,10 @@ after the shared LA capture is stopped and validates per-case payloads.
 """
 
 from dataclasses import dataclass
-from vsf_bench.test.marker import read_framework_windows, SerialInstrument, load_test_params
+from vsf_bench.vsf_test.marker import read_framework_windows, SerialInstrument, load_test_params
 from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
 from vsf_bench.utils.core import batch_decode_uart, parse_uart_csv, read_csv_rows
-from vsf_bench.config import UARTConfig
+from vsf_bench.config.models import UARTConfig
 
 
 RP2040_CLK_PERI = 125_000_000

@@ -19,7 +19,7 @@ from pathlib import Path
 from vsf_bench import pipeline
 from vsf_bench.cli._args import add_shared_test_args, resolve_shuffle_seed
 from vsf_bench.utils.tee_logger import init_logger as _init_logger
-from vsf_bench.lock import LockBusyError
+from vsf_bench.utils.lock import LockBusyError
 
 
 def parse_args():
@@ -57,13 +57,13 @@ def main():
 
     # Load hardware-map defaults (log_dir etc.)
     hw_path = Path(args.hardware_map).resolve()
-    from vsf_bench.hardware_map import load_defaults
+    from vsf_bench.config.map import load_defaults
     _defaults = load_defaults(str(hw_path)) if hw_path.exists() else {}
     # log_dir resolved later after project is loaded: CLI → project → defaults
 
     # ── --list-pipelines ──
     if args.list_pipelines:
-        from vsf_bench.hardware_map import list_pipelines as _list_pipelines
+        from vsf_bench.config.map import list_pipelines as _list_pipelines
         try:
             pipelines = _list_pipelines(str(hw_path))
         except Exception as e:
@@ -83,7 +83,7 @@ def main():
         if not args.board:
             print("[vsf-bench] Error: --pipeline requires --board", file=sys.stderr)
             sys.exit(2)
-        from vsf_bench.hardware_map import load_pipeline, resolve_pipeline_projects
+        from vsf_bench.config.map import load_pipeline, resolve_pipeline_projects
         board_name = args.board[0] if args.board else None
         try:
             pipeline_obj = load_pipeline(str(hw_path), args.pipeline)
@@ -122,7 +122,7 @@ def main():
         sys.exit(2)
 
     # Load project
-    from vsf_bench.hardware_map import load_project as _load_project
+    from vsf_bench.config.map import load_project as _load_project
     try:
         project = _load_project(str(hardware_map_path), args.project)
     except Exception as e:

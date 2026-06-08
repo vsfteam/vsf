@@ -9,7 +9,7 @@ mentions ``bh1098_flash`` or ``BH1098UartFlashRunner``.  Instead,
 import importlib
 from pathlib import Path
 
-from vsf_bench.config import RunnerConfig
+from vsf_bench.config.models import RunnerConfig
 from vsf_bench.runners.base import FlashRunner
 
 
