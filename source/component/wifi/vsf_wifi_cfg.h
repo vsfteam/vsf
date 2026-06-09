@@ -15,41 +15,43 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_COMPONENT_H__
-#define __VSF_COMPONENT_H__
-
 /*============================ INCLUDES ======================================*/
+//! \note do not move this pre-processor statement to other places
+#include "component/vsf_component_cfg.h"
 
-#include "./vsf_component_cfg.h"
-
-#include "./crypto/vsf_crypto.h"
-#include "./mal/vsf_mal.h"
-#include "./scsi/vsf_scsi.h"
-#include "./fs/vsf_fs.h"
-#include "./av/vsf_av.h"
-#include "./input/vsf_input.h"
-#include "./usb/vsf_usb.h"
-#include "./tcpip/vsf_tcpip.h"
-#include "./wifi/vsf_wifi.h"
-#include "./ui/vsf_ui.h"
-#include "./debugger/vsf_debugger.h"
-#include "./misc/vsf_component_misc.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef __VSF_WIFI_CFG_H__
+#define __VSF_WIFI_CFG_H__
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_USE_WIFI
+#   define VSF_USE_WIFI                 DISABLED
+#endif
+
+#ifndef VSF_WIFI_ASSERT
+#   define VSF_WIFI_ASSERT              VSF_ASSERT
+#endif
+
+/*
+ * Chip driver enable switches.
+ *
+ * Each chip family has its own ENABLE switch so applications can choose
+ * which chip drivers to compile in.  The switches are bus-agnostic; the
+ * same chip driver object can be used by USB / SDIO / SPI shims.
+ *
+ * A bus shim (e.g. vsf_usbh_wifi) MUST require at least one chip driver
+ * to be enabled when the bus class itself is enabled.
+ */
+#ifndef VSF_WIFI_USE_RT28XX
+#   define VSF_WIFI_USE_RT28XX          ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_component_init(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 /* EOF */
