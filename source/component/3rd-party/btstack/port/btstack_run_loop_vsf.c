@@ -128,7 +128,7 @@ static uint32_t __btstack_run_loop_vsf_get_time_ms(void)
 
 static void __btstack_run_loop_vsf_set_timer(btstack_timer_source_t *ts, uint32_t timeout_in_ms)
 {
-    ts->timeout = __btstack_run_loop_vsf_get_time_ms() + timeout_in_ms + 1;
+    ts->timeout = __btstack_run_loop_vsf_get_time_ms() + timeout_in_ms;
 }
 
 static void __btstaci_run_loop_vsf_update_timer(btstack_timer_source_t *ts)
