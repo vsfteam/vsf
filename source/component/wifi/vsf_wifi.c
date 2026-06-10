@@ -38,11 +38,24 @@ static void __vsf_wifi_on_fw_done       (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_init_done     (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_rxfilter_done (vsf_wifi_t *wifi, vsf_err_t err);
 
+/* Active scan: probe each channel during its dwell window so that silent /
+ * hidden APs answer with a probe-response.  Set to DISABLED for pure passive
+ * (beacon-only) scanning. */
+#ifndef VSF_WIFI_CFG_SCAN_ACTIVE
+#   define VSF_WIFI_CFG_SCAN_ACTIVE     ENABLED
+#endif
+
+static vsf_err_t __vsf_wifi_tx_frame  (vsf_wifi_t *wifi,
+                                       const uint8_t *frame, uint16_t len);
+
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 static void __vsf_wifi_scan_timer_cb (vsf_callback_timer_t *timer);
 static void __vsf_wifi_scan_hop_done (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_scan_advance  (vsf_wifi_t *wifi);
 static void __vsf_wifi_scan_finish   (vsf_wifi_t *wifi);
+#if VSF_WIFI_CFG_SCAN_ACTIVE == ENABLED
+static void __vsf_wifi_send_probe_req (vsf_wifi_t *wifi);
+#endif
 
 #define __VSF_WIFI_SCAN_DEFAULT_DWELL_MS    120
 #endif
@@ -589,10 +602,47 @@ static void __vsf_wifi_scan_hop_done(vsf_wifi_t *wifi, vsf_err_t err)
         __vsf_wifi_scan_finish(wifi);
         return;
     }
+#if VSF_WIFI_CFG_SCAN_ACTIVE == ENABLED
+    /* Active scan: probe the freshly-locked channel so silent / hidden APs
+     * answer with a probe-response (parsed by drv->parse_rx, same path as
+     * beacons).  Best-effort: a tx failure must not abort the scan. */
+    __vsf_wifi_send_probe_req(wifi);
+#endif
     /* Channel locked; arm dwell timer.  Beacons / probe responses arriving
      * during this window are routed to drv->parse_rx via the RX path. */
     vsf_callback_timer_add_ms(&wifi->scan_timer, wifi->scan_dwell_ms);
 }
+
+#if VSF_WIFI_CFG_SCAN_ACTIVE == ENABLED
+/* Build + send a broadcast (wildcard-SSID) probe-request on the current
+ * channel.  Bypasses the scanning guard via __vsf_wifi_tx_frame so it can
+ * run from inside the scan scheduler. */
+static void __vsf_wifi_send_probe_req(vsf_wifi_t *wifi)
+{
+    uint8_t  frame[64];     /* probe-req is 36 bytes; round up with margin */
+    uint16_t i = 0;
+
+    /* 802.11 probe-request MAC header (24 bytes). */
+    frame[i++] = 0x40;  frame[i++] = 0x00;          /* FC: mgmt, probe-req */
+    frame[i++] = 0x00;  frame[i++] = 0x00;          /* duration            */
+    memset(&frame[i], 0xFF, 6);      i += 6;        /* DA = broadcast      */
+    memcpy(&frame[i], wifi->mac, 6); i += 6;        /* SA = our MAC        */
+    memset(&frame[i], 0xFF, 6);      i += 6;        /* BSSID = broadcast   */
+    frame[i++] = 0x00;  frame[i++] = 0x00;          /* seq ctrl (hw fills) */
+    /* IE: SSID (wildcard, length 0). */
+    frame[i++] = 0x00;  frame[i++] = 0x00;
+    /* IE: supported rates 1/2/5.5/11/6/12/24/36 Mbps. */
+    frame[i++] = 0x01;  frame[i++] = 0x08;
+    frame[i++] = 0x82;  frame[i++] = 0x84;  frame[i++] = 0x8B;  frame[i++] = 0x96;
+    frame[i++] = 0x0C;  frame[i++] = 0x18;  frame[i++] = 0x30;  frame[i++] = 0x48;
+
+    vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_warning("wifi: active-scan probe-req tx failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+    }
+}
+#endif
 
 /* Issued from the bus driver's EDA when VSF_WIFI_EVT_SCAN_HOP lands —
  * step to next channel or end. */
@@ -759,7 +809,11 @@ vsf_err_t vsf_wifi_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)
 #   define VSF_WIFI_CFG_TX_BUF_SIZE     1600
 #endif
 
-vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
+/* Core TX path shared by vsf_wifi_tx (user API) and the active-scan probe-
+ * request.  Deliberately does NOT check wifi->scanning so the scan scheduler
+ * can transmit mid-scan; callers that must respect scanning check it first. */
+static vsf_err_t __vsf_wifi_tx_frame(vsf_wifi_t *wifi,
+        const uint8_t *frame, uint16_t len)
 {
     static uint32_t __tx_buf32[(VSF_WIFI_CFG_TX_BUF_SIZE + 3) / 4];
     uint8_t *tx_buf = (uint8_t *)__tx_buf32;
@@ -767,7 +821,6 @@ vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     if (!wifi->is_ready)                return VSF_ERR_NOT_READY;
     if (NULL == wifi->drv->build_tx)    return VSF_ERR_NOT_SUPPORT;
     if (NULL == wifi->bus_ops->data_tx) return VSF_ERR_NOT_SUPPORT;
-    if (wifi->scanning)                 return VSF_ERR_NOT_AVAILABLE;
     if ((NULL == frame) || (0 == len))  return VSF_ERR_INVALID_PARAMETER;
 
     uint16_t total = wifi->drv->build_tx(wifi, tx_buf,
@@ -775,6 +828,12 @@ vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     if (0 == total) return VSF_ERR_FAIL;
 
     return wifi->bus_ops->data_tx(wifi, tx_buf, total);
+}
+
+vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
+{
+    if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
+    return __vsf_wifi_tx_frame(wifi, frame, len);
 }
 
 #endif      // VSF_USE_WIFI
