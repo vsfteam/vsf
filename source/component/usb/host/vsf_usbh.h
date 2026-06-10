@@ -659,6 +659,9 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #       include "./class/CDC/vsf_usbh_CDCECM.h"
 #   endif
 #endif
+#if VSF_USBH_USE_WIFI == ENABLED
+#   include "./class/wifi/vsf_usbh_wifi.h"
+#endif
 #if VSF_USBH_USE_BTHCI == ENABLED
 #   include "./class/BTHCI/vsf_usbh_BTHCI.h"
 #endif

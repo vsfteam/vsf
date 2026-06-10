@@ -181,12 +181,30 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
     vsf_arch_irq_thread_t *thread = arg;
     DWORD rsize;
     char ch;
+    DWORD mode;
+    // Dispatch by handle type, mirroring the TX path: ReadConsoleA only works
+    // on a real console input buffer. When stdin is redirected from a file/pipe
+    // (e.g. `exe < script`, Start-Process -RedirectStandardInput, a pipe), the
+    // console APIs fail; fall back to ReadFile so injected bytes are received.
+    // Verified on Windows 25H2 alongside the symmetric TX fallback.
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    bool is_console = GetConsoleMode(hIn, &mode) ? true : false;
 
     __vsf_arch_irq_set_background(thread);
     while (1) {
-        do {
-            ReadConsoleA(GetStdHandle(STD_INPUT_HANDLE), &ch, 1, &rsize, NULL);
-        } while (!rsize);
+        BOOL ok;
+        rsize = 0;
+        if (is_console) {
+            ok = ReadConsoleA(hIn, &ch, 1, &rsize, NULL);
+        } else {
+            ok = ReadFile(hIn, &ch, 1, &rsize, NULL);
+        }
+        if (!ok || (0 == rsize)) {
+            // EOF / closed pipe (redirected stdin drained) or transient error:
+            // avoid a busy-spin that would peg the CPU at 100%.
+            Sleep(10);
+            continue;
+        }
 #if VSF_DEBUG_STREAM_CFG_CR2LF == ENABLED
         if (ch == '\r') {
             ch = '\n';
@@ -206,13 +224,14 @@ static void __vsf_x86_debug_stream_init(void)
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 
-    // switch to utf8
-#undef system
-    // TODO: in raw 'system' API, calloc will be called,
-    //  if linux/linux.stdlib/VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR are enabled,
-    //  calloc will trigger assert because calloc is not called in linux environment.
-    extern int system(const char *command);
-    system("chcp 65001");
+    // Switch console to UTF-8. Use the Win32 code-page APIs directly instead of
+    // system("chcp 65001"): the CRT system() spawns cmd.exe which inherits our
+    // stdin handle. When stdin is redirected from a disk file, the child shares
+    // the file pointer and drains the whole file to EOF, so the debug-stream RX
+    // irqhandler then reads nothing. SetConsoleCP/SetConsoleOutputCP touch only
+    // the console code page and never touch the stdin handle.
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
 
     GetConsoleMode(hIn, &mode);
     mode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
