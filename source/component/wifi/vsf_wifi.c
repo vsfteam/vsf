@@ -751,4 +751,30 @@ vsf_err_t vsf_wifi_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)
     return wifi->drv->get_link_info(wifi, info);
 }
 
+/* Staging buffer for the chip-encoded TX descriptor + frame.  A uint32_t
+ * array guarantees the 4-byte alignment the RT2800 TXINFO/TXWI layout
+ * expects.  Single-instance for now (the bus driver memcpy's it into its
+ * own TX URB, so it is free to reuse immediately after data_tx returns). */
+#ifndef VSF_WIFI_CFG_TX_BUF_SIZE
+#   define VSF_WIFI_CFG_TX_BUF_SIZE     1600
+#endif
+
+vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
+{
+    static uint32_t __tx_buf32[(VSF_WIFI_CFG_TX_BUF_SIZE + 3) / 4];
+    uint8_t *tx_buf = (uint8_t *)__tx_buf32;
+
+    if (!wifi->is_ready)                return VSF_ERR_NOT_READY;
+    if (NULL == wifi->drv->build_tx)    return VSF_ERR_NOT_SUPPORT;
+    if (NULL == wifi->bus_ops->data_tx) return VSF_ERR_NOT_SUPPORT;
+    if (wifi->scanning)                 return VSF_ERR_NOT_AVAILABLE;
+    if ((NULL == frame) || (0 == len))  return VSF_ERR_INVALID_PARAMETER;
+
+    uint16_t total = wifi->drv->build_tx(wifi, tx_buf,
+            (uint16_t)sizeof(__tx_buf32), frame, len);
+    if (0 == total) return VSF_ERR_FAIL;
+
+    return wifi->bus_ops->data_tx(wifi, tx_buf, total);
+}
+
 #endif      // VSF_USE_WIFI

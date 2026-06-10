@@ -1930,6 +1930,77 @@ static vsf_err_t __rt28xx_get_link_info(vsf_wifi_t *wifi,
     return VSF_ERR_NONE;
 }
 
+/*============================ TX DESCRIPTOR =================================*
+ *
+ * USB TX bulk-out payload layout (rt2x00usb / rt2800usb), mirror of RX:
+ *
+ *   | TXINFO (4B) | TXWI (20B, RT5592 5-word) | 802.11 frame | pad | USB end pad |
+ *                 |<-- TXINFO_W0_USB_DMA_TX_PKT_LEN = TXWI + roundup(frame,4) -->|
+ *
+ * TXINFO_W0  (ref rt2800usb.h:46-51 / rt2800usb_write_tx_desc):
+ *   [15:0] USB_DMA_TX_PKT_LEN  (everything after TXINFO)
+ *   bit24  WIV   (1 = no per-frame IV in descriptor; hw uses IVEIV reg)
+ *   [26:25]QSEL  (2 = AC_BE)
+ * TXWI_W0    (ref rt2800.h:3080-3092):
+ *   [31:30]PHYMODE (1 = OFDM), [22:16] MCS (0 = 6 Mbps).  OFDM/MCS0 is legal
+ *           on both 2.4 GHz and 5 GHz, so one rate covers every channel.
+ * TXWI_W1    (ref rt2800.h:3110-3117):
+ *   bit1   NSEQ (1 = hw assigns the 802.11 sequence number)
+ *   [27:16]MPDU_TOTAL_BYTE_COUNT (real 802.11 length)
+ *   [31:30]PACKETID_ENTRY (1 -> latch result into TX_STA_FIFO, non-zero PID)
+ * Words 2-4 are IV/EIV/reserved and must be zero for unencrypted frames.
+ *==========================================================================*/
+
+#define RT28XX_TXINFO_DESC_SIZE         4
+#define RT28XX_TXWI_DESC_SIZE_5592      20
+#define RT28XX_TXINFO_W0_WIV            (1u << 24)
+#define RT28XX_TXINFO_W0_QSEL_BE        (2u << 25)
+#define RT28XX_TXWI_W0_PHYMODE_OFDM     (1u << 30)
+#define RT28XX_TXWI_W1_NSEQ             (1u << 1)
+#define RT28XX_TXWI_W1_PACKETID_ENTRY1  (1u << 30)
+
+static inline void __rt28xx_put_le32(uint8_t *p, uint32_t v)
+{
+    p[0] = (uint8_t)( v        & 0xFF);
+    p[1] = (uint8_t)((v >>  8) & 0xFF);
+    p[2] = (uint8_t)((v >> 16) & 0xFF);
+    p[3] = (uint8_t)((v >> 24) & 0xFF);
+}
+
+/* drv->build_tx: wrap a raw 802.11 frame into TXINFO + TXWI + frame + pad. */
+static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
+        uint16_t dst_cap, const uint8_t *frame, uint16_t frame_len)
+{
+    (void)wifi;
+    uint16_t hdr       = RT28XX_TXINFO_DESC_SIZE + RT28XX_TXWI_DESC_SIZE_5592;
+    uint16_t frame_pad = (uint16_t)((frame_len + 3u) & ~3u);
+    uint16_t total     = (uint16_t)(hdr + frame_pad + 4); /* + USB end pad */
+    if ((0 == frame_len) || (frame_len > 0x0FFFu) || (total > dst_cap)) {
+        return 0;
+    }
+
+    uint16_t pkt_len   = (uint16_t)(RT28XX_TXWI_DESC_SIZE_5592 + frame_pad);
+    uint32_t txinfo_w0 = ((uint32_t)pkt_len & 0xFFFFu)
+                       | RT28XX_TXINFO_W0_WIV
+                       | RT28XX_TXINFO_W0_QSEL_BE;
+    uint32_t txwi_w0   = RT28XX_TXWI_W0_PHYMODE_OFDM;   /* OFDM, MCS0 (6 Mbps) */
+    uint32_t txwi_w1   = RT28XX_TXWI_W1_NSEQ
+                       | (((uint32_t)frame_len & 0x0FFFu) << 16)
+                       | RT28XX_TXWI_W1_PACKETID_ENTRY1;
+
+    __rt28xx_put_le32(dst +  0, txinfo_w0);
+    __rt28xx_put_le32(dst +  4, txwi_w0);
+    __rt28xx_put_le32(dst +  8, txwi_w1);
+    __rt28xx_put_le32(dst + 12, 0);     /* TXWI W2 (IV)  */
+    __rt28xx_put_le32(dst + 16, 0);     /* TXWI W3 (EIV) */
+    __rt28xx_put_le32(dst + 20, 0);     /* TXWI W4 (RT5592 5-word) */
+
+    memcpy(dst + hdr, frame, frame_len);
+    /* zero the 802.11 4-byte alignment pad + the trailing USB end pad. */
+    memset(dst + hdr + frame_len, 0, (size_t)(total - (hdr + frame_len)));
+    return total;
+}
+
 /*============================ VTABLE INSTANCE ===============================*/
 
 const vsf_wifi_chip_drv_t vsf_wifi_rt28xx_drv = {
@@ -1946,6 +2017,7 @@ const vsf_wifi_chip_drv_t vsf_wifi_rt28xx_drv = {
     .disconnect    = __rt28xx_disconnect,
     .get_link_info = __rt28xx_get_link_info,
     .parse_rx      = __rt28xx_parse_rx,
+    .build_tx      = __rt28xx_build_tx,
 };
 
 #endif      // VSF_USE_WIFI && VSF_WIFI_USE_RT28XX

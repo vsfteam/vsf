@@ -215,6 +215,14 @@ struct vsf_wifi_bus_ops_t {
      * driver uses this to enable the data path (e.g. submit bulk RX URBs).
      */
     void (*on_ready)(vsf_wifi_t *wifi);
+
+    /* Bulk data-frame transmit.  OPTIONAL — NULL on buses that have no bulk
+     * data endpoint (pure ep0).  `data` points at a fully chip-encoded TX
+     * payload (built by drv->build_tx); `len` is its total length.  Unlike
+     * the reg/script primitives this is fire-and-forget: the bus driver
+     * owns completion internally (TX URB pool).  Returns VSF_ERR_NONE when
+     * the frame was queued. */
+    vsf_err_t (*data_tx)(vsf_wifi_t *wifi, uint8_t *data, uint16_t len);
 };
 
 /*============================ CHIP DRIVER VTABLE ============================*
@@ -264,6 +272,15 @@ struct vsf_wifi_chip_drv_t {
      * here instead of vsf_wifi_on_rx; the chip code extracts beacons /
      * probe responses and emits vsf_wifi_on_scan_result(). */
     void      (*parse_rx)     (vsf_wifi_t *wifi, uint8_t *frame, uint16_t len);
+
+    /* Optional TX-descriptor builder.  Wraps a raw 802.11 frame into the
+     * chip-specific on-wire TX layout (e.g. RT2800 TXINFO + TXWI + frame +
+     * pad) by writing into `dst` (capacity `dst_cap`).  Returns the total
+     * byte count to ship over the data bus, or 0 on failure (dst too small
+     * / unsupported).  Bus-agnostic: the chip only knows the descriptor
+     * format; the bus driver (bus_ops->data_tx) performs the actual send. */
+    uint16_t  (*build_tx)     (vsf_wifi_t *wifi, uint8_t *dst, uint16_t dst_cap,
+                              const uint8_t *frame, uint16_t frame_len);
 };
 
 /*============================ APPLICATION CALLBACKS =========================*
@@ -327,6 +344,16 @@ vsf_err_t    vsf_wifi_connect      (vsf_wifi_t *wifi,
 vsf_err_t    vsf_wifi_disconnect   (vsf_wifi_t *wifi);
 vsf_err_t    vsf_wifi_get_link_info(vsf_wifi_t *wifi,
                                     vsf_wifi_link_info_t *info);
+
+/*
+ * Transmit a raw 802.11 frame.  The chip driver (drv->build_tx) wraps it
+ * into the on-wire TX descriptor layout and the bus driver (bus_ops->
+ * data_tx) ships it over the data endpoint.  Returns VSF_ERR_NOT_READY
+ * before vsf_wifi_on_ready, VSF_ERR_NOT_SUPPORTED when the chip/bus lacks
+ * a TX path, or a bus-level error.  Fire-and-forget: there is no per-frame
+ * completion callback (use TX_STA_FIFO / TX_STA_CNT to inspect results). */
+vsf_err_t    vsf_wifi_tx           (vsf_wifi_t *wifi,
+                                    const uint8_t *frame, uint16_t len);
 
 /*============================ BUS-LAYER API (used by USB shim, SDIO, ...) ==*
  *

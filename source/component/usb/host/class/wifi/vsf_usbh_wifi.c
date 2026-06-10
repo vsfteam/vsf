@@ -347,6 +347,18 @@ static void __usb_wifi_on_ready(vsf_wifi_t *wifi)
     }
 }
 
+/*============================ BUS OPS: data_tx =============================*/
+
+/* bus_ops->data_tx — ship a chip-encoded TX payload over the bulk OUT
+ * endpoint.  Thin wrapper around the existing vk_usbh_wifi_send(); the
+ * generic layer hands us a buffer already built by drv->build_tx. */
+static vsf_err_t __usb_wifi_data_tx(vsf_wifi_t *wifi, uint8_t *data,
+        uint16_t len)
+{
+    vk_usbh_wifi_t *uwifi = vsf_container_of(wifi, vk_usbh_wifi_t, wifi);
+    return vk_usbh_wifi_send(uwifi, data, len);
+}
+
 /*============================ BUS OPS VTABLE ================================*/
 
 static const vsf_wifi_bus_ops_t __usb_wifi_bus_ops = {
@@ -355,6 +367,7 @@ static const vsf_wifi_bus_ops_t __usb_wifi_bus_ops = {
     .reg_block_write = __usb_wifi_reg_block_write,
     .vendor_request  = __usb_wifi_vendor_request,
     .on_ready        = __usb_wifi_on_ready,
+    .data_tx         = __usb_wifi_data_tx,
 };
 
 /*============================ ATTACH FAIL HOOK ==============================*/
