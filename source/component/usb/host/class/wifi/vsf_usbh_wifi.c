@@ -203,6 +203,17 @@ static vsf_err_t __usb_wifi_submit_ep0(vk_usbh_wifi_t *uwifi)
         req.wLength      = chunk;
         break;
     }
+    case VK_USBH_WIFI_BUS_VENDOR: {
+        /* No-data-stage vendor request (e.g. USB_DEVICE_MODE / USB_MODE_
+         * FIRMWARE to start the 8051 MCU, or USB_MODE_RESET).  wLength=0 so
+         * there is no data buffer to allocate. */
+        req.bRequestType = USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT;
+        req.bRequest     = uwifi->bus_vendor_request;
+        req.wValue       = uwifi->bus_vendor_value;
+        req.wIndex       = uwifi->bus_vendor_index;
+        req.wLength      = 0;
+        break;
+    }
     default:
         return VSF_ERR_BUG;
     }
@@ -298,6 +309,32 @@ static vsf_err_t __usb_wifi_reg_block_write(vsf_wifi_t *wifi, uint16_t base,
     return VSF_ERR_NONE;
 }
 
+/* bus_ops->vendor_request */
+static vsf_err_t __usb_wifi_vendor_request(vsf_wifi_t *wifi, uint8_t request,
+        uint16_t value, uint16_t index, vsf_wifi_done_t done)
+{
+    vk_usbh_wifi_t *uwifi = vsf_container_of(wifi, vk_usbh_wifi_t, wifi);
+    VSF_USB_ASSERT(uwifi->bus_state == VK_USBH_WIFI_BUS_IDLE);
+
+    uwifi->bus_state          = VK_USBH_WIFI_BUS_VENDOR;
+    uwifi->bus_done           = done;
+    uwifi->bus_vendor_request = request;
+    uwifi->bus_vendor_value   = value;
+    uwifi->bus_vendor_index   = index;
+
+    vsf_err_t err = __vsf_eda_crit_npb_enter(&uwifi->dev->ep0.crit);
+    if (VSF_ERR_NONE != err) {
+        uwifi->bus_pending_first = true;
+        return VSF_ERR_NONE;
+    }
+    err = __usb_wifi_submit_ep0(uwifi);
+    if (VSF_ERR_NONE != err) {
+        __usb_wifi_bus_finish(uwifi, err);
+        return err;
+    }
+    return VSF_ERR_NONE;
+}
+
 /*============================ BUS OPS: on_ready =============================*/
 
 static bool __vk_usbh_wifi_start_rx(vk_usbh_wifi_t *uwifi);
@@ -316,6 +353,7 @@ static const vsf_wifi_bus_ops_t __usb_wifi_bus_ops = {
     .reg_write       = __usb_wifi_reg_write,
     .reg_read        = __usb_wifi_reg_read,
     .reg_block_write = __usb_wifi_reg_block_write,
+    .vendor_request  = __usb_wifi_vendor_request,
     .on_ready        = __usb_wifi_on_ready,
 };
 
@@ -371,6 +409,10 @@ static void __vk_usbh_wifi_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vk_usbh_urb_free_buffer(&dev->ep0.urb);
                 __usb_wifi_bus_finish(uwifi, ok ? VSF_ERR_NONE : VSF_ERR_FAIL);
                 break;
+            case VK_USBH_WIFI_BUS_VENDOR:
+                /* No data stage -> no buffer was allocated. */
+                __usb_wifi_bus_finish(uwifi, ok ? VSF_ERR_NONE : VSF_ERR_FAIL);
+                break;
             case VK_USBH_WIFI_BUS_REG_READ:
                 if (ok && uwifi->bus_read_out != NULL) {
                     uint32_t *buf = (uint32_t *)vk_usbh_urb_peek_buffer(
@@ -416,12 +458,20 @@ static void __vk_usbh_wifi_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         VSF_USB_ASSERT(iocb != NULL);
 
         if (iocb->is_rx) {
-            if (URB_OK == vk_usbh_urb_get_status(&iocb->urb)) {
-                uint32_t len = vk_usbh_urb_get_actual_length(&iocb->urb);
-                if (len > 0) {
-                    uint8_t *frame = vk_usbh_urb_peek_buffer(&iocb->urb);
-                    vsf_wifi_on_rx_internal(&uwifi->wifi, frame, (uint16_t)len);
-                }
+            int  st  = vk_usbh_urb_get_status(&iocb->urb);
+            uint32_t len = (URB_OK == st)
+                    ? vk_usbh_urb_get_actual_length(&iocb->urb) : 0;
+            static unsigned __dbg_rx_cmpl = 0;
+            if (__dbg_rx_cmpl < 12) {
+                __dbg_rx_cmpl++;
+                vsf_trace_info(
+                    "wifi_usb: rx urb#%u status=%d len=%u"
+                    VSF_TRACE_CFG_LINEEND,
+                    __dbg_rx_cmpl, st, (unsigned)len);
+            }
+            if (URB_OK == st && len > 0) {
+                uint8_t *frame = vk_usbh_urb_peek_buffer(&iocb->urb);
+                vsf_wifi_on_rx_internal(&uwifi->wifi, frame, (uint16_t)len);
             }
             err = vk_usbh_submit_urb(uwifi->usbh, &iocb->urb);
             if (VSF_ERR_NONE != err) {
@@ -439,6 +489,7 @@ static void __vk_usbh_wifi_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 static bool __vk_usbh_wifi_start_rx(vk_usbh_wifi_t *uwifi)
 {
+    int rx_submitted = 0;
     for (int i = 0; i < VSF_USBH_WIFI_CFG_RX_NUM; i++) {
         vk_usbh_wifi_iocb_t *icb = &uwifi->rx_icb[i];
         if (!icb->is_supported) continue;
@@ -449,7 +500,11 @@ static bool __vk_usbh_wifi_start_rx(vk_usbh_wifi_t *uwifi)
             return false;
         if (VSF_ERR_NONE != vk_usbh_submit_urb(uwifi->usbh, &icb->urb))
             return false;
+        rx_submitted++;
     }
+    vsf_trace_info("wifi_usb: start_rx submitted %d RX URBs (bufsize=%u)"
+            VSF_TRACE_CFG_LINEEND, rx_submitted,
+            (unsigned)VSF_USBH_WIFI_CFG_URB_BUFSIZE);
     for (int i = 0; i < VSF_USBH_WIFI_CFG_TX_NUM; i++) {
         vk_usbh_wifi_iocb_t *ocb = &uwifi->tx_ocb[i];
         if (!ocb->is_supported) continue;

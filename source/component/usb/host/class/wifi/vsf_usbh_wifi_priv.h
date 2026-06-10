@@ -68,6 +68,7 @@ typedef enum {
     VK_USBH_WIFI_BUS_REG_WRITE,
     VK_USBH_WIFI_BUS_REG_READ,
     VK_USBH_WIFI_BUS_BLOCK_WRITE,
+    VK_USBH_WIFI_BUS_VENDOR,        /* ep0 vendor request, no data stage */
 } vk_usbh_wifi_bus_state_t;
 
 struct vk_usbh_wifi_t {
@@ -93,6 +94,12 @@ struct vk_usbh_wifi_t {
     uint32_t             bus_block_offset;
     uint16_t             bus_block_base;
     uint16_t             bus_block_chunk;
+
+    /* Vendor-request (USB_DEVICE_MODE etc.) state: bRequest/wValue/wIndex,
+     * no data stage (wLength=0). */
+    uint8_t              bus_vendor_request;
+    uint16_t             bus_vendor_value;
+    uint16_t             bus_vendor_index;
 
     /* Bulk RX/TX iocb pool */
     union {

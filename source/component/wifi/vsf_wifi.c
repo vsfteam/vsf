@@ -28,6 +28,11 @@
 static void __vsf_wifi_script_finish (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_script_step   (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_blob_step     (vsf_wifi_t *wifi, vsf_err_t err);
+static void __vsf_wifi_read_poll_issue(vsf_wifi_t *wifi);
+static void __vsf_wifi_read_poll_done (vsf_wifi_t *wifi, vsf_err_t err);
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+static void __vsf_wifi_read_poll_timer_cb(vsf_callback_timer_t *timer);
+#endif
 
 static void __vsf_wifi_on_fw_done       (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_init_done     (vsf_wifi_t *wifi, vsf_err_t err);
@@ -101,6 +106,11 @@ static void __vsf_wifi_script_finish(vsf_wifi_t *wifi, vsf_err_t err)
     wifi->script_busy    = false;
     wifi->script_is_blob = false;
     wifi->script_done    = NULL;
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    /* Cancel any read-poll spacing timer that may still be armed (no-op if
+     * the dispatcher path that finished was script / blob).  Idempotent. */
+    vsf_callback_timer_remove(&wifi->read_poll_timer);
+#endif
     memset(&wifi->s, 0, sizeof(wifi->s));
     if (done != NULL) {
         done(wifi, err);
@@ -251,9 +261,179 @@ vsf_err_t vsf_wifi_run_blob(vsf_wifi_t *wifi,
     return err;
 }
 
+/*============================ VENDOR-REQUEST DISPATCHER =====================*/
+
+static void __vsf_wifi_vendor_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    __vsf_wifi_script_finish(wifi, err);
+}
+
+vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
+        uint16_t value, uint16_t index, vsf_wifi_done_t done)
+{
+    if (wifi->script_busy) return VSF_ERR_NOT_AVAILABLE;
+    if (wifi->bus_ops->vendor_request == NULL) {
+        if (done != NULL) done(wifi, VSF_ERR_NOT_SUPPORT);
+        return VSF_ERR_NOT_SUPPORT;
+    }
+
+    wifi->script_is_blob = false;
+    wifi->script_done    = done;
+    wifi->script_busy    = true;
+
+    vsf_err_t err = wifi->bus_ops->vendor_request(wifi, request, value, index,
+            __vsf_wifi_vendor_done);
+    if (VSF_ERR_NONE != err) {
+        wifi->script_busy = false;
+        wifi->script_done = NULL;
+        memset(&wifi->s, 0, sizeof(wifi->s));
+    }
+    return err;
+}
+
 vsf_wifi_op_t * vsf_wifi_get_scratch_ops(vsf_wifi_t *wifi)
 {
     return wifi->scratch_ops;
+}
+
+/*============================ READ-POLL DISPATCHER ==========================*
+ *
+ * Repeatedly issues bus_ops->reg_read against a single register, feeding
+ * each result into a chip-supplied predicate.  Used by chip drivers to
+ * wait for hardware-side state transitions whose duration is unknown at
+ * compile time (firmware boot, EEPROM bus completion, BBP wakeup, ...).
+ *
+ * Concurrency: shares the script_busy single-flight slot with run_script
+ * and run_blob; only one of the three may be in flight at any time.
+ * Cleanup goes through __vsf_wifi_script_finish (which also stops the
+ * read-poll spacing timer).
+ *==========================================================================*/
+
+static void __vsf_wifi_read_poll_issue(vsf_wifi_t *wifi)
+{
+    if (wifi->disconnecting) {
+        wifi->script_busy = false;
+        return;
+    }
+    vsf_err_t err = wifi->bus_ops->reg_read(wifi,
+            wifi->s.read_poll.reg, &wifi->s.read_poll.last_val,
+            __vsf_wifi_read_poll_done);
+    if (VSF_ERR_NONE != err) {
+        __vsf_wifi_script_finish(wifi, err);
+    }
+}
+
+static void __vsf_wifi_read_poll_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (wifi->disconnecting) {
+        wifi->script_busy = false;
+        return;
+    }
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_warning("wifi: read_poll reg=0x%04X bus err=%d" VSF_TRACE_CFG_LINEEND,
+                (unsigned)wifi->s.read_poll.reg, (int)err);
+        __vsf_wifi_script_finish(wifi, err);
+        return;
+    }
+    if (wifi->s.read_poll.match != NULL
+            && wifi->s.read_poll.match(wifi->s.read_poll.last_val)) {
+        vsf_trace_info("wifi: read_poll reg=0x%04X matched val=0x%08X" VSF_TRACE_CFG_LINEEND,
+                (unsigned)wifi->s.read_poll.reg,
+                (unsigned)wifi->s.read_poll.last_val);
+        __vsf_wifi_script_finish(wifi, VSF_ERR_NONE);
+        return;
+    }
+    if (wifi->s.read_poll.retry_left == 0) {
+        vsf_trace_warning("wifi: read_poll reg=0x%04X timeout, last=0x%08X" VSF_TRACE_CFG_LINEEND,
+                (unsigned)wifi->s.read_poll.reg,
+                (unsigned)wifi->s.read_poll.last_val);
+        __vsf_wifi_script_finish(wifi, VSF_ERR_TIMEOUT);
+        return;
+    }
+    wifi->s.read_poll.retry_left--;
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    if (wifi->s.read_poll.interval_ms > 0) {
+        vsf_callback_timer_add_ms(&wifi->read_poll_timer,
+                wifi->s.read_poll.interval_ms);
+        return;
+    }
+#endif
+    /* No timer support or zero spacing: re-issue immediately. */
+    __vsf_wifi_read_poll_issue(wifi);
+}
+
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+static void __vsf_wifi_read_poll_timer_cb(vsf_callback_timer_t *timer)
+{
+    vsf_wifi_t *wifi = vsf_container_of(timer, vsf_wifi_t, read_poll_timer);
+    if (wifi->disconnecting || !wifi->script_busy) return;
+    __vsf_wifi_read_poll_issue(wifi);
+}
+#endif
+
+vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
+        vsf_wifi_match_fn_t match, uint16_t max_retry, uint16_t interval_ms,
+        vsf_wifi_done_t done)
+{
+    if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
+    if (NULL == match)                  return VSF_ERR_INVALID_PARAMETER;
+    if (NULL == wifi->bus_ops->reg_read) return VSF_ERR_NOT_SUPPORT;
+    if (max_retry == 0) max_retry = 1;
+
+    wifi->script_is_blob          = false;
+    wifi->script_done             = done;
+    memset(&wifi->s, 0, sizeof(wifi->s));
+    wifi->s.read_poll.reg          = reg;
+    wifi->s.read_poll.match        = match;
+    wifi->s.read_poll.retry_left   = (uint16_t)(max_retry - 1);
+    wifi->s.read_poll.interval_ms  = interval_ms;
+    wifi->s.read_poll.last_val     = 0;
+    wifi->script_busy              = true;
+
+    vsf_trace_info("wifi: read_poll start reg=0x%04X retry=%u interval=%ums" VSF_TRACE_CFG_LINEEND,
+            (unsigned)reg, (unsigned)max_retry, (unsigned)interval_ms);
+
+    vsf_err_t err = wifi->bus_ops->reg_read(wifi, reg,
+            &wifi->s.read_poll.last_val, __vsf_wifi_read_poll_done);
+    if (VSF_ERR_NONE != err) {
+        wifi->script_busy = false;
+        wifi->script_done = NULL;
+        memset(&wifi->s, 0, sizeof(wifi->s));
+    }
+    return err;
+}
+
+/*============================ READ DISPATCHER ===============================*
+ *
+ * Single-shot 32-bit register read.  Thin wrapper over bus_ops->reg_read;
+ * its only job beyond the bus call is to honour the script_busy single-
+ * flight contract so chip drivers can mix run_read with run_script /
+ * run_blob / run_read_poll without colliding on the dispatcher slot.
+ *==========================================================================*/
+
+static void __vsf_wifi_read_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    __vsf_wifi_script_finish(wifi, err);
+}
+
+vsf_err_t vsf_wifi_run_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
+        vsf_wifi_done_t done)
+{
+    if (wifi->script_busy)               return VSF_ERR_NOT_AVAILABLE;
+    if (NULL == out)                     return VSF_ERR_INVALID_PARAMETER;
+    if (NULL == wifi->bus_ops->reg_read) return VSF_ERR_NOT_SUPPORT;
+
+    wifi->script_is_blob = false;
+    wifi->script_done    = done;
+    memset(&wifi->s, 0, sizeof(wifi->s));
+    wifi->script_busy    = true;
+
+    vsf_err_t err = wifi->bus_ops->reg_read(wifi, reg, out, __vsf_wifi_read_done);
+    if (VSF_ERR_NONE != err) {
+        wifi->script_busy = false;
+        wifi->script_done = NULL;
+    }
+    return err;
 }
 
 /*============================ START / FINI / INIT CHAIN =====================*/
@@ -271,6 +451,8 @@ void vsf_wifi_init(vsf_wifi_t *wifi,
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_init(&wifi->scan_timer);
     wifi->scan_timer.on_timer = __vsf_wifi_scan_timer_cb;
+    vsf_callback_timer_init(&wifi->read_poll_timer);
+    wifi->read_poll_timer.on_timer = __vsf_wifi_read_poll_timer_cb;
 #endif
 }
 
@@ -350,6 +532,7 @@ void vsf_wifi_fini(vsf_wifi_t *wifi)
 
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_remove(&wifi->scan_timer);
+    vsf_callback_timer_remove(&wifi->read_poll_timer);
 #endif
 
     /* Step 2: notify user before tearing down chip state. */
@@ -460,6 +643,11 @@ uint8_t vsf_wifi_get_channel(vsf_wifi_t *wifi)
 const char * vsf_wifi_get_chip_name(vsf_wifi_t *wifi)
 {
     return wifi->drv ? wifi->drv->name : "unknown";
+}
+
+const uint8_t * vsf_wifi_get_mac(vsf_wifi_t *wifi)
+{
+    return wifi->mac;
 }
 
 void vsf_wifi_set_channel(vsf_wifi_t *wifi, uint8_t channel)

@@ -91,6 +91,13 @@ typedef struct vsf_wifi_bus_ops_t   vsf_wifi_bus_ops_t;
  */
 typedef void (*vsf_wifi_done_t)(vsf_wifi_t *wifi, vsf_err_t err);
 
+/*
+ * Predicate used by vsf_wifi_run_read_poll to decide whether the value just
+ * read from a register satisfies the wait condition.  Called from the bus
+ * driver's EDA on every poll iteration; must be cheap and side-effect free.
+ */
+typedef bool (*vsf_wifi_match_fn_t)(uint32_t val);
+
 typedef struct vsf_wifi_scan_result_t {
     uint8_t  bssid[6];
     uint8_t  ssid[33];
@@ -194,6 +201,15 @@ struct vsf_wifi_bus_ops_t {
                                  const uint8_t *data, uint32_t len,
                                  vsf_wifi_done_t done);
 
+    /* Raw ep0 vendor request with no data stage (wLength=0).  OPTIONAL —
+     * NULL when the bus has no such concept.  Used by USB chips to issue
+     * USB_DEVICE_MODE (start MCU firmware / reset the digital core), which
+     * is NOT a register write.  `request`=bRequest, `value`=wValue,
+     * `index`=wIndex.  Same async / error semantics as reg_write. */
+    vsf_err_t (*vendor_request) (vsf_wifi_t *wifi, uint8_t request,
+                                 uint16_t value, uint16_t index,
+                                 vsf_wifi_done_t done);
+
     /* Bus-layer ready notification.  OPTIONAL — called when the wifi init
      * chain completes successfully (before vsf_wifi_on_ready).  The bus
      * driver uses this to enable the data path (e.g. submit bulk RX URBs).
@@ -274,6 +290,12 @@ extern void vsf_wifi_on_link_down  (vsf_wifi_t *wifi, uint8_t reason);
 uint8_t      vsf_wifi_get_channel  (vsf_wifi_t *wifi);
 const char * vsf_wifi_get_chip_name(vsf_wifi_t *wifi);
 bool         vsf_wifi_is_ready     (vsf_wifi_t *wifi);
+
+/* Per-device MAC address discovered during chip bring-up (eFuse / EEPROM
+ * read).  Returns a pointer to a 6-byte array inside the wifi struct;
+ * all-zero until the chip driver finishes its EEPROM stage.  The pointer
+ * stays valid for the lifetime of the wifi instance. */
+const uint8_t * vsf_wifi_get_mac    (vsf_wifi_t *wifi);
 
 /* Mutation.  Calls return VSF_ERR_NOT_READY before vsf_wifi_on_ready,
  * VSF_ERR_NOT_AVAILABLE while a scan is in progress, and the chip driver's
@@ -397,6 +419,50 @@ vsf_err_t vsf_wifi_run_script(vsf_wifi_t *wifi,
  */
 vsf_err_t vsf_wifi_run_blob(vsf_wifi_t *wifi,
                             const vsf_wifi_blob_t *blob,
+                            vsf_wifi_done_t done);
+
+/*
+ * Issue a single ep0 vendor request with no data stage (wLength=0) via
+ * bus_ops->vendor_request.  Used by USB chips for control commands that are
+ * not register writes (e.g. RT2800 USB_DEVICE_MODE to start the MCU firmware
+ * or reset the digital core).  Completes with VSF_ERR_NOT_SUPPORTED when the
+ * bus has no vendor_request primitive.
+ *
+ * Same concurrency rules as vsf_wifi_run_script: at most one script / blob /
+ * vendor request in flight per wifi.
+ */
+vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
+                              uint16_t value, uint16_t index,
+                              vsf_wifi_done_t done);
+
+/*
+ * Periodically read `reg` until `match(val)` returns true.
+ *
+ *   reg          : MAC register to poll.
+ *   match        : predicate; the read value is fed in on every iteration.
+ *   max_retry    : upper bound on read attempts (>= 1).  The first read
+ *                  counts as attempt #1.
+ *   interval_ms  : delay between consecutive reads.  0 means "re-issue
+ *                  immediately on completion" (use only if the bus already
+ *                  paces reads, e.g. USB ep0 vendor request).
+ *   done         : completion callback.
+ *                    VSF_ERR_NONE      : predicate matched.
+ *                    VSF_ERR_TIMEOUT   : retries exhausted without match.
+ *                    other             : bus-level error.
+ *
+ * Same single-flight constraint as run_script / run_blob.
+ */
+vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
+                                 vsf_wifi_match_fn_t match,
+                                 uint16_t max_retry, uint16_t interval_ms,
+                                 vsf_wifi_done_t done);
+
+/*
+ * Single 32-bit register read.  The result is stored at *out before
+ * `done` fires; caller must keep `out` valid until then.  Same single-
+ * flight constraint as run_script / run_blob / run_read_poll.
+ */
+vsf_err_t vsf_wifi_run_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
                             vsf_wifi_done_t done);
 
 /* Per-wifi scratch op buffer (shared by parameterised chip ops). */

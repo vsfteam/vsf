@@ -41,6 +41,8 @@ struct vsf_wifi_t {
     uint8_t  channel;
     bool     is_ready;
     bool     disconnecting;     /* set in fini() to gate stale callbacks */
+    uint8_t  mac[6];            /* populated by chip-driver EEPROM stage; */
+                                /* zero until firmware_load chain finishes */
 
     /* ---- Scan state (wifi-driven hop scheduler) ---- */
     bool     scanning;
@@ -50,6 +52,11 @@ struct vsf_wifi_t {
     uint16_t scan_dwell_ms;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t scan_timer;
+    /* Read-poll spacing timer.  Logically independent of scan_timer:
+     * read_poll runs during firmware_load (is_ready == false) while scan
+     * runs after on_ready, but they could in principle overlap if a
+     * future chip op uses run_read_poll mid-flight, so we keep two. */
+    vsf_callback_timer_t read_poll_timer;
 #endif
 
     /* ---- Script / blob dispatcher state ----
@@ -76,6 +83,15 @@ struct vsf_wifi_t {
             uint16_t       base_reg;
             uint16_t       chunk_size;
         } blob;
+        struct {
+            uint16_t              reg;
+            uint16_t              retry_left;  /* attempts remaining after
+                                                * the current in-flight read */
+            uint16_t              interval_ms;
+            uint16_t              reserved;
+            uint32_t              last_val;    /* read landing zone */
+            vsf_wifi_match_fn_t   match;
+        } read_poll;
     } s;
 
     /*
