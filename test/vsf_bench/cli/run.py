@@ -1,22 +1,18 @@
 """vsf-bench — unified build / flash / test pipeline.
 
-Composes `pipeline.build_phase`, `pipeline.program_phase`, and
-`pipeline.run_test_phase` based on the requested flags. Standalone
-scripts (`vsf-bench-build`, `vsf-bench-flash`, `vsf-bench-test`) call
-the same underlying functions, so behavior stays consistent.
-
-LA capture supports two modes (see `--la-mode`):
-  * `shared` (default): a single LA capture for the entire run; uses
-    --decode-start / --decode-end so each suite's decode only scans its
-    own window.
-  * `per-suite`: one LA capture per suite; small files decode fast.
+Composes build_phase, program_phase, and run_test_phase from focused
+modules (phases/, board.py, test_runner.py) based on the requested flags.
 """
 
 import argparse
 import sys
 from pathlib import Path
 
-from vsf_bench import pipeline
+from vsf_bench.board import load_board, acquire_board_lock
+from vsf_bench.phases.build import build_phase
+from vsf_bench.phases.program import program_phase
+from vsf_bench.phases.la import la_capture_phase, la_decode_phase
+from vsf_bench.test_runner import run_test_phase
 from vsf_bench.cli._args import add_shared_test_args, resolve_shuffle_seed
 from vsf_bench.utils.tee_logger import init_logger as _init_logger
 from vsf_bench.utils.lock import LockBusyError
@@ -52,6 +48,14 @@ def parse_args():
         help="List available pipelines in hardware-map.yml",
     )
     return parser.parse_args()
+
+
+def _mk_run_dir(board: str, pipeline_or_project: str) -> Path:
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_dir = Path(f"logs/{timestamp}-{board}-{pipeline_or_project}").resolve()
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
 
 
 def _collect_projects(step, project_map, hw_path):
@@ -121,7 +125,7 @@ def main():
             for step in pipeline_obj.steps:
                 _collect_projects(step, project_map, hw_path)
 
-            run_dir = pipeline.mk_run_dir(board_name, args.pipeline)
+            run_dir = _mk_run_dir(board_name, args.pipeline)
             _init_logger(run_dir)
         except Exception as e:
             print(f"[vsf-bench] Pipeline error: {e}", file=sys.stderr)
@@ -165,7 +169,7 @@ def main():
     board = None
     if do_program or do_test or do_la_capture:
         try:
-            _board_result = pipeline.load_board(
+            _board_result = load_board(
                 hardware_map_path,
                 project_name=args.project,
                 board_name=(args.board[0] if args.board else None),
@@ -183,7 +187,7 @@ def main():
 
     # Create run_dir for this invocation, init TeeLogger inside it
     tag = board.name if board else "vsf-bench"
-    run_dir = pipeline.mk_run_dir(tag, args.pipeline or args.project or "vsf-bench")
+    run_dir = _mk_run_dir(tag, args.pipeline or args.project or "vsf-bench")
     _init_logger(run_dir)
 
     build_config = project.build
@@ -200,14 +204,14 @@ def main():
 
     if do_build:
         try:
-            build_dir = pipeline.build_phase(project)
+            build_dir = build_phase(project)
         except Exception as e:
             print(f"[vsf-bench] Build failed: {e}", file=sys.stderr)
             sys.exit(1)
 
     if do_program or do_test:
         try:
-            lock = pipeline.acquire_board_lock(board, args.wait)
+            lock = acquire_board_lock(board, args.wait)
         except LockBusyError as e:
             print(f"[vsf-bench] {e}", file=sys.stderr)
             sys.exit(3)
@@ -221,14 +225,14 @@ def main():
                 print("[vsf-bench] Run with --build first.", file=sys.stderr)
                 sys.exit(2)
             try:
-                pipeline.program_phase(board, build_dir, project=project)
+                program_phase(board, build_dir, project=project)
             except Exception as e:
                 print(f"[vsf-bench] Program failed: {e}", file=sys.stderr)
                 sys.exit(1)
 
         if do_la_capture:
             try:
-                dsl_path = pipeline.la_capture_phase(
+                dsl_path = la_capture_phase(
                     board=board,
                     run_dir=run_dir,
                     duration=args.la_duration,
@@ -240,7 +244,7 @@ def main():
 
             if do_la_decode:
                 try:
-                    pipeline.la_decode_phase(
+                    la_decode_phase(
                         capture_path=dsl_path,
                         channel=args.la_channel,
                         baudrate=args.la_baudrate,
@@ -254,7 +258,7 @@ def main():
                 print("[vsf-bench] Error: --la-decode requires --la-decode-file", file=sys.stderr)
                 sys.exit(2)
             try:
-                pipeline.la_decode_phase(
+                la_decode_phase(
                     capture_path=Path(args.la_decode_file),
                     channel=args.la_channel,
                     baudrate=args.la_baudrate,
@@ -279,7 +283,7 @@ def main():
         # run_dir already created above
 
         try:
-            overall_pass = pipeline.run_test_phase(
+            overall_pass = run_test_phase(
                 board=board,
                 suite_names=args.suite,
                 script_override=Path(args.script) if args.script else None,

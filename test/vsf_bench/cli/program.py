@@ -14,7 +14,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from vsf_bench import pipeline
+from vsf_bench.board import load_board, acquire_board_lock
+from vsf_bench.phases.program import program_phase
 from vsf_bench.cli._args import add_shared_test_args
 from vsf_bench.utils.lock import LockBusyError
 
@@ -28,7 +29,7 @@ def main():
 
     try:
         board_name = args.board[0] if args.board else None
-        board = pipeline.load_board(hardware_map_path, board_name=board_name)
+        board = load_board(hardware_map_path, board_name=board_name)
     except Exception as e:
         print(f"[vsf-bench-program] Config error: {e}", file=sys.stderr)
         sys.exit(2)
@@ -40,13 +41,13 @@ def main():
         sys.exit(2)
 
     try:
-        lock = pipeline.acquire_board_lock(board, args.wait)
+        lock = acquire_board_lock(board, args.wait)
     except LockBusyError as e:
         print(f"[vsf-bench-program] {e}", file=sys.stderr)
         sys.exit(3)
 
     try:
-        pipeline.program_phase(board, build_dir)
+        program_phase(board, build_dir)
     except Exception as e:
         print(f"[vsf-bench-program] Program failed: {e}", file=sys.stderr)
         sys.exit(1)

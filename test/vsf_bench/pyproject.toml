@@ -30,6 +30,7 @@ packages = [
     "vsf_bench.capabilities",
     "vsf_bench.cli",
     "vsf_bench.config",
+    "vsf_bench.phases",
     "vsf_bench.runners",
     "vsf_bench.targets",
     "vsf_bench.utils",
@@ -43,6 +44,7 @@ packages = [
 "vsf_bench.capabilities" = "capabilities"
 "vsf_bench.cli" = "cli"
 "vsf_bench.config" = "config"
+"vsf_bench.phases" = "phases"
 "vsf_bench.runners" = "runners"
 "vsf_bench.targets" = "targets"
 "vsf_bench.utils" = "utils"

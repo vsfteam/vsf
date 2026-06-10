@@ -187,7 +187,7 @@ def _step_build(params, project_map, run_dir):
     project_name = params.get("build") or params.get("project") or next(iter(project_map))
     _ensure_project_loaded(project_name, project_map)
     project = project_map[project_name]
-    from vsf_bench.pipeline import build_phase
+    from vsf_bench.phases.build import build_phase
     build_phase(project)
 
 
@@ -207,19 +207,19 @@ def _step_program(params, board, project_map, run_dir):
         p.setdefault("program_port", board.program_uart)
         p.setdefault("debug_port", board.debug_uart)
         p.setdefault("debug_baudrate", board.debug_baudrate)
-    from vsf_bench.pipeline import program_phase
+    from vsf_bench.phases.program import program_phase
     build_dir = Path(project.build.build_dir)
     program_phase(board, build_dir, project=project)
 
 
 def _step_power_cycle(board, params=None):
-    from vsf_bench.pipeline import _board_power_cycle
+    from vsf_bench.board import power_cycle as _board_power_cycle
     delay = float((params or {}).get("delay", 0.5))
     _board_power_cycle(board, delay_off_s=delay)
 
 
 def _step_power(board, state):
-    from vsf_bench.pipeline import _find_hub_by_addr
+    from vsf_bench.board import find_hub_by_addr as _find_hub_by_addr
     from smartusbhub import SmartUSBHub
     hub_com = _find_hub_by_addr(board.power.hub_addr)
     if hub_com:
@@ -292,7 +292,8 @@ def _step_la_start(params, board, run_dir):
     la_cfg = board.logic_analyzer
     if la_cfg is None:
         raise RuntimeError("No logic_analyzer config for board")
-    cli = _resolve_la_cli(la_cfg)
+    from vsf_bench.phases.la import resolve_la_cli
+    cli = resolve_la_cli(la_cfg)
     channel = params.get("channel", "CH8")
     duration = float(params.get("duration", 30))
     _la_adapter = DSViewAdapter(cli, la_cfg.device, la_cfg.samplerate, {"capture": channel})
@@ -316,7 +317,8 @@ def _step_la_decode(params, board, run_dir):
     la_cfg = board.logic_analyzer
     if la_cfg is None:
         raise RuntimeError("No logic_analyzer config for board")
-    cli = _resolve_la_cli(la_cfg)
+    from vsf_bench.phases.la import resolve_la_cli
+    cli = resolve_la_cli(la_cfg)
     channel = params.get("channel", "CH8")
     baudrate = int(params.get("baudrate", 2000000))
     cfg = UARTConfig(baudrate=baudrate)
@@ -392,12 +394,3 @@ def _stop_debug_stream_capture(run_dir=None):
         _debug_buf = ""
 
 
-def _resolve_la_cli(la_cfg):
-    import shutil
-    from pathlib import Path
-    cli = Path(la_cfg.cli) if la_cfg.cli else Path("dsview-cli")
-    if not la_cfg.cli:
-        resolved = shutil.which("dsview-cli")
-        if resolved:
-            cli = Path(resolved)
-    return cli

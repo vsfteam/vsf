@@ -13,7 +13,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from vsf_bench import pipeline
+from vsf_bench.board import load_board
+from vsf_bench.phases.build import build_phase
 
 
 def main():
@@ -29,7 +30,7 @@ def main():
 
     try:
         board_name = args.board[0] if args.board else None
-        board = pipeline.load_board(hardware_map_path, board_name=board_name)
+        board = load_board(hardware_map_path, board_name=board_name)
     except Exception as e:
         print(f"[vsf-bench-build] Config error: {e}", file=sys.stderr)
         sys.exit(2)
@@ -42,7 +43,7 @@ def main():
         board.build.build_dir = args.build_dir
 
     try:
-        pipeline.build_phase(board)
+        build_phase(board)
     except Exception as e:
         print(f"[vsf-bench-build] Build failed: {e}", file=sys.stderr)
         sys.exit(1)

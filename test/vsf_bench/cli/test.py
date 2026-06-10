@@ -15,7 +15,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from vsf_bench import pipeline
+from vsf_bench.board import load_board, acquire_board_lock
+from vsf_bench.test_runner import run_test_phase, run_test_phase_all
 from vsf_bench.cli._args import add_shared_test_args, resolve_shuffle_seed
 from vsf_bench.utils.lock import LockBusyError
 
@@ -36,7 +37,7 @@ def main():
             print("[vsf-bench-test] Error: --all-boards requires --project", file=sys.stderr)
             sys.exit(2)
         try:
-            results = pipeline.run_test_phase_all(
+            results = run_test_phase_all(
                 hardware_map_path=str(hardware_map_path),
                 project_name=args.project,
                 suite_names=args.suite,
@@ -58,7 +59,7 @@ def main():
         test_params_yml = None
 
     try:
-        board = pipeline.load_board(hardware_map_path, board_name=board_name)
+        board = load_board(hardware_map_path, board_name=board_name)
     except Exception as e:
         print(f"[vsf-bench-test] Config error: {e}", file=sys.stderr)
         sys.exit(2)
@@ -74,13 +75,13 @@ def main():
     log_dir = Path(args.log_dir) if args.log_dir else None
 
     try:
-        lock = pipeline.acquire_board_lock(board, args.wait)
+        lock = acquire_board_lock(board, args.wait)
     except LockBusyError as e:
         print(f"[vsf-bench-test] {e}", file=sys.stderr)
         sys.exit(3)
 
     try:
-        overall_pass = pipeline.run_test_phase(
+        overall_pass = run_test_phase(
             board=board,
             suite_names=args.suite,
             script_override=Path(args.script) if args.script else None,
