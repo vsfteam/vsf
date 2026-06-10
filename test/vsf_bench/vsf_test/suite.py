@@ -16,8 +16,8 @@ def discover_suites() -> dict[str, Path]:
     project layout (root repo, vsf.demo directly, or a private HAL).
     """
     suites: dict[str, Path] = {}
-    # vsf_bench and vsf_test_suite are siblings under vsf/test/.
-    base = (Path(__file__).resolve().parent / ".." / "vsf_test_suite").resolve()
+    # vsf_bench/vsf_test/ → vsf_bench/ → test/ → test/vsf_test_suite
+    base = (Path(__file__).resolve().parent / ".." / ".." / "vsf_test_suite").resolve()
     if not base.exists():
         return suites
 

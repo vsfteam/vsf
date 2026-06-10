@@ -392,6 +392,32 @@ class DebugSession:
             data = data[:null_pos]
         return data.decode("utf-8", errors="replace")
 
+    # ── breakpoints ──────────────────────────────────────
+
+    def set_breakpoint(self, addr: int) -> None:
+        """Set a hardware breakpoint at *addr*."""
+        self._pyocd_target.set_breakpoint(addr)
+
+    def remove_breakpoint(self, addr: int) -> None:
+        """Remove a hardware breakpoint at *addr*."""
+        self._pyocd_target.remove_breakpoint(addr)
+
+    def get_breakpoint_addresses(self) -> list[int]:
+        """Return list of currently set breakpoint addresses."""
+        return list(self._pyocd_target.get_breakpoint_addresses())
+
+    def run(self, timeout: float = 10.0) -> None:
+        """Resume CPU and wait until halted (by breakpoint)."""
+        import time
+        HALTED = self._pyocd_target.State.HALTED
+        self._pyocd_target.resume()
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if self._pyocd_target.get_state() == HALTED:
+                return
+            time.sleep(0.1)
+        raise TimeoutError(f"Breakpoint not hit within {timeout}s")
+
     # ── variable inspection ────────────────────────────────
 
     def read_variable(self, name: str) -> dict | None:

@@ -11,6 +11,12 @@ from vsf_bench.utils.core import parse_uart_csv, read_csv_rows
 from vsf_bench.test_runner import run_test_phase
 from vsf_bench.vsf_test.params_loader import load_test_params
 
+from vsf_bench.capabilities.logic_analyzer import LogicAnalyzer
+
+# Backward-compat: LogicAnalyzerInstrument removed (→ capabilities/adapters).
+# Test scripts still import it for type annotations on unused `la` parameter.
+LogicAnalyzerInstrument = object  # type: ignore[name-assigned]
+
 __all__ = [
     "SerialInstrument",
     "SuiteTimeoutError",
@@ -20,4 +26,6 @@ __all__ = [
     "load_test_params",
     "load_board",
     "run_test_phase",
+    "LogicAnalyzer",
+    "LogicAnalyzerInstrument",
 ]

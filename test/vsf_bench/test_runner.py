@@ -188,7 +188,8 @@ def run_test_phase(
                 cli_path = Path(cli_path)
 
     shell = VsfTestShellProtocol(ser)
-    shell_ready = shell.wait_for_shell_ready()
+    time.sleep(4.0)  # wait for firmware boot + shell init (thread adds delay)
+    shell_ready = shell.wait_for_shell_ready(timeout=5.0)
     if not shell_ready:
         _get_logger().event("Warning: shell not responding, proceeding anyway")
 

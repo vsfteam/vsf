@@ -8,7 +8,17 @@ from pathlib import Path
 from vsf_bench.config.map import load as load_hardware_map, validate_runners
 from vsf_bench.config.map import load_board_and_project as _load_board_and_project
 from vsf_bench.utils.lock import BoardLock
-from vsf_bench.utils.tee_logger import get_logger as _get_logger
+
+
+def _log_event(message: str) -> None:
+    """Log an event. Uses TeeLogger when available, else print."""
+    try:
+        from vsf_bench.utils.tee_logger import get_logger
+        get_logger().event(message)
+    except RuntimeError:
+        from datetime import datetime as _dt
+        ts = _dt.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        print(f"[{ts}] [vsf-bench] {message}")
 
 
 # ── Board loading ───────────────────────────────────────────
@@ -57,7 +67,7 @@ def acquire_board_lock(board, wait_spec=None) -> BoardLock | None:
         lock.acquire(wait=True)
     else:
         lock.acquire(wait=True, timeout=wait_spec)
-    _get_logger().event(f"Lock acquired: {board.name}")
+    _log_event(f"Lock acquired: {board.name}")
     return lock
 
 
@@ -104,7 +114,7 @@ def power_cycle(board, delay_off_s: float = 0.5) -> None:
                     hub.set_channel_power(board.power.port, state=state)
                 finally:
                     hub.disconnect()
-                _get_logger().event(f"power {label} port {board.power.port}")
+                _log_event(f"power {label} port {board.power.port}")
                 return
             except Exception as e:
                 last_exc = e

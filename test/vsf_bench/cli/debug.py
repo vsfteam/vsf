@@ -44,6 +44,12 @@ def parse_args():
     vars_p.add_argument("--elf", type=str, default=None,
                         help="Path to ELF/.out file (overrides --project auto-discovery)")
 
+    break_p = sub.add_parser("break", help="Set breakpoint at address or symbol")
+    break_p.add_argument("target", type=str, help="Address (hex) or symbol name")
+    _add_elf_args(break_p)
+
+    sub.add_parser("continue", help="Resume CPU and wait for breakpoint")
+
     parser.add_argument("--board", type=str, default=None)
     parser.add_argument("board_dir")
     return parser.parse_args()
@@ -304,6 +310,67 @@ def _print_variable(r: dict) -> None:
     print()
 
 
+def cmd_break(board, args):
+    """Halt CPU, set breakpoint at address/symbol, resume and wait for hit."""
+    from vsf_bench.utils.debug import DebugSession
+
+    elf_path = _find_elf(args, str(Path(args.board_dir).resolve()), board)
+    probe_cfg = board.debug_probe
+    target = probe_cfg.get("target", "cortex_m")
+    probe_id = probe_cfg.get("probe")
+
+    addr = _resolve_break_addr(args.target, elf_path)
+    with DebugSession(target=target, probe=probe_id, elf_path=elf_path) as dbg:
+        dbg.halt()
+        regs = dbg.read_core_regs()
+        print(f"[vsf-bench-debug] Halted at 0x{regs['PC']:08X}")
+        dbg.set_breakpoint(addr)
+        if elf_path:
+            func = dbg._elf.get_function(addr) if dbg._elf else ""
+            label = f" <{func}>" if func else ""
+            print(f"[vsf-bench-debug] Breakpoint at 0x{addr:08X}{label}")
+        else:
+            print(f"[vsf-bench-debug] Breakpoint at 0x{addr:08X}")
+        if elf_path:
+            print(f"[vsf-bench-debug] ELF: {elf_path}")
+        dbg.run()
+
+
+def _resolve_break_addr(target_str: str, elf_path: str | None) -> int:
+    """Resolve a hex address or symbol name to an integer address."""
+    try:
+        return int(target_str, 0)
+    except ValueError:
+        pass
+    if elf_path:
+        from vsf_bench.utils.debug import ElfContext
+        elf = ElfContext(elf_path)
+        elf._ensure_loaded()
+        addr_size = elf.get_variable(target_str)
+        if addr_size:
+            return addr_size[0]
+        for func_addr_key, (name, start, size) in elf._func_by_addr.items():
+            if name == target_str:
+                return start
+        raise ValueError(f"Symbol not found: {target_str}")
+    raise ValueError(f"Not a valid address and no ELF for symbol lookup: {target_str}")
+
+
+def cmd_continue(board, args):
+    """Resume CPU from halted state (useful after a manual halt)."""
+    from vsf_bench.utils.debug import DebugSession
+
+    probe_cfg = board.debug_probe
+    target = probe_cfg.get("target", "cortex_m")
+    probe_id = probe_cfg.get("probe")
+
+    with DebugSession(target=target, probe=probe_id) as dbg:
+        if dbg._pyocd_target.get_state() != dbg._pyocd_target.State.HALTED:
+            dbg.halt()
+        dbg._pyocd_target.resume()
+        print("[vsf-bench-debug] Resumed")
+
+
 def main():
     args = parse_args()
 
@@ -328,6 +395,8 @@ def main():
         "regs": cmd_regs,
         "read": cmd_read,
         "vars": cmd_vars,
+        "break": cmd_break,
+        "continue": cmd_continue,
     }
     try:
         handlers[args.cmd](board, args)
