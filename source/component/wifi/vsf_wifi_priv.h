@@ -59,6 +59,22 @@ struct vsf_wifi_t {
     vsf_callback_timer_t read_poll_timer;
 #endif
 
+    /* ---- MLME connection state (OPEN-system auth + association) ----
+     *
+     * Driven by the wifi layer (vsf_wifi.c).  mlme_state walks
+     * IDLE -> AUTH -> ASSOC -> RUN; each handshake step arms mlme_timer and
+     * retransmits up to mlme_retry times before giving up. */
+    uint8_t  mlme_state;        /* WIFI_MLME_xxx                          */
+    uint8_t  mlme_bssid[6];     /* target AP BSSID                        */
+    uint8_t  mlme_ssid[33];     /* target SSID (for assoc-req SSID IE)    */
+    uint8_t  mlme_ssid_len;
+    uint8_t  mlme_channel;      /* target channel                         */
+    uint8_t  mlme_retry;        /* retransmits left for current step      */
+    uint16_t mlme_aid;          /* association id from assoc-resp         */
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_t mlme_timer;
+#endif
+
     /* ---- Script / blob dispatcher state ----
      *
      * Only one outstanding script or blob is allowed per wifi (the bus_ops

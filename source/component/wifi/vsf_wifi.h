@@ -63,6 +63,32 @@ enum {
 #define WIFI_SCAN_FLAG_WPA2             (1 << 3)
 
 /*
+ * MLME connection state (OPEN-system auth + association).  Driven entirely
+ * by the wifi layer; the chip layer only strips RX descriptors and routes
+ * mgmt frames to vsf_wifi_mlme_rx().
+ */
+enum {
+    WIFI_MLME_IDLE      = 0,    /* not connecting / disconnected         */
+    WIFI_MLME_AUTH      = 1,    /* auth-req sent, awaiting auth-resp      */
+    WIFI_MLME_ASSOC     = 2,    /* assoc-req sent, awaiting assoc-resp    */
+    WIFI_MLME_RUN       = 3,    /* associated (link up)                  */
+};
+
+/*
+ * link-down reason codes passed to vsf_wifi_on_link_down().  Low values
+ * mirror common 802.11 reason codes; high values are wifi-layer specific.
+ */
+enum {
+    WIFI_REASON_UNSPECIFIED     = 1,
+    WIFI_REASON_AUTH_LEAVING    = 3,    /* deauth: STA is leaving         */
+    WIFI_REASON_DISASSOC_LEAVING= 8,    /* disassoc: STA is leaving       */
+    WIFI_REASON_LOCAL_TIMEOUT   = 200,  /* handshake retries exhausted    */
+    WIFI_REASON_AUTH_REJECTED   = 201,  /* auth-resp status != 0          */
+    WIFI_REASON_ASSOC_REJECTED  = 202,  /* assoc-resp status != 0         */
+    WIFI_REASON_LOCAL_DISCONNECT= 203,  /* user-requested disconnect      */
+};
+
+/*
  * Scratch op buffer size — caps how many ep0 register writes a parameterised
  * chip op (set_channel / connect / disconnect ...) can issue.  Static const
  * scripts (e.g. the chip init table) are not bounded by this.
@@ -408,14 +434,32 @@ void vsf_wifi_set_attach_fail(vsf_wifi_t *wifi, vsf_wifi_attach_fail_t hook);
  * it to drv->parse_rx (during scan) or vsf_wifi_on_rx (otherwise).  */
 void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len);
 
+/* MLME management-frame entry point.  The chip parser (drv->parse_rx) calls
+ * this with a de-descriptored, naked 802.11 management frame (starting at
+ * the FC field) when its subtype is auth / assoc-resp / deauth / disassoc.
+ * The wifi-layer MLME state machine advances the OPEN-system connection. */
+void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len);
+
 /* Bus driver invokes this from its EDA when the wifi-posted scan-hop event
  * lands; the wifi layer advances to the next channel or finishes the scan. */
 void vsf_wifi_on_scan_hop_evt(vsf_wifi_t *wifi);
+
+/* Bus driver invokes this from its EDA when the wifi-posted MLME-retry event
+ * lands; the wifi layer retransmits the current handshake frame (auth-req /
+ * assoc-req) or declares a link-down timeout once retries are exhausted.
+ * Bounced through the bus EDA (like scan-hop) so the TX runs in the same
+ * context as bus completions. */
+void vsf_wifi_on_mlme_retry_evt(vsf_wifi_t *wifi);
 
 /* Custom EDA event used by vsf_wifi to trigger a scan hop on the bus EDA.
  * The bus driver's evt-handler must dispatch this value to
  * vsf_wifi_on_scan_hop_evt(). */
 #define VSF_WIFI_EVT_SCAN_HOP           (VSF_EVT_USER + 0x40)
+
+/* Custom EDA event used by vsf_wifi to trigger an MLME handshake retransmit
+ * on the bus EDA.  The bus driver's evt-handler must dispatch this value to
+ * vsf_wifi_on_mlme_retry_evt(). */
+#define VSF_WIFI_EVT_MLME_RETRY         (VSF_EVT_USER + 0x41)
 
 /*============================ CHIP <-> WIFI INTERNAL API ====================*/
 

@@ -38,6 +38,16 @@ static void __vsf_wifi_on_fw_done       (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_init_done     (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_rxfilter_done (vsf_wifi_t *wifi, vsf_err_t err);
 
+/* ---- MLME (OPEN-system auth + association) state machine ---- */
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+static void __vsf_wifi_mlme_timer_cb (vsf_callback_timer_t *timer);
+#endif
+static void __vsf_wifi_mlme_connect_done(vsf_wifi_t *wifi, vsf_err_t err);
+static void __vsf_wifi_mlme_send_auth (vsf_wifi_t *wifi);
+static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi);
+static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason);
+static void __vsf_wifi_mlme_finish    (vsf_wifi_t *wifi, uint8_t reason);
+
 /* Active scan: probe each channel during its dwell window so that silent /
  * hidden APs answer with a probe-response.  Set to DISABLED for pure passive
  * (beacon-only) scanning. */
@@ -466,6 +476,8 @@ void vsf_wifi_init(vsf_wifi_t *wifi,
     wifi->scan_timer.on_timer = __vsf_wifi_scan_timer_cb;
     vsf_callback_timer_init(&wifi->read_poll_timer);
     wifi->read_poll_timer.on_timer = __vsf_wifi_read_poll_timer_cb;
+    vsf_callback_timer_init(&wifi->mlme_timer);
+    wifi->mlme_timer.on_timer = __vsf_wifi_mlme_timer_cb;
 #endif
 }
 
@@ -546,6 +558,7 @@ void vsf_wifi_fini(vsf_wifi_t *wifi)
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_remove(&wifi->scan_timer);
     vsf_callback_timer_remove(&wifi->read_poll_timer);
+    vsf_callback_timer_remove(&wifi->mlme_timer);
 #endif
 
     /* Step 2: notify user before tearing down chip state. */
@@ -562,8 +575,12 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     if (wifi->disconnecting) return;
     /* During a scan the chip parser owns the frame so it can extract
-     * beacons / probe responses; otherwise hand it to the application. */
-    if (wifi->scanning && wifi->drv->parse_rx != NULL) {
+     * beacons / probe responses; while an MLME handshake is in progress (or
+     * the link is up) the parser also routes mgmt frames to vsf_wifi_mlme_rx
+     * so auth / assoc-resp / deauth are observed.  Otherwise hand the raw
+     * frame to the application. */
+    if ((wifi->scanning || (wifi->mlme_state != WIFI_MLME_IDLE))
+            && wifi->drv->parse_rx != NULL) {
         wifi->drv->parse_rx(wifi, frame, len);
     } else {
         vsf_wifi_on_rx(wifi, frame, len);
@@ -678,6 +695,263 @@ void vsf_wifi_on_scan_hop_evt(vsf_wifi_t *wifi) { (void)wifi; }
 
 #endif
 
+/*============================ MLME STATE MACHINE ===========================*
+ *
+ * OPEN-system authentication + association, driven entirely by the wifi
+ * layer.  Sequence (each TX runs in the bus EDA / a bus-completion cb):
+ *
+ *   vsf_wifi_connect (any ctx)
+ *     -> drv->connect (lock channel + bssid + rx-filter, ep0 script)
+ *     -> __vsf_wifi_mlme_connect_done (bus EDA): state=AUTH, send auth-req,
+ *        arm mlme_timer
+ *     -> auth-resp(status=0) via vsf_wifi_mlme_rx (bus EDA): state=ASSOC,
+ *        send assoc-req, arm timer
+ *     -> assoc-resp(status=0): state=RUN, vsf_wifi_on_link_up
+ *
+ * On each handshake timeout the mlme_timer cb bounces VSF_WIFI_EVT_MLME_RETRY
+ * to the bus EDA, which retransmits up to __VSF_WIFI_MLME_MAX_RETRY times
+ * before declaring on_link_down(timeout).
+ *==========================================================================*/
+
+#define __VSF_WIFI_MLME_MAX_RETRY       3
+#define __VSF_WIFI_MLME_TIMEOUT_MS      400
+
+/* 802.11 mgmt subtypes (high nibble of FC byte0). */
+#define __DOT11_STYPE_ASSOC_REQ         0x0
+#define __DOT11_STYPE_ASSOC_RESP        0x1
+#define __DOT11_STYPE_PROBE_RESP        0x5
+#define __DOT11_STYPE_BEACON            0x8
+#define __DOT11_STYPE_DISASSOC          0xA
+#define __DOT11_STYPE_AUTH              0xB
+#define __DOT11_STYPE_DEAUTH            0xC
+
+/* Build the 24-byte 802.11 mgmt header into buf and return the next write
+ * offset (24).  fc0 = first FC byte (subtype<<4 | type(=mgmt,0)<<2).  All
+ * three addresses are the target BSSID except addr2 (our MAC). */
+static uint16_t __vsf_wifi_mlme_hdr(vsf_wifi_t *wifi, uint8_t *buf, uint8_t fc0)
+{
+    uint16_t i = 0;
+    buf[i++] = fc0;  buf[i++] = 0x00;               /* FC                  */
+    buf[i++] = 0x00; buf[i++] = 0x00;               /* duration            */
+    memcpy(&buf[i], wifi->mlme_bssid, 6); i += 6;   /* addr1 = DA = BSSID  */
+    memcpy(&buf[i], wifi->mac,        6); i += 6;   /* addr2 = SA = our MAC*/
+    memcpy(&buf[i], wifi->mlme_bssid, 6); i += 6;   /* addr3 = BSSID       */
+    buf[i++] = 0x00; buf[i++] = 0x00;               /* seq ctrl (hw fills) */
+    return i;
+}
+
+/* OPEN-system auth-request (30 bytes). */
+static void __vsf_wifi_mlme_send_auth(vsf_wifi_t *wifi)
+{
+    uint8_t  frame[64];
+    uint16_t i = __vsf_wifi_mlme_hdr(wifi, frame, 0xB0);  /* subtype 0xB */
+    frame[i++] = 0x00; frame[i++] = 0x00;   /* auth algorithm = open(0)   */
+    frame[i++] = 0x01; frame[i++] = 0x00;   /* transaction seq    = 1     */
+    frame[i++] = 0x00; frame[i++] = 0x00;   /* status code        = 0     */
+    vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_warning("wifi: mlme auth-req tx failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+    }
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_add_ms(&wifi->mlme_timer, __VSF_WIFI_MLME_TIMEOUT_MS);
+#endif
+}
+
+/* Association-request (variable length: header + fixed fields + IEs). */
+static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
+{
+    uint8_t  frame[128];
+    uint16_t i = __vsf_wifi_mlme_hdr(wifi, frame, 0x00);  /* subtype 0x0 */
+    frame[i++] = 0x01; frame[i++] = 0x00;   /* capability info: ESS       */
+    frame[i++] = 0x0A; frame[i++] = 0x00;   /* listen interval = 10       */
+    /* SSID IE. */
+    frame[i++] = 0x00; frame[i++] = wifi->mlme_ssid_len;
+    if (wifi->mlme_ssid_len > 0) {
+        memcpy(&frame[i], wifi->mlme_ssid, wifi->mlme_ssid_len);
+        i += wifi->mlme_ssid_len;
+    }
+    /* Supported-rates IE: 1/2/5.5/11/6/12/24/36 Mbps. */
+    frame[i++] = 0x01; frame[i++] = 0x08;
+    frame[i++] = 0x82; frame[i++] = 0x84; frame[i++] = 0x8B; frame[i++] = 0x96;
+    frame[i++] = 0x0C; frame[i++] = 0x18; frame[i++] = 0x30; frame[i++] = 0x48;
+    vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_warning("wifi: mlme assoc-req tx failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+    }
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_add_ms(&wifi->mlme_timer, __VSF_WIFI_MLME_TIMEOUT_MS);
+#endif
+}
+
+/* Deauthentication (26 bytes).  Best-effort; fire-and-forget. */
+static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason)
+{
+    uint8_t  frame[64];
+    uint16_t i = __vsf_wifi_mlme_hdr(wifi, frame, 0xC0);  /* subtype 0xC */
+    frame[i++] = reason & 0xFF; frame[i++] = (reason >> 8) & 0xFF;
+    (void)__vsf_wifi_tx_frame(wifi, frame, i);
+}
+
+/* Reset MLME to IDLE and notify the application of a link-down.  Called for
+ * every non-RUN exit (timeout / rejected / deauth / user disconnect). */
+static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
+{
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_remove(&wifi->mlme_timer);
+#endif
+    bool was_active = (wifi->mlme_state != WIFI_MLME_IDLE);
+    wifi->mlme_state = WIFI_MLME_IDLE;
+    wifi->mlme_retry = 0;
+    wifi->mlme_aid   = 0;
+    if (was_active) {
+        vsf_wifi_on_link_down(wifi, reason);
+    }
+}
+
+/* drv->connect completion: channel/bssid/rx-filter locked -> kick off the
+ * OPEN-system handshake by sending the auth-request.  Runs in the bus EDA. */
+static void __vsf_wifi_mlme_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (wifi->disconnecting) return;
+    if (wifi->mlme_state != WIFI_MLME_AUTH) return;
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_error("wifi: mlme connect prep failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+        __vsf_wifi_mlme_finish(wifi, WIFI_REASON_UNSPECIFIED);
+        return;
+    }
+    wifi->mlme_retry = __VSF_WIFI_MLME_MAX_RETRY;
+    __vsf_wifi_mlme_send_auth(wifi);
+}
+
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+/* mlme_timer expiry (kernel timer EDA) — bounce to the bus EDA so the
+ * retransmit TX runs in the same context as bus completions. */
+static void __vsf_wifi_mlme_timer_cb(vsf_callback_timer_t *timer)
+{
+    vsf_wifi_t *wifi = vsf_container_of(timer, vsf_wifi_t, mlme_timer);
+    if (wifi->disconnecting) return;
+    if ((wifi->mlme_state != WIFI_MLME_AUTH)
+            && (wifi->mlme_state != WIFI_MLME_ASSOC)) {
+        return;
+    }
+    if (wifi->post_eda != NULL) {
+        vsf_eda_post_evt(wifi->post_eda, VSF_WIFI_EVT_MLME_RETRY);
+    }
+}
+#endif
+
+void vsf_wifi_on_mlme_retry_evt(vsf_wifi_t *wifi)
+{
+    if (wifi->disconnecting) return;
+    if ((wifi->mlme_state != WIFI_MLME_AUTH)
+            && (wifi->mlme_state != WIFI_MLME_ASSOC)) {
+        return;
+    }
+    if (wifi->mlme_retry == 0) {
+        vsf_trace_warning("wifi: mlme handshake timeout (state=%u)"
+                VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_state);
+        __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_TIMEOUT);
+        return;
+    }
+    wifi->mlme_retry--;
+    if (wifi->mlme_state == WIFI_MLME_AUTH) {
+        __vsf_wifi_mlme_send_auth(wifi);
+    } else {
+        __vsf_wifi_mlme_send_assoc(wifi);
+    }
+}
+
+/* Read a little-endian uint16 from a byte pointer. */
+static uint16_t __vsf_wifi_rd16(const uint8_t *p)
+{
+    return (uint16_t)(p[0] | ((uint16_t)p[1] << 8));
+}
+
+void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
+{
+    if (wifi->disconnecting) return;
+    if (wifi->mlme_state == WIFI_MLME_IDLE) return;
+    if ((dot11 == NULL) || (len < 24)) return;
+
+    uint8_t  subtype = (dot11[0] >> 4) & 0x0F;
+    const uint8_t *body = dot11 + 24;       /* skip 24-byte mgmt header */
+    uint16_t       body_len = len - 24;
+
+    switch (subtype) {
+    case __DOT11_STYPE_AUTH:
+        /* auth-resp: algorithm(2)=0, seq(2)=2, status(2)=0. */
+        if (wifi->mlme_state != WIFI_MLME_AUTH) return;
+        if (body_len < 6) return;
+        if (__vsf_wifi_rd16(&body[0]) != 0) return;     /* algorithm = open */
+        if (__vsf_wifi_rd16(&body[2]) != 2) return;     /* expect seq 2     */
+        {
+            uint16_t status = __vsf_wifi_rd16(&body[4]);
+            if (status != 0) {
+                vsf_trace_warning("wifi: auth rejected (status=%u)"
+                        VSF_TRACE_CFG_LINEEND, (unsigned)status);
+                __vsf_wifi_mlme_finish(wifi, WIFI_REASON_AUTH_REJECTED);
+                return;
+            }
+        }
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+        vsf_callback_timer_remove(&wifi->mlme_timer);
+#endif
+        vsf_trace_info("wifi: auth ok, sending assoc-req" VSF_TRACE_CFG_LINEEND);
+        wifi->mlme_state = WIFI_MLME_ASSOC;
+        wifi->mlme_retry = __VSF_WIFI_MLME_MAX_RETRY;
+        __vsf_wifi_mlme_send_assoc(wifi);
+        break;
+
+    case __DOT11_STYPE_ASSOC_RESP:
+        /* assoc-resp: capability(2), status(2), AID(2). */
+        if (wifi->mlme_state != WIFI_MLME_ASSOC) return;
+        if (body_len < 6) return;
+        {
+            uint16_t status = __vsf_wifi_rd16(&body[2]);
+            if (status != 0) {
+                vsf_trace_warning("wifi: assoc rejected (status=%u)"
+                        VSF_TRACE_CFG_LINEEND, (unsigned)status);
+                __vsf_wifi_mlme_finish(wifi, WIFI_REASON_ASSOC_REJECTED);
+                return;
+            }
+            wifi->mlme_aid = __vsf_wifi_rd16(&body[4]) & 0x3FFF;
+        }
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+        vsf_callback_timer_remove(&wifi->mlme_timer);
+#endif
+        wifi->mlme_state = WIFI_MLME_RUN;
+        wifi->mlme_retry = 0;
+        vsf_trace_info("wifi: associated, aid=%u (link up)"
+                VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
+        {
+            vsf_wifi_link_info_t info;
+            memset(&info, 0, sizeof(info));
+            memcpy(info.bssid, wifi->mlme_bssid, 6);
+            info.channel = wifi->mlme_channel;
+            info.flags   = WIFI_LINK_FLAG_CONNECTED | WIFI_LINK_FLAG_AUTHORIZED;
+            vsf_wifi_on_link_up(wifi, &info);
+        }
+        break;
+
+    case __DOT11_STYPE_DEAUTH:
+    case __DOT11_STYPE_DISASSOC: {
+        uint16_t reason = (body_len >= 2) ? __vsf_wifi_rd16(&body[0])
+                                          : WIFI_REASON_UNSPECIFIED;
+        vsf_trace_info("wifi: received %s (reason=%u)" VSF_TRACE_CFG_LINEEND,
+                (subtype == __DOT11_STYPE_DEAUTH) ? "deauth" : "disassoc",
+                (unsigned)reason);
+        __vsf_wifi_mlme_finish(wifi, (uint8_t)reason);
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
 /*============================ USER API ======================================*/
 
 bool vsf_wifi_is_ready(vsf_wifi_t *wifi)
@@ -785,14 +1059,49 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
 {
     if (!wifi->is_ready || !wifi->drv->connect) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
-    return wifi->drv->connect(wifi, bssid, ssid, ssid_len, channel, NULL);
+    if (wifi->mlme_state != WIFI_MLME_IDLE) return VSF_ERR_NOT_AVAILABLE;
+    if ((bssid == NULL) || (channel == 0)) return VSF_ERR_INVALID_PARAMETER;
+
+    /* Stash the target so the MLME state machine can build auth / assoc
+     * frames and so a retransmit has the same parameters. */
+    memcpy(wifi->mlme_bssid, bssid, 6);
+    if (ssid_len > sizeof(wifi->mlme_ssid) - 1) {
+        ssid_len = sizeof(wifi->mlme_ssid) - 1;
+    }
+    if ((ssid != NULL) && (ssid_len > 0)) {
+        memcpy(wifi->mlme_ssid, ssid, ssid_len);
+    }
+    wifi->mlme_ssid_len = ssid_len;
+    wifi->mlme_channel  = channel;
+    wifi->mlme_aid      = 0;
+    wifi->mlme_retry    = __VSF_WIFI_MLME_MAX_RETRY;
+    wifi->mlme_state    = WIFI_MLME_AUTH;
+
+    /* drv->connect locks channel + BSSID + RX filter; its completion kicks
+     * off the OPEN-system handshake (auth-req) in the bus EDA. */
+    vsf_err_t err = wifi->drv->connect(wifi, bssid, ssid, ssid_len, channel,
+            __vsf_wifi_mlme_connect_done);
+    if (VSF_ERR_NONE != err) {
+        wifi->mlme_state = WIFI_MLME_IDLE;
+    }
+    return err;
 }
 
 vsf_err_t vsf_wifi_disconnect(vsf_wifi_t *wifi)
 {
     if (!wifi->is_ready || !wifi->drv->disconnect) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
-    return wifi->drv->disconnect(wifi, NULL);
+    if (wifi->mlme_state == WIFI_MLME_IDLE) return VSF_ERR_NONE;
+
+    /* Best-effort deauth so the AP frees our association immediately. */
+    __vsf_wifi_mlme_send_deauth(wifi, WIFI_REASON_AUTH_LEAVING);
+
+    /* Tear down chip-side BSSID / RX filter; ignore its async completion. */
+    vsf_err_t err = wifi->drv->disconnect(wifi, NULL);
+
+    /* Drop the link locally regardless of the deauth/disconnect outcome. */
+    __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_DISCONNECT);
+    return err;
 }
 
 vsf_err_t vsf_wifi_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)

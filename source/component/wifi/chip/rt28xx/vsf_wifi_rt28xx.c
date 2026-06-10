@@ -935,6 +935,14 @@ static int __rt28xx_emit_bssid(vsf_wifi_op_t *ops, int n, const uint8_t bssid[6]
 #define RT28XX_DOT11_HDR_MIN            24
 #define RT28XX_BEACON_FIXED             12      /* timestamp+interval+capa */
 
+/* 802.11 management-frame subtypes (high nibble of FC byte0). */
+#define RT28XX_STYPE_ASSOC_RESP         0x1
+#define RT28XX_STYPE_PROBE_RESP         0x5
+#define RT28XX_STYPE_BEACON             0x8
+#define RT28XX_STYPE_DISASSOC           0xA
+#define RT28XX_STYPE_AUTH               0xB
+#define RT28XX_STYPE_DEAUTH             0xC
+
 static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     if (len < (RT28XX_RXINFO_DESC_SIZE + RT28XX_RXWI_DESC_SIZE_5572
@@ -972,7 +980,25 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt */
     uint8_t  subtype = (uint8_t)((fc >> 4) & 0xF);   /* 8 = beacon, 5 = probe-resp */
     if (type != 0) return;
-    if (subtype != 8 && subtype != 5) return;
+
+    /* Route management subtypes.  Auth / assoc-resp / deauth / disassoc feed
+     * the wifi-layer MLME state machine (passing the de-descriptored naked
+     * 802.11 frame starting at FC); beacon / probe-resp are scan results
+     * consumed only while scanning. */
+    switch (subtype) {
+    case RT28XX_STYPE_ASSOC_RESP:
+    case RT28XX_STYPE_AUTH:
+    case RT28XX_STYPE_DEAUTH:
+    case RT28XX_STYPE_DISASSOC:
+        vsf_wifi_mlme_rx(wifi, hdr, mpdu_len);
+        return;
+    case RT28XX_STYPE_BEACON:
+    case RT28XX_STYPE_PROBE_RESP:
+        if (!wifi->scanning) return;
+        break;
+    default:
+        return;
+    }
 
     /* Mgmt frame fixed header: FC(2) Dur(2) DA(6) SA(6) BSSID(6) SeqCtrl(2) = 24B.
      * Beacon / probe-resp body opens with: Timestamp(8) Interval(2) Capability(2). */

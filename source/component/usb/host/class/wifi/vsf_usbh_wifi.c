@@ -409,6 +409,10 @@ static void __vk_usbh_wifi_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsf_wifi_on_scan_hop_evt(&uwifi->wifi);
         return;
 
+    case VSF_WIFI_EVT_MLME_RETRY:
+        vsf_wifi_on_mlme_retry_evt(&uwifi->wifi);
+        return;
+
     case VSF_EVT_MESSAGE: {
         vk_usbh_hcd_urb_t *urb_hcd =
                 (vk_usbh_hcd_urb_t *)vsf_eda_get_cur_msg();
