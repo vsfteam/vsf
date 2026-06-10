@@ -74,9 +74,9 @@ enum {
 #   define VSF_WIFI_CFG_SCRATCH_OPS     16
 #endif
 
-/* Maximum number of channels in a single active scan (2.4 GHz band). */
+/* Maximum number of channels in a single active scan (2.4 GHz + 5 GHz). */
 #ifndef VSF_WIFI_CFG_SCAN_MAX_CHANNELS
-#   define VSF_WIFI_CFG_SCAN_MAX_CHANNELS   14
+#   define VSF_WIFI_CFG_SCAN_MAX_CHANNELS   40
 #endif
 
 /*============================ TYPES =========================================*/

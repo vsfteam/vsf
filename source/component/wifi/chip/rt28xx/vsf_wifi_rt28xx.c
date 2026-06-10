@@ -244,6 +244,7 @@
 #define RFCSR49_TX                      0x3F
 #define RFCSR50_TX                      0x3F
 #define RT28XX_POWER_BOUND              0x27
+#define RT28XX_POWER_BOUND_5G          0x2B   /* POWER_BOUND_5G (rt2800lib.c) */
 
 /*---- BBP field bits (RF5592) ----*/
 #define BBP4_MAC_IF_CTRL                0x40
@@ -271,6 +272,16 @@
  * TX_BAND_CFG: BG=1 (2.4 GHz), A=0, HT40_MINUS=0. */
 #define RT28XX_TX_PIN_CFG_2G            0x00050F02
 #define RT28XX_TX_BAND_CFG_2G           0x00000004
+/*---- TX_PIN_CFG / TX_BAND_CFG : 5 GHz (A-band) path enables ----
+ * TX_PIN_CFG (2T2R): PA_PE_A0(0x1) | PA_PE_A1(0x4) | LNA_PE_A0(0x100) |
+ *             LNA_PE_G0(0x200) | LNA_PE_A1(0x400) | LNA_PE_G1(0x800) |
+ *             RFTR_EN(0x10000) | TRSW_EN(0x40000).  ref config_channel() turns
+ *             on the A-band PAs (channel > 14) plus both LNA chains.
+ * TX_BAND_CFG: A=1 (5 GHz), BG=0, HT40_MINUS=0. */
+#define RT28XX_TX_PIN_CFG_5G            0x00050F05
+#define RT28XX_TX_BAND_CFG_5G           0x00000002
+/* LDO_CORE_VLEVEL value for 5 GHz / HT40 = 5 (bit26-28). */
+#define RT28XX_LDO_CFG0_VLEVEL_5G      (5u << 26)
 
 /*============================ OP MACROS =====================================*
  *
@@ -594,100 +605,237 @@ static const vsf_wifi_op_t __rt28xx_post_fw_script[] = {
 };
 
 /*============================ CHANNEL TABLE =================================*
- * RF5592 frequency-synthesiser values {N, K, mod, R}, selected by the on-chip
- * crystal (20 vs 40 MHz, see __rt28xx_xtal40).  Only 2.4 GHz (ch 1-14) is
- * populated -- that is all `wifi scan` needs.  Verbatim from
- * rf_vals_5592_xtal20 / rf_vals_5592_xtal40 (rt2800lib.c).
+ * RF5592 frequency-synthesiser values {channel, N, K, mod, R}, selected by the
+ * on-chip crystal (20 vs 40 MHz, see __rt28xx_xtal40).  Both 2.4 GHz (ch 1-14)
+ * and 5 GHz (ch 36-196) are populated.  Verbatim from rf_vals_5592_xtal20 /
+ * rf_vals_5592_xtal40 (rt2800lib.c).  Channel numbers in the 5 GHz band are
+ * not contiguous, so entries are looked up by channel rather than indexed.
  *==========================================================================*/
 
 typedef struct {
+    uint16_t channel;
     uint16_t n;
     uint8_t  k;
     uint8_t  mod;
     uint8_t  r;
 } rt28xx_rf_channel_t;
 
-static const rt28xx_rf_channel_t __rf_vals_5592_xtal20[14] = {
-    {482, 4, 10, 3}, {483, 4, 10, 3}, {484, 4, 10, 3}, {485, 4, 10, 3},
-    {486, 4, 10, 3}, {487, 4, 10, 3}, {488, 4, 10, 3}, {489, 4, 10, 3},
-    {490, 4, 10, 3}, {491, 4, 10, 3}, {492, 4, 10, 3}, {493, 4, 10, 3},
-    {494, 4, 10, 3}, {496, 8, 10, 3},
+static const rt28xx_rf_channel_t __rf_vals_5592_xtal20[] = {
+    {1, 482, 4, 10, 3}, {2, 483, 4, 10, 3}, {3, 484, 4, 10, 3},
+    {4, 485, 4, 10, 3}, {5, 486, 4, 10, 3}, {6, 487, 4, 10, 3},
+    {7, 488, 4, 10, 3}, {8, 489, 4, 10, 3}, {9, 490, 4, 10, 3},
+    {10, 491, 4, 10, 3}, {11, 492, 4, 10, 3}, {12, 493, 4, 10, 3},
+    {13, 494, 4, 10, 3}, {14, 496, 8, 10, 3},
+    {36, 172, 8, 12, 1}, {38, 173, 0, 12, 1}, {40, 173, 4, 12, 1},
+    {42, 173, 8, 12, 1}, {44, 174, 0, 12, 1}, {46, 174, 4, 12, 1},
+    {48, 174, 8, 12, 1}, {50, 175, 0, 12, 1}, {52, 175, 4, 12, 1},
+    {54, 175, 8, 12, 1}, {56, 176, 0, 12, 1}, {58, 176, 4, 12, 1},
+    {60, 176, 8, 12, 1}, {62, 177, 0, 12, 1}, {64, 177, 4, 12, 1},
+    {100, 183, 4, 12, 1}, {102, 183, 8, 12, 1}, {104, 184, 0, 12, 1},
+    {106, 184, 4, 12, 1}, {108, 184, 8, 12, 1}, {110, 185, 0, 12, 1},
+    {112, 185, 4, 12, 1}, {114, 185, 8, 12, 1}, {116, 186, 0, 12, 1},
+    {118, 186, 4, 12, 1}, {120, 186, 8, 12, 1}, {122, 187, 0, 12, 1},
+    {124, 187, 4, 12, 1}, {126, 187, 8, 12, 1}, {128, 188, 0, 12, 1},
+    {130, 188, 4, 12, 1}, {132, 188, 8, 12, 1}, {134, 189, 0, 12, 1},
+    {136, 189, 4, 12, 1}, {138, 189, 8, 12, 1}, {140, 190, 0, 12, 1},
+    {149, 191, 6, 12, 1}, {151, 191, 10, 12, 1}, {153, 192, 2, 12, 1},
+    {155, 192, 6, 12, 1}, {157, 192, 10, 12, 1}, {159, 193, 2, 12, 1},
+    {161, 193, 6, 12, 1}, {165, 194, 2, 12, 1}, {184, 164, 0, 12, 1},
+    {188, 164, 4, 12, 1}, {192, 165, 8, 12, 1}, {196, 166, 0, 12, 1},
 };
 
-static const rt28xx_rf_channel_t __rf_vals_5592_xtal40[14] = {
-    {241, 2, 10, 3}, {241, 7, 10, 3}, {242, 2, 10, 3}, {242, 7, 10, 3},
-    {243, 2, 10, 3}, {243, 7, 10, 3}, {244, 2, 10, 3}, {244, 7, 10, 3},
-    {245, 2, 10, 3}, {245, 7, 10, 3}, {246, 2, 10, 3}, {246, 7, 10, 3},
-    {247, 2, 10, 3}, {248, 4, 10, 3},
+static const rt28xx_rf_channel_t __rf_vals_5592_xtal40[] = {
+    {1, 241, 2, 10, 3}, {2, 241, 7, 10, 3}, {3, 242, 2, 10, 3},
+    {4, 242, 7, 10, 3}, {5, 243, 2, 10, 3}, {6, 243, 7, 10, 3},
+    {7, 244, 2, 10, 3}, {8, 244, 7, 10, 3}, {9, 245, 2, 10, 3},
+    {10, 245, 7, 10, 3}, {11, 246, 2, 10, 3}, {12, 246, 7, 10, 3},
+    {13, 247, 2, 10, 3}, {14, 248, 4, 10, 3},
+    {36, 86, 4, 12, 1}, {38, 86, 6, 12, 1}, {40, 86, 8, 12, 1},
+    {42, 86, 10, 12, 1}, {44, 87, 0, 12, 1}, {46, 87, 2, 12, 1},
+    {48, 87, 4, 12, 1}, {50, 87, 6, 12, 1}, {52, 87, 8, 12, 1},
+    {54, 87, 10, 12, 1}, {56, 88, 0, 12, 1}, {58, 88, 2, 12, 1},
+    {60, 88, 4, 12, 1}, {62, 88, 6, 12, 1}, {64, 88, 8, 12, 1},
+    {100, 91, 8, 12, 1}, {102, 91, 10, 12, 1}, {104, 92, 0, 12, 1},
+    {106, 92, 2, 12, 1}, {108, 92, 4, 12, 1}, {110, 92, 6, 12, 1},
+    {112, 92, 8, 12, 1}, {114, 92, 10, 12, 1}, {116, 93, 0, 12, 1},
+    {118, 93, 2, 12, 1}, {120, 93, 4, 12, 1}, {122, 93, 6, 12, 1},
+    {124, 93, 8, 12, 1}, {126, 93, 10, 12, 1}, {128, 94, 0, 12, 1},
+    {130, 94, 2, 12, 1}, {132, 94, 4, 12, 1}, {134, 94, 6, 12, 1},
+    {136, 94, 8, 12, 1}, {138, 94, 10, 12, 1}, {140, 95, 0, 12, 1},
+    {149, 95, 9, 12, 1}, {151, 95, 11, 12, 1}, {153, 96, 1, 12, 1},
+    {155, 96, 3, 12, 1}, {157, 96, 5, 12, 1}, {159, 96, 7, 12, 1},
+    {161, 96, 9, 12, 1}, {165, 97, 1, 12, 1}, {184, 82, 0, 12, 1},
+    {188, 82, 4, 12, 1}, {192, 82, 8, 12, 1}, {196, 83, 0, 12, 1},
 };
 
 /* Set from MAC_DEBUG_INDEX bit31 during bring-up (1 = 40 MHz crystal). */
 static uint8_t __rt28xx_xtal40;
 
+/* Look up the RF synth values for a channel in the active crystal table.
+ * Returns NULL for channels not present in the table. */
+static const rt28xx_rf_channel_t *__rt28xx_find_rf(uint8_t channel)
+{
+    const rt28xx_rf_channel_t *tbl;
+    uint32_t i, cnt;
+    if (__rt28xx_xtal40) {
+        tbl = __rf_vals_5592_xtal40;
+        cnt = dimof(__rf_vals_5592_xtal40);
+    } else {
+        tbl = __rf_vals_5592_xtal20;
+        cnt = dimof(__rf_vals_5592_xtal20);
+    }
+    for (i = 0; i < cnt; i++) {
+        if (tbl[i].channel == channel) {
+            return &tbl[i];
+        }
+    }
+    return NULL;
+}
+
 /*============================ HELPERS =======================================*/
 
-/* Port of rt2800_config_channel_rf55xx() 2.4 GHz branch + the RF5592 common
- * tail of rt2800_config_channel().  Single RX/TX chain, antenna 0, lna_gain 0,
- * 20 MHz OFDM (not 11b), TX power clamped to POWER_BOUND.  freq_cal_mode1 and
- * iq_calibrate are skipped (MCU command / EEPROM dependent).  BBP3/BBP4 are
- * left untouched: HT40_MINUS / BANDWIDTH are already 0 from init. */
+/* Port of rt2800_config_channel_rf55xx() (both bands) + the RF5592 common
+ * tail of rt2800_config_channel().  2T2R, lna_gain 0, 20 MHz OFDM (not 11b),
+ * TX power clamped to POWER_BOUND / POWER_BOUND_5G.  freq_cal_mode1 and
+ * iq_calibrate are skipped (MCU command / EEPROM dependent).  BBP3 untouched
+ * (HT40_MINUS already 0). */
 static int __rt28xx_emit_channel(vsf_wifi_op_t *ops, int n, uint8_t channel)
 {
     const rt28xx_rf_channel_t *rf;
-    uint8_t rfcsr9, rf2359;
+    uint8_t rfcsr9, power_bound;
+    bool is_5g;
 
-    if (channel < 1)  { channel = 1; }
-    if (channel > 14) { channel = 14; }
-    rf = __rt28xx_xtal40 ? &__rf_vals_5592_xtal40[channel - 1]
-                         : &__rf_vals_5592_xtal20[channel - 1];
+    rf = __rt28xx_find_rf(channel);
+    if (NULL == rf) {
+        channel = 1;
+        rf = __rt28xx_find_rf(1);
+    }
+    is_5g = (channel > 14);
+    power_bound = is_5g ? RT28XX_POWER_BOUND_5G : RT28XX_POWER_BOUND;
 
-    /* N / K / mod / R -> RFCSR8/9/11 */
+    /* N / K / mod / R -> RFCSR8/9/11 (common prefix) */
     n = __emit_rf(ops, n, 8, (uint8_t)(rf->n & 0xFF));
     rfcsr9 = (uint8_t)(rf->k & RFCSR9_K);
     if (rf->n & 0x100)               { rfcsr9 |= RFCSR9_N; }
     if (((rf->mod - 8) & 0x04) >> 2) { rfcsr9 |= RFCSR9_MOD; }
     n = __emit_rf_rmw(ops, n, 9, RFCSR9_K | RFCSR9_N | RFCSR9_MOD, rfcsr9);
-    /* RFCSR11 R/MOD are immediately overwritten by 0x4A on 2.4 GHz */
-    n = __emit_rf(ops, n, 11, 0x4A);
 
-    /* 2.4 GHz fixed RF block */
-    n = __emit_rf(ops, n, 10, 0x90);
-    n = __emit_rf(ops, n, 12, 0x52);
-    n = __emit_rf(ops, n, 13, 0x42);
-    n = __emit_rf(ops, n, 22, 0x40);
-    n = __emit_rf(ops, n, 24, 0x4A);
-    n = __emit_rf(ops, n, 25, 0x80);
-    n = __emit_rf(ops, n, 27, 0x42);
-    n = __emit_rf(ops, n, 36, 0x80);
-    n = __emit_rf(ops, n, 37, 0x08);
-    n = __emit_rf(ops, n, 38, 0x89);
-    n = __emit_rf(ops, n, 39, 0x1B);
-    n = __emit_rf(ops, n, 40, 0x0D);
-    n = __emit_rf(ops, n, 41, 0x9B);
-    n = __emit_rf(ops, n, 42, 0xD5);
-    n = __emit_rf(ops, n, 43, 0x72);
-    n = __emit_rf(ops, n, 44, 0x0E);
-    n = __emit_rf(ops, n, 45, 0xA2);
-    n = __emit_rf(ops, n, 46, 0x6B);
-    n = __emit_rf(ops, n, 48, 0x10);
-    n = __emit_rf(ops, n, 51, 0x3E);
-    n = __emit_rf(ops, n, 52, 0x48);
-    n = __emit_rf(ops, n, 54, 0x38);
-    n = __emit_rf(ops, n, 56, 0xA1);
-    n = __emit_rf(ops, n, 57, 0x00);
-    n = __emit_rf(ops, n, 58, 0x39);
-    n = __emit_rf(ops, n, 60, 0x45);
-    n = __emit_rf(ops, n, 61, 0x91);
-    n = __emit_rf(ops, n, 62, 0x39);
+    if (!is_5g) {
+        uint8_t rf2359;
+        /* RFCSR11 R/MOD are immediately overwritten by 0x4A on 2.4 GHz */
+        n = __emit_rf(ops, n, 11, 0x4A);
 
-    rf2359 = (channel <= 10) ? 0x07 : 0x06;
-    n = __emit_rf(ops, n, 23, rf2359);
-    n = __emit_rf(ops, n, 59, rf2359);
-    n = __emit_rf(ops, n, 55, 0x43);   /* OFDM, non-EP */
+        /* 2.4 GHz fixed RF block */
+        n = __emit_rf(ops, n, 10, 0x90);
+        n = __emit_rf(ops, n, 12, 0x52);
+        n = __emit_rf(ops, n, 13, 0x42);
+        n = __emit_rf(ops, n, 22, 0x40);
+        n = __emit_rf(ops, n, 24, 0x4A);
+        n = __emit_rf(ops, n, 25, 0x80);
+        n = __emit_rf(ops, n, 27, 0x42);
+        n = __emit_rf(ops, n, 36, 0x80);
+        n = __emit_rf(ops, n, 37, 0x08);
+        n = __emit_rf(ops, n, 38, 0x89);
+        n = __emit_rf(ops, n, 39, 0x1B);
+        n = __emit_rf(ops, n, 40, 0x0D);
+        n = __emit_rf(ops, n, 41, 0x9B);
+        n = __emit_rf(ops, n, 42, 0xD5);
+        n = __emit_rf(ops, n, 43, 0x72);
+        n = __emit_rf(ops, n, 44, 0x0E);
+        n = __emit_rf(ops, n, 45, 0xA2);
+        n = __emit_rf(ops, n, 46, 0x6B);
+        n = __emit_rf(ops, n, 48, 0x10);
+        n = __emit_rf(ops, n, 51, 0x3E);
+        n = __emit_rf(ops, n, 52, 0x48);
+        n = __emit_rf(ops, n, 54, 0x38);
+        n = __emit_rf(ops, n, 56, 0xA1);
+        n = __emit_rf(ops, n, 57, 0x00);
+        n = __emit_rf(ops, n, 58, 0x39);
+        n = __emit_rf(ops, n, 60, 0x45);
+        n = __emit_rf(ops, n, 61, 0x91);
+        n = __emit_rf(ops, n, 62, 0x39);
 
-    /* TX power (no EEPROM cal -> clamp to POWER_BOUND) */
-    n = __emit_rf_rmw(ops, n, 49, RFCSR49_TX, RT28XX_POWER_BOUND);
-    n = __emit_rf_rmw(ops, n, 50, RFCSR50_TX, RT28XX_POWER_BOUND);
+        rf2359 = (channel <= 10) ? 0x07 : 0x06;
+        n = __emit_rf(ops, n, 23, rf2359);
+        n = __emit_rf(ops, n, 59, rf2359);
+        n = __emit_rf(ops, n, 55, 0x43);   /* OFDM, non-EP */
+    } else {
+        /* 5 GHz: RFCSR11 overwritten by 0x40; common A-band RF block */
+        n = __emit_rf(ops, n, 10, 0x97);
+        n = __emit_rf(ops, n, 11, 0x40);
+        n = __emit_rf(ops, n, 25, 0xBF);
+        n = __emit_rf(ops, n, 27, 0x42);
+        n = __emit_rf(ops, n, 36, 0x00);
+        n = __emit_rf(ops, n, 37, 0x04);
+        n = __emit_rf(ops, n, 38, 0x85);
+        n = __emit_rf(ops, n, 40, 0x42);
+        n = __emit_rf(ops, n, 41, 0xBB);
+        n = __emit_rf(ops, n, 42, 0xD7);
+        n = __emit_rf(ops, n, 45, 0x41);
+        n = __emit_rf(ops, n, 48, 0x00);
+        n = __emit_rf(ops, n, 57, 0x77);
+        n = __emit_rf(ops, n, 60, 0x05);
+        n = __emit_rf(ops, n, 61, 0x01);
+
+        if (channel >= 36 && channel <= 64) {
+            n = __emit_rf(ops, n, 12, 0x2E);
+            n = __emit_rf(ops, n, 13, 0x22);
+            n = __emit_rf(ops, n, 22, 0x60);
+            n = __emit_rf(ops, n, 23, 0x7F);
+            n = __emit_rf(ops, n, 24, (channel <= 50) ? 0x09 : 0x07);
+            n = __emit_rf(ops, n, 39, 0x1C);
+            n = __emit_rf(ops, n, 43, 0x5B);
+            n = __emit_rf(ops, n, 44, 0x40);
+            n = __emit_rf(ops, n, 46, 0x00);
+            n = __emit_rf(ops, n, 51, 0xFE);
+            n = __emit_rf(ops, n, 52, 0x0C);
+            n = __emit_rf(ops, n, 54, 0xF8);
+            if (channel <= 50) {
+                n = __emit_rf(ops, n, 55, 0x06);
+                n = __emit_rf(ops, n, 56, 0xD3);
+            } else {
+                n = __emit_rf(ops, n, 55, 0x04);
+                n = __emit_rf(ops, n, 56, 0xBB);
+            }
+            n = __emit_rf(ops, n, 58, 0x15);
+            n = __emit_rf(ops, n, 59, 0x7F);
+            n = __emit_rf(ops, n, 62, 0x15);
+        } else if (channel >= 100 && channel <= 165) {
+            n = __emit_rf(ops, n, 12, 0x0E);
+            n = __emit_rf(ops, n, 13, 0x42);
+            n = __emit_rf(ops, n, 22, 0x40);
+            if (channel <= 153) {
+                n = __emit_rf(ops, n, 23, 0x3C);
+                n = __emit_rf(ops, n, 24, 0x06);
+            } else {
+                n = __emit_rf(ops, n, 23, 0x38);
+                n = __emit_rf(ops, n, 24, 0x05);
+            }
+            if (channel <= 138) {
+                n = __emit_rf(ops, n, 39, 0x1A);
+                n = __emit_rf(ops, n, 43, 0x3B);
+                n = __emit_rf(ops, n, 44, 0x20);
+                n = __emit_rf(ops, n, 46, 0x18);
+            } else {
+                n = __emit_rf(ops, n, 39, 0x18);
+                n = __emit_rf(ops, n, 43, 0x1B);
+                n = __emit_rf(ops, n, 44, 0x10);
+                n = __emit_rf(ops, n, 46, 0x08);
+            }
+            n = __emit_rf(ops, n, 51, (channel <= 124) ? 0xFC : 0xEC);
+            n = __emit_rf(ops, n, 52, 0x06);
+            n = __emit_rf(ops, n, 54, 0xEB);
+            n = __emit_rf(ops, n, 55, (channel <= 138) ? 0x01 : 0x00);
+            n = __emit_rf(ops, n, 56, (channel <= 128) ? 0xBB : 0xAB);
+            n = __emit_rf(ops, n, 58, (channel <= 116) ? 0x1D : 0x15);
+            n = __emit_rf(ops, n, 59, (channel <= 138) ? 0x3F : 0x7C);
+            n = __emit_rf(ops, n, 62, (channel <= 116) ? 0x1D : 0x15);
+        }
+    }
+
+    /* TX power (no EEPROM cal -> clamp to power_bound) */
+    n = __emit_rf_rmw(ops, n, 49, RFCSR49_TX, power_bound);
+    n = __emit_rf_rmw(ops, n, 50, RFCSR50_TX, power_bound);
 
     /* RF block enable: 2T2R -> RF_BLOCK_EN|PLL_PD|TX0_PD|RX0_PD|TX1_PD|RX1_PD */
     n = __emit_rf(ops, n, 1, 0x3F);
@@ -698,34 +846,36 @@ static int __rt28xx_emit_channel(vsf_wifi_op_t *ops, int n, uint8_t channel)
     /* freq_cal_mode1 skipped */
     n = __emit_rf_rmw(ops, n, 3, RFCSR3_VCOCAL_EN, RFCSR3_VCOCAL_EN);
 
-    /* BBP front-end (lna_gain = 0) */
+    /* BBP front-end (lna_gain = 0); BBP79/80/81/82 are band dependent */
     n = __emit_bbp(ops, n, 62, 0x37);
     n = __emit_bbp(ops, n, 63, 0x37);
     n = __emit_bbp(ops, n, 64, 0x37);
-    n = __emit_bbp(ops, n, 79, 0x1C);
-    n = __emit_bbp(ops, n, 80, 0x0E);
-    n = __emit_bbp(ops, n, 81, 0x3A);
-    n = __emit_bbp(ops, n, 82, 0x62);
-    /* per-channel GLRT band config */
-    n = __emit_bbp(ops, n, 195, 128); n = __emit_bbp(ops, n, 196, 0xE0);
-    n = __emit_bbp(ops, n, 195, 129); n = __emit_bbp(ops, n, 196, 0x1F);
-    n = __emit_bbp(ops, n, 195, 130); n = __emit_bbp(ops, n, 196, 0x38);
-    n = __emit_bbp(ops, n, 195, 131); n = __emit_bbp(ops, n, 196, 0x32);
-    n = __emit_bbp(ops, n, 195, 133); n = __emit_bbp(ops, n, 196, 0x28);
-    n = __emit_bbp(ops, n, 195, 124); n = __emit_bbp(ops, n, 196, 0x19);
+    n = __emit_bbp(ops, n, 79, is_5g ? 0x18 : 0x1C);
+    n = __emit_bbp(ops, n, 80, is_5g ? 0x08 : 0x0E);
+    n = __emit_bbp(ops, n, 81, is_5g ? 0x38 : 0x3A);
+    n = __emit_bbp(ops, n, 82, is_5g ? 0x92 : 0x62);
+    /* per-channel GLRT band config (band dependent) */
+    n = __emit_bbp(ops, n, 195, 128); n = __emit_bbp(ops, n, 196, is_5g ? 0xF0 : 0xE0);
+    n = __emit_bbp(ops, n, 195, 129); n = __emit_bbp(ops, n, 196, is_5g ? 0x1E : 0x1F);
+    n = __emit_bbp(ops, n, 195, 130); n = __emit_bbp(ops, n, 196, is_5g ? 0x28 : 0x38);
+    n = __emit_bbp(ops, n, 195, 131); n = __emit_bbp(ops, n, 196, is_5g ? 0x20 : 0x32);
+    n = __emit_bbp(ops, n, 195, 133); n = __emit_bbp(ops, n, 196, is_5g ? 0x7F : 0x28);
+    n = __emit_bbp(ops, n, 195, 124); n = __emit_bbp(ops, n, 196, is_5g ? 0x7F : 0x19);
 
-    /* rt2800_config_channel() common tail (RF5592, 2.4 GHz, no external LNA) */
+    /* rt2800_config_channel() common tail (RF5592, no external LNA) */
     n = __emit_bbp(ops, n, 62, 0x37);
     n = __emit_bbp(ops, n, 63, 0x37);
     n = __emit_bbp(ops, n, 64, 0x37);
     n = __emit_bbp(ops, n, 86, 0x00);
-    n = __emit_bbp(ops, n, 82, 0x84);   /* overrides 0x62 above */
+    n = __emit_bbp(ops, n, 82, is_5g ? 0xF2 : 0x84);  /* overrides value above */
     n = __emit_bbp(ops, n, 75, 0x50);
 
     /* Band + RX-path pin enables.  LNA_PE/RFTR/TRSW MUST be set or the
      * receiver hears nothing (the old RT30xx 0x00000D0F left them clear). */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_BAND_CFG, RT28XX_TX_BAND_CFG_2G);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PIN_CFG,  RT28XX_TX_PIN_CFG_2G);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_BAND_CFG,
+            is_5g ? RT28XX_TX_BAND_CFG_5G : RT28XX_TX_BAND_CFG_2G);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PIN_CFG,
+            is_5g ? RT28XX_TX_PIN_CFG_5G : RT28XX_TX_PIN_CFG_2G);
 
     /* RT5592 GLRT BW + AGC.  bbp_write_with_rx_chain() programs BBP66 once per
      * RX chain (chain 0 then chain 1) by toggling BBP27 RX_CHAIN_SEL. */
@@ -1619,8 +1769,11 @@ static void __rt28xx_setch_after_diag(vsf_wifi_t *wifi, vsf_err_t err)
 {
     uint16_t false_cca = (uint16_t)(__rt28xx_rxsta1 & 0xFFFF);
     uint16_t plcp_err  = (uint16_t)(__rt28xx_rxsta1 >> 16);
-    uint32_t ldo_new   = __rt28xx_ldo & ~RT28XX_LDO_CFG0_VLEVEL_MASK; /* 2.4G VLEVEL=0 */
+    uint32_t ldo_new   = __rt28xx_ldo & ~RT28XX_LDO_CFG0_VLEVEL_MASK;
     int n;
+    if (__rt28xx_setch_channel > 14) {
+        ldo_new |= RT28XX_LDO_CFG0_VLEVEL_5G;   /* 5 GHz LDO_CORE_VLEVEL=5 */
+    }
     vsf_trace_info("rt28xx: RX_STA_CNT1=0x%08X false_cca=%u plcp_err=%u "
             "MAC_SYS_CTRL=0x%08X (TX_EN=%u RX_EN=%u) LDO_CFG0=0x%08X (VLEVEL=%u) "
             "CH_IDLE=%u CH_BUSY_STA=%u (ch->%u)"
@@ -1630,7 +1783,7 @@ static void __rt28xx_setch_after_diag(vsf_wifi_t *wifi, vsf_err_t err)
             (unsigned)((__rt28xx_ldo >> 26) & 0x7), __rt28xx_chidle,
             __rt28xx_chbusy, __rt28xx_setch_channel);
     /* config_channel_rf55xx() first writes LDO_CFG0 with LDO_CORE_VLEVEL=0 for
-     * 2.4 GHz (read-modify-write, preserving DELAY/BGSEL/LDO25 bits). */
+     * 2.4 GHz / 5 for 5 GHz (read-modify-write, preserving DELAY/BGSEL/LDO25). */
     __rt28xx_ops_buf[0] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_LDO_CFG0, ldo_new);
     n = __rt28xx_emit_channel(__rt28xx_ops_buf, 1, __rt28xx_setch_channel);
     if (VSF_ERR_NONE != vsf_wifi_run_script(wifi, __rt28xx_ops_buf, (uint16_t)n,
@@ -1687,7 +1840,7 @@ static void __rt28xx_setch_read_macctrl(vsf_wifi_t *wifi, vsf_err_t err)
 static vsf_err_t __rt28xx_set_channel(vsf_wifi_t *wifi, uint8_t channel,
         vsf_wifi_done_t done)
 {
-    if (channel < 1 || channel > 14) return VSF_ERR_INVALID_PARAMETER;
+    if (NULL == __rt28xx_find_rf(channel)) return VSF_ERR_INVALID_PARAMETER;
     __rt28xx_setch_done    = done;
     __rt28xx_setch_channel = channel;
     __rt28xx_rxsta1        = 0;
@@ -1746,7 +1899,7 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
         uint8_t channel, vsf_wifi_done_t done)
 {
     (void)ssid; (void)ssid_len;
-    if (channel < 1 || channel > 14) return VSF_ERR_INVALID_PARAMETER;
+    if (NULL == __rt28xx_find_rf(channel)) return VSF_ERR_INVALID_PARAMETER;
 
     /* bssid(2) + channel(~75) + filter(1) -> shared static buffer. */
     vsf_wifi_op_t *ops = __rt28xx_ops_buf;

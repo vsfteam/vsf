@@ -652,8 +652,8 @@ const uint8_t * vsf_wifi_get_mac(vsf_wifi_t *wifi)
 
 void vsf_wifi_set_channel(vsf_wifi_t *wifi, uint8_t channel)
 {
-    if (channel < 1)  channel = 1;
-    if (channel > 14) channel = 14;
+    if (channel < 1)   channel = 1;
+    if (channel > 196) channel = 196;   /* 2.4 GHz + 5 GHz; driver validates */
     wifi->channel = channel;
     /* Scan owner has set_channel scheduled — bumping it from outside would
      * corrupt scratch_ops mid-script. */
