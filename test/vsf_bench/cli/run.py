@@ -131,7 +131,7 @@ def main():
             print(f"[vsf-bench] Pipeline error: {e}", file=sys.stderr)
             sys.exit(2)
 
-        from vsf_bench.executor import execute_pipeline
+        from vsf_bench.pipeline import execute_pipeline
         try:
             overrides = _parse_set(args.set) if hasattr(args, 'set') and args.set else None
             ok = execute_pipeline(pipeline_obj, board, run_dir, project_map, overrides=overrides)
