@@ -18,6 +18,81 @@ from vsf_bench.config.models import (
     StageConfig,
     UARTConfig,
 )
+def _parse_steps(steps_raw: list) -> list:
+    """Parse unified steps from YAML."""
+    from vsf_bench.config.models import StepConfig, StepType
+    result = []
+    for raw in steps_raw:
+        # Bare string: step name only (e.g. `- power_cycle`)
+        if isinstance(raw, str):
+            try:
+                st = StepType(raw.replace("-", "_"))
+            except ValueError:
+                raise RuntimeError(f"Unknown step type: {raw}")
+            result.append(StepConfig(type=st))
+            continue
+
+        # Bare int/float: short for delay
+        if isinstance(raw, (int, float)):
+            result.append(StepConfig(type=StepType.DELAY, params={"duration": float(raw)}))
+            continue
+
+        if not isinstance(raw, dict):
+            continue
+
+        # Extract step type (single-key dict like {delay: 1.0} or {build: project})
+        step_type_str = None
+        step_params = {}
+        for key in raw:
+            if key in ("id", "max-retries", "continue-on-error", "on-failure"):
+                continue
+            if key == "loop":
+                step_type_str = "loop"
+                loop_raw = raw[key]
+                step_params = {"repeat": loop_raw.get("repeat", 1)}
+                loop_steps = _parse_steps(loop_raw.get("steps", []))
+                result.append(StepConfig(
+                    type=StepType.LOOP,
+                    id=raw.get("id"),
+                    params=step_params,
+                    continue_on_error=raw.get("continue-on-error", False),
+                    max_retries=raw.get("max-retries", 1),
+                    on_failure=_parse_steps(raw.get("on-failure", [])),
+                    steps=loop_steps,
+                ))
+                step_type_str = None  # already handled
+                break
+            else:
+                step_type_str = key
+                val = raw[key]
+                if isinstance(val, dict):
+                    step_params = dict(val)
+                elif isinstance(val, (int, float)):
+                    if step_type_str in ("power_cycle", "power_off", "power_on"):
+                        step_params = {"delay": val}
+                    else:
+                        step_params = {"duration" if step_type_str == "delay" else step_type_str: val}
+                elif isinstance(val, str):
+                    if step_type_str in ("build", "program", "serial_send", "run"):
+                        step_params = {step_type_str: val}
+                    else:
+                        step_params = {"data": val}
+        if step_type_str:
+            try:
+                st = StepType(step_type_str.replace("-", "_"))
+            except ValueError:
+                raise RuntimeError(f"Unknown step type: {step_type_str}")
+            result.append(StepConfig(
+                type=st,
+                id=raw.get("id"),
+                params=step_params,
+                continue_on_error=raw.get("continue-on-error", False),
+                max_retries=raw.get("max-retries", 1),
+                on_failure=_parse_steps(raw.get("on-failure", [])),
+            ))
+    return result
+
+
 def _match_serial_port(match_cfg, label: str = "serial port") -> str:
     """Resolve a serial port from match criteria (str or dict with vid/pid/serial/desc)."""
     if isinstance(match_cfg, str):
@@ -94,7 +169,7 @@ def _parse_build_config(build_cfg: dict, yaml_dir: Path) -> BuildConfig:
         tool=build_cfg.get("tool", "cmake"),
         params=params,
         artifacts=[
-            ArtifactConfig(name=a["name"], format=a["format"])
+            ArtifactConfig(name=a["name"], format=a["format"], kind=a.get("kind", ""))
             for a in build_cfg.get("artifacts", [])
         ],
     )
@@ -110,6 +185,7 @@ def _parse_runners(runners_raw: dict) -> dict[str, RunnerConfig]:
             artifact = ArtifactConfig(
                 name=artifact_raw["name"],
                 format=artifact_raw["format"],
+                kind=artifact_raw.get("kind", ""),
             )
         if "params" in cfg and isinstance(cfg["params"], dict):
             params = dict(cfg["params"])
@@ -218,6 +294,7 @@ def _entry_to_project(project_name: str, entry: dict, yaml_dir: Path) -> Project
         runners=runners,
         name=project_name,
         log_dir=entry.get("log_dir", ""),
+        debug_vars=entry.get("debug_vars", []),
     )
     project.validate()
     return project
@@ -463,6 +540,21 @@ def load_pipeline(
         )
 
     entry = pipelines_raw[pipeline_name]
+
+    # ── New unified steps format ──
+    steps_raw = entry.get("steps")
+    if steps_raw:
+        from vsf_bench.config.models import StepConfig, StepType
+        steps = _parse_steps(steps_raw)
+        return PipelineConfig(
+            name=pipeline_name,
+            description=entry.get("description", ""),
+            timeout=entry.get("timeout"),
+            matrix=entry.get("matrix", {}),
+            steps=steps,
+        )
+
+    # ── Legacy stages format ──
     stages = []
     for i, s in enumerate(entry.get("stages", [])):
         actions = s.get("actions", [])
@@ -483,6 +575,7 @@ def load_pipeline(
         description=entry.get("description", ""),
         stages=stages,
     )
+
 
 
 def list_pipelines(hardware_map_path: str) -> list[PipelineConfig]:

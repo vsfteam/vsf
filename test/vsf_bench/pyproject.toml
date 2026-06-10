@@ -22,24 +22,28 @@ gpio = ["pyftdi"]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
-# The project root is the package: pyproject.toml lives next to __init__.py
-# and the subpackage directories (cli/, instruments/, runners/). Map the
-# vsf_bench package to "." so setuptools picks up the contents in place.
 [tool.setuptools]
 packages = [
     "vsf_bench",
-    "vsf_bench.cli",
-    "vsf_bench.instruments",
-    "vsf_bench.runners",
+    "vsf_bench.adapters",
     "vsf_bench.builders",
     "vsf_bench.capabilities",
-    "vsf_bench.adapters",
+    "vsf_bench.cli",
+    "vsf_bench.config",
+    "vsf_bench.runners",
+    "vsf_bench.targets",
+    "vsf_bench.utils",
+    "vsf_bench.vsf_test",
 ]
 
 [tool.setuptools.package-dir]
 "vsf_bench" = "."
-"vsf_bench.cli" = "cli"
-"vsf_bench.instruments" = "instruments"
-"vsf_bench.runners" = "runners"
-"vsf_bench.capabilities" = "capabilities"
 "vsf_bench.adapters" = "adapters"
+"vsf_bench.builders" = "builders"
+"vsf_bench.capabilities" = "capabilities"
+"vsf_bench.cli" = "cli"
+"vsf_bench.config" = "config"
+"vsf_bench.runners" = "runners"
+"vsf_bench.targets" = "targets"
+"vsf_bench.utils" = "utils"
+"vsf_bench.vsf_test" = "vsf_test"

@@ -23,6 +23,36 @@ class TestResult(str, Enum):
     SKIP = "SKIP"
 
 
+class StepType(Enum):
+    BUILD = "build"
+    PROGRAM = "program"
+    POWER_CYCLE = "power_cycle"
+    POWER_OFF = "power_off"
+    POWER_ON = "power_on"
+    DELAY = "delay"
+    WAIT_FOR = "wait_for"
+    SERIAL_SEND = "serial_send"
+    GPIO_SET = "gpio_set"
+    LA_START = "la_start"
+    LA_STOP = "la_stop"
+    LA_DECODE = "la_decode"
+    DEBUG_STREAM_START = "debug_stream_start"
+    DEBUG_STREAM_STOP = "debug_stream_stop"
+    RUN = "run"
+    LOOP = "loop"
+
+
+@dataclass
+class StepConfig:
+    type: StepType
+    id: str | None = None
+    params: dict = field(default_factory=dict)
+    continue_on_error: bool = False
+    max_retries: int = 1
+    on_failure: list["StepConfig"] | None = None
+    steps: list["StepConfig"] | None = None  # for LOOP type
+
+
 @dataclass
 class UARTConfig:
     """UART decode parameters."""
@@ -36,6 +66,7 @@ class UARTConfig:
 class ArtifactConfig:
     name: str
     format: str
+    kind: str = ""       # variant discriminator: "raw", "crc", "encrypted", "debug", ...
 
 
 @dataclass
@@ -74,6 +105,7 @@ class ProjectConfig:
     runners: dict[str, RunnerConfig] = field(default_factory=dict)
     name: str = ""
     log_dir: str = ""                        # project-specific default log directory
+    debug_vars: list[str] = field(default_factory=list)  # variables to dump with vsf-bench-debug vars
 
     def validate(self) -> None:
         missing = []
@@ -104,10 +136,18 @@ class StageConfig:
 
 @dataclass
 class PipelineConfig:
-    """Multi-stage pipeline: named sequence of build/flash/test stages."""
+    """Multi-stage pipeline: named sequence of build/flash/test stages.
+
+    Supports two formats:
+      - New: ``steps`` — list of StepConfig (unified steps model)
+      - Legacy: ``stages`` — list of StageConfig (old project-action format)
+    """
     name: str
     description: str = ""
-    stages: list[StageConfig] = field(default_factory=list)
+    timeout: float | None = None
+    matrix: dict[str, list] = field(default_factory=dict)
+    stages: list[StageConfig] = field(default_factory=list)    # legacy
+    steps: list[StepConfig] = field(default_factory=list)      # new unified
 
 
 @dataclass
