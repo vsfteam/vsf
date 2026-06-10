@@ -1,7 +1,7 @@
 from vsf_bench.config.models import (
     ArtifactConfig, BoardConfig, BuildConfig, LogicAnalyzerConfig,
     PipelineConfig, PowerConfig, ProjectConfig, RunnerConfig,
-    StageConfig, TestResult, UARTConfig,
+    StageConfig, StepConfig, StepType, TestResult, UARTConfig,
 )
 from vsf_bench.config.map import (
     load, load_all, load_board_and_project, load_defaults,

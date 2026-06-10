@@ -56,7 +56,7 @@ class CaptureScene:
         first_la_idx = la_indices[0]
         last_la_idx = la_indices[-1]
 
-        shared_capture = self._run_dir / "shared-capture.dsl"
+        shared_capture = self._run_dir / "la-shared.dsl"
         shared_adapter = None
         la_start_t: float | None = None
         suite_windows: list[tuple[str, object, int, int]] = []
@@ -137,7 +137,7 @@ class CaptureScene:
                 capture_path = None
                 if needs_la:
                     label = f"{suite_name}{('_' + case) if case else ''}"
-                    capture_path = self._run_dir / f"{label}-capture.dsl"
+                    capture_path = self._run_dir / f"la-{label}.dsl"
                     adapter = self._new_adapter()
                     adapter.start(capture_path, 180.0)
                     adapter.wait_until_started(timeout=5.0)

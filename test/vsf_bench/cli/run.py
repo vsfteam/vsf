@@ -40,6 +40,8 @@ def parse_args():
                         help=".dsl file to decode (required for --la-decode without --la-capture)")
     parser.add_argument("--la-baudrate", type=int, default=2_000_000,
                         help="UART baud rate for decode (default: 2000000)")
+    parser.add_argument("--set", action="append", default=None,
+                        help="Override step params: --set key=value or --set id.key=value")
     parser.add_argument("--all", action="store_true")
     parser.add_argument(
         "--pipeline", type=str, default=None,
@@ -52,14 +54,36 @@ def parse_args():
     return parser.parse_args()
 
 
+def _collect_projects(step, project_map, hw_path):
+    from vsf_bench.config.map import load_project
+    st = step.type.value
+    project_name = step.params.get("project") or step.params.get("build") or step.params.get("program")
+    if project_name and project_name not in project_map:
+        try:
+            project_map[project_name] = load_project(str(hw_path), project_name)
+        except Exception:
+            pass
+    if step.steps:
+        for s in step.steps:
+            _collect_projects(s, project_map, hw_path)
+
+
+def _parse_set(set_args: list[str]) -> dict:
+    import yaml
+    result = {}
+    for spec in set_args:
+        if "=" in spec:
+            key, val = spec.split("=", 1)
+            result[key] = yaml.safe_load(val)
+    return result
+
+
 def main():
     args = parse_args()
-
     # Load hardware-map defaults (log_dir etc.)
     hw_path = Path(args.hardware_map).resolve()
     from vsf_bench.config.map import load_defaults
     _defaults = load_defaults(str(hw_path)) if hw_path.exists() else {}
-    # log_dir resolved later after project is loaded: CLI → project → defaults
 
     # ── --list-pipelines ──
     if args.list_pipelines:
@@ -78,29 +102,37 @@ def main():
                 print(f"  {p.name}{desc}")
         return
 
-    # ── --pipeline ──
+    # ── --pipeline (new unified steps model) ──
     if args.pipeline:
         if not args.board:
             print("[vsf-bench] Error: --pipeline requires --board", file=sys.stderr)
             sys.exit(2)
-        from vsf_bench.config.map import load_pipeline, resolve_pipeline_projects
-        board_name = args.board[0] if args.board else None
+        from vsf_bench.config.map import load_board_and_project, load_pipeline, load_project
+        board_name = args.board[0]
         try:
             pipeline_obj = load_pipeline(str(hw_path), args.pipeline)
-            board, _first_project = pipeline.load_board(
-                hw_path,
-                board_name=board_name,
-                project_name=pipeline_obj.stages[0].project,
-            )
-            project_map = resolve_pipeline_projects(
-                pipeline_obj, str(hw_path), board_name=board_name,
-            )
-            _init_logger(args.log_dir or _defaults.get("log_dir"))
+            board, _ = load_board_and_project(str(hw_path), board_name=board_name, project_name="application-standalone")
+            if not pipeline_obj.steps:
+                print("[vsf-bench] Error: pipeline has no steps", file=sys.stderr)
+                sys.exit(2)
+
+            # Build project map from steps
+            project_map = {}
+            for step in pipeline_obj.steps:
+                _collect_projects(step, project_map, hw_path)
+
+            run_dir = pipeline.mk_run_dir(board_name, args.pipeline)
+            _init_logger(run_dir)
         except Exception as e:
             print(f"[vsf-bench] Pipeline error: {e}", file=sys.stderr)
             sys.exit(2)
+
+        from vsf_bench.executor import execute_pipeline
         try:
-            pipeline.run_pipeline(pipeline_obj, board, project_map)
+            overrides = _parse_set(args.set) if hasattr(args, 'set') and args.set else None
+            ok = execute_pipeline(pipeline_obj, board, run_dir, project_map, overrides=overrides)
+            if not ok:
+                sys.exit(1)
         except Exception as e:
             print(f"[vsf-bench] Pipeline failed: {e}", file=sys.stderr)
             sys.exit(1)
@@ -129,9 +161,6 @@ def main():
         print(f"[vsf-bench] Config error: {e}", file=sys.stderr)
         sys.exit(2)
 
-    # Resolve log_dir: CLI → project.log_dir → defaults.log_dir
-    log_dir = args.log_dir or project.log_dir or _defaults.get("log_dir")
-
     # Load board (only needed for program/test/capture)
     board = None
     if do_program or do_test or do_la_capture:
@@ -154,7 +183,7 @@ def main():
 
     # Create run_dir for this invocation, init TeeLogger inside it
     tag = board.name if board else "vsf-bench"
-    run_dir = pipeline._mk_run_dir(log_dir, tag)
+    run_dir = pipeline.mk_run_dir(tag, args.pipeline or args.project or "vsf-bench")
     _init_logger(run_dir)
 
     build_config = project.build
@@ -235,6 +264,8 @@ def main():
                 sys.exit(1)
 
         if not do_test:
+            if do_program or do_la_capture:
+                print(f"[vsf-bench] Done. Log: {run_dir / 'run.log'}")
             return
 
         case_specs: list[str] = []
@@ -245,7 +276,7 @@ def main():
 
         shuffle_seed = resolve_shuffle_seed(args, case_specs)
 
-        log_dir = Path(args.log_dir) if args.log_dir else None
+        # run_dir already created above
 
         try:
             overall_pass = pipeline.run_test_phase(
@@ -254,7 +285,7 @@ def main():
                 script_override=Path(args.script) if args.script else None,
                 case_specs=case_specs,
                 la_mode=args.la_mode,
-                log_dir=log_dir,
+                run_dir=run_dir,
                 shuffle_seed=shuffle_seed,
                 test_params_yml=test_params_yml,
                 trace_level=args.trace_level,

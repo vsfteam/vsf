@@ -171,6 +171,33 @@ class SerialInstrument:
         assert passed > 0, "no cases ran"
         return passed, failed, skipped
 
+    def expect_any(self, patterns: list, timeout: float = 10.0) -> dict | None:
+        """Wait for the first pattern match. Returns dict with pattern/verdict."""
+        import re
+        assert self._ser is not None
+        deadline = time.monotonic() + timeout
+        buf = self._leftover
+        self._leftover = ""
+
+        while time.monotonic() < deadline:
+            available = self._ser.in_waiting
+            if available > 0:
+                chunk = self._ser.read(available).decode(errors="replace")
+                buf += chunk
+                if self._echo:
+                    self._echo_print(chunk)
+
+            for spec in patterns:
+                pattern = spec["pattern"] if isinstance(spec, dict) else spec
+                verdict = spec.get("verdict", "pass") if isinstance(spec, dict) else "pass"
+                if re.search(pattern, buf):
+                    self._log("recv", pattern, verdict=verdict)
+                    return spec
+            time.sleep(0.05)
+
+        self._leftover = buf
+        raise TimeoutError(f"expect_any timeout: none of {len(patterns)} patterns matched")
+
     def __enter__(self):
         self.open()
         return self

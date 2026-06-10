@@ -31,7 +31,7 @@ class TeeLogger:
     def _log(self, prefix, message):
         line = f"{_format_timestamp()} {prefix} {message}"
         with self._lock:
-            print(line)
+            print(line, flush=True)
             if self._file:
                 self._file.write(line + "\n")
                 self._file.flush()
@@ -53,12 +53,12 @@ class TeeLogger:
                 self._file = None
 
 
-def init_logger(log_dir: Path | str | None = None) -> TeeLogger:
+def init_logger(run_dir: Path | str | None = None) -> TeeLogger:
     """Create and register the singleton TeeLogger.  Call once at startup."""
     global _logger_instance
     log_path = None
-    if log_dir is not None:
-        log_path = Path(log_dir) / "console.log"
+    if run_dir is not None:
+        log_path = Path(run_dir) / "run.log"
     _logger_instance = TeeLogger(log_path)
     return _logger_instance
 

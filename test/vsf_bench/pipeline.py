@@ -55,11 +55,10 @@ def __log_event(message: str) -> None:
         print(f"[{ts}] [vsf-bench] {message}")
 
 
-def _mk_run_dir(log_dir: str | None, tag: str = "vsf-bench") -> Path:
-    """Create timestamped run directory under *log_dir*."""
-    base = Path(log_dir) if log_dir else Path("logs")
+def mk_run_dir(board: str, pipeline_or_project: str) -> Path:
+    """``logs/<timestamp>-<board>-<pipeline>`` — hardcoded base."""
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    run_dir = (base / f"{timestamp}-{tag}").resolve()
+    run_dir = Path(f"logs/{timestamp}-{board}-{pipeline_or_project}").resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
 
@@ -229,13 +228,13 @@ def la_capture_phase(
         raise RuntimeError(f"Board '{board.name}' has no logic_analyzer config")
 
     cli = _resolve_la_cli(la_cfg)
-    capture_path = run_dir / f"{board.name}_{channel}.dsl"
+    capture_path = run_dir / f"la-{channel}.dsl"
 
     if board.power:
         _board_power_cycle(board)
 
     # ── Open serial for debug log capture ──
-    ser_log = run_dir / "serial.log"
+    ser_log = run_dir / "la-serial.log"
     ser = None
     if board.debug_uart:
         try:
@@ -312,7 +311,7 @@ def la_decode_phase(
     __log_event(f"LA decode CSV → {csv}")
     data = parse_uart_csv(csv)
     text = data.decode("utf-8", errors="replace")
-    output = capture_path.with_suffix(".txt")
+    output = capture_path.parent / f"la-decode-{channel}-{baudrate}.txt"
     output.write_text(text, encoding="utf-8")
     __log_event(f"LA decoded {len(data)} bytes → {output}")
     return output
@@ -438,7 +437,7 @@ def run_test_phase(
     script_override: Path | None,
     case_specs: list[str],
     la_mode: str,
-    log_dir: Path | None,
+    run_dir: Path,
     shuffle_seed: int | None = None,
     test_params_yml: Path | None = None,
     trace_level: str | None = None,
@@ -470,9 +469,7 @@ def run_test_phase(
                 __log_event(f"Resolved --case {spec} -> index {idx}")
         case_specs = resolved
 
-    run_dir = _mk_run_dir(str(log_dir) if log_dir else None,
-                          ordered_suites[0][0] if len(ordered_suites) == 1 else "vsf_test_suite")
-    log_path = run_dir / "vsf-bench.jsonl"
+    log_path = run_dir / "test-events.jsonl"
 
     ser = SerialInstrument(board.debug_uart, board.debug_baudrate, audit_log=log_path)
     ser.open()
@@ -769,7 +766,7 @@ def run_test_phase_all(
             ok = run_test_phase(
                 board=board, suite_names=suite_names, script_override=None,
                 case_specs=[], la_mode=la_mode,
-                log_dir=Path(log_dir) / board.name if log_dir else None,
+                run_dir=Path(log_dir) / board.name if log_dir else None,
                 shuffle_seed=None, test_params_yml=None, trace_level=trace_level,
             )
             return board.name, ok
