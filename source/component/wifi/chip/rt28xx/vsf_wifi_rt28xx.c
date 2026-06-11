@@ -54,6 +54,8 @@
 
 #include "../../vsf_wifi.h"
 
+#include <stdlib.h>     /* rand() for fallback MAC generation */
+
 #if VSF_USE_WIFI == ENABLED && VSF_WIFI_USE_RT28XX == ENABLED
 
 #include "../../vsf_wifi_priv.h"
@@ -943,6 +945,66 @@ static int __rt28xx_emit_bssid(vsf_wifi_op_t *ops, int n, const uint8_t bssid[6]
 #define RT28XX_STYPE_AUTH               0xB
 #define RT28XX_STYPE_DEAUTH             0xC
 
+/* Map an RSN/WPA cipher-suite selector (OUI 00-0F-AC) type byte to a
+ * WIFI_CIPHER_xxx constant. */
+static uint8_t __rt28xx_rsn_cipher(uint8_t suite_type)
+{
+    switch (suite_type) {
+    case 1:  return WIFI_CIPHER_WEP40;
+    case 2:  return WIFI_CIPHER_TKIP;
+    case 4:  return WIFI_CIPHER_CCMP;
+    case 5:  return WIFI_CIPHER_WEP104;
+    default: return WIFI_CIPHER_NONE;
+    }
+}
+
+/* Parse an RSN IE body (everything after tag+len) and fill the security
+ * fields of a scan result.  Only WPA2-PSK is recognised: the IE must carry
+ * the PSK AKM (00-0F-AC-02).  Malformed/truncated IEs are ignored. */
+static void __rt28xx_parse_rsn(const uint8_t *body, uint8_t len,
+        vsf_wifi_scan_result_t *result)
+{
+    static const uint8_t oui[3] = { 0x00, 0x0F, 0xAC };
+    const uint8_t *p   = body;
+    const uint8_t *end = body + len;
+    uint16_t count, k;
+    bool     has_psk  = false;
+    uint8_t  pairwise = WIFI_CIPHER_NONE;
+    uint8_t  group    = WIFI_CIPHER_NONE;
+
+    if (len < 8) return;                /* version(2)+group(4)+pwcount(2)    */
+    p += 2;                             /* skip version                     */
+    if (!memcmp(p, oui, 3)) group = __rt28xx_rsn_cipher(p[3]);
+    p += 4;
+    /* pairwise cipher suite list */
+    if (p + 2 > end) return;
+    count = (uint16_t)(p[0] | ((uint16_t)p[1] << 8)); p += 2;
+    for (k = 0; k < count; k++) {
+        if (p + 4 > end) return;
+        if (!memcmp(p, oui, 3)) {
+            uint8_t c = __rt28xx_rsn_cipher(p[3]);
+            if (c == WIFI_CIPHER_CCMP)              pairwise = WIFI_CIPHER_CCMP;
+            else if (pairwise == WIFI_CIPHER_NONE)  pairwise = c;
+        }
+        p += 4;
+    }
+    /* AKM suite list */
+    if (p + 2 > end) return;
+    count = (uint16_t)(p[0] | ((uint16_t)p[1] << 8)); p += 2;
+    for (k = 0; k < count; k++) {
+        if (p + 4 > end) return;
+        if (!memcmp(p, oui, 3) && (p[3] == 2)) has_psk = true;   /* PSK */
+        p += 4;
+    }
+
+    if (has_psk) {
+        result->auth_mode       = WIFI_AUTH_WPA2_PSK;
+        result->pairwise_cipher = (pairwise != WIFI_CIPHER_NONE)
+                                ? pairwise : WIFI_CIPHER_CCMP;
+        result->group_cipher    = group;
+    }
+}
+
 static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     if (len < (RT28XX_RXINFO_DESC_SIZE + RT28XX_RXWI_DESC_SIZE_5572
@@ -977,8 +1039,20 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 
     /* 802.11 frame control: type/subtype encoded in the low byte. */
     uint16_t fc      = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
-    uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt */
+    uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt, 2 = data */
     uint8_t  subtype = (uint8_t)((fc >> 4) & 0xF);   /* 8 = beacon, 5 = probe-resp */
+
+    /* Data frames (type 2) are only meaningful once the link is associated.
+     * Hand the naked 802.11 frame to the wifi layer, which detects EAPOL
+     * (4-way handshake) and forwards business payloads.  Null-data / control
+     * subtypes (>= 4 with no body) carry nothing useful and are dropped. */
+    if (type == 2) {
+        if ((wifi->mlme_state == WIFI_MLME_RUN)
+                || (wifi->mlme_state == WIFI_MLME_4WAY)) {
+            vsf_wifi_data_rx(wifi, hdr, mpdu_len);
+        }
+        return;
+    }
     if (type != 0) return;
 
     /* Route management subtypes.  Auth / assoc-resp / deauth / disassoc feed
@@ -1044,6 +1118,8 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
             result.ssid_len = l;
         } else if (tag == 3 && l == 1) {            /* DS Param Set */
             result.channel = ie[2];
+        } else if (tag == 48) {                     /* RSN IE (WPA2) */
+            __rt28xx_parse_rsn(ie + 2, l, &result);
         }
         ie += 2 + l;
     }
@@ -1283,6 +1359,15 @@ static void __rt28xx_eeprom_after_data0(vsf_wifi_t *wifi, vsf_err_t err)
                 "rt28xx: EEPROM MAC invalid %02X:%02X:%02X:%02X:%02X:%02X (eFuse %s)" VSF_TRACE_CFG_LINEEND,
                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
                 all_zero ? "all-zero" : all_ff ? "all-FF" : "multicast bit set");
+        /* Generate a locally-administered unicast MAC so the stack stays
+         * functional even with corrupted eFuse.  Bit 1 of the first octet
+         * marks "locally administered"; bit 0 cleared = unicast. */
+        for (int i = 0; i < 6; i++) mac[i] = (uint8_t)rand();
+        mac[0] = (mac[0] & ~0x01) | 0x02;
+        memcpy(wifi->mac, mac, 6);
+        vsf_trace_info(
+                "rt28xx: using random MAC %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
+                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     } else {
         memcpy(wifi->mac, mac, 6);
         vsf_trace_info(

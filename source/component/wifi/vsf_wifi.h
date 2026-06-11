@@ -71,6 +71,7 @@ enum {
     WIFI_MLME_IDLE      = 0,    /* not connecting / disconnected         */
     WIFI_MLME_AUTH      = 1,    /* auth-req sent, awaiting auth-resp      */
     WIFI_MLME_ASSOC     = 2,    /* assoc-req sent, awaiting assoc-resp    */
+    WIFI_MLME_4WAY      = 4,    /* associated, WPA2 4-way handshake running */
     WIFI_MLME_RUN       = 3,    /* associated (link up)                  */
 };
 
@@ -81,6 +82,7 @@ enum {
 enum {
     WIFI_REASON_UNSPECIFIED     = 1,
     WIFI_REASON_AUTH_LEAVING    = 3,    /* deauth: STA is leaving         */
+    WIFI_REASON_MIC_FAILURE     = 14,   /* EAPOL-Key MIC verification failed */
     WIFI_REASON_DISASSOC_LEAVING= 8,    /* disassoc: STA is leaving       */
     WIFI_REASON_LOCAL_TIMEOUT   = 200,  /* handshake retries exhausted    */
     WIFI_REASON_AUTH_REJECTED   = 201,  /* auth-resp status != 0          */
@@ -132,6 +134,12 @@ typedef struct vsf_wifi_scan_result_t {
     int8_t   rssi;
     uint16_t capability;
     uint8_t  flags;
+    /* Security parsed from the RSN IE (tag 48).  auth_mode == WIFI_AUTH_OPEN
+     * means no RSN IE was present (open network / WEP).  Only WPA2-PSK is
+     * recognised; pairwise/group are WIFI_CIPHER_xxx. */
+    uint8_t  auth_mode;
+    uint8_t  pairwise_cipher;
+    uint8_t  group_cipher;
 } vsf_wifi_scan_result_t;
 
 typedef struct vsf_wifi_link_info_t {
@@ -264,6 +272,32 @@ struct vsf_wifi_bus_ops_t {
  * driver's private types.
  *==========================================================================*/
 
+#if VSF_WIFI_USE_WPA == ENABLED
+/*
+ * Optional hardware crypto backend.  When a chip driver supplies crypto_ops
+ * with a non-NULL install_key, the wifi layer hands the negotiated PTK.TK /
+ * GTK to the hardware engine and assumes the chip performs CCMP in-line; the
+ * software CCMP path (wpa_hw_crypto == false) is then skipped on both TX and
+ * RX.  Leaving crypto_ops (or install_key) NULL selects the built-in software
+ * CCMP fallback.
+ *
+ *   install_key : program a key.  key_idx 0 + pairwise == the unicast TK;
+ *                 key_idx 1..3 + !pairwise == a GTK.  `mac` is the peer for
+ *                 pairwise keys, NULL for group keys.  Returns VSF_ERR_NONE.
+ *   encrypt/decrypt : reserved per-frame overrides for chips that still need
+ *                 wifi-layer framing with a chip-specific tweak; NULL means
+ *                 "use the built-in software CCMP".
+ */
+typedef struct vsf_wifi_crypto_ops_t {
+    vsf_err_t (*install_key)(vsf_wifi_t *wifi, uint8_t key_idx, bool pairwise,
+                             const uint8_t *key, uint8_t key_len,
+                             const uint8_t *mac);
+    vsf_err_t (*encrypt)    (vsf_wifi_t *wifi, uint8_t *dot11,
+                             uint16_t *len, uint16_t cap);
+    vsf_err_t (*decrypt)    (vsf_wifi_t *wifi, uint8_t *dot11, uint16_t *len);
+} vsf_wifi_crypto_ops_t;
+#endif
+
 struct vsf_wifi_chip_drv_t {
     const char *name;
 
@@ -307,6 +341,12 @@ struct vsf_wifi_chip_drv_t {
      * format; the bus driver (bus_ops->data_tx) performs the actual send. */
     uint16_t  (*build_tx)     (vsf_wifi_t *wifi, uint8_t *dst, uint16_t dst_cap,
                               const uint8_t *frame, uint16_t frame_len);
+
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* Optional hardware crypto backend (see vsf_wifi_crypto_ops_t above).
+     * NULL selects the software CCMP fallback. */
+    const vsf_wifi_crypto_ops_t *crypto_ops;
+#endif
 };
 
 /*============================ APPLICATION CALLBACKS =========================*
@@ -439,6 +479,28 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len);
  * the FC field) when its subtype is auth / assoc-resp / deauth / disassoc.
  * The wifi-layer MLME state machine advances the OPEN-system connection. */
 void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len);
+
+/* Data-frame entry point.  The chip parser (drv->parse_rx) calls this with a
+ * de-descriptored, naked 802.11 data frame (starting at the FC field) once
+ * the link is associated (mlme_state RUN / 4WAY).  The wifi layer parses the
+ * data header, detects EAPOL (LLC/SNAP + ethertype 0x888E) for the 4-way
+ * handshake, and forwards decrypted business payloads to vsf_wifi_on_rx. */
+void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len);
+
+#if VSF_WIFI_USE_WPA == ENABLED
+/* Helpers exported to the WPA 4-way handshake (vsf_wifi_wpa.c).  The wifi
+ * layer owns the MLME state, the retry timer and the chip TX path; the WPA
+ * module owns EAPOL-Key parsing / building and key derivation, and drives
+ * the connection through these calls:
+ *   - mlme_tx          : transmit a fully formed 802.11 frame (EAPOL).
+ *   - mlme_arm_timer   : (re)arm the handshake timeout.
+ *   - handshake_done   : keys installed -> state RUN + vsf_wifi_on_link_up.
+ *   - handshake_fail   : abort the handshake -> link down with `reason`. */
+vsf_err_t vsf_wifi_mlme_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len);
+void vsf_wifi_mlme_arm_timer(vsf_wifi_t *wifi, uint16_t ms);
+void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi);
+void vsf_wifi_mlme_handshake_fail(vsf_wifi_t *wifi, uint8_t reason);
+#endif
 
 /* Bus driver invokes this from its EDA when the wifi-posted scan-hop event
  * lands; the wifi layer advances to the next channel or finishes the scan. */

@@ -75,6 +75,42 @@ struct vsf_wifi_t {
     vsf_callback_timer_t mlme_timer;
 #endif
 
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* ---- WPA2-PSK security context ----
+     *
+     * wpa_auth is captured by vsf_wifi_set_auth_mode(); auth_mode == OPEN
+     * means no RSN (the assoc-req carries no RSN IE and no 4-way handshake
+     * runs).  wpa_rsn_ie holds the STA RSN IE bytes sent in the assoc-req so
+     * the 4-way handshake M2 can echo them unchanged.  Handshake-specific
+     * fields (PTK / nonces / GTK / replay / substate) are added by the WPA
+     * state machine. */
+    vsf_wifi_auth_cfg_t wpa_auth;
+    uint8_t  wpa_rsn_ie[24];
+    uint8_t  wpa_rsn_ie_len;
+
+    /* 4-way handshake working state (vsf_wifi_wpa.c).  The PMK lives in
+     * wpa_auth.psk; PTK = KCK(16)|KEK(16)|TK(16) is derived on M1.  anonce /
+     * snonce feed the PRF; gtk holds the group key unwrapped from M3.
+     * replay echoes the AP's EAPOL-Key replay counter; ptk_valid gates the
+     * CCMP data path until the handshake installs keys. */
+    uint8_t  wpa_ptk[48];
+    uint8_t  wpa_anonce[32];
+    uint8_t  wpa_snonce[32];
+    uint8_t  wpa_gtk[32];
+    uint8_t  wpa_gtk_len;
+    uint8_t  wpa_gtk_keyidx;
+    uint8_t  wpa_replay[8];
+    bool     wpa_ptk_valid;
+
+    /* CCMP data path (vsf_wifi.c).  wpa_tx_pn is the 48-bit packet-number
+     * counter (little-endian, pn[0] = LSB) advanced once per encrypted TX
+     * MPDU; it seeds the CCMP header and CCM nonce.  wpa_hw_crypto is set
+     * when a chip crypto_ops backend installed the keys, in which case the
+     * software CCMP encap/decap is bypassed (the chip does it in-line). */
+    uint8_t  wpa_tx_pn[6];
+    bool     wpa_hw_crypto;
+#endif
+
     /* ---- Script / blob dispatcher state ----
      *
      * Only one outstanding script or blob is allowed per wifi (the bus_ops

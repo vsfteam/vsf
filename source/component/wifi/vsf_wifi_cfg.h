@@ -46,6 +46,21 @@
 #   define VSF_WIFI_USE_RT28XX          ENABLED
 #endif
 
+/*
+ * WPA2-PSK (CCMP) support switch.
+ *
+ * The WPA software stack (PBKDF2 / PRF / EAPOL MIC / AES key-unwrap / CCMP)
+ * is implemented on top of mbedtls, so it can only be enabled when mbedtls is
+ * compiled in.  Defaults to follow VSF_USE_MBEDTLS.
+ */
+#ifndef VSF_WIFI_USE_WPA
+#   if defined(VSF_USE_MBEDTLS) && (VSF_USE_MBEDTLS == ENABLED)
+#       define VSF_WIFI_USE_WPA         ENABLED
+#   else
+#       define VSF_WIFI_USE_WPA         DISABLED
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

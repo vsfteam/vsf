@@ -23,6 +23,11 @@
 
 #include "./vsf_wifi_priv.h"
 
+#if VSF_WIFI_USE_WPA == ENABLED
+#   include "./vsf_wifi_wpa.h"
+#   include "./vsf_wifi_crypto.h"
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 
 static void __vsf_wifi_script_finish (vsf_wifi_t *wifi, vsf_err_t err);
@@ -36,6 +41,7 @@ static void __vsf_wifi_read_poll_timer_cb(vsf_callback_timer_t *timer);
 
 static void __vsf_wifi_on_fw_done       (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_init_done     (vsf_wifi_t *wifi, vsf_err_t err);
+static void __vsf_wifi_on_mac_set_done  (vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_on_rxfilter_done (vsf_wifi_t *wifi, vsf_err_t err);
 
 /* ---- MLME (OPEN-system auth + association) state machine ---- */
@@ -522,6 +528,24 @@ static void __vsf_wifi_on_init_done(vsf_wifi_t *wifi, vsf_err_t err)
         __vsf_wifi_attach_fail(wifi, err);
         return;
     }
+    /* Program the MAC address (populated from EEPROM / fallback during init)
+     * into the chip's unicast-filter registers so hardware ACKs work. */
+    if (wifi->drv->set_mac_addr != NULL) {
+        err = wifi->drv->set_mac_addr(wifi, wifi->mac, __vsf_wifi_on_mac_set_done);
+        if (VSF_ERR_NONE != err) {
+            __vsf_wifi_attach_fail(wifi, err);
+        }
+        return;
+    }
+    __vsf_wifi_on_mac_set_done(wifi, VSF_ERR_NONE);
+}
+
+static void __vsf_wifi_on_mac_set_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_warning("wifi: set_mac_addr failed (err=%d), continuing"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+    }
     if (NULL == wifi->drv->set_rx_filter) {
         __vsf_wifi_on_rxfilter_done(wifi, VSF_ERR_NONE);
         return;
@@ -585,6 +609,215 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     } else {
         vsf_wifi_on_rx(wifi, frame, len);
     }
+}
+
+#if VSF_WIFI_USE_WPA == ENABLED
+/*============================ SOFTWARE CCMP DATA PATH =======================*
+ * AES-CCMP encap/decap for unicast/multicast data MPDUs when no hardware
+ * crypto backend is mounted (wpa_hw_crypto == false).  Layout produced /
+ * consumed: [802.11 hdr][CCMP hdr 8B][cipher == plaintext_len][MIC 8B].
+ *==========================================================================*/
+
+#ifndef __VSF_WIFI_CCMP_BUF_SIZE
+#   define __VSF_WIFI_CCMP_BUF_SIZE     1600
+#endif
+
+/* Build the CCMP AAD and CCM nonce for a 3-address data MPDU, matching the
+ * IEEE 802.11 masking rules (see hostap wlantest reference):
+ *   FC : subtype bits (0x70 of byte0) masked; Retry/PwrMgt/MoreData (byte1
+ *        0x08|0x10|0x20) masked; Protected (0x40) forced on.
+ *   SC : sequence number masked out, fragment number kept.
+ * aad = FC(2)|A1(6)|A2(6)|A3(6)|SC(2)[|QC(2)]; nonce = prio(1)|A2(6)|PN(6).
+ * pn[] is little-endian (pn[0] = LSB); the nonce carries PN MSB-first. */
+static void __ccmp_aad_nonce(const uint8_t *dot11, uint16_t hdr_len, bool qos,
+        const uint8_t pn[6], uint8_t *aad, uint16_t *aad_len, uint8_t nonce[13])
+{
+    uint8_t prio = 0;
+    uint16_t n = 0;
+
+    aad[n++] = dot11[0] & ~0x70;
+    aad[n++] = (dot11[1] & ~(0x08 | 0x10 | 0x20)) | 0x40;
+    memcpy(&aad[n], &dot11[4],  6); n += 6;     /* A1 */
+    memcpy(&aad[n], &dot11[10], 6); n += 6;     /* A2 */
+    memcpy(&aad[n], &dot11[16], 6); n += 6;     /* A3 */
+    aad[n++] = dot11[22] & 0x0F;                /* SC: keep frag#, drop seq# */
+    aad[n++] = 0;
+    if (qos) {
+        prio     = dot11[24] & 0x0F;            /* QoS Control TID */
+        aad[n++] = prio;
+        aad[n++] = 0;
+    }
+    *aad_len = n;
+
+    nonce[0] = prio;
+    memcpy(&nonce[1], &dot11[10], 6);           /* A2 */
+    nonce[7]  = pn[5];
+    nonce[8]  = pn[4];
+    nonce[9]  = pn[3];
+    nonce[10] = pn[2];
+    nonce[11] = pn[1];
+    nonce[12] = pn[0];
+}
+
+/* CCMP-encrypt a plaintext data MPDU `frame` (802.11 hdr + payload) into
+ * `out` (capacity `cap`).  Advances wifi->wpa_tx_pn.  Returns the encrypted
+ * MPDU length, or 0 on failure. */
+static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
+        const uint8_t *frame, uint16_t len, uint8_t *out, uint16_t cap)
+{
+    bool     qos     = ((frame[0] >> 4) & 0x0F) & 0x08;
+    uint16_t hdr_len = qos ? 26 : 24;
+    if (len <= hdr_len)                          return 0;
+
+    uint16_t payload_len = len - hdr_len;
+    uint16_t total       = hdr_len + 8 + payload_len + 8;
+    if (total > cap)                             return 0;
+
+    /* Advance the 48-bit PN (little-endian). */
+    uint8_t *pn = wifi->wpa_tx_pn;
+    for (int i = 0; i < 6; i++) { if (++pn[i] != 0) break; }
+
+    /* Header with Protected bit set. */
+    memcpy(out, frame, hdr_len);
+    out[1] |= 0x40;
+
+    /* CCMP header (Ext IV, key id 0). */
+    uint8_t *cc = out + hdr_len;
+    cc[0] = pn[0];
+    cc[1] = pn[1];
+    cc[2] = 0;
+    cc[3] = 0x20;
+    cc[4] = pn[2];
+    cc[5] = pn[3];
+    cc[6] = pn[4];
+    cc[7] = pn[5];
+
+    uint8_t  aad[32], nonce[13], mic[8];
+    uint16_t aad_len;
+    __ccmp_aad_nonce(out, hdr_len, qos, pn, aad, &aad_len, nonce);
+
+    const uint8_t *tk = wifi->wpa_ptk + 32;
+    if (vsf_wifi_ccmp_encrypt(tk, aad, aad_len, nonce,
+            frame + hdr_len, payload_len, cc + 8, mic) != VSF_ERR_NONE) {
+        return 0;
+    }
+    memcpy(cc + 8 + payload_len, mic, 8);
+    return total;
+}
+
+/* CCMP-decrypt an encrypted data MPDU `dot11` into `out` (capacity `cap`),
+ * reconstructing a plaintext 802.11 frame (Protected bit cleared).  Returns
+ * the plaintext MPDU length, or 0 on MIC failure / malformed input. */
+static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
+        const uint8_t *dot11, uint16_t len, uint8_t *out, uint16_t cap)
+{
+    bool     qos     = ((dot11[0] >> 4) & 0x0F) & 0x08;
+    uint16_t hdr_len = qos ? 26 : 24;
+    if (len < (hdr_len + 8 + 8))                 return 0;
+
+    const uint8_t *cc = dot11 + hdr_len;
+    if ((cc[3] & 0x20) == 0)                     return 0;   /* Ext IV required */
+
+    uint8_t pn[6];
+    pn[0] = cc[0];
+    pn[1] = cc[1];
+    pn[2] = cc[4];
+    pn[3] = cc[5];
+    pn[4] = cc[6];
+    pn[5] = cc[7];
+
+    uint16_t cipher_len = len - hdr_len - 8 - 8;
+    const uint8_t *cipher = cc + 8;
+    const uint8_t *mic    = cipher + cipher_len;
+    if ((hdr_len + cipher_len) > cap)            return 0;
+
+    uint8_t  aad[32], nonce[13];
+    uint16_t aad_len;
+    __ccmp_aad_nonce(dot11, hdr_len, qos, pn, aad, &aad_len, nonce);
+
+    /* Unicast (A1 individual addr) uses the pairwise TK; group-addressed
+     * frames (A1 bit0 == 1) use the GTK installed from M3. */
+    const uint8_t *tk = (dot11[4] & 0x01) ? wifi->wpa_gtk : (wifi->wpa_ptk + 32);
+
+    memcpy(out, dot11, hdr_len);
+    out[1] &= ~0x40;
+    if (vsf_wifi_ccmp_decrypt(tk, aad, aad_len, nonce,
+            cipher, cipher_len, out + hdr_len, mic) != VSF_ERR_NONE) {
+        return 0;
+    }
+    return hdr_len + cipher_len;
+}
+#endif      // VSF_WIFI_USE_WPA
+
+/*
+ * Data-frame RX (post-association).  The chip parser hands us a naked 802.11
+ * data frame (starting at the FC field) once the link is up.  We:
+ *   - compute the data header length (24B, or 26B for QoS data);
+ *   - on a plaintext frame, detect EAPOL (LLC/SNAP 'AA AA 03 00 00 00' +
+ *     ethertype 0x888E) and route it to the 4-way handshake;
+ *   - encrypted (Protected) frames are CCMP-decrypted in Task 5; for now
+ *     they are dropped.
+ * Non-EAPOL plaintext data is handed to the application via vsf_wifi_on_rx.
+ */
+void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
+{
+    if (wifi->disconnecting) return;
+    if (len < 24) return;
+
+    uint8_t  fc1     = dot11[1];
+    uint8_t  subtype = (dot11[0] >> 4) & 0x0F;
+    bool     prot    = (fc1 & 0x40) != 0;       /* FC byte1 bit6 = Protected */
+
+    /* QoS data (subtype bit 3) carries a 2-byte QoS Control field. */
+    uint16_t hdr_len = 24;
+    if (subtype & 0x08) {
+        hdr_len += 2;
+    }
+    if (len <= hdr_len) return;
+
+    const uint8_t *payload     = dot11 + hdr_len;
+    uint16_t       payload_len = len - hdr_len;
+
+    if (prot) {
+#if VSF_WIFI_USE_WPA == ENABLED
+        /* CCMP-encrypted business frame.  When the keys live in a hardware
+         * crypto engine the chip already decrypted it (or the chip parser
+         * never sets Protected), so just forward; otherwise software-decrypt
+         * and hand the recovered plaintext frame to the application. */
+        if (!wifi->wpa_ptk_valid) return;
+        if (wifi->wpa_hw_crypto) {
+            vsf_wifi_on_rx(wifi, (uint8_t *)dot11, len);
+            return;
+        }
+        {
+            static uint32_t __ccmp_rx32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
+            uint8_t *out = (uint8_t *)__ccmp_rx32;
+            uint16_t plen = __vsf_wifi_ccmp_decap(wifi, dot11, len,
+                    out, (uint16_t)sizeof(__ccmp_rx32));
+            if (plen == 0) return;              /* MIC failure / malformed */
+            vsf_wifi_on_rx(wifi, out, plen);
+        }
+        return;
+#else
+        /* No WPA support compiled in: drop encrypted frames. */
+        return;
+#endif
+    }
+
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* Plaintext EAPOL detection: LLC/SNAP header + 0x888E ethertype.
+     * 4-way handshake EAPOL-Key frames are always sent in the clear. */
+    static const uint8_t __snap_eapol[8] = {
+        0xAA, 0xAA, 0x03, 0x00, 0x00, 0x00, 0x88, 0x8E
+    };
+    if ((payload_len > 8) && (memcmp(payload, __snap_eapol, 8) == 0)) {
+        vsf_wifi_eapol_rx(wifi, payload + 8, payload_len - 8);
+        return;
+    }
+#endif
+
+    /* Non-EAPOL plaintext data: hand the naked 802.11 frame to the app. */
+    vsf_wifi_on_rx(wifi, (uint8_t *)dot11, len);
 }
 
 /*============================ SCAN SCHEDULER ================================*/
@@ -715,6 +948,11 @@ void vsf_wifi_on_scan_hop_evt(vsf_wifi_t *wifi) { (void)wifi; }
 
 #define __VSF_WIFI_MLME_MAX_RETRY       3
 #define __VSF_WIFI_MLME_TIMEOUT_MS      400
+#if VSF_WIFI_USE_WPA == ENABLED
+/* Whole-handshake budget: the AP retransmits M1/M3 on its own schedule, so a
+ * single generous timeout covers all four messages; expiry aborts the link. */
+#define __VSF_WIFI_WPA_TIMEOUT_MS       3000
+#endif
 
 /* 802.11 mgmt subtypes (high nibble of FC byte0). */
 #define __DOT11_STYPE_ASSOC_REQ         0x0
@@ -775,6 +1013,27 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
     frame[i++] = 0x01; frame[i++] = 0x08;
     frame[i++] = 0x82; frame[i++] = 0x84; frame[i++] = 0x8B; frame[i++] = 0x96;
     frame[i++] = 0x0C; frame[i++] = 0x18; frame[i++] = 0x30; frame[i++] = 0x48;
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* RSN IE (tag 48) for WPA2-PSK / CCMP.  Suite OUI = 00-0F-AC; group +
+     * pairwise = CCMP(4), AKM = PSK(2).  Cache the exact bytes so the 4-way
+     * handshake M2 can echo this IE unchanged. */
+    if (wifi->wpa_auth.auth_mode == WIFI_AUTH_WPA2_PSK) {
+        static const uint8_t __rsn_ie[] = {
+            0x30, 0x14,                 /* tag 48, length 20                 */
+            0x01, 0x00,                 /* RSN version 1                     */
+            0x00, 0x0F, 0xAC, 0x04,     /* group cipher  = CCMP              */
+            0x01, 0x00,                 /* pairwise count = 1                */
+            0x00, 0x0F, 0xAC, 0x04,     /* pairwise      = CCMP              */
+            0x01, 0x00,                 /* AKM count     = 1                 */
+            0x00, 0x0F, 0xAC, 0x02,     /* AKM           = PSK               */
+            0x00, 0x00,                 /* RSN capabilities                  */
+        };
+        memcpy(&frame[i], __rsn_ie, sizeof(__rsn_ie));
+        i += sizeof(__rsn_ie);
+        memcpy(wifi->wpa_rsn_ie, __rsn_ie, sizeof(__rsn_ie));
+        wifi->wpa_rsn_ie_len = (uint8_t)sizeof(__rsn_ie);
+    }
+#endif
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
     if (VSF_ERR_NONE != err) {
         vsf_trace_warning("wifi: mlme assoc-req tx failed (err=%d)"
@@ -805,6 +1064,9 @@ static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
     wifi->mlme_state = WIFI_MLME_IDLE;
     wifi->mlme_retry = 0;
     wifi->mlme_aid   = 0;
+#if VSF_WIFI_USE_WPA == ENABLED
+    wifi->wpa_ptk_valid = false;
+#endif
     if (was_active) {
         vsf_wifi_on_link_down(wifi, reason);
     }
@@ -834,7 +1096,8 @@ static void __vsf_wifi_mlme_timer_cb(vsf_callback_timer_t *timer)
     vsf_wifi_t *wifi = vsf_container_of(timer, vsf_wifi_t, mlme_timer);
     if (wifi->disconnecting) return;
     if ((wifi->mlme_state != WIFI_MLME_AUTH)
-            && (wifi->mlme_state != WIFI_MLME_ASSOC)) {
+            && (wifi->mlme_state != WIFI_MLME_ASSOC)
+            && (wifi->mlme_state != WIFI_MLME_4WAY)) {
         return;
     }
     if (wifi->post_eda != NULL) {
@@ -846,6 +1109,15 @@ static void __vsf_wifi_mlme_timer_cb(vsf_callback_timer_t *timer)
 void vsf_wifi_on_mlme_retry_evt(vsf_wifi_t *wifi)
 {
     if (wifi->disconnecting) return;
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* The 4-way handshake has no per-message retransmit on our side (the AP
+     * retries M1/M3); a timer expiry here means the handshake stalled. */
+    if (wifi->mlme_state == WIFI_MLME_4WAY) {
+        vsf_trace_warning("wifi: 4-way handshake timeout" VSF_TRACE_CFG_LINEEND);
+        __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_TIMEOUT);
+        return;
+    }
+#endif
     if ((wifi->mlme_state != WIFI_MLME_AUTH)
             && (wifi->mlme_state != WIFI_MLME_ASSOC)) {
         return;
@@ -922,8 +1194,22 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
         vsf_callback_timer_remove(&wifi->mlme_timer);
 #endif
-        wifi->mlme_state = WIFI_MLME_RUN;
         wifi->mlme_retry = 0;
+#if VSF_WIFI_USE_WPA == ENABLED
+        /* WPA2-PSK: associate first, then run the 4-way handshake before the
+         * link is usable.  Stay in 4WAY (no link-up yet) and wait for the
+         * AP's EAPOL-Key M1; vsf_wifi_data_rx routes it to the WPA module. */
+        if ((wifi->wpa_auth.auth_mode == WIFI_AUTH_WPA2_PSK)
+                && (wifi->wpa_auth.psk_len == VSF_WIFI_PMK_LEN)) {
+            wifi->wpa_ptk_valid = false;
+            wifi->mlme_state    = WIFI_MLME_4WAY;
+            vsf_trace_info("wifi: associated, aid=%u (4-way handshake)"
+                    VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
+            vsf_wifi_mlme_arm_timer(wifi, __VSF_WIFI_WPA_TIMEOUT_MS);
+            break;
+        }
+#endif
+        wifi->mlme_state = WIFI_MLME_RUN;
         vsf_trace_info("wifi: associated, aid=%u (link up)"
                 VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
         {
@@ -1006,6 +1292,16 @@ vsf_err_t vsf_wifi_set_auth_mode(vsf_wifi_t *wifi,
 {
     if (!wifi->is_ready || !wifi->drv->set_auth_mode) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* Remember the requested security so the MLME can build the assoc-req RSN
+     * IE and (for WPA2-PSK) run the 4-way handshake with the supplied PMK. */
+    if (cfg != NULL) {
+        wifi->wpa_auth = *cfg;
+    } else {
+        memset(&wifi->wpa_auth, 0, sizeof(wifi->wpa_auth));
+    }
+    wifi->wpa_rsn_ie_len = 0;
+#endif
     return wifi->drv->set_auth_mode(wifi, cfg, NULL);
 }
 
@@ -1142,7 +1438,90 @@ static vsf_err_t __vsf_wifi_tx_frame(vsf_wifi_t *wifi,
 vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 {
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
+
+#if VSF_WIFI_USE_WPA == ENABLED
+    /* Software CCMP encap for plaintext unicast/multicast data frames once
+     * the 4-way handshake installed keys.  Skipped when a hardware crypto
+     * backend owns encryption (wpa_hw_crypto), and never applied to frames
+     * that are already Protected or are not data type. */
+    if (wifi->wpa_ptk_valid && !wifi->wpa_hw_crypto &&
+            (len >= 2) && (((frame[0] >> 2) & 0x03) == 2) &&
+            ((frame[1] & 0x40) == 0)) {
+        static uint32_t __ccmp_tx32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
+        uint8_t *enc = (uint8_t *)__ccmp_tx32;
+        uint16_t total = __vsf_wifi_ccmp_encap(wifi, frame, len,
+                enc, (uint16_t)sizeof(__ccmp_tx32));
+        if (total == 0) return VSF_ERR_FAIL;
+        return __vsf_wifi_tx_frame(wifi, enc, total);
+    }
+#endif
+
     return __vsf_wifi_tx_frame(wifi, frame, len);
 }
+
+#if VSF_WIFI_USE_WPA == ENABLED
+/*============================ WPA HANDSHAKE GLUE ============================*
+ * Thin wrappers letting vsf_wifi_wpa.c drive the connection without touching
+ * the MLME internals directly (TX path, retry timer, state transitions).
+ *==========================================================================*/
+
+vsf_err_t vsf_wifi_mlme_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
+{
+    return __vsf_wifi_tx_frame(wifi, frame, len);
+}
+
+void vsf_wifi_mlme_arm_timer(vsf_wifi_t *wifi, uint16_t ms)
+{
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_remove(&wifi->mlme_timer);
+    vsf_callback_timer_add_ms(&wifi->mlme_timer, ms);
+#else
+    (void)wifi; (void)ms;
+#endif
+}
+
+void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi)
+{
+    if (wifi->mlme_state != WIFI_MLME_4WAY) return;
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_remove(&wifi->mlme_timer);
+#endif
+
+    /* Install the negotiated keys.  A hardware crypto backend takes the TK /
+     * GTK directly (wpa_hw_crypto = true, software CCMP bypassed); otherwise
+     * fall back to the software CCMP path with a fresh TX PN counter. */
+    if ((wifi->drv->crypto_ops != NULL) &&
+            (wifi->drv->crypto_ops->install_key != NULL)) {
+        wifi->wpa_hw_crypto = true;
+        wifi->drv->crypto_ops->install_key(wifi, 0, true,
+                wifi->wpa_ptk + 32, VSF_WIFI_TK_LEN, wifi->mlme_bssid);
+        if (wifi->wpa_gtk_len > 0) {
+            wifi->drv->crypto_ops->install_key(wifi, wifi->wpa_gtk_keyidx,
+                    false, wifi->wpa_gtk, wifi->wpa_gtk_len, NULL);
+        }
+    } else {
+        wifi->wpa_hw_crypto = false;
+        memset(wifi->wpa_tx_pn, 0, sizeof(wifi->wpa_tx_pn));
+    }
+
+    wifi->mlme_state = WIFI_MLME_RUN;
+    wifi->mlme_retry = 0;
+    vsf_trace_info("wifi: 4-way handshake complete, aid=%u (link up)"
+            VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
+    {
+        vsf_wifi_link_info_t info;
+        memset(&info, 0, sizeof(info));
+        memcpy(info.bssid, wifi->mlme_bssid, 6);
+        info.channel = wifi->mlme_channel;
+        info.flags   = WIFI_LINK_FLAG_CONNECTED | WIFI_LINK_FLAG_AUTHORIZED;
+        vsf_wifi_on_link_up(wifi, &info);
+    }
+}
+
+void vsf_wifi_mlme_handshake_fail(vsf_wifi_t *wifi, uint8_t reason)
+{
+    __vsf_wifi_mlme_finish(wifi, reason);
+}
+#endif
 
 #endif      // VSF_USE_WIFI
