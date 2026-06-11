@@ -3047,6 +3047,44 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         cursize = vsf_stream_read(stream, buf, size);
         if ((buf != NULL) && isatty(sfd->fd) && !(priv->flags & O_NOCTTY)) {
             vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+
+            // termios c_iflag processing: IGNCR / ICRNL
+            if (cursize > 0 && (term_priv->termios.c_iflag & (IGNCR | ICRNL))) {
+                uint_fast32_t j = 0;
+                for (uint_fast32_t i = 0; i < cursize; i++) {
+                    char ch = ((char *)buf)[i];
+                    // after ICRNL converted CR→LF, skip the paired LF in CRLF
+                    if (term_priv->icrnl_pending) {
+                        term_priv->icrnl_pending = false;
+                        if (ch == '\n') {
+                            continue;
+                        }
+                    }
+                    if (ch == '\r') {
+                        if (term_priv->termios.c_iflag & IGNCR) {
+                            // drop CR
+                        } else {
+                            // ICRNL: convert CR to NL, mark pending for CRLF
+                            ((char *)buf)[j++] = '\n';
+                            term_priv->icrnl_pending = true;
+                        }
+                    } else {
+                        ((char *)buf)[j++] = ch;
+                    }
+                }
+                cursize = j;
+                if (0 == cursize) {
+                    // All bytes dropped (e.g. lone CR); update POLLIN and retry
+                    orig = vsf_protect_sched();
+                    if (!vsf_stream_get_data_size(stream)) {
+                        __vsf_linux_stream_evt(priv, orig, POLLIN, false);
+                    } else {
+                        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+                    }
+                    continue;
+                }
+            }
+
             if (term_priv->termios.c_lflag & ECHO) {
                 char ch;
                 for (uint_fast32_t i = 0; i < cursize; i++) {
@@ -3548,6 +3586,8 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     }
     // default is 115200_8N1
     static const struct termios __default_term = {
+        // ICRNL: convert CR to NL; CRLF pairs handled by icrnl_pending
+        .c_iflag        = ICRNL,
         .c_cflag        = CS8,
         .c_oflag        = OPOST | ONLCR,
         .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON,

@@ -191,6 +191,7 @@ typedef struct vsf_linux_term_priv_t {
     char esc_type;
     bool line_start;
     bool subop_inited;
+    bool icrnl_pending;
 } vsf_linux_term_priv_t;
 
 typedef struct vsf_linux_key_t vsf_linux_key_t;

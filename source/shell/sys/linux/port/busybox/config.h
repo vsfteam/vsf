@@ -13,5 +13,5 @@
 #   define VSH_CMD_SIZE             256
 #endif
 #ifndef VSH_ENTER_CHAR
-#   define VSH_ENTER_CHAR           '\r'
+#   define VSH_ENTER_CHAR           '\n'
 #endif
