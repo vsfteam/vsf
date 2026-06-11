@@ -62,6 +62,9 @@
 /* EAPOL-Key messages we transmit (key descriptor version 2). */
 #define KI_M2   (KI_VERSION_AES | KI_KEYTYPE_PAIRWISE | KI_MIC)
 #define KI_M4   (KI_VERSION_AES | KI_KEYTYPE_PAIRWISE | KI_MIC | KI_SECURE)
+/* Group Key Handshake reply (G2): group key type (pairwise bit clear),
+ * MIC + secure set, no key data. */
+#define KI_G2   (KI_VERSION_AES | KI_MIC | KI_SECURE)
 
 /* Re-arm the handshake timer after each step we answer. */
 #define __WPA_STEP_TIMEOUT_MS   1000
@@ -358,6 +361,86 @@ static void __wpa_handle_m3(vsf_wifi_t *wifi, const uint8_t *ek,
     vsf_wifi_mlme_handshake_done(wifi);
 }
 
+/* Group Key Handshake message 1 (GTK rekey, IEEE 802.11i Sec 8.5.4).
+ *
+ * Once the link is up the AP periodically refreshes the group key.  It sends
+ * a single EAPOL-Key (group type, MIC + secure set, ACK set, encrypted GTK
+ * KDE in the key data) and expects a Group message 2 (G2) confirmation.  We
+ * reuse the 4-way KCK/KEK already installed in wpa_ptk: verify the MIC with
+ * KCK, AES-unwrap the new GTK with KEK, install it, then echo G2.  The link
+ * stays in WIFI_MLME_RUN throughout. */
+static void __wpa_handle_group_m1(vsf_wifi_t *wifi, const uint8_t *ek,
+        uint16_t key_info, uint16_t eapol_len)
+{
+    uint8_t  tmp[__WPA_BUF_MAX];
+    uint8_t  calc_mic[16];
+    uint8_t  rx_mic[16];
+
+    /* Only meaningful after the pairwise keys are installed. */
+    if (!wifi->wpa_ptk_valid) return;
+    if (eapol_len > sizeof(tmp)) return;
+
+    /* MIC check over the frame with the MIC field zeroed (KCK = PTK[0:16]). */
+    memcpy(rx_mic, &ek[EK_MIC_OFF], 16);
+    memcpy(tmp, ek, eapol_len);
+    memset(&tmp[EK_MIC_OFF], 0, 16);
+    if (vsf_wifi_eapol_mic(wifi->wpa_ptk, tmp, eapol_len, calc_mic)
+            != VSF_ERR_NONE) {
+        return;
+    }
+    if (memcmp(calc_mic, rx_mic, 16) != 0) {
+        vsf_trace_warning("wifi: group rekey MIC mismatch" VSF_TRACE_CFG_LINEEND);
+        return;
+    }
+
+    /* Recover the new GTK from the key data (AES key-unwrapped with KEK). */
+    uint16_t kdl = __wpa_rd16be(&ek[EK_KEYDATALEN_OFF]);
+    if (kdl > 0) {
+        uint8_t  kd[__WPA_BUF_MAX];
+        uint16_t out_len;
+        if (key_info & KI_ENCRYPTED) {
+            if ((kdl < 24) || (kdl % 8) || ((uint16_t)(kdl - 8) > sizeof(kd))) {
+                return;
+            }
+            if (vsf_wifi_aes_unwrap(&wifi->wpa_ptk[16], VSF_WIFI_KEK_LEN,
+                    &ek[EK_KEYDATA_OFF], kdl, kd) != VSF_ERR_NONE) {
+                vsf_trace_warning("wifi: group rekey GTK unwrap failed"
+                        VSF_TRACE_CFG_LINEEND);
+                return;
+            }
+            out_len = (uint16_t)(kdl - 8);
+        } else {
+            if (kdl > sizeof(kd)) return;
+            memcpy(kd, &ek[EK_KEYDATA_OFF], kdl);
+            out_len = kdl;
+        }
+        /* Updates wifi->wpa_gtk / wpa_gtk_len / wpa_gtk_keyidx in place; the
+         * software CCMP RX path picks up the new GTK immediately. */
+        __wpa_parse_gtk(wifi, kd, out_len);
+    }
+
+    /* If a hardware crypto backend owns the keys, re-program the new GTK. */
+    if (wifi->wpa_hw_crypto && (wifi->wpa_gtk_len > 0)
+            && (wifi->drv != NULL) && (wifi->drv->crypto_ops != NULL)
+            && (wifi->drv->crypto_ops->install_key != NULL)) {
+        wifi->drv->crypto_ops->install_key(wifi, wifi->wpa_gtk_keyidx,
+                false, wifi->wpa_gtk, wifi->wpa_gtk_len, NULL);
+    }
+
+    /* Echo the AP's replay counter in G2. */
+    memcpy(wifi->wpa_replay, &ek[EK_REPLAY_OFF], 8);
+
+    /* G2: group key type, MIC + secure, no key data.  The Key ID from the
+     * group M1 is carried back in the key-info field per the spec. */
+    uint16_t g2_info = (uint16_t)(KI_G2 | (key_info & (3 << 4)));
+    if (__wpa_send_eapol(wifi, ek[0], g2_info, 0, NULL, NULL, 0)
+            != VSF_ERR_NONE) {
+        vsf_trace_warning("wifi: group G2 tx failed" VSF_TRACE_CFG_LINEEND);
+    }
+    vsf_trace_info("wifi: GTK rekey done, G2 sent (keyidx=%u)"
+            VSF_TRACE_CFG_LINEEND, (unsigned)wifi->wpa_gtk_keyidx);
+}
+
 /*============================ IMPLEMENTATION ================================*/
 
 void vsf_wifi_eapol_rx(vsf_wifi_t *wifi, const uint8_t *eapol, uint16_t len)
@@ -379,8 +462,7 @@ void vsf_wifi_eapol_rx(vsf_wifi_t *wifi, const uint8_t *eapol, uint16_t len)
 
     /* Key descriptor version 2 (AES / HMAC-SHA1-128) is the only one we do. */
     if ((key_info & KI_VERSION_MASK) != KI_VERSION_AES) return;
-    /* Only pairwise EAPOL-Key messages from the AP (ACK set) drive us. */
-    if (!(key_info & KI_KEYTYPE_PAIRWISE)) return;
+    /* Only EAPOL-Key messages from the AP (ACK set) drive us. */
     if (!(key_info & KI_ACK)) return;
 
     /* Bound the EAPOL length by the 802.1X body length field. */
@@ -388,10 +470,19 @@ void vsf_wifi_eapol_rx(vsf_wifi_t *wifi, const uint8_t *eapol, uint16_t len)
     if (eapol_len > len) eapol_len = len;
     if (eapol_len < EK_HDR_LEN) return;
 
-    if (key_info & KI_MIC) {
-        __wpa_handle_m3(wifi, eapol, key_info, eapol_len);
+    if (key_info & KI_KEYTYPE_PAIRWISE) {
+        /* Pairwise EAPOL-Key: the 4-way handshake. */
+        if (key_info & KI_MIC) {
+            __wpa_handle_m3(wifi, eapol, key_info, eapol_len);
+        } else {
+            __wpa_handle_m1(wifi, eapol, key_len);
+        }
     } else {
-        __wpa_handle_m1(wifi, eapol, key_len);
+        /* Group EAPOL-Key: GTK rekey.  Only valid on an established link
+         * (RUN state with keys installed) and carries a MIC. */
+        if ((wifi->mlme_state == WIFI_MLME_RUN) && (key_info & KI_MIC)) {
+            __wpa_handle_group_m1(wifi, eapol, key_info, eapol_len);
+        }
     }
 }
 

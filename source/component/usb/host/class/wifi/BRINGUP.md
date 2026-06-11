@@ -112,6 +112,10 @@
 - [x] M4 多次发送（×3）提高可靠性（无硬件 ACK 情况下单次丢失率高）
 - [x] RUN 状态接受 AP M3 重试（AP 未收到 M4 时自动重发 M4）
 - [x] disconnect 发送 Deauth 帧 + 状态清理
+- [x] **GTK Rekeying（Group Key Handshake）**：RUN 状态接收 AP 的 Group Key M1
+      （group 类型 EAPOL-Key），用 KCK 校验 MIC、KEK 解包新 GTK、就地更新
+      `wpa_gtk`，回复 G2 确认；软件 CCMP RX 路径立即使用新 GTK，硬件后端
+      重新 install_key。复用 4-way 的 MIC/unwrap/解析代码，链路保持不断开。
 
 ### 2.4 CCMP 数据面（component/wifi/）
 
@@ -125,6 +129,7 @@
 - [x] 4-way 期间 PTK 解密：SNonce 已生成即可尝试解密（处理加密 M3）
 - [x] AES-CCM 自测：NIST SP 800-38C Example C.4 向量验证
 - [x] PN（Packet Number）递增：TX 每帧递增，防重放
+- [x] DHCP 完整流程测试：Discover → Offer → Request → ACK，获得 IP 地址
 
 ### 2.5 RT28xx backend 数据面增强（component/wifi/chip/rt28xx/）
 
@@ -155,8 +160,14 @@ wifi: 4-way handshake complete, aid=1 (link up)
 wifi: LINK UP bssid=74:39:89:1C:6B:07 ch=6 flags=0x3
 wifi: connected to "VStudio"
 / # wifi_dhcp
-wifi: DHCP TX #0 ok
-wifi: DHCP Discover done, waiting for Offer...
+wifi: DHCP Discover (xid=...)
+wifi: DHCP Offer: ip=192.168.0.xxx server=192.168.0.1
+wifi: DHCP Request (ip=192.168.0.xxx)
+wifi: DHCP complete!
+  IP:      192.168.0.xxx
+  Subnet:  255.255.255.0
+  Gateway: 192.168.0.1
+  DNS:     192.168.0.1
 / # wifi_disconnect
 wifi: LINK DOWN (reason=203)
 ```
@@ -178,7 +189,6 @@ wifi: LINK DOWN (reason=203)
 ## 3. 未完成 / 待续（按优先级）
 
 - [ ] **(P1)** WiFi netif 对接 lwIP：实现 linkoutput/input 桥接，lwIP 处理 DHCP/ARP/TCP
-- [ ] **(P1)** GTK Rekeying：处理 AP 的 Group Key Handshake（长连接必需）
 - [ ] **(P2)** 速率自适应：当前固定 OFDM MCS0 (6 Mbps)，需基于 TX status 反馈调整
 - [ ] **(P2)** 扫描结果去重（同 AP 多次出现，多信道/重复 beacon）
 - [ ] **(P2)** ch144 及 UNII-4 (169/173/177)：ref `rf_vals_5592` 表未提供系数
