@@ -5,9 +5,9 @@
 
 > 目标硬件：RT2870 / RT3070 / RT3572 / RT5370 / RT5372 / RT5572(RT5592) USB dongle
 > 实测平台：vc.linux 工程 + WinUSB HCD + RT5572 真实 dongle (VID=0x148F PID=0x5572)
-> 当前状态：**2.4GHz + 5GHz 主动扫描已完整 bring-up 并实测通过** —— 枚举、
-> 固件上传、MCU 就绪、eFuse MAC 读取、寄存器读通路、RF 全频段调谐、RX 帧解析
-> (RXWI/RXINFO) → 扫描结果回调，全部走通；TX 发包与 station 关联待续。
+> 当前状态：**WPA2-PSK 全流程 bring-up 完成** —— 枚举、固件上传、MCU 就绪、
+> eFuse MAC 读取、RF 全频段调谐、2.4G+5G 扫描、TX 发包、Auth/Assoc、
+> WPA2-PSK 4-way handshake、连接/断开，全部实测通过。
 > 框架依赖：仅依赖 VSF 内核 + USB host 栈，**不依赖 VSF/Linux 子系统**。
 
 ---
@@ -98,39 +98,58 @@
       set_rx_filter / set_mac_addr / set_bssid / set_auth_mode / connect /
       disconnect / get_link_info / parse_rx
 
-### 2.3 vc.linux + WinUSB HCD 实测（RT5572 真实硬件）
+### 2.3 WPA2-PSK 连接（component/wifi/）
+
+- [x] TX 路径：TXINFO(4B) + TXWI 头封装 + bulk TX 发送
+- [x] TX 自测（offline）：框架初始化后自动 TX self-test 验证发包通路
+- [x] Auth 帧收发：Open System Authentication（seq1/seq2）
+- [x] Association Request/Response：capability + listen interval + IE 编码
+- [x] WPA2-PSK PBKDF2：SSID + passphrase → PMK (256-bit)
+- [x] 4-way handshake：M1(ANonce) → M2(SNonce+MIC) → M3(encrypted GTK) → M4(confirm)
+- [x] AES key-unwrap (RFC 3394)：就地解包，无大小限制
+- [x] PTK/GTK 密钥派生与安装
+- [x] disconnect 发送 Deauth 帧 + 状态清理
+
+### 2.4 vc.linux + WinUSB HCD 实测（RT5572 真实硬件）
 
 ```
 / # usbhost
-/ # usbhost wifi scan
-wifi: device probed (chip=rt28xx)
+/ # wifi_scan
 wifi: scanning 37 channels (dwell 120 ms)
-wifi: AP[ 1] 88:C7:8F:1B:81:6E ch= 1 rssi= -52 caps=0x1C31 ssid="ChinaNet-5Jhc"
-...
-wifi: AP[19] 04:AB:08:A3:0D:A7 ch=48 rssi= -76 caps=0x1131 ssid="803_5G"
-wifi: scan done, 21 APs found
+wifi: scan done, 40 APs found
+/ # wifi_connect VStudio <password>
+wifi: WPA2-PSK "VStudio" PMK derived, starting handshake
+wifi: connecting to "VStudio" bssid=74:39:89:1C:6B:07 ch=6
+wifi: auth ok, sending assoc-req
+wifi: associated, aid=1 (4-way handshake)
+wifi: 4-way M1 rx, M2 sent
+wifi: 4-way M3 rx, M4 sent (keys ready)
+wifi: 4-way handshake complete, aid=1 (link up)
+wifi: LINK UP bssid=74:39:89:1C:6B:07 ch=6 flags=0x3
+wifi: connected to "VStudio"
+/ # wifi_disconnect
+wifi: LINK DOWN (reason=203)
 ```
 
 - 枚举 + 固件 + init + MCU 就绪 + eFuse MAC 全部 `urb_status=0`
-- 2.4GHz：单次扫描稳定捕获 25~35 个真实 AP
+- 2.4GHz：单次扫描稳定捕获 35~40 个真实 AP
 - 5GHz：LDO_CFG0 在 5G 信道正确切到 VLEVEL=5 (0x15040F14)，2.4G 为
   VLEVEL=0 (0x01040F14)；抓到真实 5G AP（如 ch48 `803_5G`，与 2.4G 的
   `803` 同源），所有 5G 信道 `false_cca` 非零，证明 5G RF/PHY 前端工作正常
-- 测试方法：交互式敲 `usbhost wifi scan`，或 stdin 重定向注入命令文件
+- WPA2-PSK 全流程端到端验证通过（真实 AP: VStudio, ch6）
+- 测试方法：交互式 `wifi_scan` / `wifi_connect` / `wifi_disconnect`
 
 ---
 
 ## 3. 未完成 / 待续（按优先级）
 
-- [ ] **(P1)** TX 路径：`vk_usbh_wifi_send` 目前直发裸 802.11 frame，
-      **未封装 TXINFO/TXWI**；需加 `build_tx_header` vtable hook
-      （RT2870 与 RT5592 的 TXWI 布局有差异）
-- [ ] **(P1)** station 关联 / 认证：`set_auth_mode` / `connect` 为 raw-protocol
-      stub（无 MLME / WPA 握手），关联需上层应用发裸帧或另起 supplicant 状态机
+- [ ] **(P1)** 数据面：连接建立后的加密数据帧收发（CCMP encrypt/decrypt）
 - [ ] **(P2)** 扫描结果去重（同 AP 多次出现，多信道/重复 beacon）
 - [ ] **(P2)** ch144 及 UNII-4 (169/173/177)：ref `rf_vals_5592` 表未提供系数
+- [ ] **(P2)** WPA2-Enterprise / WPA3-SAE 支持
 - [ ] **(P3)** iq_calibrate / EEPROM TX power 表（当前 TX 功率 clamp 到 POWER_BOUND）
 - [ ] **(P3)** 多 chip family 适配：RT2860/RT2870 的 RXWI 为 16B（当前按 RT5592 的 24B）
+- [ ] **(P3)** 断线自动重连 / 漫游
 
 ---
 
@@ -187,11 +206,16 @@ wifi: scan done, 21 APs found
 编译期嵌入为 rodata 静态数组（`vsf_wifi_rt2870_firmware_data.c`），零运行时
 文件依赖；代价是占 8 KiB rom，切芯片型号要重链。weak stub + strong override。
 
-### 5.3 raw-protocol 设计
-本驱动只做 PHY/MAC bring-up 与裸帧收发；关联/认证/加密由上层负责，
-不属于本驱动职责。
+### 5.3 内建 WPA2-PSK supplicant
+驱动内建轻量 WPA2-PSK supplicant（PBKDF2 + 4-way handshake + AES key-unwrap），
+无需外部 wpa_supplicant。Auth/Assoc/Deauth 帧由框架层构造发送。
 
-### 5.4 bring-up 踩坑记录（复发概率极高，务必保留）
+### 5.4 AES key-unwrap 就地解包
+`vsf_wifi_aes_unwrap` 使用 caller 提供的 `out` 缓冲区做 RFC 3394 就地解包，
+无栈缓冲区大小限制。真实 AP 的 M3 Key Data（RSN IE + GTK KDE）包裹后通常 >48 字节，
+旧版 40 字节栈缓冲区会导致 GTK unwrap 失败。
+
+### 5.5 bring-up 踩坑记录（复发概率极高，务必保留）
 
 #### (1) Ralink rt2x00 vendor 协议参数
 **症状**：control transfer 全部 timeout (`urb_status=-121`)。
@@ -269,12 +293,16 @@ Wireshark filter `usb.bRequest == 6` 看 vendor 控制写；对照
   - ep0 vendor 写 (USB_MULTI_WRITE=6) / 读 (USB_MULTI_READ=7) 通路
   - 8192B 固件切片上传 + post-fw 握手 + MCU 就绪轮询
   - eFuse row-0 MAC 读取
-  - 2.4GHz 扫描（25~35 AP）+ 5GHz 扫描（抓到真实 5G AP）
-  - disconnect 路径不泄漏
+  - 2.4GHz 扫描（35~40 AP）+ 5GHz 扫描（抓到真实 5G AP）
+  - bulk TX 路径 + TXINFO/TXWI 头封装（TX self-test PASSED）
+  - Open System Auth + Association（aid=1）
+  - WPA2-PSK 4-way handshake（M1→M2→M3→M4，PTK/GTK 安装成功）
+  - 全流程连接到真实 AP（VStudio, WPA2-PSK, ch6）
+  - disconnect（Deauth 发送 + LINK DOWN）路径不泄漏
 - **未验证 / 待续**：
-  - bulk TX 路径（TXINFO/TXWI 头封装）
-  - station 关联 / 数据收发 / WPA
+  - 加密数据帧收发（CCMP）
   - 扫描去重、ch144 / UNII-4
+  - 断线重连 / 漫游
 
 espidf 测试集不含 wifi 用例——wifi 不接入 espidf，验证只通过 vc.linux 工程
-跑 `usbhost wifi scan` 完成。
+跑 `wifi_scan` / `wifi_connect` / `wifi_disconnect` 完成。
