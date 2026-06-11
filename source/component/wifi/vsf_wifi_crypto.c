@@ -403,6 +403,67 @@ vsf_err_t vsf_wifi_crypto_selftest(void)
         return VSF_ERR_FAIL;
     }
 
+    /* 5. NIST SP 800-38C Example C.4 : AES-128-CCM with Nlen=13, Tlen=8.
+     * This is the AUTHORITATIVE reference for the exact CCM parameters used
+     * by IEEE 802.11 CCMP.  Verifies our mbedTLS CCM output against the
+     * published expected ciphertext and tag from the NIST standard. */
+    {
+        static const uint8_t nist_key[16] = {
+            0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+            0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F,
+        };
+        static const uint8_t nist_nonce[13] = {
+            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+            0x18, 0x19, 0x1A, 0x1B, 0x1C,
+        };
+        static const uint8_t nist_aad[20] = {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+            0x10, 0x11, 0x12, 0x13,
+        };
+        static const uint8_t nist_plain[24] = {
+            0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+            0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
+            0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+        };
+        /* Expected ciphertext from NIST SP 800-38C Example C.4 */
+        static const uint8_t nist_ct_expected[24] = {
+            0xE3, 0xB2, 0x01, 0xA9, 0xF5, 0xB7, 0x1A, 0x7A,
+            0x9B, 0x1C, 0xEA, 0xEC, 0xCD, 0x97, 0xE7, 0x0B,
+            0x61, 0x76, 0xAA, 0xD9, 0xA4, 0x42, 0x8A, 0xA5,
+        };
+        static const uint8_t nist_tag_expected[8] = {
+            0x48, 0x43, 0x92, 0xFB, 0xC1, 0xB0, 0x99, 0x51,
+        };
+        uint8_t nist_ct[24], nist_tag[8];
+        if (VSF_ERR_NONE != vsf_wifi_ccmp_encrypt(nist_key,
+                nist_aad, sizeof(nist_aad), nist_nonce,
+                nist_plain, sizeof(nist_plain), nist_ct, nist_tag)) {
+            vsf_trace_error("wifi crypto: NIST CCM encrypt failed" VSF_TRACE_CFG_LINEEND);
+            return VSF_ERR_FAIL;
+        }
+        if (!__vsf_wifi_buf_eq(nist_ct, nist_ct_expected, 24)) {
+            vsf_trace_error("wifi crypto: NIST CCM ciphertext MISMATCH" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("  got: %02X%02X%02X%02X %02X%02X%02X%02X"
+                    " %02X%02X%02X%02X %02X%02X%02X%02X"
+                    " %02X%02X%02X%02X %02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
+                    nist_ct[0],nist_ct[1],nist_ct[2],nist_ct[3],
+                    nist_ct[4],nist_ct[5],nist_ct[6],nist_ct[7],
+                    nist_ct[8],nist_ct[9],nist_ct[10],nist_ct[11],
+                    nist_ct[12],nist_ct[13],nist_ct[14],nist_ct[15],
+                    nist_ct[16],nist_ct[17],nist_ct[18],nist_ct[19],
+                    nist_ct[20],nist_ct[21],nist_ct[22],nist_ct[23]);
+            return VSF_ERR_FAIL;
+        }
+        if (!__vsf_wifi_buf_eq(nist_tag, nist_tag_expected, 8)) {
+            vsf_trace_error("wifi crypto: NIST CCM tag MISMATCH" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("  got: %02X%02X%02X%02X%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
+                    nist_tag[0],nist_tag[1],nist_tag[2],nist_tag[3],
+                    nist_tag[4],nist_tag[5],nist_tag[6],nist_tag[7]);
+            return VSF_ERR_FAIL;
+        }
+    }
+
     vsf_trace_info("wifi crypto: self-test passed (pbkdf2/prf/unwrap/ccmp)"
             VSF_TRACE_CFG_LINEEND);
     return VSF_ERR_NONE;

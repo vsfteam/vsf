@@ -635,8 +635,8 @@ static void __ccmp_aad_nonce(const uint8_t *dot11, uint16_t hdr_len, bool qos,
     uint8_t prio = 0;
     uint16_t n = 0;
 
-    aad[n++] = dot11[0] & ~0x70;
-    aad[n++] = (dot11[1] & ~(0x08 | 0x10 | 0x20)) | 0x40;
+    aad[n++] = dot11[0] & ~0x70;                /* FC byte0: keep subtype bit3 */
+    aad[n++] = (dot11[1] & ~(0x08 | 0x10 | 0x20)) | 0x40;  /* FC byte1: clear Retry/PwrMgt/MoreData, set Protected */
     memcpy(&aad[n], &dot11[4],  6); n += 6;     /* A1 */
     memcpy(&aad[n], &dot11[10], 6); n += 6;     /* A2 */
     memcpy(&aad[n], &dot11[16], 6); n += 6;     /* A3 */
@@ -658,6 +658,10 @@ static void __ccmp_aad_nonce(const uint8_t *dot11, uint16_t hdr_len, bool qos,
     nonce[11] = pn[1];
     nonce[12] = pn[0];
 }
+
+/* Forward decl (defined below encap). */
+static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
+        const uint8_t *dot11, uint16_t len, uint8_t *out, uint16_t cap);
 
 /* CCMP-encrypt a plaintext data MPDU `frame` (802.11 hdr + payload) into
  * `out` (capacity `cap`).  Advances wifi->wpa_tx_pn.  Returns the encrypted
@@ -696,12 +700,61 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     uint16_t aad_len;
     __ccmp_aad_nonce(out, hdr_len, qos, pn, aad, &aad_len, nonce);
 
+    /* Diagnostic: dump AAD, nonce, and TK for the first few frames. */
+    {
+        static uint32_t __aad_dump_cnt = 0;
+        if (++__aad_dump_cnt <= 3) {
+            vsf_trace_info("wifi: CCMP encap #%u hdr=%u qos=%u pn=%02X%02X%02X%02X%02X%02X"
+                    VSF_TRACE_CFG_LINEEND,
+                    (unsigned)__aad_dump_cnt, hdr_len, (unsigned)qos,
+                    pn[5], pn[4], pn[3], pn[2], pn[1], pn[0]);
+            char buf[80]; int pos = 0;
+            for (uint16_t i = 0; i < aad_len && i < 24; i++)
+                pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", aad[i]);
+            vsf_trace_info("  AAD(%u): %s" VSF_TRACE_CFG_LINEEND,
+                    (unsigned)aad_len, buf);
+            pos = 0;
+            for (int i = 0; i < 13; i++)
+                pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", nonce[i]);
+            vsf_trace_info("  NONCE: %s" VSF_TRACE_CFG_LINEEND, buf);
+            const uint8_t *tk2 = wifi->wpa_ptk + 32;
+            vsf_trace_info("  TK: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
+                    VSF_TRACE_CFG_LINEEND,
+                    tk2[0],tk2[1],tk2[2],tk2[3],tk2[4],tk2[5],tk2[6],tk2[7],
+                    tk2[8],tk2[9],tk2[10],tk2[11],tk2[12],tk2[13],tk2[14],tk2[15]);
+        }
+    }
+
     const uint8_t *tk = wifi->wpa_ptk + 32;
     if (vsf_wifi_ccmp_encrypt(tk, aad, aad_len, nonce,
             frame + hdr_len, payload_len, cc + 8, mic) != VSF_ERR_NONE) {
         return 0;
     }
     memcpy(cc + 8 + payload_len, mic, 8);
+
+    /* Self-verify: try to decrypt our own output and check roundtrip. */
+    {
+        static uint32_t __verify_cnt = 0;
+        if (++__verify_cnt <= 5) {
+            static uint32_t __vbuf32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
+            uint8_t *vout = (uint8_t *)__vbuf32;
+            uint16_t vlen = __vsf_wifi_ccmp_decap(wifi, out, total, vout, (uint16_t)sizeof(__vbuf32));
+            if (vlen == 0) {
+                vsf_trace_error("wifi: CCMP TX self-verify FAILED (decrypt returned 0)"
+                        VSF_TRACE_CFG_LINEEND);
+            } else if (vlen != len) {
+                vsf_trace_error("wifi: CCMP TX self-verify LEN MISMATCH enc_in=%u dec_out=%u orig=%u"
+                        VSF_TRACE_CFG_LINEEND, (unsigned)total, (unsigned)vlen, (unsigned)len);
+            } else if (memcmp(vout + hdr_len, frame + hdr_len, payload_len) != 0) {
+                vsf_trace_error("wifi: CCMP TX self-verify PAYLOAD MISMATCH"
+                        VSF_TRACE_CFG_LINEEND);
+            } else {
+                vsf_trace_info("wifi: CCMP TX self-verify OK (roundtrip %u bytes)"
+                        VSF_TRACE_CFG_LINEEND, (unsigned)vlen);
+            }
+        }
+    }
+
     return total;
 }
 
@@ -713,10 +766,18 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
 {
     bool     qos     = ((dot11[0] >> 4) & 0x0F) & 0x08;
     uint16_t hdr_len = qos ? 26 : 24;
-    if (len < (hdr_len + 8 + 8))                 return 0;
+    if (len < (hdr_len + 8 + 8)) {
+        vsf_trace_warning("wifi: ccmp_decap: too short len=%u hdr=%u" VSF_TRACE_CFG_LINEEND,
+                (unsigned)len, hdr_len);
+        return 0;
+    }
 
     const uint8_t *cc = dot11 + hdr_len;
-    if ((cc[3] & 0x20) == 0)                     return 0;   /* Ext IV required */
+    if ((cc[3] & 0x20) == 0) {
+        vsf_trace_warning("wifi: ccmp_decap: no ExtIV cc[3]=0x%02X" VSF_TRACE_CFG_LINEEND,
+                cc[3]);
+        return 0;
+    }
 
     uint8_t pn[6];
     pn[0] = cc[0];
@@ -743,6 +804,23 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
     out[1] &= ~0x40;
     if (vsf_wifi_ccmp_decrypt(tk, aad, aad_len, nonce,
             cipher, cipher_len, out + hdr_len, mic) != VSF_ERR_NONE) {
+        static uint32_t __ccmp_mic_fail = 0;
+        if (++__ccmp_mic_fail <= 10) {
+            vsf_trace_warning("wifi: ccmp MIC fail #%u len=%u cipher=%u %s "
+                    "A1=%02X:%02X:%02X:%02X:%02X:%02X A2=%02X:%02X:%02X:%02X:%02X:%02X"
+                    " pn=%02X%02X%02X%02X%02X%02X keyid=%u" VSF_TRACE_CFG_LINEEND,
+                    (unsigned)__ccmp_mic_fail, (unsigned)len, (unsigned)cipher_len,
+                    (dot11[4] & 0x01) ? "MC" : "UC",
+                    dot11[4], dot11[5], dot11[6], dot11[7], dot11[8], dot11[9],
+                    dot11[10], dot11[11], dot11[12], dot11[13], dot11[14], dot11[15],
+                    pn[5], pn[4], pn[3], pn[2], pn[1], pn[0],
+                    (unsigned)((cc[3] >> 6) & 0x03));
+            vsf_trace_warning("  TK: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X"
+                    " hdr=%u qos=%u" VSF_TRACE_CFG_LINEEND,
+                    tk[0], tk[1], tk[2], tk[3], tk[4], tk[5], tk[6], tk[7],
+                    tk[8], tk[9], tk[10], tk[11], tk[12], tk[13], tk[14], tk[15],
+                    (unsigned)hdr_len, (unsigned)qos);
+        }
         return 0;
     }
     return hdr_len + cipher_len;
@@ -764,6 +842,14 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
     if (wifi->disconnecting) return;
     if (len < 24) return;
 
+    /* Filter by A1 (destination address): only accept unicast frames
+     * addressed to our MAC or broadcast/multicast frames.  The RX filter on
+     * some chips is semi-promiscuous and may deliver frames for other STAs. */
+    if (!(dot11[4] & 0x01)) {
+        /* Unicast: A1 must match our MAC. */
+        if (memcmp(&dot11[4], wifi->mac, 6) != 0) return;
+    }
+
     uint8_t  fc1     = dot11[1];
     uint8_t  subtype = (dot11[0] >> 4) & 0x0F;
     bool     prot    = (fc1 & 0x40) != 0;       /* FC byte1 bit6 = Protected */
@@ -783,8 +869,21 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
         /* CCMP-encrypted business frame.  When the keys live in a hardware
          * crypto engine the chip already decrypted it (or the chip parser
          * never sets Protected), so just forward; otherwise software-decrypt
-         * and hand the recovered plaintext frame to the application. */
-        if (!wifi->wpa_ptk_valid) return;
+         * and hand the recovered plaintext frame to the application.
+         *
+         * IMPORTANT: During the 4-way handshake the PTK is already derived
+         * (from M1) but wpa_ptk_valid is still false.  The AP may send M3
+         * encrypted with the PTK (per IEEE 802.11i-2004 Sec 8.5.3.3).
+         * We MUST attempt decryption so that the EAPOL M3 inside can be
+         * processed; otherwise the handshake stalls forever. */
+        if (!wifi->wpa_ptk_valid) {
+            /* Allow decryption during 4-way if PTK has been derived
+             * (indicated by a non-zero SNonce from M1 handling). */
+            if (wifi->mlme_state != WIFI_MLME_4WAY) return;
+            if (!(wifi->wpa_snonce[0] | wifi->wpa_snonce[1]
+                    | wifi->wpa_snonce[2] | wifi->wpa_snonce[3])) return;
+            /* Fall through to attempt decryption with derived PTK. */
+        }
         if (wifi->wpa_hw_crypto) {
             vsf_wifi_on_rx(wifi, (uint8_t *)dot11, len);
             return;
@@ -794,7 +893,31 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             uint8_t *out = (uint8_t *)__ccmp_rx32;
             uint16_t plen = __vsf_wifi_ccmp_decap(wifi, dot11, len,
                     out, (uint16_t)sizeof(__ccmp_rx32));
-            if (plen == 0) return;              /* MIC failure / malformed */
+            if (plen == 0) {
+                static uint32_t __ccmp_fail_cnt = 0;
+                if (++__ccmp_fail_cnt <= 5) {
+                    vsf_trace_warning("wifi: CCMP decap FAIL #%u len=%u"
+                            VSF_TRACE_CFG_LINEEND,
+                            (unsigned)__ccmp_fail_cnt, (unsigned)len);
+                }
+                return;
+            }
+            /* After decryption, check if this is an EAPOL frame (encrypted
+             * M3 during 4-way handshake).  Route to eapol_rx if so. */
+            {
+                static const uint8_t __snap_eapol_enc[8] = {
+                    0xAA, 0xAA, 0x03, 0x00, 0x00, 0x00, 0x88, 0x8E
+                };
+                uint16_t dec_hdr = 24;
+                if ((out[0] & 0x80) && ((out[0] & 0x0C) == 0x08)) dec_hdr = 26;
+                uint16_t dec_pl = (plen > dec_hdr) ? (plen - dec_hdr) : 0;
+                if ((dec_pl > 8) && (memcmp(out + dec_hdr, __snap_eapol_enc, 8) == 0)) {
+                    vsf_trace_info("wifi: encrypted EAPOL detected, routing to eapol_rx"
+                            VSF_TRACE_CFG_LINEEND);
+                    vsf_wifi_eapol_rx(wifi, out + dec_hdr + 8, dec_pl - 8);
+                    return;
+                }
+            }
             vsf_wifi_on_rx(wifi, out, plen);
         }
         return;
@@ -1034,6 +1157,19 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         wifi->wpa_rsn_ie_len = (uint8_t)sizeof(__rsn_ie);
     }
 #endif
+    /* WMM/WME Information Element (vendor-specific IE 221).
+     * Without this, the AP considers us a non-QoS STA and may reject or
+     * mishandle QoS Data frames we send after the handshake completes.
+     * OUI = 00-50-F2, type 2 (WMM), subtype 0 (info), version 1. */
+    static const uint8_t __wmm_ie[] = {
+        0xDD, 0x07,                     /* vendor-specific, length 7       */
+        0x00, 0x50, 0xF2, 0x02,         /* OUI 00-50-F2, type 2 (WMM)     */
+        0x00,                           /* subtype 0 (WMM Information)     */
+        0x01,                           /* version 1                       */
+        0x00,                           /* QoS info: no U-APSD             */
+    };
+    memcpy(&frame[i], __wmm_ie, sizeof(__wmm_ie));
+    i += sizeof(__wmm_ie);
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
     if (VSF_ERR_NONE != err) {
         vsf_trace_warning("wifi: mlme assoc-req tx failed (err=%d)"

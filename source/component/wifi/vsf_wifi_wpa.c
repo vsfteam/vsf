@@ -113,23 +113,27 @@ static vsf_err_t __wpa_send_eapol(vsf_wifi_t *wifi, uint8_t ver,
     };
     uint8_t  buf[__WPA_BUF_MAX];
     uint16_t eapol_len = (uint16_t)(EK_HDR_LEN + key_data_len);
-    uint16_t total     = (uint16_t)(24 + 8 + eapol_len);
+    uint16_t total     = (uint16_t)(26 + 8 + eapol_len);
 
     if (total > sizeof(buf)) return VSF_ERR_FAIL;
     memset(buf, 0, total);
 
-    /* 802.11 data header (ToDS): addr1=BSSID(RA), addr2=our MAC(TA),
-     * addr3=BSSID(DA). */
-    buf[0] = 0x08;  buf[1] = 0x01;
+    /* 802.11 QoS data header (ToDS): addr1=BSSID(RA), addr2=our MAC(TA),
+     * addr3=BSSID(DA).  Use QoS Data (subtype 8, FC=0x8801) instead of plain
+     * Data because the AP negotiated WMM and may reject non-QoS frames. */
+    buf[0] = 0x88;  buf[1] = 0x01;
     memcpy(&buf[4],  wifi->mlme_bssid, 6);
     memcpy(&buf[10], wifi->mac,        6);
     memcpy(&buf[16], wifi->mlme_bssid, 6);
+    /* bytes 22-23: seq control (hardware fills) */
+    /* bytes 24-25: QoS Control = 0x0007 (TID 7, Voice, highest priority) */
+    buf[24] = 0x07; buf[25] = 0x00;
 
     /* LLC/SNAP + EAPOL ethertype. */
-    memcpy(&buf[24], snap, 8);
+    memcpy(&buf[26], snap, 8);
 
     /* EAPOL-Key. */
-    uint8_t *ek = &buf[32];
+    uint8_t *ek = &buf[34];
     ek[0] = ver;
     ek[EAPOL_TYPE_OFF] = EAPOL_TYPE_KEY;
     __wpa_wr16be(&ek[EAPOL_BODYLEN_OFF], (uint16_t)(eapol_len - 4));
@@ -160,7 +164,14 @@ static vsf_err_t __wpa_send_eapol(vsf_wifi_t *wifi, uint8_t ver,
 }
 
 /* Extract the GTK from the (already decrypted) key-data KDE list of M3.
- * GTK KDE = 0xDD len 00-0F-AC 01 [keyid/tx][rsvd][GTK...]. */
+ * GTK KDE = 0xDD len 00-0F-AC 01 [keyid/tx][rsvd][GTK...].
+ *
+ * The key data is a sequence of IEs (type-length-value).  We must parse
+ * them properly: skip each IE by (2 + length) bytes.  The previous code
+ * did byte-scan (p++) for non-DD elements, which broke on any 0x00 byte
+ * inside an RSN IE body (the OUI 00:0F:AC contains 0x00), causing the
+ * parser to stop before reaching the GTK KDE.  This was the root cause
+ * of GTK being all-zeros after handshake. */
 static void __wpa_parse_gtk(vsf_wifi_t *wifi, const uint8_t *data, uint16_t len)
 {
     const uint8_t *p   = data;
@@ -168,20 +179,29 @@ static void __wpa_parse_gtk(vsf_wifi_t *wifi, const uint8_t *data, uint16_t len)
 
     while (p + 2 <= end) {
         uint8_t t = p[0];
-        if (t == 0x00) break;                   /* padding                 */
-        if (t != 0xDD) { p++; continue; }       /* not a KDE               */
         uint8_t l = p[1];
-        if (p + 2 + l > end) break;
-        if ((l >= 6) && (p[2] == 0x00) && (p[3] == 0x0F)
+        if (t == 0x00) break;                   /* padding byte            */
+        if (p + 2 + l > end) break;             /* truncated IE            */
+        if ((t == 0xDD) && (l >= 6) && (p[2] == 0x00) && (p[3] == 0x0F)
                 && (p[4] == 0xAC) && (p[5] == 0x01)) {
             uint8_t glen = (uint8_t)(l - 6);
             if (glen > sizeof(wifi->wpa_gtk)) glen = sizeof(wifi->wpa_gtk);
             wifi->wpa_gtk_keyidx = (uint8_t)(p[6] & 0x03);
             memcpy(wifi->wpa_gtk, &p[8], glen);
             wifi->wpa_gtk_len = glen;
+            vsf_trace_info("wifi: GTK extracted keyidx=%u len=%u"
+                    " tk=%02X%02X%02X%02X%02X%02X%02X%02X..."
+                    VSF_TRACE_CFG_LINEEND,
+                    (unsigned)wifi->wpa_gtk_keyidx, (unsigned)glen,
+                    wifi->wpa_gtk[0], wifi->wpa_gtk[1], wifi->wpa_gtk[2],
+                    wifi->wpa_gtk[3], wifi->wpa_gtk[4], wifi->wpa_gtk[5],
+                    wifi->wpa_gtk[6], wifi->wpa_gtk[7]);
+            return;
         }
-        p += 2 + l;
+        p += 2 + l;                             /* skip entire IE          */
     }
+    vsf_trace_warning("wifi: GTK KDE not found in key data (len=%u)"
+            VSF_TRACE_CFG_LINEEND, (unsigned)len);
 }
 
 /* Handle EAPOL-Key M1 (ANonce, ACK, no MIC): derive the PTK and answer M2.
@@ -316,10 +336,18 @@ static void __wpa_handle_m3(vsf_wifi_t *wifi, const uint8_t *ek,
     /* Echo M3's replay counter in M4. */
     memcpy(wifi->wpa_replay, &ek[EK_REPLAY_OFF], 8);
 
-    /* M4: no key data, MIC + secure set. */
-    if (__wpa_send_eapol(wifi, ek[0], KI_M4, 0, NULL, NULL, 0)
-            != VSF_ERR_NONE) {
-        vsf_trace_warning("wifi: EAPOL M4 tx failed" VSF_TRACE_CFG_LINEEND);
+    /* M4: no key data, MIC + secure set.
+     * Send M4 multiple times to improve reliability: without hardware ACK
+     * the AP may not receive a single transmission.  In tests, M2 required
+     * ~4 attempts before the AP acknowledged; M4 is sent only once by the
+     * standard flow, giving ~75% chance of failure.  Redundant M4s are
+     * harmless (AP ignores duplicates once PTK is installed). */
+    for (int __m4_i = 0; __m4_i < 3; __m4_i++) {
+        if (__wpa_send_eapol(wifi, ek[0], KI_M4, 0, NULL, NULL, 0)
+                != VSF_ERR_NONE) {
+            vsf_trace_warning("wifi: EAPOL M4 tx[%d] failed" VSF_TRACE_CFG_LINEEND,
+                    __m4_i);
+        }
     }
 
     /* PTK/GTK derived; the cipher backend installation lands in Task 5.  Mark
@@ -335,7 +363,11 @@ static void __wpa_handle_m3(vsf_wifi_t *wifi, const uint8_t *ek,
 void vsf_wifi_eapol_rx(vsf_wifi_t *wifi, const uint8_t *eapol, uint16_t len)
 {
     if ((wifi == NULL) || (eapol == NULL)) return;
-    if (wifi->mlme_state != WIFI_MLME_4WAY) return;     /* only mid-handshake */
+    /* Accept EAPOL both during the 4-way handshake and when already connected.
+     * In RUN state this handles AP M3 retries (AP didn't receive our M4):
+     * we simply resend M4 without disrupting the existing link. */
+    if ((wifi->mlme_state != WIFI_MLME_4WAY)
+            && (wifi->mlme_state != WIFI_MLME_RUN)) return;
     if (len < EK_HDR_LEN) return;
 
     /* Must be an EAPOL-Key frame with an RSN key descriptor. */
