@@ -2643,28 +2643,24 @@ static vsf_err_t __rt28xx_set_auth_mode(vsf_wifi_t *wifi,
 
 static int __rt28xx_emit_wcid(vsf_wifi_op_t *ops, int n, const uint8_t mac[6])
 {
-    /* Program WCID 1 entry with AP MAC + WCID_ATTR with KEYTAB=1, mirroring
-     * the Windows native driver connect sequence (ref/rt5572_win_usb.log
-     * L23445-L23450).  Earlier debug experiments left this as a no-op which
-     * did not solve the EAPOL drop issue, so we restore the canonical config
-     * to match Windows exactly while we hunt the real root cause via other
-     * registers (BCN_TIME_CFG TSF_SYNC, etc). */
+    /* Program WCID 1 entry with AP MAC + WCID_ATTR with KEYTAB=1 (bit0).
+     * VERIFIED ROOT-CAUSE FIX (do NOT revert to 0): on RT5572 the WCID_ATTR
+     * KEYTAB bit is the hardware gate for accepting unicast DATA frames
+     * (type=2) addressed to us.  Even with cipher=0 (software crypto), if
+     * KEYTAB=0 the chip RX path silently DROPS every to-me unicast data frame
+     * (including the plaintext EAPOL M1), so the 4-way handshake never starts.
+     * Windows native driver writes 0x0001 here (KEYTAB=1, CIPHER=0); the
+     * Linux/VSF default of 0x0000 is the bug.  Confirmed by Windows USB log
+     * (ref/rt5572_win_usb.log L23445-23450) + air capture cross-check.
+     * NOTE: Linux rt2800_config_wcid_attr_cipher() clears this before SET_KEY,
+     * but that path does NOT apply to our software-crypto raw backend -- here
+     * KEYTAB=1 must be set at connect time for plaintext EAPOL to be RX'ed. */
     uint32_t lo = (uint32_t)mac[0] | ((uint32_t)mac[1] << 8)
                 | ((uint32_t)mac[2] << 16) | ((uint32_t)mac[3] << 24);
     uint32_t hi = (uint32_t)mac[4] | ((uint32_t)mac[5] << 8);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID),     lo);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID) + 4, hi);
-    /* WCID_ATTR: must be 0 until the PTK is installed.  Ref rt2800lib.c
-     * rt2800_config_wcid_attr_cipher(): before SET_KEY the whole attribute
-     * register is cleared (KEYTAB=0, CIPHER=0).  KEYTAB=1 is set ONLY when a
-     * pairwise key is programmed.  pcap analysis (ref/wifi_channel1.pcap
-     * frame 3669) proved the EAPOL M1 arrives as a PLAINTEXT QoS data frame
-     * (fc=0x880a, type=2 sub=8, Protected=0); with KEYTAB=1 but no key the
-     * hardware expects this WCID's data frames to be encrypted, flags M1 as a
-     * CIPHER_ERROR, drops it before DMA and never hardware-ACKs it -> the AP
-     * keeps retransmitting M1 and the 4-way handshake never starts.  Setting
-     * 0 here lets plaintext to-me data frames (M1) be ACKed and delivered. */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), 0x00000000);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), 0x00000001);
     return n;
 }
 
@@ -2678,24 +2674,17 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
     /* bssid(2) + wcid(3) + channel(~75) + filter(1) -> shared static buffer. */
     vsf_wifi_op_t *ops = __rt28xx_ops_buf;
     int n = 0;
-    /* MAC_BSSID (0x1010/0x1014) must hold the AP BSSID in infra STA mode.
-     * Ref rt2800lib.c rt2800_config_intf(): for a station (conf->sync !=
-     * TSF_SYNC_AP_NONE) it writes conf->bssid = the AP BSSID into MAC_BSSID_DW0
-     * with BSS_ID_MASK=3; only AP mode copies our own MAC there.  Two separate
-     * hardware tests exist:
-     *   - UNICAST_TO_ME: frame RA vs MAC_ADDR (0x1008) = OUR MAC (set by
-     *     __rt28xx_set_mac_addr) -> drives hardware auto-ACK.
-     *   - MY_BSS:        frame BSSID vs MAC_BSSID (0x1010) = AP BSSID -> drives
-     *     acceptance of data frames into the joined BSS.
-     * Earlier we wrongly wrote OUR MAC to 0x1010, so incoming data frames
-     * (BSSID=AP MAC) failed the MY_BSS test: the chip dropped them before DMA
-     * and (for data frames) withheld the ACK, while management frames still
-     * surfaced via a different path.  pcap (ref/wifi_channel1.pcap) shows
-     * exactly this: Assoc-Resp ACKed both ways but EAPOL M1 (fc=0x880a QoS
-     * data) never ACKed nor delivered -> 4-way never starts.  Writing the AP
-     * BSSID here fixes MY_BSS so to-me data frames are accepted & ACKed. */
-    n = __rt28xx_emit_bssid  (ops, n, bssid);       /* 0x1010 = AP BSSID */
-    n = __rt28xx_emit_wcid   (ops, n, bssid);   /* program WCID 1 with AP MAC */
+    /* MAC_BSSID (0x1010/0x1014): write OUR OWN MAC here, NOT the AP BSSID.
+     * VERIFIED BASELINE (do NOT revert to AP BSSID): this is the configuration
+     * under which hardware auto-ACK of the AP's unicast management frames was
+     * confirmed working (AP assigns aid, Auth/Assoc-Resp ACKed both ways).
+     * The DW1 high half written by __rt28xx_emit_bssid carries 0x0023 = the
+     * vendor bit 21 (0x00200000) that gates BSSID-match -> auto-responder;
+     * without it the chip RX'es but never auto-ACKs the AP frames.
+     * Empirically writing the AP BSSID here (tried this session) did NOT solve
+     * the EAPOL-M1-not-delivered problem and is therefore reverted. */
+    n = __rt28xx_emit_bssid  (ops, n, wifi->mac);   /* 0x1010 = OUR MAC + DW1 bit21 */
+    n = __rt28xx_emit_wcid   (ops, n, bssid);   /* program WCID 1 with AP MAC, WCID_ATTR KEYTAB=1 */
     n = __rt28xx_emit_channel(ops, n, channel);
     /* BCN_TIME_CFG: enable STA mode TSF sync + TBTT timer.  Windows native
      * driver writes 0x000B0640 in the connect sequence (ref/rt5572_win_usb.log

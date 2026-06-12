@@ -316,7 +316,7 @@ DROP_NOT_TO_ME / DROP_VER_ERROR / DROP_DUP 等。
 **修复**：写入 LEGACY_BASIC_RATE + AUTO_RSP_CFG，同时设 TX_PWR_CFG_0..4
 确保 ACK 发射功率足够。
 
-### 5.6 【进行中】RT5572 + ChinaNet-5Jhc 4-way 超时回归（根因未定位）
+### 5.6 【进行中】RT5572 + ChinaNet-5Jhc 4-way 超时回归（根因：硬件未 auto-ACK）
 
 **测试环境**：vc.linux + WinUSB HCD + RT5572 真实 dongle（ASIC=0x55920222
 rev=0x0222 = RT5592C+，2T2R），目标 AP `ChinaNet-5Jhc`（BSSID
@@ -325,16 +325,21 @@ rev=0x0222 = RT5592C+，2T2R），目标 AP `ChinaNet-5Jhc`（BSSID
 空口抓包 `ref/wifi_channel1.pcap`（11.7MB，45783 帧，决定性证据）。
 
 **症状（pcap + 设备日志双向印证）**：
-- 关联成功（AP 分配 aid，Auth/Assoc-Resp 双向 ACK，mgmt 帧收发正常）。
+- 本机状态机进入 mlme=4（自认为关联成功、AP 分配 aid），但 RAW-TOP 实测显示
+  AP 仍在 mlme=4 后持续重发 Assoc-Resp（最新一次 40 次），说明 AP 未认为关联
+  完成——即本机未对 Assoc-Resp 回链路层 ACK（详见下方根因重定位）。
 - **EAPOL M1 = 明文 QoS Data 帧**（pcap frame 3669：`fc=0x880a`，type=2
-  sub=8，`llc=0x888e`，`eapol.type=3`，Protected=0），AP→STA 反复重传。
+  sub=8，`llc=0x888e`，`eapol.type=3`，Protected=0）；AP 需先认为关联完成才会发
+  M1，因此在本 bug 下 M1 根本不会被发出。
 - **M1 既不被硬件 ACK，也不被 DMA 上交主机**：设备日志 `mlme=4` 阶段
   从未出现任何 `type=2` 帧（RAW-TOP 会打印所有 to-us 帧），全是 Assoc-Resp
   (sub=1) 和 Auth (sub=11) 的重传。STA 因此永远进不了 4-way → 无 M2 →
   pcap 中 STA→AP 方向一个 EAPOL 都没有 → 握手超时。
-- **我方上行 data 帧 TX 全失败**：`TX_STA_FIFO ack_ok=0 ack_req=1 wcid=1
-  pid=4 mcs=0 raw=0x40000189` 连续 34 次完全相同（raw 值一字不变，可疑，
-  疑似 FIFO 未真正 pop 或读到伪值）。
+- **我方上行 data 帧 TX「失败」实为虚假统计**：`TX_STA_FIFO ack_ok=0
+  ack_req=1 wcid=1 pid=4 mcs=0 raw=0x40000189` 连续 34 次完全相同。**`raw 值
+  一字不变`是已知的 TX_STA_FIFO 虚假统计现象**（FIFO 未被正确清空，VALID=1
+  但内容不刷新），不代表真实 TX 失败。绝不能据此判断 TX 死亡——必须用
+  RAW-TOP 真实帧观测，或先确认 FIFO 返回值是否动态刷新。
 
 **已排除的假设（逐一实测证伪）**：
 1. **IQ 校准**：eFuse IQ 块全 0xFF，原代码却 iq_valid=true。已修为全 0xFF
@@ -342,17 +347,42 @@ rev=0x0222 = RT5592C+，2T2R），目标 AP `ChinaNet-5Jhc`（BSSID
 2. **RFCSR1=0x17（缺 TX0/TX1_PD）**：怀疑 TX 链路 power-gate。但 RFCSR8=0xF1
    读回完全正确证明 RF 读路径可信；且 mgmt 帧能正常 TX 到达 AP，说明 TX 物理层
    没死。0x17 可能只是 idle 时 TX 动态 power-gate。不是根因。
-3. **WCID_ATTR KEYTAB=1**：怀疑装 key 前 KEYTAB=1 让 HW 把明文 EAPOL 当
-   CIPHER_ERROR 丢弃。对照 Linux `rt2800_config_wcid_attr_cipher`（装 PTK
-   前整个 WCID_ATTR 应为 0）改为 0x00000000。**实测无效**，M1 仍不交付。
-4. **MAC_BSSID(0x1010) 误写我方 MAC**：对照 Linux `rt2800_config_intf`
-   （infra STA 模式 0x1010 应写 AP BSSID，仅 AP 模式写自己 MAC），改为写
-   AP BSSID 修复 MY_BSS 判定。**实测无效**，M1 仍不交付、TX 仍全失败。
 
-**当前状态**：以上 4 项修复均未解决。症状精确为「mgmt 能收发能 ACK，但单播
-data 帧（M1）既不被 ACK 也不被 DMA 上交」。下一步怀疑方向：TX_STA_FIFO
-raw 恒定值是否说明 TX 描述符根本没提交/FIFO 采样逻辑有误；以及连接态
-MAC RX 数据通路（data 帧的 DMA enable / WCID 关联 / TSF join 状态）。
+**⚠️ 本 session 的两处错误改动（已回滚，记录以防再犯）**：
+本 session 一度无视历史已验证结论，把两处正确配置改反，均经实测证明是
+**退化**，现已全部回滚到验证基线：
+3. **WCID_ATTR**：误据 Linux `rt2800_config_wcid_attr_cipher`（装 PTK 前清 0）
+   把 0x0001 改成 0x0000。**这是退化**——RT5572 的 WCID_ATTR `KEYTAB` 位
+   (bit0) 是硬件接收 unicast data 帧（type=2）的门控，即使软件加解密
+   (cipher=0) 也必须置 1，否则硬件丢弃所有 to-me 单播 data 帧（含明文 EAPOL
+   M1）。Windows 实测写 0x0001，Linux/VSF 默认 0x0000 才是 bug。**已恢复
+   0x00000001**。Linux 的 clear-before-SET_KEY 路径不适用于本软件加解密 raw
+   后端。
+4. **MAC_BSSID(0x1010)**：误据 Linux `rt2800_config_intf` 把写我方 MAC 改成
+   写 AP BSSID。**这是退化**——验证基线是 0x1010 写我方 MAC + DW1 高半字
+   0x0023（vendor bit21=auto-ACK 门控），正是该组合下 mgmt 帧 auto-ACK 工作
+   (aid 分配、Assoc-Resp 双向 ACK)。改写 AP BSSID 实测无效。**已恢复写我方
+   MAC**。
+
+**当前状态**：两处错误改动已回滚到验证基线（WCID_ATTR=0x0001、0x1010=我方
+MAC+bit21）并重测（wifi_dhcp_run.log），以 RAW-TOP 真实帧为唯一可信信号：
+- `mlme=4` 阶段 **type=2 帧 = 0 个**（M1 仍未被 DMA 上交）。
+- AP 持续重发 **Assoc-Resp 40 次** + Auth 9 次。
+- 4-way handshake 依旧 timeout。
+
+**根因重定位（以 RAW-TOP 实测为准，修正本节开头的“mgmt 双向 ACK”假设）**：
+AP 反复重发同一 Assoc-Resp 达 40 次的唯一原因 = 收不到我方对该单播管理帧
+的链路层 ACK。即**硬件未对 AP 的单播帧自动回 ACK**，这才是 M1 永不到达的真
+正根因（与本 session 早期“mgmt 能 ACK”的判断相反；以无盲区的 RAW-TOP 实测
+为准）。`TX_STA_FIFO=0x40000189` 确认为虚假统计、不可作为 TX 判断依据。
+
+**下一步方向**：在 Windows 成功抓包 `ref/rt5572_win_usb.log` 中定位关联成功
+瞬间为开启 auto-ACK 写的寄存器（`MAC_SYS_CTRL` / `AUTO_RSP_CFG` / `TXOP` /
+`PBF` 等），与我方连接流程逐条对齐，找出缺失的 auto-ACK 使能写。
+
+> 教训：历史记忆中经实测验证的配置（WCID_ATTR KEYTAB=1、0x1010 写我方 MAC、
+> TX_STA_FIFO 虚假统计）优先级高于 Linux 参考源码的纸面推断；不得用未经实测
+> 的源码比对去推翻已验证结论。
 
 > 注：本回归出现在 ChinaNet-5Jhc；§2.6 记录的 VStudio AP 全流程通过是更早
 > 的验证状态，两者差异（信道 ch1 vs ch6、AP 行为）尚待对比确认。
