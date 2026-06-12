@@ -367,6 +367,36 @@ extern void vsf_wifi_on_link_up    (vsf_wifi_t *wifi,
                                     const vsf_wifi_link_info_t *info);
 extern void vsf_wifi_on_link_down  (vsf_wifi_t *wifi, uint8_t reason);
 
+/*============================ NETIF BINDING ================================*
+ *
+ * Runtime binding for a network-stack adapter (e.g. the lwIP netdrv driver
+ * in vsf_wifi_netdrv.c).  Once a backend is attached via
+ * vsf_wifi_netdrv_attach(), the core delivers decrypted RX data frames to
+ * its on_rx (replacing the weak vsf_wifi_on_rx hook), and additionally
+ * delivers link up/down events to its on_link_up / on_link_down.  Link
+ * events still also fire the weak vsf_wifi_on_link_up / vsf_wifi_on_link_down
+ * hooks: those are control-plane notifications (e.g. unblocking a connect
+ * command) and run alongside the backend's data-plane handling.  With no
+ * backend attached only the weak hooks are used (back-compat with the
+ * diagnostic commands).  All callbacks run in the bus driver's EDA context,
+ * exactly like the weak hooks.  `on_rx` receives a naked, decrypted 802.11
+ * data frame (FC .. payload); the backend is responsible for any 802.11 <->
+ * Ethernet framing. */
+typedef struct vsf_wifi_netif_ops_t {
+    void (*on_rx)       (void *param, vsf_wifi_t *wifi,
+                         uint8_t *frame, uint16_t len);
+    void (*on_link_up)  (void *param, vsf_wifi_t *wifi,
+                         const vsf_wifi_link_info_t *info);
+    void (*on_link_down)(void *param, vsf_wifi_t *wifi, uint8_t reason);
+} vsf_wifi_netif_ops_t;
+
+/* Register / unregister a netif backend.  `ops` (and the storage it points
+ * at) must stay valid until detach; `param` is passed back verbatim to each
+ * callback.  Passing ops == NULL is equivalent to detach. */
+void vsf_wifi_netdrv_attach(vsf_wifi_t *wifi,
+                            const vsf_wifi_netif_ops_t *ops, void *param);
+void vsf_wifi_netdrv_detach(vsf_wifi_t *wifi);
+
 /*============================ USER API ======================================*/
 
 /* Inspection. */

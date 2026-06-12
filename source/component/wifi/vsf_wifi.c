@@ -107,6 +107,73 @@ VSF_CAL_WEAK(vsf_wifi_on_link_down)
 void vsf_wifi_on_link_down(vsf_wifi_t *wifi, uint8_t reason)
 { (void)wifi; (void)reason; }
 
+/*============================ NETIF BINDING ================================*
+ *
+ * A network-stack backend (lwIP netdrv adapter) registers here.  The three
+ * __vsf_wifi_deliver_* helpers below are the single funnel the core uses for
+ * data-frame RX and link events: when a backend is attached its ops take
+ * priority, otherwise the weak application hooks run (back-compat). */
+
+void vsf_wifi_netdrv_attach(vsf_wifi_t *wifi,
+        const vsf_wifi_netif_ops_t *ops, void *param)
+{
+    wifi->netif_ops   = ops;
+    wifi->netif_param = param;
+}
+
+void vsf_wifi_netdrv_detach(vsf_wifi_t *wifi)
+{
+    wifi->netif_ops   = NULL;
+    wifi->netif_param = NULL;
+}
+
+static void __vsf_wifi_deliver_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
+{
+    {
+        static uint32_t __deliver_cnt = 0;
+        uint16_t dh = (((frame[0] >> 4) & 0x0F) & 0x08) ? 26 : 24;
+        uint8_t et0 = (len > dh + 7) ? frame[dh + 6] : 0;
+        uint8_t et1 = (len > dh + 7) ? frame[dh + 7] : 0;
+        /* Only log IPv4 / ARP business frames (post-handshake), skip the
+         * mgmt/scan noise that otherwise floods the counter. */
+        if (((et0 == 0x08) && ((et1 == 0x00) || (et1 == 0x06)))
+                && (++__deliver_cnt <= 16)) {
+            vsf_trace_info("wifi: deliver_rx #%u len=%u fc=%02X%02X prot=%u"
+                    " et=%02X%02X" VSF_TRACE_CFG_LINEEND,
+                    (unsigned)__deliver_cnt, (unsigned)len, frame[0], frame[1],
+                    (unsigned)((frame[1] >> 6) & 1), et0, et1);
+        }
+    }
+    if ((wifi->netif_ops != NULL) && (wifi->netif_ops->on_rx != NULL)) {
+        wifi->netif_ops->on_rx(wifi->netif_param, wifi, frame, len);
+    } else {
+        vsf_wifi_on_rx(wifi, frame, len);
+    }
+}
+
+static void __vsf_wifi_deliver_link_up(vsf_wifi_t *wifi,
+        const vsf_wifi_link_info_t *info)
+{
+    /* Link events are delivered to BOTH sinks: the weak application hook is a
+     * control-plane notification (e.g. unblocking a wifi_connect command),
+     * while the attached netif backend treats it as a data-plane action
+     * (bring the netdrv up and auto-start DHCP).  The two are orthogonal, so
+     * unlike RX delivery this is not an either/or funnel. */
+    vsf_wifi_on_link_up(wifi, info);
+    if ((wifi->netif_ops != NULL) && (wifi->netif_ops->on_link_up != NULL)) {
+        wifi->netif_ops->on_link_up(wifi->netif_param, wifi, info);
+    }
+}
+
+static void __vsf_wifi_deliver_link_down(vsf_wifi_t *wifi, uint8_t reason)
+{
+    /* See __vsf_wifi_deliver_link_up: both sinks run. */
+    vsf_wifi_on_link_down(wifi, reason);
+    if ((wifi->netif_ops != NULL) && (wifi->netif_ops->on_link_down != NULL)) {
+        wifi->netif_ops->on_link_down(wifi->netif_param, wifi, reason);
+    }
+}
+
 /*============================ HELPERS =======================================*/
 
 static void __vsf_wifi_attach_fail(vsf_wifi_t *wifi, vsf_err_t err)
@@ -607,7 +674,7 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
             && wifi->drv->parse_rx != NULL) {
         wifi->drv->parse_rx(wifi, frame, len);
     } else {
-        vsf_wifi_on_rx(wifi, frame, len);
+        __vsf_wifi_deliver_rx(wifi, frame, len);
     }
 }
 
@@ -885,7 +952,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             /* Fall through to attempt decryption with derived PTK. */
         }
         if (wifi->wpa_hw_crypto) {
-            vsf_wifi_on_rx(wifi, (uint8_t *)dot11, len);
+            __vsf_wifi_deliver_rx(wifi, (uint8_t *)dot11, len);
             return;
         }
         {
@@ -893,6 +960,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             uint8_t *out = (uint8_t *)__ccmp_rx32;
             uint16_t plen = __vsf_wifi_ccmp_decap(wifi, dot11, len,
                     out, (uint16_t)sizeof(__ccmp_rx32));
+            bool is_uc = !(dot11[4] & 0x01);
             if (plen == 0) {
                 static uint32_t __ccmp_fail_cnt = 0;
                 if (++__ccmp_fail_cnt <= 5) {
@@ -901,6 +969,19 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                             (unsigned)__ccmp_fail_cnt, (unsigned)len);
                 }
                 return;
+            }
+            if (is_uc) {
+                /* Unicast data from the AP decrypted OK: this is the path DHCP
+                 * OFFER/ACK arrive on.  Make it visible regardless of the
+                 * multicast-noise fail counter. */
+                static uint32_t __uc_ok_cnt = 0;
+                if (++__uc_ok_cnt <= 12) {
+                    vsf_trace_info("wifi: UC decap OK #%u plen=%u et=%02X%02X"
+                            VSF_TRACE_CFG_LINEEND, (unsigned)__uc_ok_cnt,
+                            (unsigned)plen,
+                            (plen > 32) ? out[(((out[0]>>4)&0x0F)&0x08)?32:30] : 0,
+                            (plen > 33) ? out[(((out[0]>>4)&0x0F)&0x08)?33:31] : 0);
+                }
             }
             /* After decryption, check if this is an EAPOL frame (encrypted
              * M3 during 4-way handshake).  Route to eapol_rx if so. */
@@ -918,7 +999,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                     return;
                 }
             }
-            vsf_wifi_on_rx(wifi, out, plen);
+            __vsf_wifi_deliver_rx(wifi, out, plen);
         }
         return;
 #else
@@ -940,7 +1021,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
 #endif
 
     /* Non-EAPOL plaintext data: hand the naked 802.11 frame to the app. */
-    vsf_wifi_on_rx(wifi, (uint8_t *)dot11, len);
+    __vsf_wifi_deliver_rx(wifi, (uint8_t *)dot11, len);
 }
 
 /*============================ SCAN SCHEDULER ================================*/
@@ -1204,7 +1285,7 @@ static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
     wifi->wpa_ptk_valid = false;
 #endif
     if (was_active) {
-        vsf_wifi_on_link_down(wifi, reason);
+        __vsf_wifi_deliver_link_down(wifi, reason);
     }
 }
 
@@ -1354,7 +1435,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             memcpy(info.bssid, wifi->mlme_bssid, 6);
             info.channel = wifi->mlme_channel;
             info.flags   = WIFI_LINK_FLAG_CONNECTED | WIFI_LINK_FLAG_AUTHORIZED;
-            vsf_wifi_on_link_up(wifi, &info);
+            __vsf_wifi_deliver_link_up(wifi, &info);
         }
         break;
 
@@ -1650,7 +1731,7 @@ void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi)
         memcpy(info.bssid, wifi->mlme_bssid, 6);
         info.channel = wifi->mlme_channel;
         info.flags   = WIFI_LINK_FLAG_CONNECTED | WIFI_LINK_FLAG_AUTHORIZED;
-        vsf_wifi_on_link_up(wifi, &info);
+        __vsf_wifi_deliver_link_up(wifi, &info);
     }
 }
 

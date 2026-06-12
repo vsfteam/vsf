@@ -97,12 +97,42 @@
  * the row, EFUSE_DATA0 the highest (the byte order is reversed compared
  * to the register address ordering — same convention Linux rt2x00 uses). */
 #define RT28XX_EFUSE_CTRL               0x0580
-#define RT28XX_EFUSE_DATA3              0x0590
-#define RT28XX_EFUSE_DATA2              0x0594
-#define RT28XX_EFUSE_DATA1              0x0598
-#define RT28XX_EFUSE_DATA0              0x059C
+/* eFuse data registers (ref rt2800.h:664).  DATA0=0x0590 holds the LAST 4
+ * bytes of a row, DATA3=0x059C the FIRST 4 bytes ("data is read from end to
+ * start", rt2800lib.c:10941).  These were previously swapped, which mis-parsed
+ * the MAC (and would corrupt any future EEPROM-calibration reads). */
+#define RT28XX_EFUSE_DATA0              0x0590
+#define RT28XX_EFUSE_DATA1              0x0594
+#define RT28XX_EFUSE_DATA2              0x0598
+#define RT28XX_EFUSE_DATA3              0x059C
 #define RT28XX_EFUSE_KICK               (1u << 30)
 #define RT28XX_EFUSE_PRESENT            (1u << 31)
+/* EFUSE_CTRL field positions (ref rt2800.h:656-657).  ADDRESS_IN is the WORD
+ * index (u16 units) of the 8-word block to read; it starts at bit 17, NOT 16.
+ * The old row-0 read used (x<<16) which only happened to work because AIN==0. */
+#define RT28XX_EFUSE_AIN_SHIFT          17      /* EFUSE_CTRL_ADDRESS_IN = 0x03fe0000 */
+#define RT28XX_EFUSE_MODE_SHIFT         6       /* EFUSE_CTRL_MODE        = 0x000000c0 */
+/* RF frequency-offset calibration (ref rt2800lib.c:2447 rt2800_freq_cal_mode1).
+ * EEPROM_FREQ is word 0x1d on RT5592 (ref rt2800lib.c:316); its low byte
+ * (EEPROM_FREQ_OFFSET = 0x00ff) feeds RFCSR17_CODE (0x7f), clamped to 0x5f. */
+#define RT28XX_EFUSE_FREQ_WORD          0x1d    /* EEPROM_FREQ (RT5592) */
+#define RT28XX_EFUSE_FREQ_BLOCK         24      /* 8-word block (0x18) holding word 0x1d */
+#define RT28XX_RFCSR17_CODE             0x7f    /* ref RFCSR17_CODE */
+#define RT28XX_FREQ_OFFSET_BOUND        0x5f    /* ref FREQ_OFFSET_BOUND */
+/* TX IQ calibration (ref rt2800lib.c:4026 rt2800_iq_calibrate, RT5592 only).
+ * The EEPROM IQ cal entries are BYTE addresses (ref rt2800.h:2960):
+ *   0x130 IQ_GAIN_CAL_TX0_2G   0x131 IQ_PHASE_CAL_TX0_2G
+ *   0x133 IQ_GAIN_CAL_TX1_2G   0x134 IQ_PHASE_CAL_TX1_2G
+ *   0x13C RF_IQ_COMPENSATION_CONTROL
+ *   0x13D RF_IQ_IMBALANCE_COMPENSATION_CONTROL
+ * Byte 0x130 == word 0x98 (152) -> falls in the 8-word eFuse block whose AIN
+ * is the block-aligned word index 152 (0x98).  Within that block (LE):
+ *   DATA3 = words 152..153 -> bytes 0x130(lo) 0x131 0x132 0x133
+ *   DATA2 = words 154..155 -> bytes 0x134 0x135 0x136 0x137
+ *   DATA0 = words 158..159 -> bytes 0x13C 0x13D 0x13E 0x13F */
+#define RT28XX_EFUSE_IQ_BLOCK           152     /* word 0x98, holds bytes 0x130.. */
+#define RT28XX_BBP158_IQ_INDEX          158     /* IQ cal index register */
+#define RT28XX_BBP159_IQ_VALUE          159     /* IQ cal value register */
 
 #define RT28XX_H2M_MAILBOX_CSR          0x7010
 /* rt2800.h:2123/2133 -- the CID/STATUS mailboxes sit at 0x7014/0x701c, NOT
@@ -132,6 +162,10 @@
 #define RT28XX_MAC_BSSID_DW1            0x1014
 #define RT28XX_MAC_MAX_LEN_CFG          0x1018
 #define RT28XX_BBP_CSR_CFG              0x101C
+/* TX status FIFO (ref rt2800.h:1931).  VALID=bit0, PID_TYPE=bits4:1,
+ * TX_SUCCESS=bit5, TX_ACK_REQUIRED=bit7, WCID=bits15:8, MCS=bits20:16.
+ * Reading pops one entry; the FIFO is 16 deep and latched per PACKETID. */
+#define RT28XX_TX_STA_FIFO             0x1718
 /* RF indirect-access serial-bus register is at 0x0500 (rt2800.h RF_CSR_CFG);
  * 0x1020 is RF_CSR_CFG0, a different RT30xx-style register. */
 #define RT28XX_RF_CSR_CFG               0x0500
@@ -362,6 +396,24 @@
 
 static uint8_t __rt28xx_rf_shadow[64];
 static uint8_t __rt28xx_bbp_shadow[256];
+
+/* RF frequency offset (RFCSR17_CODE) decoded from EEPROM_FREQ during bring-up.
+ * 0 = not yet read / not programmed, in which case the channel script leaves
+ * RFCSR17 alone (matches the previous "freq offset defaulted to 0" behaviour).
+ * Defined here so __rt28xx_emit_channel() (above the eFuse chain) can read it. */
+static uint8_t __rt28xx_freq_offset;
+
+/* TX IQ calibration values decoded from EEPROM (ref rt2800_iq_calibrate).
+ * 2.4 GHz only for now (the AP under test is 2.4 GHz).  __rt28xx_iq_valid is
+ * set once the eFuse IQ block has been read; until then emit_channel skips
+ * the IQ writes and leaves the BBP IQ registers at their init defaults. */
+static bool    __rt28xx_iq_valid;
+static uint8_t __rt28xx_iq_gain_tx0;    /* byte 0x130, BBP158=0x2c */
+static uint8_t __rt28xx_iq_phase_tx0;   /* byte 0x131, BBP158=0x2d */
+static uint8_t __rt28xx_iq_gain_tx1;    /* byte 0x133, BBP158=0x4a */
+static uint8_t __rt28xx_iq_phase_tx1;   /* byte 0x134, BBP158=0x4b */
+static uint8_t __rt28xx_iq_rf_comp;     /* byte 0x13C, BBP158=0x04 (0xff->0) */
+static uint8_t __rt28xx_iq_rf_imbal;    /* byte 0x13D, BBP158=0x03 (0xff->0) */
 
 /* Scratch big enough for the whole init sequence (~270 ops incl. the 84-entry
  * GLRT table) and for a single channel switch (~75 ops).  init / set_channel /
@@ -595,9 +647,13 @@ static int __rt28xx_build_init(vsf_wifi_op_t *ops)
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_LED_CFG,             0x7F031E46);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_AMPDU_MAX_LEN_20M1S, 0x0000A8FF);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_AMPDU_MAX_LEN_40M1S, 0x000108EB);
-    /* RT5592 TX_SW_CFG (rt2800lib.c:5995): CFG0=0x404, CFG1=0, CFG2=0. */
+    /* RT5592 TX_SW_CFG: match Windows native driver capture (ref/rt5572_win_usb.log
+     * reg 0x1330=0x00000404, 0x1334=0x00080606, 0x1338=0).  CFG1=0x00080606 sets
+     * the PA switch on/off timing; leaving it 0 (the generic rt2800 default) can
+     * leave the PA mis-timed during TX so the on-air frame is malformed and the
+     * AP never ACKs it -- consistent with TX_STA_FIFO ack_ok=0 on every frame. */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_SW_CFG0,          0x00000404);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_SW_CFG1,          0x00000000);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_SW_CFG1,          0x00080606);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_SW_CFG2,          0x00000000);
     /* ---- BASIC RATE tables (rt2800_init_registers:5864-5865) ----
      * LEGACY_BASIC_RATE tells the auto-responder which rates are valid for
@@ -608,12 +664,11 @@ static int __rt28xx_build_init(vsf_wifi_op_t *ops)
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_HT_BASIC_RATE,        0x00008003);
     /* ---- Backoff / Slot timing (rt2800_init_registers:5880) ---- */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_BKOFF_SLOT_CFG,       0x00000209);
-    /* ---- TX retry config (rt2800_init_registers:6075) ----
-     * SHORT_RTY=7, LONG_RTY=4 (mac80211 defaults: DOT11_SHORT_RETRY_LIMIT=7,
-     * DOT11_LONG_RETRY_LIMIT=4).  Init default was 2/2 which is too low for
-     * reliable delivery of critical frames like EAPOL M4 in noisy environments.
-     * LONG_THRE=2000, NON_AGG_RTY_MODE=0, AGG_RTY_MODE=0, AUTO_FB=1. */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_RTY_CFG,           0x47D00407);
+    /* ---- TX retry config: match Windows capture 0x47D01F1F (reg 0x134C).
+     * SHORT_RTY=0x1F(31), LONG_RTY=0x1F(31): far more aggressive than our prior
+     * 0x47D00407 (7/4).  More on-air retries per frame raise the odds the AP
+     * actually hears one of them. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_RTY_CFG,           0x47D01F1F);
     /* ---- TX timeout (rt2800_init_registers:6041) ----
      * bits[7:0]=RX_ACK_TIMEOUT=0x20(32), bits[15:8]=TX_OP_TIMEOUT=0x0A(10),
      * bits[19:16]=MPDU_LIFETIME=9.  Previous value 0x000A2090 had the fields
@@ -623,16 +678,21 @@ static int __rt28xx_build_init(vsf_wifi_op_t *ops)
     /* ---- TX link config (rt2800_init_registers:6030) ----
      * MFB_LIFETIME=32, TX_CF_ACK_EN=1. */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_LINK_CFG,          0x00001020);
-    /* ---- TX power per-rate (rt2800_config_txpower_rt28xx) ----
-     * Without EEPROM calibration, set all rates to 0x0C (12 dBm, same ceiling
-     * the Linux driver uses after compensate_txpower clamp).  Reset default is
-     * 0 (MINIMUM power) which makes ACK and data frames inaudible to the AP
-     * -- THIS WAS THE ROOT CAUSE of "AP never receives our ACK" after we TX. */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_0,        0x0C0C0C0C);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_1,        0x0C0C0C0C);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_2,        0x0C0C0C0C);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_3,        0x0C0C0C0C);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_4,        0x0000000C);
+    /* ---- TX power per-rate ----
+     * Match the Windows native driver's TX_PWR_CFG values captured while
+     * successfully connecting to the SAME AP (ref/rt5572_win_usb.log, regs
+     * 0x1314-0x1324 reassembled from 16-bit halves):
+     *   CFG0=0xAAAA6666 CFG1/2/3=0xAAAA6688 CFG4=0xFFFF6688.
+     * Our previous 0x0C0C0C0C was a guess: its nibble layout (0,C,0,C) is not
+     * even a valid per-rate power map, and the hardware TX_STA_FIFO showed
+     * EVERY uplink frame to the AP going un-ACKed (ack_ok=0 x34, mcs=0).  The
+     * Windows map uses regular nibbles (6/8 for CCK/OFDM, A/F for HT) which is
+     * the real calibrated layout for this dongle. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_0,        0xAAAA6666);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_1,        0xAAAA6688);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_2,        0xAAAA6688);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_3,        0xAAAA6688);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_4,        0xFFFF6688);
     /* ---- Protection configs (rt2800_init_registers:6094-6170) ---- */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_CCK_PROT_CFG,         0x01740003);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_OFDM_PROT_CFG,        0x01740003);
@@ -640,19 +700,30 @@ static int __rt28xx_build_init(vsf_wifi_op_t *ops)
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MM40_PROT_CFG,        0x03E54084);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_GF20_PROT_CFG,        0x01654004);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_GF40_PROT_CFG,        0x03E54084);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_AUTO_RSP_CFG,        0x00000007);
-    /* ---- TXOP_CTRL_CFG / TXOP_HLDR_ET: DISABLED for regression testing.
-     * ccmp10 worked without them; ccmp11/12 timeout with them.  Will re-enable
-     * individually once handshake stability is confirmed. ---- */
-    // ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TXOP_CTRL_CFG,        0x0000583F);
+    /* AUTO_RSP_CFG (0x1404): match the Windows native driver's runtime value
+     * 0x13 = AUTORESPONDER | BAC_ACK_POLICY | AR_PREAMBLE(short).  The Windows
+     * USB capture connecting to the SAME AP (ChinaNet-5Jhc) writes 0x13 every
+     * time (ref/rt5572_win_usb.log L2121/7876/8220/17615/18074), whereas the
+     * Linux rt2800 init writes 0x07 (AUTORESPONDER|BAC_ACK_POLICY|CTS_40_MMODE).
+     * Two differences vs our old 0x07: (1) drop bit2 CTS_40_MMODE -- ChinaNet is
+     * 20MHz on ch1 so 40MHz CTS duplicate mode should be off; (2) set bit4
+     * AR_PREAMBLE=1 so the hardware auto-ACK uses short preamble, which the AP
+     * expects.  A long-preamble auto-ACK the AP can't decode would explain the
+     * observed symptom: AP keeps retransmitting auth/assoc-resp and never
+     * advances to EAPOL M1 (handshake timeout). */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_AUTO_RSP_CFG,        0x00000013);
+    /* ---- TXOP_CTRL_CFG: match Windows capture 0x0000243F (reg 0x1340).
+     * Previously disabled "for regression testing"; the Windows native driver
+     * that successfully connects to this AP sets it, so re-enable with its
+     * exact value. ---- */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TXOP_CTRL_CFG,        0x0000243F);
     // ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TXOP_HLDR_ET,         0x00000082);
-    /* ---- TX_RTS_CFG (rt2800_init_registers:6213): AUTO_RTS_RETRY=7,
-     * RTS_THRES=2347(0x92B), RTS_FBK_EN=1 ---- */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_RTS_CFG,           0x01092B07);
-    /* ---- EXP_ACK_TIME (rt2800_init_registers:6220): CRITICAL for auto-
-     * responder ACK generation timing.  Without this the hardware may not
-     * send ACK within SIFS -> AP retransmits all frames. ---- */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EXP_ACK_TIME,         0x002400CA);
+    /* ---- TX_RTS_CFG: match Windows capture 0x01092B20 (reg 0x1344).
+     * RTS_THRES=0x92B, AUTO_RTS_RETRY=0x20. ---- */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TX_RTS_CFG,           0x01092B20);
+    /* ---- EXP_ACK_TIME: match Windows capture 0x002C00DC (reg 0x1380).
+     * Governs the expected-ACK timing window for the auto-responder. ---- */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EXP_ACK_TIME,         0x002C00DC);
     /* ---- Clear SHARED_KEY_MODE (rt2800_init_registers:6242-6243): garbage
      * in these registers from a previous run may cause the hardware to attempt
      * decryption with non-existent keys -> frames rejected -> no ACK. ---- */
@@ -663,6 +734,20 @@ static int __rt28xx_build_init(vsf_wifi_op_t *ops)
     /* Clear WCID 0 and 1 attributes (garbage cipher type → spurious decrypt) */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6800, 0);  /* MAC_WCID_ATTR_ENTRY(0) */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6804, 0);  /* MAC_WCID_ATTR_ENTRY(1) */
+    /* Clear MAC_IVEIV_ENTRY(0..1): the IV/EIV per-WCID state used by the
+     * cipher engine.  rt2800_init_registers (rt2800lib.c:6256-6257) clears
+     * all 256 entries on probe, but at minimum WCID 0/1 must be zeroed.
+     *
+     * Empirical: with KEYTAB=0, garbage IVEIV state, the chip RXes our
+     * unicast EAPOL frames (PHY auto-ACKs them) but silently DROPs them in
+     * the cipher engine before USB DMA -- driver sees 0 type=2 frames for
+     * our MAC even with RX_FILTER=0 (promiscuous), while frames for OTHER
+     * MACs (no WCID match -> no cipher engine) come through fine.  Each
+     * IVEIV entry is 8 bytes (2 x 32-bit regs at 0x6000+8*wcid). */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6000, 0);  /* MAC_IVEIV_ENTRY(0).iv */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6004, 0);  /* MAC_IVEIV_ENTRY(0).eiv */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6008, 0);  /* MAC_IVEIV_ENTRY(1).iv */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x600C, 0);  /* MAC_IVEIV_ENTRY(1).eiv */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_BCN_TIME_CFG,        0x00006400);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TBTT_SYNC_CFG,       0x00000020);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_INT_TIMER_CFG,       0x00000000);
@@ -953,9 +1038,18 @@ static int __rt28xx_emit_channel(vsf_wifi_op_t *ops, int n, uint8_t channel)
         }
     }
 
-    /* TX power (no EEPROM cal -> clamp to power_bound) */
-    n = __emit_rf_rmw(ops, n, 49, RFCSR49_TX, power_bound);
-    n = __emit_rf_rmw(ops, n, 50, RFCSR50_TX, power_bound);
+    /* TX power.  The reference uses per-channel EEPROM power (default_power1/2)
+     * clamped to power_bound; on 2.4 GHz that value is itself clamped to
+     * MAX_G_TXPOWER=0x1f, so RFCSR49/50 never exceed 0x1f there.  We do not yet
+     * read the per-channel EEPROM power, so use MAX_G_TXPOWER (0x1f) as a safe
+     * upper bound on 2.4 GHz -- this matches the highest value ref would ever
+     * program there and avoids the PA over-drive that forcing power_bound
+     * (0x27) caused. */
+    {
+        uint8_t tx_power = is_5g ? power_bound : 0x1F;
+        n = __emit_rf_rmw(ops, n, 49, RFCSR49_TX, tx_power);
+        n = __emit_rf_rmw(ops, n, 50, RFCSR50_TX, tx_power);
+    }
 
     /* RF block enable: 2T2R -> RF_BLOCK_EN|PLL_PD|TX0_PD|RX0_PD|TX1_PD|RX1_PD */
     n = __emit_rf(ops, n, 1, 0x3F);
@@ -963,7 +1057,12 @@ static int __rt28xx_emit_channel(vsf_wifi_op_t *ops, int n, uint8_t channel)
     n = __emit_rf(ops, n, 30, 0x10);   /* not HT40 */
     n = __emit_rf(ops, n, 31, 0x80);
     n = __emit_rf(ops, n, 32, 0x80);
-    /* freq_cal_mode1 skipped */
+    /* freq_cal_mode1 (ref rt2800lib.c:2447): apply EEPROM frequency offset to
+     * RFCSR17_CODE.  Skipped when freq_offset==0 (not read / not programmed),
+     * preserving the chip default. */
+    if (__rt28xx_freq_offset != 0) {
+        n = __emit_rf_rmw(ops, n, 17, RT28XX_RFCSR17_CODE, __rt28xx_freq_offset);
+    }
     n = __emit_rf_rmw(ops, n, 3, RFCSR3_VCOCAL_EN, RFCSR3_VCOCAL_EN);
 
     /* BBP front-end (lna_gain = 0); BBP79/80/81/82 are band dependent */
@@ -1009,7 +1108,26 @@ static int __rt28xx_emit_channel(vsf_wifi_op_t *ops, int n, uint8_t channel)
      * it the BBP keeps whatever bandwidth the init left and the RX decoder may
      * never lock onto 20 MHz OFDM. */
     n = __emit_bbp_rmw(ops, n, 4, BBP4_BANDWIDTH, 0);
-    /* iq_calibrate skipped (needs EEPROM) */
+    /* TX IQ calibration (ref rt2800lib.c:4026 rt2800_iq_calibrate, RT5592).
+     * Programs the per-chain TX IQ gain/phase and the RF IQ compensation via
+     * the BBP158(index)/BBP159(value) pair.  WITHOUT this the TX constellation
+     * has an uncorrected IQ imbalance -> high EVM -> the AP fails to decode
+     * most of our uplink MPDUs and never ACKs them (RX is unaffected because
+     * it does not use the TX IQ path).  2.4 GHz indices only for now. */
+    if (__rt28xx_iq_valid && !is_5g) {
+        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x2c);
+        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_gain_tx0);
+        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x2d);
+        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_phase_tx0);
+        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x4a);
+        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_gain_tx1);
+        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x4b);
+        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_phase_tx1);
+        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x04);
+        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_rf_comp);
+        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x03);
+        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_rf_imbal);
+    }
     return n;
 }
 
@@ -1021,9 +1139,19 @@ static int __rt28xx_emit_bssid(vsf_wifi_op_t *ops, int n, const uint8_t bssid[6]
                  | ((uint32_t)bssid[3] << 24);
     /* BSS_ID_MASK (bits 17:16) = 3: match all BSSID bytes.
      * BSS_BCN_NUM (bits 20:18) = 0: single beacon.
-     * Ref: rt2800lib.c:2070-2071. */
+     * Ref: rt2800lib.c:2070-2071.
+     *
+     * NOTE: Windows native driver writes 0x23 to bits 16-23 of MAC_BSSID_DW1
+     * (high half = 0x0023) in the same place we write 0x03.  bit 21 (mask
+     * 0x00200000) is NOT defined in rt2800.h — Linux rt2x00 leaves it 0, but
+     * the Windows driver always sets it before scan and before connect/M1
+     * (ref/rt5572_win_usb.log: 0x1016=0x0023 at lines 9768 and 23590).
+     * Empirical: without bit 21 the chip RX'es AP's auth/assoc-resp but does
+     * NOT auto-ACK them (OmniPeek air capture: AP retransmits 52 auth-resp,
+     * we send 22 auth-req, 0 ACK frames from us).  Treat bit 21 as a vendor
+     * "enable BSSID match → auto-responder" gate. */
     uint32_t dw1 = (uint32_t)bssid[4] | ((uint32_t)bssid[5] << 8)
-                 | (3u << 16);      /* BSS_ID_MASK = 3 (full match) */
+                 | (0x23u << 16);   /* BSS_ID_MASK=3 + vendor bit 21 (Win) */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_BSSID_DW0, dw0);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_BSSID_DW1, dw1);
     return n;
@@ -1127,6 +1255,53 @@ static void __rt28xx_parse_rsn(const uint8_t *body, uint8_t len,
     }
 }
 
+/* ---- TX_STA_FIFO sampler (diagnostic) -------------------------------------
+ * Asynchronously read TX_STA_FIFO from the RX path while associated, to learn
+ * whether our uplink data frames (DHCP DISCOVER) are actually ACKed by the AP.
+ * 802.11 ACK happens at the MAC layer BEFORE decryption, so:
+ *   TX_SUCCESS=1 -> frame reached AP and was ACKed (any later drop is a higher
+ *                   layer / decryption issue, NOT a radio/uplink issue);
+ *   TX_SUCCESS=0 -> frame never reached AP or AP did not ACK (uplink problem).
+ * Single-flight via the wifi-layer script slot; if busy we just skip. */
+/* TX_STA_FIFO is a pop-on-read hardware FIFO (ref rt2800usb.c:106): each read
+ * pops one entry, and the reader must keep reading until VALID=0 to drain it.
+ * The previous single-shot read kept returning the SAME stale head entry
+ * (raw stuck at 0x40000189) which falsely looked like 100% TX failure.  Drain
+ * the whole FIFO here by re-issuing run_read from the completion callback
+ * (script_busy is already cleared by the dispatcher finish) until VALID=0, and
+ * accumulate real per-frame ACK stats so success is actually observable. */
+static uint32_t __rt28xx_txfifo_val;
+static uint32_t __rt28xx_txfifo_ok;
+static uint32_t __rt28xx_txfifo_fail;
+static void __rt28xx_txfifo_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) {
+        return;
+    }
+    uint32_t v = __rt28xx_txfifo_val;
+    if (0 == (v & 0x1u)) {  /* VALID=0 -> FIFO drained */
+        return;
+    }
+    unsigned ack_ok = (unsigned)((v >> 5) & 0x1u);   /* TX_SUCCESS */
+    if (ack_ok) {
+        __rt28xx_txfifo_ok++;
+    } else {
+        __rt28xx_txfifo_fail++;
+    }
+    vsf_trace_info("wifi: TX_STA_FIFO ack_ok=%u ack_req=%u wcid=%u pid=%u mcs=%u"
+            " raw=0x%08X (ok=%u fail=%u)" VSF_TRACE_CFG_LINEEND,
+            ack_ok,
+            (unsigned)((v >> 7) & 0x1u),    /* TX_ACK_REQUIRED */
+            (unsigned)((v >> 8) & 0xFFu),   /* WCID            */
+            (unsigned)((v >> 1) & 0xFu),    /* PID_TYPE        */
+            (unsigned)((v >> 16) & 0x7Fu),  /* MCS             */
+            (unsigned)v,
+            (unsigned)__rt28xx_txfifo_ok, (unsigned)__rt28xx_txfifo_fail);
+    /* Re-issue to pop the next entry; stop automatically when VALID=0. */
+    vsf_wifi_run_read(wifi, RT28XX_TX_STA_FIFO,
+            &__rt28xx_txfifo_val, __rt28xx_txfifo_done);
+}
+
 static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     /* RT5592 USB bulk-in may deliver multiple aggregated frames in a single
@@ -1141,6 +1316,56 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
             + RT28XX_RXD_DESC_SIZE);
 
     while (len >= min_frame) {
+
+    /* === RAW-TOP DIAG (temporary): log EVERY frame at the very top of the loop,
+     * BEFORE any length-validity break below.  This is the most upstream point we
+     * can observe: if a BSSID shows here but NOT in the RAW SCAN DIAG further down,
+     * the frame was dropped by our length checks (fixable, root cause B); if a
+     * BSSID never shows here at all, the chip never DMA'd it up (root cause A/C,
+     * not our software).  addr3(BSSID) sits at MPDU+16; here len>=min_frame so
+     * the read is in-bounds.  Remove after debug. */
+    /* Also fire whenever a frame's receiver address (addr1/da at MPDU+4) equals
+     * our own MAC, REGARDLESS of mlme_state.  The previous gate (mlme_state==4WAY)
+     * had a blind spot: if M1 arrives while the state machine is still in ASSOC
+     * (before it flips to 4WAY), the frame would never be logged and we'd wrongly
+     * conclude "M1 never came".  Matching on da==our-MAC guarantees every frame
+     * physically delivered to us is observed, at any handshake stage.  da sits at
+     * MPDU+4; here len>=min_frame so the read is in-bounds.  Remove after debug. */
+    {
+        const uint8_t *ht  = frame + RT28XX_RXINFO_DESC_SIZE + RT28XX_RXWI_DESC_SIZE_5572;
+        bool to_us = (ht[4] == wifi->mac[0]) && (ht[5] == wifi->mac[1])
+                  && (ht[6] == wifi->mac[2]) && (ht[7] == wifi->mac[3])
+                  && (ht[8] == wifi->mac[4]) && (ht[9] == wifi->mac[5]);
+        if (wifi->scanning || to_us) {
+            uint16_t fct = (uint16_t)ht[0] | ((uint16_t)ht[1] << 8);
+            vsf_trace_info("wifi: RAW-TOP fc=%04X type=%u sub=%u prot=%u mlme=%u buflen=%u"
+                    " da=%02X:%02X:%02X:%02X:%02X:%02X bssid=%02X:%02X:%02X:%02X:%02X:%02X"
+                    VSF_TRACE_CFG_LINEEND,
+                    fct, (unsigned)((fct >> 2) & 0x3u), (unsigned)((fct >> 4) & 0xFu),
+                    (unsigned)((fct >> 14) & 0x1u), (unsigned)wifi->mlme_state, (unsigned)len,
+                    ht[4], ht[5], ht[6], ht[7], ht[8], ht[9],
+                    ht[16], ht[17], ht[18], ht[19], ht[20], ht[21]);
+            /* When fc protocol-version bits are non-zero (illegal in 802.11),
+             * the parsed offset is wrong.  Dump the first 96 bytes of the
+             * USB transfer raw, plus a few key offsets, so we can see chip's
+             * actual layout (RXINFO/RXWI sizes, possible prefix, aggregation
+             * boundary).  Remove after debug. */
+            if ((fct & 0x0003u) != 0u) {
+                unsigned dump_n = (len < 96u) ? len : 96u;
+                char hex[3 * 96 + 1];
+                unsigned hi = 0;
+                for (unsigned i = 0; i < dump_n; i++) {
+                    static const char d[] = "0123456789ABCDEF";
+                    hex[hi++] = d[(frame[i] >> 4) & 0xFu];
+                    hex[hi++] = d[frame[i] & 0xFu];
+                    hex[hi++] = ' ';
+                }
+                hex[hi] = '\0';
+                vsf_trace_info("wifi: RAW-DUMP n=%u %s" VSF_TRACE_CFG_LINEEND,
+                        dump_n, hex);
+            }
+        }
+    }
 
     uint32_t rxinfo_w0 = get_unaligned_le32(frame);
     uint16_t rx_pkt_len = (uint16_t)(rxinfo_w0 & 0xFFFF);
@@ -1157,11 +1382,27 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                 + RT28XX_RXINFO_DESC_SIZE + rx_pkt_len);
         if (rxd_w0 & RT28XX_RXD_W0_CRC_ERROR) crc_err = true;
     }
-    if (crc_err) goto __advance_frame;
+    /* CRC result computed above (crc_err); defer the drop until after the
+     * scan diagnostic below so CRC-failed beacons are visible too. */
 
     uint8_t *rxwi = frame + RT28XX_RXINFO_DESC_SIZE;
     uint32_t rxwi_w0 = get_unaligned_le32(rxwi + 0);
     uint32_t rxwi_w2 = get_unaligned_le32(rxwi + 8);
+
+    /* === RAW SCAN DIAG (temporary): log EVERY frame the chip demodulated and
+     * DMA'd up while scanning, BEFORE any mpdu_len validity check below, so a
+     * frame dropped at the length checks is still visible.  This distinguishes
+     * "dropped at length check (fixable)" from "chip never demodulated it (PHY)".
+     * Reads addr3 (BSSID) at the fixed mgmt-header offset.  Remove after debug. */
+    if (wifi->scanning) {
+        const uint8_t *h0  = rxwi + RT28XX_RXWI_DESC_SIZE_5572;
+        uint16_t       fc0 = (uint16_t)h0[0] | ((uint16_t)h0[1] << 8);
+        uint16_t       ml0 = (uint16_t)((rxwi_w0 >> 16) & 0xFFFu);
+        vsf_trace_info("wifi: RAW scan fc=%04X rxlen=%u mpdu=%u buflen=%u crc=%u bssid=%02X:%02X:%02X:%02X:%02X:%02X"
+                VSF_TRACE_CFG_LINEEND,
+                fc0, (unsigned)rx_pkt_len, (unsigned)ml0, (unsigned)len, (unsigned)crc_err,
+                h0[16], h0[17], h0[18], h0[19], h0[20], h0[21]);
+    }
 
     uint16_t mpdu_len = (uint16_t)((rxwi_w0 >> 16) & 0xFFFu);
     if (mpdu_len < RT28XX_DOT11_HDR_MIN) goto __advance_frame;
@@ -1174,6 +1415,41 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     uint16_t fc      = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
     uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt, 2 = data */
     uint8_t  subtype = (uint8_t)((fc >> 4) & 0xF);   /* 8 = beacon, 5 = probe-resp */
+
+    /* === SCAN DIAGNOSTIC (temporary): log every mgmt beacon / probe-resp that
+     * physically arrived — including CRC-failed ones — so we can distinguish
+     * "AP never received" from "received but dropped".  Remove after debug. */
+    if (wifi->scanning && (type == 0) && ((subtype == 8) || (subtype == 5))) {
+        char     dssid[33];
+        uint8_t  dssid_len = 0;
+        dssid[0] = '\0';
+        if (mpdu_len >= RT28XX_DOT11_HDR_MIN + RT28XX_BEACON_FIXED) {
+            const uint8_t *b    = hdr + RT28XX_DOT11_HDR_MIN;
+            uint16_t       blen = (uint16_t)(mpdu_len - RT28XX_DOT11_HDR_MIN);
+            const uint8_t *die  = b + RT28XX_BEACON_FIXED;
+            const uint8_t *dend = b + blen;
+            while (die + 2 <= dend) {
+                uint8_t t = die[0];
+                uint8_t l = die[1];
+                if (die + 2 + l > dend) break;
+                if (t == 0) {
+                    uint8_t cc = (l > 32) ? 32 : l;
+                    memcpy(dssid, die + 2, cc);
+                    dssid[cc] = '\0';
+                    dssid_len = cc;
+                    break;
+                }
+                die += 2 + l;
+            }
+        }
+        vsf_trace_info("wifi: DIAG sub=%u crc=%u len=%u bssid=%02X:%02X:%02X:%02X:%02X:%02X ssid=\"%s\"(%u)"
+                VSF_TRACE_CFG_LINEEND,
+                subtype, (unsigned)crc_err, (unsigned)mpdu_len,
+                hdr[16], hdr[17], hdr[18], hdr[19], hdr[20], hdr[21],
+                dssid, (unsigned)dssid_len);
+    }
+
+    if (crc_err) goto __advance_frame;
 
     /* Diagnose post-handshake frame types (state >= 2 = 4WAY/RUN). */
     if (wifi->mlme_state >= 2) {
@@ -1196,6 +1472,21 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                     VSF_TRACE_CFG_LINEEND,
                     (unsigned)__parse_run_cnt, type, subtype, fc, (unsigned)mpdu_len,
                     hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9]);
+        }
+    }
+
+    /* Drain one TX_STA_FIFO entry per few RX frames while associated, to learn
+     * whether uplink data frames are ACKed by the AP (see helper above).
+     * Also sample during 4WAY: we are stuck there (no M1 received) and need to
+     * know whether the AP ACKs OUR frames (assoc-req etc.) -- ack_ok tells us if
+     * the AP can hear us at all, which distinguishes "AP never sent M1" from
+     * "M1 was sent but we failed to ACK it". */
+    if ((wifi->mlme_state == WIFI_MLME_RUN)
+            || (wifi->mlme_state == WIFI_MLME_4WAY)) {
+        static uint32_t __txfifo_gate = 0;
+        if ((++__txfifo_gate & 0x1u) == 0) {
+            vsf_wifi_run_read(wifi, RT28XX_TX_STA_FIFO,
+                    &__rt28xx_txfifo_val, __rt28xx_txfifo_done);
         }
     }
 
@@ -1366,6 +1657,14 @@ static void __rt28xx_eeprom_after_data3    (vsf_wifi_t *wifi, vsf_err_t err);
 static void __rt28xx_eeprom_after_data2    (vsf_wifi_t *wifi, vsf_err_t err);
 static void __rt28xx_eeprom_after_data1    (vsf_wifi_t *wifi, vsf_err_t err);
 static void __rt28xx_eeprom_after_data0    (vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_freq_kick(vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_freq_poll(vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_freq_data(vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_iq_kick  (vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_iq_poll  (vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_iq_data3 (vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_iq_data2 (vsf_wifi_t *wifi, vsf_err_t err);
+static void __rt28xx_eeprom_after_iq_data0 (vsf_wifi_t *wifi, vsf_err_t err);
 
 /* Crystal-select probe: MAC_DEBUG_INDEX bit31 chooses xtal20 vs xtal40 for
  * the RF5592 channel table.  Read once during bring-up (before any
@@ -1414,6 +1713,8 @@ static void __rt28xx_mcu_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
 static struct {
     uint32_t detect_val;
     uint32_t data3, data2, data1, data0;
+    uint32_t freq_raw;          /* EFUSE_DATA1 of the freq block (words 28..29) */
+    uint32_t iq_raw3, iq_raw2, iq_raw0;  /* IQ block DATA3/DATA2/DATA0 */
 } __rt28xx_efuse_ctx;
 
 static bool __rt28xx_efuse_kick_clear(uint32_t val)
@@ -1424,6 +1725,8 @@ static bool __rt28xx_efuse_kick_clear(uint32_t val)
 static void __rt28xx_eeprom_read_start(vsf_wifi_t *wifi)
 {
     memset(&__rt28xx_efuse_ctx, 0, sizeof(__rt28xx_efuse_ctx));
+    __rt28xx_freq_offset = 0;
+    __rt28xx_iq_valid = false;
     vsf_err_t err = vsf_wifi_run_read(wifi, RT28XX_EFUSE_CTRL,
             &__rt28xx_efuse_ctx.detect_val, __rt28xx_eeprom_after_detect);
     if (VSF_ERR_NONE != err) {
@@ -1449,10 +1752,10 @@ static void __rt28xx_eeprom_after_detect(vsf_wifi_t *wifi, vsf_err_t err)
         __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
         return;
     }
-    /* KICK row 0, MODE=0 (read), AIN=0 (row index). */
+    /* KICK row 0, MODE=0 (read), AIN=0 (block index). */
     vsf_wifi_op_t *ops = vsf_wifi_get_scratch_ops(wifi);
     ops[0] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EFUSE_CTRL,
-            RT28XX_EFUSE_KICK | (0u << 16) | (0u << 12));
+            RT28XX_EFUSE_KICK | (0u << RT28XX_EFUSE_AIN_SHIFT) | (0u << RT28XX_EFUSE_MODE_SHIFT));
     vsf_err_t e = vsf_wifi_run_script(wifi, ops, 1, __rt28xx_eeprom_after_kick);
     if (VSF_ERR_NONE != e) {
         vsf_trace_warning("rt28xx: efuse kick submit err=%d" VSF_TRACE_CFG_LINEEND, (int)e);
@@ -1559,6 +1862,150 @@ static void __rt28xx_eeprom_after_data0(vsf_wifi_t *wifi, vsf_err_t err)
                 "rt28xx: MAC %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
+    /* MAC done; continue to read the RF frequency-offset word (EEPROM_FREQ,
+     * word 0x1d) from a second eFuse block so set_channel can apply it.  A
+     * failure here is non-fatal -- freq_offset just stays 0. */
+    vsf_wifi_op_t *ops = vsf_wifi_get_scratch_ops(wifi);
+    ops[0] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EFUSE_CTRL, RT28XX_EFUSE_KICK
+            | ((uint32_t)RT28XX_EFUSE_FREQ_BLOCK << RT28XX_EFUSE_AIN_SHIFT)
+            | (0u << RT28XX_EFUSE_MODE_SHIFT));
+    vsf_err_t fe = vsf_wifi_run_script(wifi, ops, 1, __rt28xx_eeprom_after_freq_kick);
+    if (VSF_ERR_NONE != fe) {
+        vsf_trace_warning("rt28xx: efuse freq kick submit err=%d" VSF_TRACE_CFG_LINEEND, (int)fe);
+        __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+    }
+}
+
+/* ---- EEPROM_FREQ (word 0x1d) read chain: kick block 24, poll KICK clear,
+ * then read EFUSE_DATA1 which mirrors words 28..29 (word 29 == 0x1d is the
+ * high 16 bits).  Decode RFCSR17_CODE and clamp to FREQ_OFFSET_BOUND. ---- */
+static void __rt28xx_eeprom_after_freq_kick(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    vsf_err_t e = vsf_wifi_run_read_poll(wifi, RT28XX_EFUSE_CTRL,
+            __rt28xx_efuse_kick_clear, /* max_retry */ 100, /* interval_ms */ 1,
+            __rt28xx_eeprom_after_freq_poll);
+    if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+}
+
+static void __rt28xx_eeprom_after_freq_poll(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    vsf_err_t e = vsf_wifi_run_read(wifi, RT28XX_EFUSE_DATA1,
+            &__rt28xx_efuse_ctx.freq_raw, __rt28xx_eeprom_after_freq_data);
+    if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+}
+
+static void __rt28xx_eeprom_after_freq_data(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    /* Block 24: DATA1 holds words 28..29 (LE).  EEPROM_FREQ is word 29 ->
+     * high 16 bits; EEPROM_FREQ_OFFSET is its low byte. */
+    uint16_t freq_word = (uint16_t)(__rt28xx_efuse_ctx.freq_raw >> 16);
+    uint8_t off = (uint8_t)(freq_word & 0x00FFu);     /* EEPROM_FREQ_OFFSET */
+    off &= RT28XX_RFCSR17_CODE;                         /* RFCSR17_CODE (0x7f) */
+    if (off > RT28XX_FREQ_OFFSET_BOUND) { off = RT28XX_FREQ_OFFSET_BOUND; }
+    /* 0xff EEPROM (blank cell) decodes to 0x5f after the clamp, which is a
+     * valid albeit extreme code; treat an all-FF raw word as "not programmed"
+     * and skip, so a blank part is not pushed to a bogus extreme. */
+    if ((freq_word & 0x00FFu) == 0x00FFu) {
+        vsf_trace_warning("rt28xx: EEPROM_FREQ blank (0x%04X), freq cal skipped" VSF_TRACE_CFG_LINEEND,
+                (unsigned)freq_word);
+    } else {
+        __rt28xx_freq_offset = off;
+        vsf_trace_info("rt28xx: EEPROM_FREQ raw=0x%08X word=0x%04X -> RFCSR17 freq_offset=0x%02X" VSF_TRACE_CFG_LINEEND,
+                (unsigned)__rt28xx_efuse_ctx.freq_raw, (unsigned)freq_word, (unsigned)off);
+    }
+    /* Freq done; continue to read the TX IQ calibration block (byte 0x130 ->
+     * word 0x98 / block 152) so emit_channel can program BBP158/159.  Any
+     * failure here is non-fatal -- iq_valid just stays false. */
+    vsf_wifi_op_t *ops = vsf_wifi_get_scratch_ops(wifi);
+    ops[0] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EFUSE_CTRL, RT28XX_EFUSE_KICK
+            | ((uint32_t)RT28XX_EFUSE_IQ_BLOCK << RT28XX_EFUSE_AIN_SHIFT)
+            | (0u << RT28XX_EFUSE_MODE_SHIFT));
+    vsf_err_t ie = vsf_wifi_run_script(wifi, ops, 1, __rt28xx_eeprom_after_iq_kick);
+    if (VSF_ERR_NONE != ie) {
+        vsf_trace_warning("rt28xx: efuse iq kick submit err=%d" VSF_TRACE_CFG_LINEEND, (int)ie);
+        __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+    }
+}
+
+/* ---- TX IQ calibration block read chain: kick block 152 (word 0x98), poll
+ * KICK clear, then read EFUSE_DATA3/DATA2/DATA0 which mirror bytes 0x130.. .
+ * Decode the six 2.4 GHz IQ cal bytes (ref rt2800_iq_calibrate). ---- */
+static void __rt28xx_eeprom_after_iq_kick(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    vsf_err_t e = vsf_wifi_run_read_poll(wifi, RT28XX_EFUSE_CTRL,
+            __rt28xx_efuse_kick_clear, /* max_retry */ 100, /* interval_ms */ 1,
+            __rt28xx_eeprom_after_iq_poll);
+    if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+}
+
+static void __rt28xx_eeprom_after_iq_poll(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    vsf_err_t e = vsf_wifi_run_read(wifi, RT28XX_EFUSE_DATA3,
+            &__rt28xx_efuse_ctx.iq_raw3, __rt28xx_eeprom_after_iq_data3);
+    if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+}
+
+static void __rt28xx_eeprom_after_iq_data3(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    vsf_err_t e = vsf_wifi_run_read(wifi, RT28XX_EFUSE_DATA2,
+            &__rt28xx_efuse_ctx.iq_raw2, __rt28xx_eeprom_after_iq_data2);
+    if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+}
+
+static void __rt28xx_eeprom_after_iq_data2(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    vsf_err_t e = vsf_wifi_run_read(wifi, RT28XX_EFUSE_DATA0,
+            &__rt28xx_efuse_ctx.iq_raw0, __rt28xx_eeprom_after_iq_data0);
+    if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
+}
+
+static void __rt28xx_eeprom_after_iq_data0(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
+    /* Block 152 (word 0x98), LE byte layout:
+     *   DATA3 = bytes 0x130 0x131 0x132 0x133
+     *   DATA2 = bytes 0x134 0x135 0x136 0x137
+     *   DATA0 = bytes 0x13C 0x13D 0x13E 0x13F */
+    uint32_t r3 = __rt28xx_efuse_ctx.iq_raw3;
+    uint32_t r2 = __rt28xx_efuse_ctx.iq_raw2;
+    uint32_t r0 = __rt28xx_efuse_ctx.iq_raw0;
+    __rt28xx_iq_gain_tx0  = (uint8_t)(r3 >>  0);   /* 0x130 */
+    __rt28xx_iq_phase_tx0 = (uint8_t)(r3 >>  8);   /* 0x131 */
+    __rt28xx_iq_gain_tx1  = (uint8_t)(r3 >> 24);   /* 0x133 */
+    __rt28xx_iq_phase_tx1 = (uint8_t)(r2 >>  0);   /* 0x134 */
+    {
+        uint8_t comp  = (uint8_t)(r0 >> 0);        /* 0x13C */
+        uint8_t imbal = (uint8_t)(r0 >> 8);        /* 0x13D */
+        __rt28xx_iq_rf_comp  = (comp  != 0xFF) ? comp  : 0;
+        __rt28xx_iq_rf_imbal = (imbal != 0xFF) ? imbal : 0;
+    }
+    /* CRITICAL: only apply TX IQ calibration when the eFuse IQ block is actually
+     * programmed.  This dongle's eFuse returns 0xFF for the whole block (D3=D2=
+     * D0=0xFFFFFFFF), meaning IQ_GAIN/IQ_PHASE = 0xFF.  0xFF is NOT a valid
+     * gain/phase coefficient: forcing it into BBP159 injects a huge TX IQ
+     * imbalance that corrupts the TX constellation, so the AP cannot decode ANY
+     * of our uplink MPDUs and never ACKs them (observed: TX_STA_FIFO ack_ok=0
+     * on every frame incl. mcs=0, AP keeps retransmitting Assoc-Resp, handshake
+     * never reaches EAPOL).  Linux only ever reads programmed EEPROM bytes here
+     * (never 0xFF for gain/phase).  When the gain/phase bytes are all 0xFF the
+     * block is blank: leave iq_valid=false so emit_channel skips IQ entirely and
+     * the chip keeps its (calibrated) default TX path. */
+    __rt28xx_iq_valid =
+            !((__rt28xx_iq_gain_tx0  == 0xFF) && (__rt28xx_iq_phase_tx0 == 0xFF)
+           && (__rt28xx_iq_gain_tx1  == 0xFF) && (__rt28xx_iq_phase_tx1 == 0xFF));
+    vsf_trace_info("rt28xx: IQ cal D3=0x%08X D2=0x%08X D0=0x%08X -> g0=%02X p0=%02X g1=%02X p1=%02X comp=%02X imb=%02X valid=%u" VSF_TRACE_CFG_LINEEND,
+            (unsigned)r3, (unsigned)r2, (unsigned)r0,
+            __rt28xx_iq_gain_tx0, __rt28xx_iq_phase_tx0,
+            __rt28xx_iq_gain_tx1, __rt28xx_iq_phase_tx1,
+            __rt28xx_iq_rf_comp, __rt28xx_iq_rf_imbal,
+            (unsigned)__rt28xx_iq_valid);
     __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
@@ -2196,21 +2643,28 @@ static vsf_err_t __rt28xx_set_auth_mode(vsf_wifi_t *wifi,
 
 static int __rt28xx_emit_wcid(vsf_wifi_op_t *ops, int n, const uint8_t mac[6])
 {
-    /* Program WCID 1 with the AP's MAC address so the hardware can
-     * properly track TX status and match ACKs for our peer.
-     * Also set WCID attribute to CIPHER_NONE (0) since we do software
-     * CCMP encryption.  Ref: rt2800_sta_add / rt2800_config_wcid. */
-    uint32_t dw0 = (uint32_t)mac[0] | ((uint32_t)mac[1] << 8)
-                 | ((uint32_t)mac[2] << 16) | ((uint32_t)mac[3] << 24);
-    uint32_t dw1 = (uint32_t)mac[4] | ((uint32_t)mac[5] << 8);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID), dw0);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID) + 4, dw1);
-    /* WCID_ATTRIBUTE: cipher=NONE (0) for software crypto.  The hardware
-     * passes Protected frames through without touching them when cipher=NONE;
-     * this is the same state as Linux rt2x00 SW_CRYPTO mode (set_key never
-     * called → WCID_ATTR stays 0 after sta_add).
-     * Ref: rt2800_sta_add → rt2800_delete_wcid_attr → writes 0. */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), 0);
+    /* Program WCID 1 entry with AP MAC + WCID_ATTR with KEYTAB=1, mirroring
+     * the Windows native driver connect sequence (ref/rt5572_win_usb.log
+     * L23445-L23450).  Earlier debug experiments left this as a no-op which
+     * did not solve the EAPOL drop issue, so we restore the canonical config
+     * to match Windows exactly while we hunt the real root cause via other
+     * registers (BCN_TIME_CFG TSF_SYNC, etc). */
+    uint32_t lo = (uint32_t)mac[0] | ((uint32_t)mac[1] << 8)
+                | ((uint32_t)mac[2] << 16) | ((uint32_t)mac[3] << 24);
+    uint32_t hi = (uint32_t)mac[4] | ((uint32_t)mac[5] << 8);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID),     lo);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID) + 4, hi);
+    /* WCID_ATTR: must be 0 until the PTK is installed.  Ref rt2800lib.c
+     * rt2800_config_wcid_attr_cipher(): before SET_KEY the whole attribute
+     * register is cleared (KEYTAB=0, CIPHER=0).  KEYTAB=1 is set ONLY when a
+     * pairwise key is programmed.  pcap analysis (ref/wifi_channel1.pcap
+     * frame 3669) proved the EAPOL M1 arrives as a PLAINTEXT QoS data frame
+     * (fc=0x880a, type=2 sub=8, Protected=0); with KEYTAB=1 but no key the
+     * hardware expects this WCID's data frames to be encrypted, flags M1 as a
+     * CIPHER_ERROR, drops it before DMA and never hardware-ACKs it -> the AP
+     * keeps retransmitting M1 and the 4-way handshake never starts.  Setting
+     * 0 here lets plaintext to-me data frames (M1) be ACKed and delivered. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), 0x00000000);
     return n;
 }
 
@@ -2224,9 +2678,37 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
     /* bssid(2) + wcid(3) + channel(~75) + filter(1) -> shared static buffer. */
     vsf_wifi_op_t *ops = __rt28xx_ops_buf;
     int n = 0;
-    n = __rt28xx_emit_bssid  (ops, n, bssid);
+    /* MAC_BSSID (0x1010/0x1014) must hold the AP BSSID in infra STA mode.
+     * Ref rt2800lib.c rt2800_config_intf(): for a station (conf->sync !=
+     * TSF_SYNC_AP_NONE) it writes conf->bssid = the AP BSSID into MAC_BSSID_DW0
+     * with BSS_ID_MASK=3; only AP mode copies our own MAC there.  Two separate
+     * hardware tests exist:
+     *   - UNICAST_TO_ME: frame RA vs MAC_ADDR (0x1008) = OUR MAC (set by
+     *     __rt28xx_set_mac_addr) -> drives hardware auto-ACK.
+     *   - MY_BSS:        frame BSSID vs MAC_BSSID (0x1010) = AP BSSID -> drives
+     *     acceptance of data frames into the joined BSS.
+     * Earlier we wrongly wrote OUR MAC to 0x1010, so incoming data frames
+     * (BSSID=AP MAC) failed the MY_BSS test: the chip dropped them before DMA
+     * and (for data frames) withheld the ACK, while management frames still
+     * surfaced via a different path.  pcap (ref/wifi_channel1.pcap) shows
+     * exactly this: Assoc-Resp ACKed both ways but EAPOL M1 (fc=0x880a QoS
+     * data) never ACKed nor delivered -> 4-way never starts.  Writing the AP
+     * BSSID here fixes MY_BSS so to-me data frames are accepted & ACKed. */
+    n = __rt28xx_emit_bssid  (ops, n, bssid);       /* 0x1010 = AP BSSID */
     n = __rt28xx_emit_wcid   (ops, n, bssid);   /* program WCID 1 with AP MAC */
     n = __rt28xx_emit_channel(ops, n, channel);
+    /* BCN_TIME_CFG: enable STA mode TSF sync + TBTT timer.  Windows native
+     * driver writes 0x000B0640 in the connect sequence (ref/rt5572_win_usb.log
+     * L23441-L23444): BEACON_INTERVAL=0x0640 (1600 TU = 1.6384s scaled),
+     * TSF_TICKING=1 (bit16), TSF_SYNC=01 STA mode (bits17-18, follow AP TSF),
+     * TBTT_ENABLE=1 (bit19).  Linux rt2800_config_intf does the same via
+     * BCN_TIME_CFG_TSF_SYNC = TSF_SYNC_INFRA after STA association.  Without
+     * this the chip MAC RX path silently drops to-me unicast data frames
+     * (EAPOL M1 etc) even though they are physically received and ACKed --
+     * the chip apparently treats the BSS as not yet joined and refuses to
+     * DMA data frames to USB.  init writes 0x00006400 (no TSF sync) which is
+     * fine for scan/pre-assoc; this overrides for the connected state. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_BCN_TIME_CFG, 0x000B0640);
     /* RX_FILTER for connected STA mode (same as Linux rt2800_config_filter):
      * Drop: CRC, PHY, NOT_TO_ME, VER, DUP, all control (CFEND_ACK..PSPOLL),
      *       BA, CNTL.  Keep: NOT_MYBSS(0), MULTICAST(needed for GTK/DHCP),
@@ -2236,7 +2718,12 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
      * This was the ccmp10->ccmp11 regression root cause: old broken bit defs
      * accidentally produced 0x30 (VER+MC), new correct defs produced 0x03
      * (CRC+PHY only) which has almost no filtering. */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0x00017F97);
+    /* DEBUG: temporarily set RX_FILTER_CFG = 0 (promiscuous, no drops) to
+     * isolate whether EAPOL data frames are being filtered out by RX_FILTER
+     * vs being silently dropped deeper in the chip RX path (cipher engine
+     * etc).  If EAPOL still doesn't surface, the chip is dropping it after
+     * the filter stage, ruling out RX_FILTER as the cause. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0x00000000);
     wifi->channel = channel;
     return vsf_wifi_run_script(wifi, ops, (uint16_t)n, done);
 }

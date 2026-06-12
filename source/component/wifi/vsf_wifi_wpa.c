@@ -235,15 +235,21 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
                 VSF_TRACE_CFG_LINEEND);
     }
 
-    /* M2: SNonce + our RSN IE in key data, MIC under the fresh KCK. */
+    /* M2: SNonce + our RSN IE in key data, MIC under the fresh KCK.
+     * Send M2 EXACTLY ONCE.  The Windows native driver USB capture
+     * (ref/rt5572_win_usb.log L23730) shows M2 sent a single time, with the
+     * AP's M3 arriving immediately after (L23736).  Wi-Fi is half-duplex:
+     * back-to-back M2 retransmits keep us transmitting while the AP is trying
+     * to send M3, so we miss M3 and the handshake stalls (exactly the symptom
+     * seen on iPhone/ChinaNet).  M1 retransmits from the AP (handled via the
+     * is_retransmit path above) provide the retry mechanism if M2 is lost. */
     if (__wpa_send_eapol(wifi, ek[0], KI_M2, key_len, wifi->wpa_snonce,
             wifi->wpa_rsn_ie, wifi->wpa_rsn_ie_len) != VSF_ERR_NONE) {
         vsf_trace_warning("wifi: EAPOL M2 tx failed" VSF_TRACE_CFG_LINEEND);
     }
     vsf_wifi_mlme_arm_timer(wifi, __WPA_STEP_TIMEOUT_MS);
-    if (!is_retransmit) {
-        vsf_trace_info("wifi: 4-way M1 rx, M2 sent" VSF_TRACE_CFG_LINEEND);
-    }
+    vsf_trace_info("wifi: 4-way M2 sent (single)%s" VSF_TRACE_CFG_LINEEND,
+            is_retransmit ? " [on M1 retx]" : "");
 }
 
 /* Handle EAPOL-Key M3 (ANonce, ACK, MIC, install, encrypted GTK): verify

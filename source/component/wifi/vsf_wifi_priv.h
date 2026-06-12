@@ -38,6 +38,13 @@ struct vsf_wifi_t {
     vsf_eda_t                 *post_eda;
     vsf_wifi_attach_fail_t     attach_fail;
 
+    /* Optional network-stack backend (lwIP netdrv adapter, etc.) bound at
+     * runtime via vsf_wifi_netdrv_attach().  When netif_ops != NULL the core
+     * routes decrypted RX data frames and link up/down events here instead
+     * of the weak vsf_wifi_on_* hooks. */
+    const vsf_wifi_netif_ops_t *netif_ops;
+    void                       *netif_param;
+
     uint8_t  channel;
     bool     is_ready;
     bool     disconnecting;     /* set in fini() to gate stale callbacks */
