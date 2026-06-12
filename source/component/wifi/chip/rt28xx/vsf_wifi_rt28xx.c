@@ -187,6 +187,16 @@
  * frames were never transmitted -> AP retransmitted and eventually gave up. */
 #define RT28XX_BKOFF_SLOT_CFG           0x1104
 #define RT28XX_TXOP_CTRL_CFG            0x1340
+#define RT28XX_TXOP_THRES_CFG           0x133C
+#define RT28XX_EDCA_AC0_CFG             0x1300
+#define RT28XX_EDCA_AC1_CFG             0x1304
+#define RT28XX_EDCA_AC2_CFG             0x1308
+#define RT28XX_EDCA_AC3_CFG             0x130C
+#define RT28XX_WMM_AIFSN_CFG            0x0214
+#define RT28XX_WMM_CWMIN_CFG            0x0218
+#define RT28XX_WMM_CWMAX_CFG            0x021C
+#define RT28XX_WMM_TXOP0_CFG            0x0220
+#define RT28XX_WMM_TXOP1_CFG            0x0224
 #define RT28XX_TX_RTS_CFG               0x1344
 #define RT28XX_TX_TIMEOUT_CFG           0x1348
 #define RT28XX_TX_RTY_CFG               0x134c
@@ -2686,6 +2696,33 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
     n = __rt28xx_emit_bssid  (ops, n, wifi->mac);   /* 0x1010 = OUR MAC + DW1 bit21 */
     n = __rt28xx_emit_wcid   (ops, n, bssid);   /* program WCID 1 with AP MAC, WCID_ATTR KEYTAB=1 */
     n = __rt28xx_emit_channel(ops, n, channel);
+    /* --- EDCA / WMM: match Windows connect sequence (ref/rt5572_win_usb.log
+     *     L23597-L23614).  These are the 802.11e/WMM access-category parameters
+     *     that the AP expects from an associated STA.  Without them the chip uses
+     *     power-on defaults that may violate the AP's admission-control policy,
+     *     causing it to silently discard our uplink frames (including ACKs for
+     *     its own downlink management frames).  Values are standard WMM
+     *     infrastructure-mode defaults: BK(AIFSN=7,CW=4/10,TXOP=0),
+     *     BE(4,4,10,0), VI(3,4,4,0x5E=94), VO(2,3,4,0x2F=47). ---- */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC0_CFG, 0x00064300);  /* BK */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC1_CFG, 0x000A4700);  /* BE */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC2_CFG, 0x00043338);  /* VI */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC3_CFG, 0x0003222F);  /* VO */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_AIFSN_CFG, 0x00001344);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_CWMIN_CFG, 0x00000000);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_CWMAX_CFG, 0x00002F00);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_TXOP0_CFG, 0x00000000);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_TXOP1_CFG, 0x002F005E);
+    /* TXOP_THRES_CFG: Windows writes 0 during connect (ref L23656).  A non-zero
+     * threshold may prevent the auto-responder from sending ACK when the
+     * channel-busy estimate exceeds the limit.  Force to 0 = no restriction. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_TXOP_THRES_CFG, 0x00000000);
+    /* AUTO_RSP_CFG + LEGACY_BASIC_RATE: re-program during connect to match
+     * Windows native driver (ref L23615/L23619).  Windows writes 0x017F for
+     * LEGACY_BASIC_RATE (includes 12 Mbps rate bit that our init 0x013F omits).
+     * AUTO_RSP_CFG = 0x13 = AUTORESPONDER | BAC_ACK_POLICY | AR_PREAMBLE. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_AUTO_RSP_CFG, 0x00000013);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_LEGACY_BASIC_RATE, 0x0000017F);
     /* BCN_TIME_CFG: enable STA mode TSF sync + TBTT timer.  Windows native
      * driver writes 0x000B0640 in the connect sequence (ref/rt5572_win_usb.log
      * L23441-L23444): BEACON_INTERVAL=0x0640 (1600 TU = 1.6384s scaled),
