@@ -933,6 +933,22 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
 
     if (prot) {
 #if VSF_WIFI_USE_WPA == ENABLED
+        /* Some chip/driver combinations mark EAPOL-Key frames during the 4-way
+         * handshake with Protected=1 even though they are effectively sent in
+         * the clear.  Probe for the EAPOL LLC/SNAP header before requiring a
+         * valid PTK so that M1 can reach the supplicant. */
+        if ((wifi->mlme_state == WIFI_MLME_4WAY)
+                && (payload_len > 8)
+                && (payload[0] == 0xAA) && (payload[1] == 0xAA)
+                && (payload[2] == 0x03) && (payload[3] == 0x00)
+                && (payload[4] == 0x00) && (payload[5] == 0x00)
+                && (payload[6] == 0x88) && (payload[7] == 0x8E)) {
+            vsf_trace_info("wifi: Protected EAPOL detected in 4-way, routing to eapol_rx"
+                    VSF_TRACE_CFG_LINEEND);
+            vsf_wifi_eapol_rx(wifi, payload + 8, payload_len - 8);
+            return;
+        }
+
         /* CCMP-encrypted business frame.  When the keys live in a hardware
          * crypto engine the chip already decrypted it (or the chip parser
          * never sets Protected), so just forward; otherwise software-decrypt
@@ -1203,27 +1219,95 @@ static void __vsf_wifi_mlme_send_auth(vsf_wifi_t *wifi)
 /* Association-request (variable length: header + fixed fields + IEs). */
 static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
 {
-    uint8_t  frame[128];
+    /* Assoc-req body built from the Windows Ralink driver capture for the
+     * same AP (ChinaNet-5Jhc).  The exact IE order and capability bits are
+     * required for this AP to send EAPOL-Key M1 after association. */
+    uint8_t  frame[256];
     uint16_t i = __vsf_wifi_mlme_hdr(wifi, frame, 0x00);  /* subtype 0x0 */
-    frame[i++] = 0x01; frame[i++] = 0x00;   /* capability info: ESS       */
-    frame[i++] = 0x0A; frame[i++] = 0x00;   /* listen interval = 10       */
+
+    /* Capability info: ESS | Privacy | ShortPreamble | CF-PollReq.
+     * The Windows driver uses 0x0431 for this network. */
+    frame[i++] = 0x31; frame[i++] = 0x04;
+    frame[i++] = 0x03; frame[i++] = 0x00;   /* listen interval = 3        */
+
     /* SSID IE. */
     frame[i++] = 0x00; frame[i++] = wifi->mlme_ssid_len;
     if (wifi->mlme_ssid_len > 0) {
         memcpy(&frame[i], wifi->mlme_ssid, wifi->mlme_ssid_len);
         i += wifi->mlme_ssid_len;
     }
-    /* Supported-rates IE: 1/2/5.5/11/6/12/24/36 Mbps. */
-    frame[i++] = 0x01; frame[i++] = 0x08;
-    frame[i++] = 0x82; frame[i++] = 0x84; frame[i++] = 0x8B; frame[i++] = 0x96;
-    frame[i++] = 0x0C; frame[i++] = 0x18; frame[i++] = 0x30; frame[i++] = 0x48;
+
+    /* Supported Rates IE: 1/2/5.5/11/9/18/36/54 Mbps. */
+    static const uint8_t __supp_rates_ie[] = {
+        0x01, 0x08,
+        0x82, 0x84, 0x8B, 0x96,
+        0x12, 0x24, 0x48, 0x6C,
+    };
+    memcpy(&frame[i], __supp_rates_ie, sizeof(__supp_rates_ie));
+    i += sizeof(__supp_rates_ie);
+
+    /* Extended Supported Rates IE: 6/12/24/48 Mbps. */
+    static const uint8_t __ext_rates_ie[] = {
+        0x32, 0x04,
+        0x0C, 0x18, 0x30, 0x60,
+    };
+    memcpy(&frame[i], __ext_rates_ie, sizeof(__ext_rates_ie));
+    i += sizeof(__ext_rates_ie);
+
+    /* HT Capabilities IE (tag 45) - exact Windows values. */
+    static const uint8_t __ht_cap_ie[] = {
+        0x2D, 0x1A,
+        0xAC, 0x01, 0x02,
+        0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+    memcpy(&frame[i], __ht_cap_ie, sizeof(__ht_cap_ie));
+    i += sizeof(__ht_cap_ie);
+
+    /* Extended Capabilities IE (tag 127). */
+    static const uint8_t __ext_cap_ie[] = {
+        0x7F, 0x08,
+        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+    memcpy(&frame[i], __ext_cap_ie, sizeof(__ext_cap_ie));
+    i += sizeof(__ext_cap_ie);
+
+    /* Ralink proprietary vendor IE (OUI 00-0C-43). */
+    static const uint8_t __ralink_ie[] = {
+        0xDD, 0x07,
+        0x00, 0x0C, 0x43, 0x00, 0x00, 0x00, 0x00,
+    };
+    memcpy(&frame[i], __ralink_ie, sizeof(__ralink_ie));
+    i += sizeof(__ralink_ie);
+
+    /* WMM Information Element (vendor-specific IE 221, subtype 0).
+     * Windows sends the WMM Information IE, not the Parameter IE. */
+    static const uint8_t __wmm_ie[] = {
+        0xDD, 0x07,
+        0x00, 0x50, 0xF2, 0x02,
+        0x00,                           /* subtype 0 (WMM Information)     */
+        0x01,                           /* version 1                       */
+        0x00,                           /* QoS info                        */
+    };
+    memcpy(&frame[i], __wmm_ie, sizeof(__wmm_ie));
+    i += sizeof(__wmm_ie);
+
+    /* Ralink proprietary IE 0x21 observed in the Windows capture. */
+    static const uint8_t __ralink_21_ie[] = {
+        0x21, 0x02,
+        0x05, 0x13,
+    };
+    memcpy(&frame[i], __ralink_21_ie, sizeof(__ralink_21_ie));
+    i += sizeof(__ralink_21_ie);
+
 #if VSF_WIFI_USE_WPA == ENABLED
     /* RSN IE (tag 48) for WPA2-PSK / CCMP.  Suite OUI = 00-0F-AC; group +
      * pairwise = CCMP(4), AKM = PSK(2).  Cache the exact bytes so the 4-way
      * handshake M2 can echo this IE unchanged. */
     if (wifi->wpa_auth.auth_mode == WIFI_AUTH_WPA2_PSK) {
         static const uint8_t __rsn_ie[] = {
-            0x30, 0x14,                 /* tag 48, length 20                 */
+            0x30, 0x16,                 /* tag 48, length 22                 */
             0x01, 0x00,                 /* RSN version 1                     */
             0x00, 0x0F, 0xAC, 0x04,     /* group cipher  = CCMP              */
             0x01, 0x00,                 /* pairwise count = 1                */
@@ -1231,6 +1315,7 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
             0x01, 0x00,                 /* AKM count     = 1                 */
             0x00, 0x0F, 0xAC, 0x02,     /* AKM           = PSK               */
             0x00, 0x00,                 /* RSN capabilities                  */
+            0x00, 0x00,                 /* PMKID count = 0                   */
         };
         memcpy(&frame[i], __rsn_ie, sizeof(__rsn_ie));
         i += sizeof(__rsn_ie);
@@ -1238,19 +1323,13 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         wifi->wpa_rsn_ie_len = (uint8_t)sizeof(__rsn_ie);
     }
 #endif
-    /* WMM/WME Information Element (vendor-specific IE 221).
-     * Without this, the AP considers us a non-QoS STA and may reject or
-     * mishandle QoS Data frames we send after the handshake completes.
-     * OUI = 00-50-F2, type 2 (WMM), subtype 0 (info), version 1. */
-    static const uint8_t __wmm_ie[] = {
-        0xDD, 0x07,                     /* vendor-specific, length 7       */
-        0x00, 0x50, 0xF2, 0x02,         /* OUI 00-50-F2, type 2 (WMM)     */
-        0x00,                           /* subtype 0 (WMM Information)     */
-        0x01,                           /* version 1                       */
-        0x00,                           /* QoS info: no U-APSD             */
-    };
-    memcpy(&frame[i], __wmm_ie, sizeof(__wmm_ie));
-    i += sizeof(__wmm_ie);
+    {
+        char buf[384]; int pos = 0;
+        for (uint16_t k = 0; k < i && pos < (int)sizeof(buf) - 3; k++)
+            pos += snprintf(&buf[pos], sizeof(buf) - pos, "%02X", frame[k]);
+        vsf_trace_info("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
+                (unsigned)i, buf);
+    }
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
     if (VSF_ERR_NONE != err) {
         vsf_trace_warning("wifi: mlme assoc-req tx failed (err=%d)"

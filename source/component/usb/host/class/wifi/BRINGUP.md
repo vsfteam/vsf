@@ -188,8 +188,8 @@ wifi: LINK DOWN (reason=203)
 
 ## 3. 未完成 / 待续（按优先级）
 
-- [ ] **(P0) 【进行中】RT5572 + ChinaNet-5Jhc 回归：连接态单播 data 帧 TX 全失败 /
-      RX EAPOL M1 不交付 → 4-way 超时**（详见 §5.6 调试记录，根因仍未定位）
+- [x] **(已修复) RT5572 + ChinaNet-5Jhc 4-way 超时：BBP1 初始化错误（0x14 vs 0x50）
+      导致 PHY 无法解码 CCK short-preamble EAPOL M1**（详见 §5.6）
 - [ ] **(P1)** WiFi netif 对接 lwIP：实现 linkoutput/input 桥接，lwIP 处理 DHCP/ARP/TCP
 - [ ] **(P2)** 速率自适应：当前固定 OFDM MCS0 (6 Mbps)，需基于 TX status 反馈调整
 - [ ] **(P2)** 扫描结果去重（同 AP 多次出现，多信道/重复 beacon）
@@ -316,76 +316,86 @@ DROP_NOT_TO_ME / DROP_VER_ERROR / DROP_DUP 等。
 **修复**：写入 LEGACY_BASIC_RATE + AUTO_RSP_CFG，同时设 TX_PWR_CFG_0..4
 确保 ACK 发射功率足够。
 
-### 5.6 【进行中】RT5572 + ChinaNet-5Jhc 4-way 超时回归（根因：硬件未 auto-ACK）
+#### (9) BBP1 配错导致 CCK short-preamble EAPOL M1 丢失
+**症状**：assoc 成功，但软件层完全收不到 AP 单播 EAPOL-Key M1，空口抓包显示 AP
+反复重传 M1（`fc=0x880A`，Protected=0，CCK short-preamble），4-way handshake timeout。
+**根因**：`__rt28xx_build_bbp()` 中 BBP1 被写成 0x14（I/Q_SWAP 0x04 + TX_ANTENNA 0x10），
+而 RT5592 2T2R 的正确值应为 0x50（Windows 原生驱动 `ref/rt5572_win_usb.log` 实测值）。
+错误的 BBP1 使 PHY 无法正确解码 CCK short-preamble 的 M1 帧；软件层因此永远看不到 M1。
+**修复**：BBP1 改为 0x50，并恢复 RX_FILTER=0x17F97（DROP_NOT_TO_ME）。
+验证：M1 以明文 QoS Data 帧到达（prot=0），4-way 握手完成，DHCP 成功。
+
+## 5.6 【已修复】RT5572 + ChinaNet-5Jhc 4-way 超时回归
 
 **测试环境**：vc.linux + WinUSB HCD + RT5572 真实 dongle（ASIC=0x55920222
 rev=0x0222 = RT5592C+，2T2R），目标 AP `ChinaNet-5Jhc`（BSSID
 `88:C7:8F:1B:81:6E`，ch1，WPA2-PSK），STA MAC `00:87:33:23:03:41`。
 测试脚本 `run_wifi_dhcp_test.ps1`，运行日志 `wifi_dhcp_run.log`，
 空口抓包 `ref/wifi_channel1.pcap`（11.7MB，45783 帧，决定性证据）。
+Windows 原生驱动 USB 对照：`ref/rt5572_win_usb.log`（Bus Hound 6.01）。
 
-**症状（pcap + 设备日志双向印证）**：
-- 本机状态机进入 mlme=4（自认为关联成功、AP 分配 aid），但 RAW-TOP 实测显示
-  AP 仍在 mlme=4 后持续重发 Assoc-Resp（最新一次 40 次），说明 AP 未认为关联
-  完成——即本机未对 Assoc-Resp 回链路层 ACK（详见下方根因重定位）。
-- **EAPOL M1 = 明文 QoS Data 帧**（pcap frame 3669：`fc=0x880a`，type=2
-  sub=8，`llc=0x888e`，`eapol.type=3`，Protected=0）；AP 需先认为关联完成才会发
-  M1，因此在本 bug 下 M1 根本不会被发出。
-- **M1 既不被硬件 ACK，也不被 DMA 上交主机**：设备日志 `mlme=4` 阶段
-  从未出现任何 `type=2` 帧（RAW-TOP 会打印所有 to-us 帧），全是 Assoc-Resp
-  (sub=1) 和 Auth (sub=11) 的重传。STA 因此永远进不了 4-way → 无 M2 →
-  pcap 中 STA→AP 方向一个 EAPOL 都没有 → 握手超时。
-- **我方上行 data 帧 TX「失败」实为虚假统计**：`TX_STA_FIFO ack_ok=0
-  ack_req=1 wcid=1 pid=4 mcs=0 raw=0x40000189` 连续 34 次完全相同。**`raw 值
-  一字不变`是已知的 TX_STA_FIFO 虚假统计现象**（FIFO 未被正确清空，VALID=1
-  但内容不刷新），不代表真实 TX 失败。绝不能据此判断 TX 死亡——必须用
-  RAW-TOP 真实帧观测，或先确认 FIFO 返回值是否动态刷新。
+#### 症状
 
-**已排除的假设（逐一实测证伪）**：
-1. **IQ 校准**：eFuse IQ 块全 0xFF，原代码却 iq_valid=true。已修为全 0xFF
-   时 iq_valid=false，不执行校准。不是根因。
-2. **RFCSR1=0x17（缺 TX0/TX1_PD）**：怀疑 TX 链路 power-gate。但 RFCSR8=0xF1
-   读回完全正确证明 RF 读路径可信；且 mgmt 帧能正常 TX 到达 AP，说明 TX 物理层
-   没死。0x17 可能只是 idle 时 TX 动态 power-gate。不是根因。
+assoc 成功后 STA 进入 4-way 状态，但 `vsf_wifi_data_rx()` 始终收不到 AP 单播的
+EAPOL-Key M1。空口抓包 `ref/wifi_channel1.pcap` 显示 AP 反复向 STA MAC
+`00:87:33:23:03:41` 重传 M1（`fc=0x880A`，type=2 sub=8，Protected=0，
+LLC/SNAP `AA AA 03 00 00 00 88 8E`），但设备日志中没有任何目标地址为本 STA 的
+`type=2` 帧；即使临时关闭 `DROP_NOT_TO_ME` 也看不到 M1，只看到大量其他 BSS 的帧。
+最终 `wifi: 4-way handshake timeout`。
 
-**⚠️ 本 session 的两处错误改动（已回滚，记录以防再犯）**：
-本 session 一度无视历史已验证结论，把两处正确配置改反，均经实测证明是
-**退化**，现已全部回滚到验证基线：
-3. **WCID_ATTR**：误据 Linux `rt2800_config_wcid_attr_cipher`（装 PTK 前清 0）
-   把 0x0001 改成 0x0000。**这是退化**——RT5572 的 WCID_ATTR `KEYTAB` 位
-   (bit0) 是硬件接收 unicast data 帧（type=2）的门控，即使软件加解密
-   (cipher=0) 也必须置 1，否则硬件丢弃所有 to-me 单播 data 帧（含明文 EAPOL
-   M1）。Windows 实测写 0x0001，Linux/VSF 默认 0x0000 才是 bug。**已恢复
-   0x00000001**。Linux 的 clear-before-SET_KEY 路径不适用于本软件加解密 raw
-   后端。
-4. **MAC_BSSID(0x1010)**：误据 Linux `rt2800_config_intf` 把写我方 MAC 改成
-   写 AP BSSID。**这是退化**——验证基线是 0x1010 写我方 MAC + DW1 高半字
-   0x0023（vendor bit21=auto-ACK 门控），正是该组合下 mgmt 帧 auto-ACK 工作
-   (aid 分配、Assoc-Resp 双向 ACK)。改写 AP BSSID 实测无效。**已恢复写我方
-   MAC**。
+#### 关键对照实验
 
-**当前状态**：两处错误改动已回滚到验证基线（WCID_ATTR=0x0001、0x1010=我方
-MAC+bit21）并重测（wifi_dhcp_run.log），以 RAW-TOP 真实帧为唯一可信信号：
-- `mlme=4` 阶段 **type=2 帧 = 0 个**（M1 仍未被 DMA 上交）。
-- AP 持续重发 **Assoc-Resp 40 次** + Auth 9 次。
-- 4-way handshake 依旧 timeout。
+通过逐变量回退，定位到 **BBP1** 是决定性寄存器：
 
-**根因重定位（以 RAW-TOP 实测为准，修正本节开头的“mgmt 双向 ACK”假设）**：
-AP 反复重发同一 Assoc-Resp 达 40 次的唯一原因 = 收不到我方对该单播管理帧
-的链路层 ACK。即**硬件未对 AP 的单播帧自动回 ACK**，这才是 M1 永不到达的真
-正根因（与本 session 早期“mgmt 能 ACK”的判断相反；以无盲区的 RAW-TOP 实测
-为准）。`TX_STA_FIFO=0x40000189` 确认为虚假统计、不可作为 TX 判断依据。
+| BBP1 | 其他 BBP 保持基线 | M1 是否到达 | handshake |
+|------|-------------------|-------------|-----------|
+| 0x14 | 基线              | 否          | timeout   |
+| 0x50 | 基线              | 是（prot=0）| 完成      |
 
-**下一步方向**：在 Windows 成功抓包 `ref/rt5572_win_usb.log` 中定位关联成功
-瞬间为开启 auto-ACK 写的寄存器（`MAC_SYS_CTRL` / `AUTO_RSP_CFG` / `TXOP` /
-`PBF` 等），与我方连接流程逐条对齐，找出缺失的 auto-ACK 使能写。
+Windows 原生驱动 `ref/rt5572_win_usb.log` 在 RT5572 2T2R 初始化时明确写入
+`BBP1=0x50`；Linux `rt2800_config_ant()` 对 2T2R 也会把 `BBP1_TX_ANTENNA` 配成 2，
+但这里额外依赖了寄存器默认值/其他写入保持 bit6，而 VSF 的 shadow 初始化从 0 开始，
+只写 0x14 会丢失必要的 bit6，导致 PHY 行为异常。
 
-> 教训：历史记忆中经实测验证的配置（WCID_ATTR KEYTAB=1、0x1010 写我方 MAC、
-> TX_STA_FIFO 虚假统计）优先级高于 Linux 参考源码的纸面推断；不得用未经实测
-> 的源码比对去推翻已验证结论。
+#### 根因
 
-> 注：本回归出现在 ChinaNet-5Jhc；§2.6 记录的 VStudio AP 全流程通过是更早
-> 的验证状态，两者差异（信道 ch1 vs ch6、AP 行为）尚待对比确认。
+BBP1 是 RT5592 的 **TX/RX 天线与 I-Q 路径控制** 寄存器。错误的 0x14 使 PHY
+无法正确解码 AP 以 **CCK short-preamble 2 Mbps** 发送的 EAPOL-Key M1 帧，
+芯片因此不向 USB DMA 上交该帧，软件层完全无感知。Auth/Assoc 使用 OFDM 6 Mbps，
+所以此前工作正常；4-way 阶段的 M1 改用 CCK，问题才暴露。
+
+> 注：此前曾误判为「硬件篡改 FC Protected bit」——那是在 `DROP_NOT_TO_ME`
+> 关闭后，其他 BSS 的 data 帧被误当作 M1 的干扰现象；真正属于本 STA 的 M1
+> 当时根本未被 PHY 解出，自然谈不上 Protected bit。
+
+#### 修复
+
+`__rt28xx_build_bbp()` 中：
+
+```c
+n = __emit_bbp(ops, n, 1, 0x50);   /* 原为 0x14 */
+```
+
+同时把调试期间临时改动的项恢复为基线：
+- BBP70 恢复为 `0x05`
+- RX_FILTER 恢复为 `0x00017F97`（DROP_NOT_TO_ME）
+
+#### 验证
+
+修复后日志：
+
+```text
+wifi: associated, aid=19 (4-way handshake)
+wifi: 4-way M2 sent (single)
+wifi: 4-way M3 rx, M4 sent (keys ready)
+wifi: 4-way handshake complete, aid=19 (link up)
+wifi: connected to "ChinaNet-5Jhc"
+...
+wifi: DHCP complete!
+```
+
+M1 现在以明文 QoS Data 帧到达（`fc=0x880A`，Protected=0），`vsf_wifi_data_rx()`
+正确识别 LLC/SNAP EAPOL 并送入 4-way 状态机。
 
 ---
 

@@ -201,6 +201,12 @@
 #define RT28XX_TX_TIMEOUT_CFG           0x1348
 #define RT28XX_TX_RTY_CFG               0x134c
 #define RT28XX_TX_LINK_CFG              0x1350
+#define RT28XX_HT_FBK_CFG0              0x1354
+#define RT28XX_HT_FBK_CFG1              0x1358
+#define RT28XX_LG_FBK_CFG0              0x135C
+#define RT28XX_LG_FBK_CFG1              0x1360
+#define RT28XX_BCN_OFFSET0              0x042C
+#define RT28XX_BCN_OFFSET1              0x0430
 /* EXP_ACK_TIME (0x1380): expected ACK timeout -- critical for auto-responder
  * timing.  Without it ACKs may not be generated in time. */
 #define RT28XX_EXP_ACK_TIME             0x1380
@@ -562,9 +568,10 @@ static int __rt28xx_build_bbp(vsf_wifi_op_t *ops, int n)
         n = __emit_bbp(ops, n, 103, 0xC0);
     }
     /* ---- BBP1 / BBP3 : TX & RX antenna chain config (init_bbp_5592:7055-7060
-     * + config_ant for 2T2R).  Without these, the baseband only drives a single
-     * TX DAC → half the TX power → unreliable hardware ACK. ---- */
-    n = __emit_bbp(ops, n, 1, 0x14);   /* I/Q_SWAP(0x04) + TX_ANTENNA=2(0x10) */
+     * + config_ant for 2T2R).  BBP1=0x50 matches the Windows native driver and
+     * is required for CCK short-preamble EAPOL-Key M1 reception; 0x14 causes
+     * the PHY to miss M1 and the 4-way handshake times out. ---- */
+    n = __emit_bbp(ops, n, 1, 0x50);
     n = __emit_bbp(ops, n, 3, 0x08);   /* RX_ANTENNA=1 (both chains active)   */
     return n;
 }
@@ -741,8 +748,12 @@ static int __rt28xx_build_init(vsf_wifi_op_t *ops)
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x7004, 0);  /* SHARED_KEY_MODE_ENTRY(1) */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x7008, 0);  /* SHARED_KEY_MODE_ENTRY(2) */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x700C, 0);  /* SHARED_KEY_MODE_ENTRY(3) */
-    /* Clear WCID 0 and 1 attributes (garbage cipher type → spurious decrypt) */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6800, 0);  /* MAC_WCID_ATTR_ENTRY(0) */
+    /* WCID 0 is the hardware default for RX frames that don't match another
+     * WCID entry (e.g. unencrypted EAPOL-Key M1/M3 before the pairwise key
+     * is installed).  Leave its KEYTAB bit set so the cipher engine does not
+     * silently drop those frames.  Clear WCID 1 attribute; connect() will set
+     * it for the AP once association succeeds. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6800, 0x00000001u);  /* MAC_WCID_ATTR_ENTRY(0): KEYTAB=1 */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x6804, 0);  /* MAC_WCID_ATTR_ENTRY(1) */
     /* Clear MAC_IVEIV_ENTRY(0..1): the IV/EIV per-WCID state used by the
      * cipher engine.  rt2800_init_registers (rt2800lib.c:6256-6257) clears
@@ -1147,21 +1158,25 @@ static int __rt28xx_emit_bssid(vsf_wifi_op_t *ops, int n, const uint8_t bssid[6]
                  | ((uint32_t)bssid[1] <<  8)
                  | ((uint32_t)bssid[2] << 16)
                  | ((uint32_t)bssid[3] << 24);
-    /* BSS_ID_MASK (bits 17:16) = 3: match all BSSID bytes.
+    /* BSS_ID_MASK (bits 17:16) = 3: multi-BSSID / disable strict BSSID match.
      * BSS_BCN_NUM (bits 20:18) = 0: single beacon.
-     * Ref: rt2800lib.c:2070-2071.
+     * Bit 21 (vendor/reserved) = 1: observed in Windows native driver.
+     * DW1 high half = 0x23 (bits 21:16 = 100011).
      *
-     * NOTE: Windows native driver writes 0x23 to bits 16-23 of MAC_BSSID_DW1
-     * (high half = 0x0023) in the same place we write 0x03.  bit 21 (mask
-     * 0x00200000) is NOT defined in rt2800.h — Linux rt2x00 leaves it 0, but
-     * the Windows driver always sets it before scan and before connect/M1
-     * (ref/rt5572_win_usb.log: 0x1016=0x0023 at lines 9768 and 23590).
-     * Empirical: without bit 21 the chip RX'es AP's auth/assoc-resp but does
-     * NOT auto-ACK them (OmniPeek air capture: AP retransmits 52 auth-resp,
-     * we send 22 auth-req, 0 ACK frames from us).  Treat bit 21 as a vendor
-     * "enable BSSID match → auto-responder" gate. */
+     * The Windows Ralink driver stores OUR OWN STA MAC in MAC_BSSID_DW0/1
+     * (ref/rt5572_win_usb.log L23583-23584 reads 0x1014=0x00234103 and then
+     * rewrites 0x1010/0x1012 with our MAC before EAPOL-Key M1 arrives).
+     * With BSS_ID_MASK=0 the chip runs 1-BSSID mode and compares the incoming
+     * frame's BSSID field (addr3 = AP BSSID) against MAC_BSSID (= our MAC),
+     * dropping all unicast data frames including plaintext EAPOL M1.
+     * Management frames are unaffected because they match on addr1.
+     *
+     * Setting BSS_ID_MASK=3 matches the Windows driver (DW1 high = 0x0023) and
+     * disables that strict BSSID comparison, so frames addressed to us (addr1
+     * matches our MAC/WCID) are accepted regardless of the BSSID field.
+     * Linux rt2x00 uses the same mask but writes the AP BSSID to MAC_BSSID. */
     uint32_t dw1 = (uint32_t)bssid[4] | ((uint32_t)bssid[5] << 8)
-                 | (0x23u << 16);   /* BSS_ID_MASK=3 + vendor bit 21 (Win) */
+                 | (0x23u << 16);   /* BSS_ID_MASK=3 + vendor bit 21 */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_BSSID_DW0, dw0);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_BSSID_DW1, dw1);
     return n;
@@ -1421,6 +1436,29 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 
     const uint8_t *hdr = rxwi + RT28XX_RXWI_DESC_SIZE_5572;
 
+    /* === TEMP DIAG 2: dump ALL type=2 frames (no A1 filter) during 4-way, to see
+     * if M1 reaches the parser with some unexpected A1.  Remove after debug. */
+    if (wifi->mlme_state == WIFI_MLME_4WAY) {
+        uint16_t __fc_dbg = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
+        uint8_t  __type_dbg = (uint8_t)((__fc_dbg >> 2) & 0x3);
+        if (__type_dbg == 2) {
+            static uint32_t __all_data_cnt = 0;
+            if (__all_data_cnt < 50) {
+                __all_data_cnt++;
+                vsf_trace_info("wifi: ALLDATA[%u] mpdu=%u W0=0x%08X fc=%02X%02X "
+                        "a1=%02X:%02X:%02X:%02X:%02X:%02X "
+                        "a2=%02X:%02X:%02X:%02X:%02X:%02X "
+                        "a3=%02X:%02X:%02X:%02X:%02X:%02X"
+                        VSF_TRACE_CFG_LINEEND,
+                        (unsigned)__all_data_cnt, (unsigned)mpdu_len,
+                        (unsigned)rxwi_w0, hdr[0], hdr[1],
+                        hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9],
+                        hdr[10], hdr[11], hdr[12], hdr[13], hdr[14], hdr[15],
+                        hdr[16], hdr[17], hdr[18], hdr[19], hdr[20], hdr[21]);
+            }
+        }
+    }
+
     /* 802.11 frame control: type/subtype encoded in the low byte. */
     uint16_t fc      = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
     uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt, 2 = data */
@@ -1511,6 +1549,25 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
      * strip L2PAD before passing the frame up.  Ref: rt2x00queue_remove_l2pad,
      * RXD_W0_L2PAD (bit 14), REQUIRE_L2PAD. */
     if (type == 2) {
+        /* === TEMP DIAG: dump first 50 data frames during 4-way, to see if M1
+         * ever reaches the parser (vs being dropped at MAC).  Remove after debug. */
+        if (wifi->mlme_state == WIFI_MLME_4WAY) {
+            static uint32_t __data_diag_cnt = 0;
+            if (__data_diag_cnt < 200) {
+                uint32_t w1 = get_unaligned_le32(rxwi + 4);
+                uint32_t w3 = get_unaligned_le32(rxwi + 12);
+                __data_diag_cnt++;
+                vsf_trace_info("wifi: DATA[%u] mpdu=%u W0=0x%08X W1=0x%08X W2=0x%08X W3=0x%08X "
+                        "fc=%02X%02X dur=%02X%02X a1=%02X:%02X:%02X:%02X:%02X:%02X "
+                        "a2=%02X:%02X:%02X:%02X:%02X:%02X"
+                        VSF_TRACE_CFG_LINEEND,
+                        (unsigned)__data_diag_cnt, (unsigned)mpdu_len,
+                        (unsigned)rxwi_w0, (unsigned)w1, (unsigned)rxwi_w2, (unsigned)w3,
+                        hdr[0], hdr[1], hdr[2], hdr[3],
+                        hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9],
+                        hdr[10], hdr[11], hdr[12], hdr[13], hdr[14], hdr[15]);
+            }
+        }
         if ((wifi->mlme_state == WIFI_MLME_RUN)
                 || (wifi->mlme_state == WIFI_MLME_4WAY)) {
             /* Strip RX L2PAD: shift the 802.11 header forward by l2pad bytes
@@ -1554,6 +1611,7 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     const uint8_t *body     = hdr + RT28XX_DOT11_HDR_MIN;
     uint16_t       body_len = (uint16_t)(mpdu_len - RT28XX_DOT11_HDR_MIN);
     uint16_t       capa     = (uint16_t)body[10] | ((uint16_t)body[11] << 8);
+    uint16_t       bcn_int  = (uint16_t)body[8]  | ((uint16_t)body[9]  << 8);
 
     /* Pick the strongest of three antenna AGC samples (matches Linux
      * rt2800_agc_to_rssi).  Without per-device lna_gain we apply only the
@@ -1593,10 +1651,29 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
             result.channel = ie[2];
         } else if (tag == 48) {                     /* RSN IE (WPA2) */
             __rt28xx_parse_rsn(ie + 2, l, &result);
+            if (result.ssid_len > 0 && !memcmp(result.ssid, "ChinaNet", 8) && l <= 32) {
+                char rsnbuf[80]; int rpos = 0;
+                for (uint8_t m = 0; m < l && rpos < (int)sizeof(rsnbuf) - 3; m++)
+                    rpos += snprintf(&rsnbuf[rpos], sizeof(rsnbuf) - rpos, "%02X", ie[2 + m]);
+                vsf_trace_info("wifi: beacon RSN IE len=%u: %s" VSF_TRACE_CFG_LINEEND,
+                        (unsigned)l, rsnbuf);
+            }
+        } else if (tag == 45) {                     /* HT Capabilities */
+            if (result.ssid_len > 0 && !memcmp(result.ssid, "ChinaNet", 8) && l <= 32) {
+                char htbuf[80]; int hpos = 0;
+                for (uint8_t m = 0; m < l && hpos < (int)sizeof(htbuf) - 3; m++)
+                    hpos += snprintf(&htbuf[hpos], sizeof(htbuf) - hpos, "%02X", ie[2 + m]);
+                vsf_trace_info("wifi: beacon HT CAP IE len=%u: %s" VSF_TRACE_CFG_LINEEND,
+                        (unsigned)l, htbuf);
+            }
         }
         ie += 2 + l;
     }
 
+    vsf_trace_info("wifi: beacon bssid=%02X:%02X:%02X:%02X:%02X:%02X interval=%u caps=0x%04X"
+            VSF_TRACE_CFG_LINEEND,
+            bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5],
+            (unsigned)bcn_int, (unsigned)capa);
     vsf_wifi_on_scan_result(wifi, &result);
 
 __advance_frame:
@@ -2626,8 +2703,12 @@ static vsf_err_t __rt28xx_set_mac_addr(vsf_wifi_t *wifi, const uint8_t mac[6],
     /* UNICAST_TO_ME_MASK (bits 23:16) = 0xFF: all 6 MAC bytes must match
      * for hardware to consider a frame "unicast to me" (auto-ACK, filtering).
      * Ref: rt2800lib.c:2059 rt2x00_set_field32(&reg, MAC_ADDR_DW1_UNICAST_TO_ME_MASK, 0xff). */
+    /* Linux rt2800lib sets UNICAST_TO_ME_MASK (bits 23:16) to 0xFF so the
+     * hardware matches all six MAC-address bytes for "unicast to me".
+     * Keep the high byte clear; only the mask and the two low MAC bytes are
+     * documented fields in MAC_ADDR_DW1. */
     uint32_t dw1 = (uint32_t)mac[4] | ((uint32_t)mac[5] << 8)
-                 | (0xFFu << 16);   /* UNICAST_TO_ME_MASK = 0xFF */
+                 | (0x00FFu << 16);   /* UNICAST_TO_ME_MASK = 0xFF */
     vsf_wifi_op_t *ops = vsf_wifi_get_scratch_ops(wifi);
     ops[0] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_ADDR_DW0, dw0);
     ops[1] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_ADDR_DW1, dw1);
@@ -2651,26 +2732,32 @@ static vsf_err_t __rt28xx_set_auth_mode(vsf_wifi_t *wifi,
     return VSF_ERR_NONE;
 }
 
-static int __rt28xx_emit_wcid(vsf_wifi_op_t *ops, int n, const uint8_t mac[6])
+static int __rt28xx_emit_wcid(vsf_wifi_op_t *ops, int n, const uint8_t mac[6],
+        uint32_t attr)
 {
-    /* Program WCID 1 entry with AP MAC + WCID_ATTR with KEYTAB=1 (bit0).
-     * VERIFIED ROOT-CAUSE FIX (do NOT revert to 0): on RT5572 the WCID_ATTR
-     * KEYTAB bit is the hardware gate for accepting unicast DATA frames
-     * (type=2) addressed to us.  Even with cipher=0 (software crypto), if
-     * KEYTAB=0 the chip RX path silently DROPS every to-me unicast data frame
-     * (including the plaintext EAPOL M1), so the 4-way handshake never starts.
-     * Windows native driver writes 0x0001 here (KEYTAB=1, CIPHER=0); the
-     * Linux/VSF default of 0x0000 is the bug.  Confirmed by Windows USB log
-     * (ref/rt5572_win_usb.log L23445-23450) + air capture cross-check.
-     * NOTE: Linux rt2800_config_wcid_attr_cipher() clears this before SET_KEY,
-     * but that path does NOT apply to our software-crypto raw backend -- here
-     * KEYTAB=1 must be set at connect time for plaintext EAPOL to be RX'ed. */
+    /* Program WCID 1 entry with AP MAC + the supplied WCID_ATTR.
+     *
+     * Bit layout (MAC_WCID_ATTRIBUTE_* in rt2800.h):
+     *   KEYTAB (bit 0)   = 1 : peer entry is valid / key-installed
+     *   CIPHER (bits 1-3)    : 0=none, 1=WEP64, 2=WEP128, 3=TKIP, 4=AES(CCMP)
+     *   BSS_IDX(4-6)/WIUDF(7-9)=0
+     *
+     * For WPA2-PSK STA mode with software CCMP we use KEYTAB=1 and CIPHER=0
+     * so the hardware treats WCID 1 as a valid peer but does not try to
+     * decrypt frames.  With KEYTAB=0 the RX classifier silently drops unicast
+     * data frames (including plaintext EAPOL-Key M1).  A non-zero CIPHER
+     * would route encrypted frames through the hardware cipher engine; we
+     * want raw encrypted frames for software CCMP.  During disconnect
+     * attr=0x00000000 clears the entry. */
     uint32_t lo = (uint32_t)mac[0] | ((uint32_t)mac[1] << 8)
                 | ((uint32_t)mac[2] << 16) | ((uint32_t)mac[3] << 24);
+    /* The Windows native driver leaves the upper 16 bits of the WCID entry
+     * at 0x0000 (ref/rt5572_win_usb.log L17975), not 0xFFFF.  Keep the
+     * writable part of the register exactly as observed. */
     uint32_t hi = (uint32_t)mac[4] | ((uint32_t)mac[5] << 8);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID),     lo);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID) + 4, hi);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), 0x00000001);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), attr);
     return n;
 }
 
@@ -2681,20 +2768,33 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
     (void)ssid; (void)ssid_len;
     if (NULL == __rt28xx_find_rf(channel)) return VSF_ERR_INVALID_PARAMETER;
 
-    /* bssid(2) + wcid(3) + channel(~75) + filter(1) -> shared static buffer. */
+    /* bssid(2) + wcid(3) + channel(~75) + edca/wmm(~20) -> shared static buffer. */
     vsf_wifi_op_t *ops = __rt28xx_ops_buf;
     int n = 0;
-    /* MAC_BSSID (0x1010/0x1014): write OUR OWN MAC here, NOT the AP BSSID.
-     * VERIFIED BASELINE (do NOT revert to AP BSSID): this is the configuration
-     * under which hardware auto-ACK of the AP's unicast management frames was
-     * confirmed working (AP assigns aid, Auth/Assoc-Resp ACKed both ways).
-     * The DW1 high half written by __rt28xx_emit_bssid carries 0x0023 = the
-     * vendor bit 21 (0x00200000) that gates BSSID-match -> auto-responder;
-     * without it the chip RX'es but never auto-ACKs the AP frames.
-     * Empirically writing the AP BSSID here (tried this session) did NOT solve
-     * the EAPOL-M1-not-delivered problem and is therefore reverted. */
-    n = __rt28xx_emit_bssid  (ops, n, wifi->mac);   /* 0x1010 = OUR MAC + DW1 bit21 */
-    n = __rt28xx_emit_wcid   (ops, n, bssid);   /* program WCID 1 with AP MAC, WCID_ATTR KEYTAB=1 */
+    /* MAC_BSSID (0x1010/0x1014): the Windows Ralink driver stores our own
+     * STA MAC here with BSS_ID_MASK=3 (ref/rt5572_win_usb.log L6547-6550,
+     * L8235-8238, L18043-18047).  With BSS_ID_MASK=3 the strict BSSID
+     * comparison is disabled, so frames addressed to us (addr1 matches our
+     * MAC/WCID) are accepted regardless of the BSSID field. */
+    n = __rt28xx_emit_bssid  (ops, n, wifi->mac);  /* 0x1010 = own MAC, mask=3 */
+    /* WCID / peer configuration for WPA2-PSK STA mode (matches Windows):
+     *
+     *   WCID 0 ATTR   = 0x00000001 (KEYTAB=1) — default fallback WCID used
+     *                   for plaintext EAPOL-Key M1/M3 before pairwise key.
+     *   WCID 1 entry  = AP BSSID
+     *   WCID 1 ATTR   = 0x00000001 (KEYTAB=1, CIPHER=0/none)
+     *
+     * KEYTAB=1 tells the RX classifier that the WCID is a valid peer, so
+     * unicast data frames (including plaintext EAPOL-Key M1) from the AP
+     * are DMA'd to USB instead of being silently dropped.  CIPHER is left
+     * at 0 because we use software CCMP; a non-zero cipher would make the
+     * hardware try to decrypt frames before handing them to the driver. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(0), 0x00000001u);
+    n = __rt28xx_emit_wcid   (ops, n, bssid, 0x00000001u);
+    /* SHARED_KEY_MODE: Windows sets entry 0 to 0x2AA7 at connect time
+     * (ref/rt5572_win_usb.log L17978-L17979: 0x7000 = 0x2AA70000).
+     * The group-key mode bits are updated by the WPA layer after M3. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(0x7000, 0x2AA70000u);
     n = __rt28xx_emit_channel(ops, n, channel);
     /* --- EDCA / WMM: match Windows connect sequence (ref/rt5572_win_usb.log
      *     L23597-L23614).  These are the 802.11e/WMM access-category parameters
@@ -2708,9 +2808,13 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC1_CFG, 0x000A4700);  /* BE */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC2_CFG, 0x00043338);  /* VI */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_EDCA_AC3_CFG, 0x0003222F);  /* VO */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_AIFSN_CFG, 0x00001344);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_CWMIN_CFG, 0x00000000);
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_CWMAX_CFG, 0x00002F00);
+    /* WMM parameter values captured from the Windows native driver connect
+     * sequence (ref/rt5572_win_usb.log L23609-L23614).  These differ from our
+     * earlier hard-coded defaults and match the AP's expected infrastructure
+     * EDCA parameters more closely. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_AIFSN_CFG, 0x00001273);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_CWMIN_CFG, 0x00001344);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_CWMAX_CFG, 0x000034A6);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_TXOP0_CFG, 0x00000000);
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_WMM_TXOP1_CFG, 0x002F005E);
     /* TXOP_THRES_CFG: Windows writes 0 during connect (ref L23656).  A non-zero
@@ -2735,21 +2839,19 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
      * DMA data frames to USB.  init writes 0x00006400 (no TSF sync) which is
      * fine for scan/pre-assoc; this overrides for the connected state. */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_BCN_TIME_CFG, 0x000B0640);
-    /* RX_FILTER for connected STA mode (same as Linux rt2800_config_filter):
-     * Drop: CRC, PHY, NOT_TO_ME, VER, DUP, all control (CFEND_ACK..PSPOLL),
-     *       BA, CNTL.  Keep: NOT_MYBSS(0), MULTICAST(needed for GTK/DHCP),
-     *       BROADCAST(0), BAR(0).
-     * Without NOT_TO_ME the USB gets flooded with ALL other stations' frames
-     * and TX (including M2) is delayed -> AP retransmits -> handshake timeout.
-     * This was the ccmp10->ccmp11 regression root cause: old broken bit defs
-     * accidentally produced 0x30 (VER+MC), new correct defs produced 0x03
-     * (CRC+PHY only) which has almost no filtering. */
-    /* DEBUG: temporarily set RX_FILTER_CFG = 0 (promiscuous, no drops) to
-     * isolate whether EAPOL data frames are being filtered out by RX_FILTER
-     * vs being silently dropped deeper in the chip RX path (cipher engine
-     * etc).  If EAPOL still doesn't surface, the chip is dropping it after
-     * the filter stage, ruling out RX_FILTER as the cause. */
-    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0x00000000);
+    /* RX_FILTER_CFG: drop CRC/PHY/NOT_TO_ME errors, keep bc/mc.
+     * DROP_NOT_TO_ME(bit2)=1 is critical: without it the USB is flooded with
+     * all other stations' frames, wasting bandwidth. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0x00017F97);
+    /* HT_FBK_CFG0 / LG_FBK_CFG0: rate fallback tables for TX rate adaptation.
+     * Windows writes these during connect (ref/rt5572_win_usb.log L23640-23643).
+     * The hardware reset default for HT_FBK_CFG0 is 0x00004360 (each MCS falls
+     * back to a lower MCS) and LG_FBK_CFG0 is 0x00000000.  Explicitly writing
+     * them ensures the TX rate adaptation engine is properly configured and
+     * may also serve as a MAC register bus "warm-up" that activates the TX/RX
+     * data path. */
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_HT_FBK_CFG0, 0x00004360);
+    ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_LG_FBK_CFG0, 0x00000000);
     wifi->channel = channel;
     return vsf_wifi_run_script(wifi, ops, (uint16_t)n, done);
 }
@@ -2759,8 +2861,8 @@ static vsf_err_t __rt28xx_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     static const uint8_t zero_bssid[6] = {0};
     vsf_wifi_op_t *ops = vsf_wifi_get_scratch_ops(wifi);
     int n = 0;
-    n = __rt28xx_emit_bssid(ops, n, zero_bssid);                    /* 2 ops */
-    n = __rt28xx_emit_wcid (ops, n, zero_bssid);                    /* 3 ops: clear WCID 1 */
+    n = __rt28xx_emit_bssid(ops, n, zero_bssid);                          /* 2 ops */
+    n = __rt28xx_emit_wcid (ops, n, zero_bssid, 0x00000000);              /* 3 ops: clear WCID 1 */
     ops[n++] = (vsf_wifi_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0);   /* 1 op  */
     return vsf_wifi_run_script(wifi, ops, (uint16_t)n, done);
 }
@@ -2822,6 +2924,22 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
         uint16_t dst_cap, const uint8_t *frame, uint16_t frame_len)
 {
     (void)wifi;
+    /* Temporary diagnostic: identify every non-probe-request frame we hand
+     * to the chip so we can correlate TX_STA_FIFO entries with the actual
+     * 802.11 header during auth/assoc/4-way.  Probe requests are numerous
+     * during scans and only clutter the log. */
+    if ((frame_len >= 10) && ((frame[0] & 0xFC) != 0x40)) {
+        static uint32_t __tx_build_cnt = 0;
+        if (__tx_build_cnt < 80) {
+            __tx_build_cnt++;
+            vsf_trace_info("wifi: TX build[%u] fc=%02X%02X a1=%02X:%02X:%02X:%02X:%02X:%02X len=%u"
+                    VSF_TRACE_CFG_LINEEND,
+                    (unsigned)__tx_build_cnt,
+                    frame[0], frame[1],
+                    frame[4], frame[5], frame[6], frame[7], frame[8], frame[9],
+                    (unsigned)frame_len);
+        }
+    }
     /* Determine 802.11 header length (QoS data has 2 extra bytes).
      * QoS: Type must be Data (bits[3:2]=10 → byte0 & 0x0C == 0x08) AND
      * subtype bit3 must be set (bit7 of byte0). */
@@ -2844,8 +2962,9 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
                        | RT28XX_TXINFO_W0_WIV
                        | RT28XX_TXINFO_W0_QSEL_BE;
     uint32_t txwi_w0   = RT28XX_TXWI_W0_PHYMODE_OFDM;   /* OFDM, MCS0 (6 Mbps) */
+    bool is_data = (frame_len >= 2) && ((frame[0] & 0x0Cu) == 0x08u);
     uint32_t txwi_w1   = RT28XX_TXWI_W1_ACK
-                       | RT28XX_TXWI_W1_NSEQ
+                       | (is_data ? RT28XX_TXWI_W1_NSEQ : 0u)
                        | ((uint32_t)RT28XX_STA_WCID << 8)  /* WCID=1 */
                        | (((uint32_t)frame_len & 0x0FFFu) << 16)
                        | RT28XX_TXWI_W1_PACKETID_ENTRY1;
