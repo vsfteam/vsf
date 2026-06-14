@@ -74,11 +74,11 @@ jobs:
 
     - name: Install C compiler
       id: install_c
-      uses: rlalik/setup-cpp-compiler@master
+      uses: rlalik/setup-cpp-compiler@v2
       with:
         compiler: ${{ matrix.vars.c }}
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true # without recursive
 

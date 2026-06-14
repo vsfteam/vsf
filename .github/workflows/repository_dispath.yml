@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.VSF_SYNC }}
           script: |
@@ -22,7 +22,7 @@ jobs:
               ref: 'main'
             })
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.VSF_SYNC }}
           script: |
@@ -33,7 +33,7 @@ jobs:
               ref: 'main'
             })
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.VSF_AIO }}
           script: |

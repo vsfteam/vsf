@@ -19,17 +19,18 @@ jobs:
           'latest',
           '15.2.Rel1',
           '14.3.Rel1',
-          '14.2.Rel1',
           '13.3.Rel1',
           '12.3.Rel1',
           '11.3.Rel1',
           '10.3-2021.10',
-          '9-2019-q4',
+          '9-2020-q2',
           '8-2019-q3',
           '7-2018-q2',
           '6-2017-q2',
           '5-2016-q3',
-          '4.9-2015-q3'
+          '4.9-2015-q3',
+          '4.8-2014-q4',
+          '4.7-2014-q2'
         ]
         os: [ubuntu-latest]
         exclude:
@@ -43,11 +44,15 @@ jobs:
             cc: 5-2016-q3
           - os: ubuntu-latest
             cc: 4.9-2015-q3
+          - os: ubuntu-latest
+            cc: 4.8-2014-q4
+          - os: ubuntu-latest
+            cc: 4.7-2014-q2
 
     runs-on: ${{matrix.os}}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true # without recursive
 
@@ -55,7 +60,7 @@ jobs:
       uses: lukka/get-cmake@latest
 
     - name: arm-none-eabi-gcc
-      uses: carlosperate/arm-none-eabi-gcc-action@v1
+      uses: carlosperate/arm-none-eabi-gcc-action@v1.12.3
       with:
         release: ${{matrix.cc}}
 
