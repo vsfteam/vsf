@@ -47,6 +47,32 @@
 #endif
 
 /*
+ * Per-module log level.
+ *
+ *   0 = silent    : no trace output (assertions still fire)
+ *   1 = error     : runtime errors only
+ *   2 = info      : key life-cycle events (ready, link up/down, scan done,
+ *                   connect success/fail, DHCP bound)
+ *   3 = verbose   : normal runtime logs (TX build, reg script steps,
+ *                   single URB completion)
+ *   4 = debug     : per-frame/beacon/RX delivery counters
+ *
+ * Sub-module macros fall back to VSF_WIFI_CFG_LOG_LEVEL when not defined.
+ */
+#ifndef VSF_WIFI_CFG_LOG_LEVEL
+#   define VSF_WIFI_CFG_LOG_LEVEL           2
+#endif
+#ifndef VSF_WIFI_CFG_CHIP_RT28XX_LOG_LEVEL
+#   define VSF_WIFI_CFG_CHIP_RT28XX_LOG_LEVEL   VSF_WIFI_CFG_LOG_LEVEL
+#endif
+#ifndef VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL
+#   define VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL    VSF_WIFI_CFG_LOG_LEVEL
+#endif
+#ifndef VSF_WIFI_CFG_NETDRV_LOG_LEVEL
+#   define VSF_WIFI_CFG_NETDRV_LOG_LEVEL        VSF_WIFI_CFG_LOG_LEVEL
+#endif
+
+/*
  * WPA2-PSK (CCMP) support switch.
  *
  * The WPA software stack (PBKDF2 / PRF / EAPOL MIC / AES key-unwrap / CCMP)

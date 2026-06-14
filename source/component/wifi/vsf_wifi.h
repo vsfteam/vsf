@@ -635,14 +635,42 @@ vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
 /* Per-wifi scratch op buffer (shared by parameterised chip ops). */
 vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi);
 
-/*
- * Firmware blob declared by chip/rt28xx/vsf_wifi_rt2870_firmware.c (weak
- * stub).  Link a strong override to ship the real rt2870.bin; the rt28xx
- * chip driver uses size > 0 as the trigger to invoke run_blob during
- * firmware_load.
- */
-extern const uint8_t  __rt2870_firmware_data[];
-extern const uint32_t __rt2870_firmware_size;
+/*============================ CHIP-SPECIFIC HEADERS =========================*
+ *
+ * Concrete chip families live in chip/xxx/ and expose their own firmware
+ * symbols, logging helpers and (if needed) public constants.  The generic
+ * wifi header only pulls in the chips that are enabled at compile time.
+ *===========================================================================*/
+
+#if VSF_WIFI_USE_RT28XX == ENABLED
+#   include "./chip/rt28xx/vsf_wifi_rt28xx.h"
+#endif
+
+/*============================ LOGGING HELPERS ===============================*
+ *
+ * Compile-time log level gates for the WiFi subsystem and its sub-modules.
+ * Levels are defined in vsf_wifi_cfg.h; sub-module macros fall back to the
+ * global VSF_WIFI_CFG_LOG_LEVEL when not explicitly set.
+ *==========================================================================*/
+
+#if VSF_WIFI_CFG_LOG_LEVEL >= 1
+#   define vsf_wifi_trace_error(...)    vsf_trace_error(__VA_ARGS__)
+#else
+#   define vsf_wifi_trace_error(...)    ((void)0)
+#endif
+
+#if VSF_WIFI_CFG_LOG_LEVEL >= 2
+#   define vsf_wifi_trace_info(...)     vsf_trace_info(__VA_ARGS__)
+#else
+#   define vsf_wifi_trace_info(...)     ((void)0)
+#endif
+
+#if VSF_WIFI_CFG_LOG_LEVEL >= 4
+#   define vsf_wifi_trace_debug(...)    vsf_trace_info(__VA_ARGS__)
+#else
+#   define vsf_wifi_trace_debug(...)    ((void)0)
+#endif
+
 
 #ifdef __cplusplus
 }

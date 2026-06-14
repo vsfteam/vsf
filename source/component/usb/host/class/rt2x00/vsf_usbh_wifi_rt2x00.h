@@ -27,6 +27,26 @@
 
 #if VSF_USE_WIFI == ENABLED
 
+/*============================ LOGGING HELPERS ===============================*/
+
+#if VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL >= 1
+#   define vsf_wifi_bus_rt2x00_trace_error(...)    vsf_trace_error(__VA_ARGS__)
+#else
+#   define vsf_wifi_bus_rt2x00_trace_error(...)    ((void)0)
+#endif
+
+#if VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL >= 2
+#   define vsf_wifi_bus_rt2x00_trace_info(...)     vsf_trace_info(__VA_ARGS__)
+#else
+#   define vsf_wifi_bus_rt2x00_trace_info(...)     ((void)0)
+#endif
+
+#if VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL >= 4
+#   define vsf_wifi_bus_rt2x00_trace_debug(...)    vsf_trace_info(__VA_ARGS__)
+#else
+#   define vsf_wifi_bus_rt2x00_trace_debug(...)    ((void)0)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

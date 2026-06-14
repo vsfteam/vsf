@@ -138,7 +138,7 @@ static void __vsf_wifi_deliver_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len
          * mgmt/scan noise that otherwise floods the counter. */
         if (((et0 == 0x08) && ((et1 == 0x00) || (et1 == 0x06)))
                 && (++__deliver_cnt <= 16)) {
-            vsf_trace_info("wifi: deliver_rx #%u len=%u fc=%02X%02X prot=%u"
+            vsf_wifi_trace_debug("wifi: deliver_rx #%u len=%u fc=%02X%02X prot=%u"
                     " et=%02X%02X" VSF_TRACE_CFG_LINEEND,
                     (unsigned)__deliver_cnt, (unsigned)len, frame[0], frame[1],
                     (unsigned)((frame[1] >> 6) & 1), et0, et1);
@@ -178,7 +178,7 @@ static void __vsf_wifi_deliver_link_down(vsf_wifi_t *wifi, uint8_t reason)
 
 static void __vsf_wifi_attach_fail(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    vsf_trace_error("wifi: attach failed (err=%d)" VSF_TRACE_CFG_LINEEND, (int)err);
+    vsf_wifi_trace_error("wifi: attach failed (err=%d)" VSF_TRACE_CFG_LINEEND, (int)err);
     if (wifi->attach_fail != NULL) {
         wifi->attach_fail(wifi, err);
     }
@@ -429,21 +429,21 @@ static void __vsf_wifi_read_poll_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
     if (VSF_ERR_NONE != err) {
-        vsf_trace_warning("wifi: read_poll reg=0x%04X bus err=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: read_poll reg=0x%04X bus err=%d" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg, (int)err);
         __vsf_wifi_script_finish(wifi, err);
         return;
     }
     if (wifi->s.read_poll.match != NULL
             && wifi->s.read_poll.match(wifi->s.read_poll.last_val)) {
-        vsf_trace_info("wifi: read_poll reg=0x%04X matched val=0x%08X" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_debug("wifi: read_poll reg=0x%04X matched val=0x%08X" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg,
                 (unsigned)wifi->s.read_poll.last_val);
         __vsf_wifi_script_finish(wifi, VSF_ERR_NONE);
         return;
     }
     if (wifi->s.read_poll.retry_left == 0) {
-        vsf_trace_warning("wifi: read_poll reg=0x%04X timeout, last=0x%08X" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: read_poll reg=0x%04X timeout, last=0x%08X" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg,
                 (unsigned)wifi->s.read_poll.last_val);
         __vsf_wifi_script_finish(wifi, VSF_ERR_TIMEOUT);
@@ -490,7 +490,7 @@ vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
     wifi->s.read_poll.last_val     = 0;
     wifi->script_busy              = true;
 
-    vsf_trace_info("wifi: read_poll start reg=0x%04X retry=%u interval=%ums" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_trace_debug("wifi: read_poll start reg=0x%04X retry=%u interval=%ums" VSF_TRACE_CFG_LINEEND,
             (unsigned)reg, (unsigned)max_retry, (unsigned)interval_ms);
 
     vsf_err_t err = wifi->reg_bus->reg_read(wifi, reg,
@@ -566,11 +566,11 @@ void vsf_wifi_set_attach_fail(vsf_wifi_t *wifi, vsf_wifi_attach_fail_t hook)
 
 void vsf_wifi_start(vsf_wifi_t *wifi)
 {
-    vsf_trace_info("wifi: start: chip=%s, firmware=%s" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_trace_info("wifi: start: chip=%s, firmware=%s" VSF_TRACE_CFG_LINEEND,
             (wifi->drv->name != NULL) ? wifi->drv->name : "?",
             (wifi->drv->firmware_load != NULL) ? "yes" : "no");
     if (wifi->drv->firmware_load != NULL) {
-        vsf_trace_info("wifi: uploading firmware ..." VSF_TRACE_CFG_LINEEND);
+        vsf_wifi_trace_info("wifi: uploading firmware ..." VSF_TRACE_CFG_LINEEND);
         if (VSF_ERR_NONE != wifi->drv->firmware_load(wifi,
                 __vsf_wifi_on_fw_done)) {
             __vsf_wifi_attach_fail(wifi, VSF_ERR_FAIL);
@@ -583,11 +583,11 @@ void vsf_wifi_start(vsf_wifi_t *wifi)
 static void __vsf_wifi_on_fw_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (VSF_ERR_NONE != err) {
-        vsf_trace_error("wifi: firmware upload failed (err=%d)" VSF_TRACE_CFG_LINEEND, (int)err);
+        vsf_wifi_trace_error("wifi: firmware upload failed (err=%d)" VSF_TRACE_CFG_LINEEND, (int)err);
         __vsf_wifi_attach_fail(wifi, err);
         return;
     }
-    vsf_trace_info("wifi: firmware uploaded, running init script ..." VSF_TRACE_CFG_LINEEND);
+    vsf_wifi_trace_info("wifi: firmware uploaded, running init script ..." VSF_TRACE_CFG_LINEEND);
     if (VSF_ERR_NONE != wifi->drv->init(wifi, __vsf_wifi_on_init_done)) {
         __vsf_wifi_attach_fail(wifi, VSF_ERR_FAIL);
     }
@@ -596,7 +596,7 @@ static void __vsf_wifi_on_fw_done(vsf_wifi_t *wifi, vsf_err_t err)
 static void __vsf_wifi_on_init_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (VSF_ERR_NONE != err) {
-        vsf_trace_error("wifi: init script failed (err=%d)" VSF_TRACE_CFG_LINEEND, (int)err);
+        vsf_wifi_trace_error("wifi: init script failed (err=%d)" VSF_TRACE_CFG_LINEEND, (int)err);
         __vsf_wifi_attach_fail(wifi, err);
         return;
     }
@@ -615,7 +615,7 @@ static void __vsf_wifi_on_init_done(vsf_wifi_t *wifi, vsf_err_t err)
 static void __vsf_wifi_on_mac_set_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (VSF_ERR_NONE != err) {
-        vsf_trace_warning("wifi: set_mac_addr failed (err=%d), continuing"
+        vsf_wifi_trace_info("wifi: set_mac_addr failed (err=%d), continuing"
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
     if (NULL == wifi->drv->set_rx_filter) {
@@ -635,7 +635,7 @@ static void __vsf_wifi_on_rxfilter_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
     wifi->is_ready = true;
-    vsf_trace_info("wifi: MCU ready, chip is up" VSF_TRACE_CFG_LINEEND);
+    vsf_wifi_trace_info("wifi: MCU ready, chip is up" VSF_TRACE_CFG_LINEEND);
     if (wifi->reg_bus != NULL && wifi->reg_bus->on_ready != NULL) {
         wifi->reg_bus->on_ready(wifi);
     }
@@ -776,24 +776,25 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     {
         static uint32_t __aad_dump_cnt = 0;
         if (++__aad_dump_cnt <= 3) {
-            vsf_trace_info("wifi: CCMP encap #%u hdr=%u qos=%u pn=%02X%02X%02X%02X%02X%02X"
+            vsf_wifi_trace_debug("wifi: CCMP encap #%u hdr=%u qos=%u pn=%02X%02X%02X%02X%02X%02X"
                     VSF_TRACE_CFG_LINEEND,
                     (unsigned)__aad_dump_cnt, hdr_len, (unsigned)qos,
                     pn[5], pn[4], pn[3], pn[2], pn[1], pn[0]);
             char buf[80]; int pos = 0;
             for (uint16_t i = 0; i < aad_len && i < 24; i++)
                 pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", aad[i]);
-            vsf_trace_info("  AAD(%u): %s" VSF_TRACE_CFG_LINEEND,
+            vsf_wifi_trace_debug("  AAD(%u): %s" VSF_TRACE_CFG_LINEEND,
                     (unsigned)aad_len, buf);
             pos = 0;
             for (int i = 0; i < 13; i++)
                 pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", nonce[i]);
-            vsf_trace_info("  NONCE: %s" VSF_TRACE_CFG_LINEEND, buf);
+            vsf_wifi_trace_debug("  NONCE: %s" VSF_TRACE_CFG_LINEEND, buf);
             const uint8_t *tk2 = wifi->wpa_ptk + 32;
-            vsf_trace_info("  TK: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
+            vsf_wifi_trace_debug("  TK: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
                     VSF_TRACE_CFG_LINEEND,
                     tk2[0],tk2[1],tk2[2],tk2[3],tk2[4],tk2[5],tk2[6],tk2[7],
                     tk2[8],tk2[9],tk2[10],tk2[11],tk2[12],tk2[13],tk2[14],tk2[15]);
+            (void)tk2;
         }
     }
 
@@ -812,16 +813,16 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
             uint8_t *vout = (uint8_t *)__vbuf32;
             uint16_t vlen = __vsf_wifi_ccmp_decap(wifi, out, total, vout, (uint16_t)sizeof(__vbuf32));
             if (vlen == 0) {
-                vsf_trace_error("wifi: CCMP TX self-verify FAILED (decrypt returned 0)"
+                vsf_wifi_trace_error("wifi: CCMP TX self-verify FAILED (decrypt returned 0)"
                         VSF_TRACE_CFG_LINEEND);
             } else if (vlen != len) {
-                vsf_trace_error("wifi: CCMP TX self-verify LEN MISMATCH enc_in=%u dec_out=%u orig=%u"
+                vsf_wifi_trace_error("wifi: CCMP TX self-verify LEN MISMATCH enc_in=%u dec_out=%u orig=%u"
                         VSF_TRACE_CFG_LINEEND, (unsigned)total, (unsigned)vlen, (unsigned)len);
             } else if (memcmp(vout + hdr_len, frame + hdr_len, payload_len) != 0) {
-                vsf_trace_error("wifi: CCMP TX self-verify PAYLOAD MISMATCH"
+                vsf_wifi_trace_error("wifi: CCMP TX self-verify PAYLOAD MISMATCH"
                         VSF_TRACE_CFG_LINEEND);
             } else {
-                vsf_trace_info("wifi: CCMP TX self-verify OK (roundtrip %u bytes)"
+                vsf_wifi_trace_debug("wifi: CCMP TX self-verify OK (roundtrip %u bytes)"
                         VSF_TRACE_CFG_LINEEND, (unsigned)vlen);
             }
         }
@@ -839,14 +840,14 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
     bool     qos     = ((dot11[0] >> 4) & 0x0F) & 0x08;
     uint16_t hdr_len = qos ? 26 : 24;
     if (len < (hdr_len + 8 + 8)) {
-        vsf_trace_warning("wifi: ccmp_decap: too short len=%u hdr=%u" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: ccmp_decap: too short len=%u hdr=%u" VSF_TRACE_CFG_LINEEND,
                 (unsigned)len, hdr_len);
         return 0;
     }
 
     const uint8_t *cc = dot11 + hdr_len;
     if ((cc[3] & 0x20) == 0) {
-        vsf_trace_warning("wifi: ccmp_decap: no ExtIV cc[3]=0x%02X" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: ccmp_decap: no ExtIV cc[3]=0x%02X" VSF_TRACE_CFG_LINEEND,
                 cc[3]);
         return 0;
     }
@@ -878,7 +879,7 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
             cipher, cipher_len, out + hdr_len, mic) != VSF_ERR_NONE) {
         static uint32_t __ccmp_mic_fail = 0;
         if (++__ccmp_mic_fail <= 10) {
-            vsf_trace_warning("wifi: ccmp MIC fail #%u len=%u cipher=%u %s "
+            vsf_wifi_trace_info("wifi: ccmp MIC fail #%u len=%u cipher=%u %s "
                     "A1=%02X:%02X:%02X:%02X:%02X:%02X A2=%02X:%02X:%02X:%02X:%02X:%02X"
                     " pn=%02X%02X%02X%02X%02X%02X keyid=%u" VSF_TRACE_CFG_LINEEND,
                     (unsigned)__ccmp_mic_fail, (unsigned)len, (unsigned)cipher_len,
@@ -887,7 +888,7 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
                     dot11[10], dot11[11], dot11[12], dot11[13], dot11[14], dot11[15],
                     pn[5], pn[4], pn[3], pn[2], pn[1], pn[0],
                     (unsigned)((cc[3] >> 6) & 0x03));
-            vsf_trace_warning("  TK: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X"
+            vsf_wifi_trace_debug("  TK: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X"
                     " hdr=%u qos=%u" VSF_TRACE_CFG_LINEEND,
                     tk[0], tk[1], tk[2], tk[3], tk[4], tk[5], tk[6], tk[7],
                     tk[8], tk[9], tk[10], tk[11], tk[12], tk[13], tk[14], tk[15],
@@ -948,7 +949,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                 && (payload[2] == 0x03) && (payload[3] == 0x00)
                 && (payload[4] == 0x00) && (payload[5] == 0x00)
                 && (payload[6] == 0x88) && (payload[7] == 0x8E)) {
-            vsf_trace_info("wifi: Protected EAPOL detected in 4-way, routing to eapol_rx"
+            vsf_wifi_trace_debug("wifi: Protected EAPOL detected in 4-way, routing to eapol_rx"
                     VSF_TRACE_CFG_LINEEND);
             vsf_wifi_eapol_rx(wifi, payload + 8, payload_len - 8);
             return;
@@ -985,7 +986,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             if (plen == 0) {
                 static uint32_t __ccmp_fail_cnt = 0;
                 if (++__ccmp_fail_cnt <= 5) {
-                    vsf_trace_warning("wifi: CCMP decap FAIL #%u len=%u"
+                    vsf_wifi_trace_info("wifi: CCMP decap FAIL #%u len=%u"
                             VSF_TRACE_CFG_LINEEND,
                             (unsigned)__ccmp_fail_cnt, (unsigned)len);
                 }
@@ -997,7 +998,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                  * multicast-noise fail counter. */
                 static uint32_t __uc_ok_cnt = 0;
                 if (++__uc_ok_cnt <= 12) {
-                    vsf_trace_info("wifi: UC decap OK #%u plen=%u et=%02X%02X"
+                    vsf_wifi_trace_debug("wifi: UC decap OK #%u plen=%u et=%02X%02X"
                             VSF_TRACE_CFG_LINEEND, (unsigned)__uc_ok_cnt,
                             (unsigned)plen,
                             (plen > 32) ? out[(((out[0]>>4)&0x0F)&0x08)?32:30] : 0,
@@ -1014,7 +1015,7 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                 if ((out[0] & 0x80) && ((out[0] & 0x0C) == 0x08)) dec_hdr = 26;
                 uint16_t dec_pl = (plen > dec_hdr) ? (plen - dec_hdr) : 0;
                 if ((dec_pl > 8) && (memcmp(out + dec_hdr, __snap_eapol_enc, 8) == 0)) {
-                    vsf_trace_info("wifi: encrypted EAPOL detected, routing to eapol_rx"
+                    vsf_wifi_trace_debug("wifi: encrypted EAPOL detected, routing to eapol_rx"
                             VSF_TRACE_CFG_LINEEND);
                     vsf_wifi_eapol_rx(wifi, out + dec_hdr + 8, dec_pl - 8);
                     return;
@@ -1113,7 +1114,7 @@ static void __vsf_wifi_send_probe_req(vsf_wifi_t *wifi)
 
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
     if (VSF_ERR_NONE != err) {
-        vsf_trace_warning("wifi: active-scan probe-req tx failed (err=%d)"
+        vsf_wifi_trace_info("wifi: active-scan probe-req tx failed (err=%d)"
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
 }
@@ -1213,7 +1214,7 @@ static void __vsf_wifi_mlme_send_auth(vsf_wifi_t *wifi)
     frame[i++] = 0x00; frame[i++] = 0x00;   /* status code        = 0     */
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
     if (VSF_ERR_NONE != err) {
-        vsf_trace_warning("wifi: mlme auth-req tx failed (err=%d)"
+        vsf_wifi_trace_info("wifi: mlme auth-req tx failed (err=%d)"
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
@@ -1332,12 +1333,12 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         char buf[384]; int pos = 0;
         for (uint16_t k = 0; k < i && pos < (int)sizeof(buf) - 3; k++)
             pos += snprintf(&buf[pos], sizeof(buf) - pos, "%02X", frame[k]);
-        vsf_trace_info("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_debug("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
                 (unsigned)i, buf);
     }
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
     if (VSF_ERR_NONE != err) {
-        vsf_trace_warning("wifi: mlme assoc-req tx failed (err=%d)"
+        vsf_wifi_trace_info("wifi: mlme assoc-req tx failed (err=%d)"
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
@@ -1380,7 +1381,7 @@ static void __vsf_wifi_mlme_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
     if (wifi->disconnecting) return;
     if (wifi->mlme_state != WIFI_MLME_AUTH) return;
     if (VSF_ERR_NONE != err) {
-        vsf_trace_error("wifi: mlme connect prep failed (err=%d)"
+        vsf_wifi_trace_error("wifi: mlme connect prep failed (err=%d)"
                 VSF_TRACE_CFG_LINEEND, (int)err);
         __vsf_wifi_mlme_finish(wifi, WIFI_REASON_UNSPECIFIED);
         return;
@@ -1414,7 +1415,7 @@ void vsf_wifi_on_mlme_retry_evt(vsf_wifi_t *wifi)
     /* The 4-way handshake has no per-message retransmit on our side (the AP
      * retries M1/M3); a timer expiry here means the handshake stalled. */
     if (wifi->mlme_state == WIFI_MLME_4WAY) {
-        vsf_trace_warning("wifi: 4-way handshake timeout" VSF_TRACE_CFG_LINEEND);
+        vsf_wifi_trace_info("wifi: 4-way handshake timeout" VSF_TRACE_CFG_LINEEND);
         __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_TIMEOUT);
         return;
     }
@@ -1424,7 +1425,7 @@ void vsf_wifi_on_mlme_retry_evt(vsf_wifi_t *wifi)
         return;
     }
     if (wifi->mlme_retry == 0) {
-        vsf_trace_warning("wifi: mlme handshake timeout (state=%u)"
+        vsf_wifi_trace_info("wifi: mlme handshake timeout (state=%u)"
                 VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_state);
         __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_TIMEOUT);
         return;
@@ -1463,7 +1464,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
         {
             uint16_t status = __vsf_wifi_rd16(&body[4]);
             if (status != 0) {
-                vsf_trace_warning("wifi: auth rejected (status=%u)"
+                vsf_wifi_trace_info("wifi: auth rejected (status=%u)"
                         VSF_TRACE_CFG_LINEEND, (unsigned)status);
                 __vsf_wifi_mlme_finish(wifi, WIFI_REASON_AUTH_REJECTED);
                 return;
@@ -1472,7 +1473,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
         vsf_callback_timer_remove(&wifi->mlme_timer);
 #endif
-        vsf_trace_info("wifi: auth ok, sending assoc-req" VSF_TRACE_CFG_LINEEND);
+        vsf_wifi_trace_info("wifi: auth ok, sending assoc-req" VSF_TRACE_CFG_LINEEND);
         wifi->mlme_state = WIFI_MLME_ASSOC;
         wifi->mlme_retry = __VSF_WIFI_MLME_MAX_RETRY;
         __vsf_wifi_mlme_send_assoc(wifi);
@@ -1485,7 +1486,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
         {
             uint16_t status = __vsf_wifi_rd16(&body[2]);
             if (status != 0) {
-                vsf_trace_warning("wifi: assoc rejected (status=%u)"
+                vsf_wifi_trace_info("wifi: assoc rejected (status=%u)"
                         VSF_TRACE_CFG_LINEEND, (unsigned)status);
                 __vsf_wifi_mlme_finish(wifi, WIFI_REASON_ASSOC_REJECTED);
                 return;
@@ -1504,14 +1505,14 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                 && (wifi->wpa_auth.psk_len == VSF_WIFI_PMK_LEN)) {
             wifi->wpa_ptk_valid = false;
             wifi->mlme_state    = WIFI_MLME_4WAY;
-            vsf_trace_info("wifi: associated, aid=%u (4-way handshake)"
+            vsf_wifi_trace_info("wifi: associated, aid=%u (4-way handshake)"
                     VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
             vsf_wifi_mlme_arm_timer(wifi, __VSF_WIFI_WPA_TIMEOUT_MS);
             break;
         }
 #endif
         wifi->mlme_state = WIFI_MLME_RUN;
-        vsf_trace_info("wifi: associated, aid=%u (link up)"
+        vsf_wifi_trace_info("wifi: associated, aid=%u (link up)"
                 VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
         {
             vsf_wifi_link_info_t info;
@@ -1527,7 +1528,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
     case __DOT11_STYPE_DISASSOC: {
         uint16_t reason = (body_len >= 2) ? __vsf_wifi_rd16(&body[0])
                                           : WIFI_REASON_UNSPECIFIED;
-        vsf_trace_info("wifi: received %s (reason=%u)" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: received %s (reason=%u)" VSF_TRACE_CFG_LINEEND,
                 (subtype == __DOT11_STYPE_DEAUTH) ? "deauth" : "disassoc",
                 (unsigned)reason);
         __vsf_wifi_mlme_finish(wifi, (uint8_t)reason);
@@ -1791,7 +1792,7 @@ void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi)
 
     wifi->mlme_state = WIFI_MLME_RUN;
     wifi->mlme_retry = 0;
-    vsf_trace_info("wifi: 4-way handshake complete, aid=%u (link up)"
+    vsf_wifi_trace_info("wifi: 4-way handshake complete, aid=%u (link up)"
             VSF_TRACE_CFG_LINEEND, (unsigned)wifi->mlme_aid);
     {
         vsf_wifi_link_info_t info;

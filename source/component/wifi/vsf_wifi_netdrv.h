@@ -28,6 +28,26 @@
 #include "./vsf_wifi.h"
 #include "component/tcpip/vsf_tcpip.h"
 
+/*============================ LOGGING HELPERS ===============================*/
+
+#if VSF_WIFI_CFG_NETDRV_LOG_LEVEL >= 1
+#   define vsf_wifi_netdrv_trace_error(...)    vsf_trace_error(__VA_ARGS__)
+#else
+#   define vsf_wifi_netdrv_trace_error(...)    ((void)0)
+#endif
+
+#if VSF_WIFI_CFG_NETDRV_LOG_LEVEL >= 2
+#   define vsf_wifi_netdrv_trace_info(...)     vsf_trace_info(__VA_ARGS__)
+#else
+#   define vsf_wifi_netdrv_trace_info(...)     ((void)0)
+#endif
+
+#if VSF_WIFI_CFG_NETDRV_LOG_LEVEL >= 4
+#   define vsf_wifi_netdrv_trace_debug(...)    vsf_trace_info(__VA_ARGS__)
+#else
+#   define vsf_wifi_netdrv_trace_debug(...)    ((void)0)
+#endif
+
 #if     defined(__VSF_WIFI_NETDRV_CLASS_IMPLEMENT)
 #   undef __VSF_WIFI_NETDRV_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__

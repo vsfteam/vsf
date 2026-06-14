@@ -215,9 +215,10 @@ static void __vk_netdrv_wifi_thread(void *param)
         vsf_unprotect_sched(orig);
 
         if (pending & __WIFI_NETDRV_PEND_LINK_UP) {
-            vsf_trace_info("wifi-netdrv: worker LINK_UP -> vk_netdrv_connect" VSF_TRACE_CFG_LINEEND);
+            vsf_wifi_netdrv_trace_info("wifi-netdrv: worker LINK_UP -> vk_netdrv_connect" VSF_TRACE_CFG_LINEEND);
             vsf_err_t cerr = vk_netdrv_connect(&wifi_netdrv->use_as__vk_netdrv_t);
-            vsf_trace_info("wifi-netdrv: vk_netdrv_connect err=%d" VSF_TRACE_CFG_LINEEND, (int)cerr);
+            vsf_wifi_netdrv_trace_info("wifi-netdrv: vk_netdrv_connect err=%d" VSF_TRACE_CFG_LINEEND, (int)cerr);
+            (void)cerr;
         }
         if (pending & __WIFI_NETDRV_PEND_RX) {
             __vk_netdrv_wifi_drain_rx(wifi_netdrv);
@@ -288,15 +289,16 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
                 uint8_t  proto = eth[23];
                 uint16_t sport = (eth[14 + ihl] << 8) | eth[14 + ihl + 1];
                 uint16_t dport = (eth[14 + ihl + 2] << 8) | eth[14 + ihl + 3];
-                vsf_trace_info("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
+                vsf_wifi_netdrv_trace_debug("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
                         " SA=%02X%02X%02X%02X%02X%02X IPv4 proto=%u sport=%u dport=%u"
                         VSF_TRACE_CFG_LINEEND,
                         (unsigned)__tx_cnt, (unsigned)eth_len,
                         eth[0],eth[1],eth[2],eth[3],eth[4],eth[5],
                         eth[6],eth[7],eth[8],eth[9],eth[10],eth[11],
                         (unsigned)proto, (unsigned)sport, (unsigned)dport);
+                (void)proto; (void)sport; (void)dport;
             } else {
-                vsf_trace_info("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
+                vsf_wifi_netdrv_trace_debug("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
                         " et=%02X%02X" VSF_TRACE_CFG_LINEEND,
                         (unsigned)__tx_cnt, (unsigned)eth_len,
                         eth[0],eth[1],eth[2],eth[3],eth[4],eth[5],
@@ -354,13 +356,14 @@ static void __vk_netdrv_wifi_on_rx(void *param, vsf_wifi_t *wifi,
                 uint8_t  proto = b[23];
                 uint16_t sport = (b[14 + ihl] << 8) | b[14 + ihl + 1];
                 uint16_t dport = (b[14 + ihl + 2] << 8) | b[14 + ihl + 3];
-                vsf_trace_info("wifi-netdrv: rx->lwIP #%u eth_len=%u IPv4"
+                vsf_wifi_netdrv_trace_debug("wifi-netdrv: rx->lwIP #%u eth_len=%u IPv4"
                         " proto=%u sport=%u dport=%u dst=%u.%u.%u.%u"
                         VSF_TRACE_CFG_LINEEND, (unsigned)__rx_cnt,
                         (unsigned)eth_len, proto, sport, dport,
                         b[30], b[31], b[32], b[33]);
+                (void)proto; (void)sport; (void)dport;
             } else {
-                vsf_trace_info("wifi-netdrv: rx->lwIP #%u eth_len=%u et=%02X%02X"
+                vsf_wifi_netdrv_trace_debug("wifi-netdrv: rx->lwIP #%u eth_len=%u et=%02X%02X"
                         VSF_TRACE_CFG_LINEEND, (unsigned)__rx_cnt,
                         (unsigned)eth_len, b[12], b[13]);
             }
@@ -380,7 +383,7 @@ static void __vk_netdrv_wifi_on_link_up(void *param, vsf_wifi_t *wifi,
 {
     vk_netdrv_wifi_t *wifi_netdrv = param;
 
-    vsf_trace_info("wifi-netdrv: on_link_up hook fired, posting to worker" VSF_TRACE_CFG_LINEEND);
+    vsf_wifi_netdrv_trace_info("wifi-netdrv: on_link_up hook fired, posting to worker" VSF_TRACE_CFG_LINEEND);
     memcpy(wifi_netdrv->bssid, info->bssid, 6);
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -408,7 +411,7 @@ static void __vk_netdrv_wifi_on_link_down(void *param, vsf_wifi_t *wifi, uint8_t
 void vsf_wifi_netdrv_start(vk_netdrv_wifi_t *netdrv, vsf_wifi_t *wifi)
 {
     VSF_WIFI_ASSERT((netdrv != NULL) && (wifi != NULL));
-    vsf_trace_info("wifi-netdrv: start (bridge wifi->lwIP)" VSF_TRACE_CFG_LINEEND);
+    vsf_wifi_netdrv_trace_info("wifi-netdrv: start (bridge wifi->lwIP)" VSF_TRACE_CFG_LINEEND);
 
     memset(netdrv, 0, sizeof(*netdrv));
     netdrv->wifi = wifi;

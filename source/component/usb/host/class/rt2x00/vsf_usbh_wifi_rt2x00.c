@@ -481,7 +481,7 @@ static void __vk_usbh_wifi_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             static unsigned __dbg_rx_cmpl = 0;
             if (__dbg_rx_cmpl < 12) {
                 __dbg_rx_cmpl++;
-                vsf_trace_info(
+                vsf_wifi_bus_rt2x00_trace_debug(
                     "wifi_usb: rx urb#%u status=%d len=%u"
                     VSF_TRACE_CFG_LINEEND,
                     __dbg_rx_cmpl, st, (unsigned)len);
@@ -519,9 +519,10 @@ static bool __vk_usbh_wifi_start_rx(vk_usbh_wifi_t *uwifi)
             return false;
         rx_submitted++;
     }
-    vsf_trace_info("wifi_usb: start_rx submitted %d RX URBs (bufsize=%u)"
+    vsf_wifi_bus_rt2x00_trace_info("wifi_usb: start_rx submitted %d RX URBs (bufsize=%u)"
             VSF_TRACE_CFG_LINEEND, rx_submitted,
             (unsigned)VSF_USBH_WIFI_CFG_URB_BUFSIZE);
+    (void)rx_submitted;
     for (int i = 0; i < VSF_USBH_WIFI_CFG_TX_NUM; i++) {
         vk_usbh_wifi_iocb_t *ocb = &uwifi->tx_ocb[i];
         if (!ocb->is_supported) continue;
@@ -573,7 +574,7 @@ static void * __vk_usbh_wifi_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             usbh->parser->desc_device->idVendor,
             usbh->parser->desc_device->idProduct);
     if (NULL == drv) return NULL;
-    vsf_trace_info("wifi_usb: probe matched vid=0x%04X pid=0x%04X chip=%s" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_bus_rt2x00_trace_info("wifi_usb: probe matched vid=0x%04X pid=0x%04X chip=%s" VSF_TRACE_CFG_LINEEND,
             usbh->parser->desc_device->idVendor,
             usbh->parser->desc_device->idProduct,
             (drv->name != NULL) ? drv->name : "?");
