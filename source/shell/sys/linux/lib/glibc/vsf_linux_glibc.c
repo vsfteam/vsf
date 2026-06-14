@@ -307,7 +307,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
 
 #if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED && !defined(__VSF_APPLET__)
 
-VSF_CAL_WEAK(wmemset)
+// use strong symbol for lld-link on Windows
 wchar_t * wmemset(wchar_t *dest, wchar_t c, size_t n)
 {
     for (size_t i = 0; i < n; i++) {
@@ -316,7 +316,7 @@ wchar_t * wmemset(wchar_t *dest, wchar_t c, size_t n)
     return dest;
 }
 
-VSF_CAL_WEAK(wmemchr)
+// use strong symbol for lld-link on Windows
 wchar_t * wmemchr(const wchar_t *str, wchar_t c, size_t n)
 {
     for (size_t i = 0; i < n; i++) {
@@ -327,7 +327,7 @@ wchar_t * wmemchr(const wchar_t *str, wchar_t c, size_t n)
     return NULL;
 }
 
-VSF_CAL_WEAK(wmemcmp)
+// use strong symbol for lld-link on Windows
 int wmemcmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
     for (size_t i = 0; i < n; i++) {
@@ -338,7 +338,7 @@ int wmemcmp(const wchar_t *s1, const wchar_t *s2, size_t n)
     return 0;
 }
 
-VSF_CAL_WEAK(wmemcpy)
+// use strong symbol for lld-link on Windows
 wchar_t * wmemcpy(wchar_t *dest, const wchar_t *src, size_t n)
 {
     for (size_t i = 0; i < n; i++) {
@@ -347,7 +347,7 @@ wchar_t * wmemcpy(wchar_t *dest, const wchar_t *src, size_t n)
     return dest;
 }
 
-VSF_CAL_WEAK(wmemmove)
+// use strong symbol for lld-link on Windows
 wchar_t * wmemmove(wchar_t *dest, const wchar_t *src, size_t n)
 {
     if (dest < src) {
