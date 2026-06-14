@@ -60,7 +60,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y build-essential ninja-build libsdl2-dev libbsd-dev libusb-dev libusb-1.0
+        sudo apt-get install -y build-essential gcc-13 g++-13 gcc-14 g++-14 clang-16 clang-17 clang-18 ninja-build libsdl2-dev libbsd-dev libusb-dev libusb-1.0
         pip3 install pytest pytest-bdd pexpect simple-hexdump
 
     - name: Install depends for macOS
