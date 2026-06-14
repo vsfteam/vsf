@@ -64,9 +64,18 @@ static void __vsf_wifi_mlme_finish    (vsf_wifi_t *wifi, uint8_t reason);
 static vsf_err_t __vsf_wifi_tx_frame  (vsf_wifi_t *wifi,
                                        const uint8_t *frame, uint16_t len);
 
+#if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+static void __vsf_wifi_keepalive_send (vsf_wifi_t *wifi);
+static void __vsf_wifi_keepalive_start(vsf_wifi_t *wifi);
+static void __vsf_wifi_keepalive_stop (vsf_wifi_t *wifi);
+#endif
+
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 static void __vsf_wifi_scan_timer_cb (vsf_callback_timer_t *timer);
 static void __vsf_wifi_scan_hop_done (vsf_wifi_t *wifi, vsf_err_t err);
+#if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+static void __vsf_wifi_keepalive_cb(vsf_callback_timer_t *timer);
+#endif
 static void __vsf_wifi_scan_advance  (vsf_wifi_t *wifi);
 static void __vsf_wifi_scan_finish   (vsf_wifi_t *wifi);
 #if VSF_WIFI_CFG_SCAN_ACTIVE == ENABLED
@@ -163,6 +172,9 @@ static void __vsf_wifi_deliver_link_up(vsf_wifi_t *wifi,
     if ((wifi->netif_ops != NULL) && (wifi->netif_ops->on_link_up != NULL)) {
         wifi->netif_ops->on_link_up(wifi->netif_param, wifi, info);
     }
+#if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+    __vsf_wifi_keepalive_start(wifi);
+#endif
 }
 
 static void __vsf_wifi_deliver_link_down(vsf_wifi_t *wifi, uint8_t reason)
@@ -172,7 +184,97 @@ static void __vsf_wifi_deliver_link_down(vsf_wifi_t *wifi, uint8_t reason)
     if ((wifi->netif_ops != NULL) && (wifi->netif_ops->on_link_down != NULL)) {
         wifi->netif_ops->on_link_down(wifi->netif_param, wifi, reason);
     }
+#if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+    __vsf_wifi_keepalive_stop(wifi);
+#endif
 }
+
+#if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+/* ------------------------------------------------------------------------- *
+ * 802.11 null-data-frame keepalive.
+ *
+ * Many APs deauthenticate a STA that has been idle for longer than their BSS
+ * Max Idle Period.  We send a short null data frame (no payload) at regular
+ * intervals so the AP sees uplink activity.  The interval is taken from the
+ * BSS Max Idle Period IE when advertised, otherwise we fall back to the user
+ * configurable default.
+ * ------------------------------------------------------------------------- */
+
+static void __vsf_wifi_keepalive_send(vsf_wifi_t *wifi)
+{
+    uint8_t frame[24];
+    memset(frame, 0, sizeof(frame));
+
+    /* FC: type=Data(2), subtype=Null(4), ToDS. */
+    frame[0] = 0x48;
+    frame[1] = 0x01;
+
+    /* addr1 = BSSID (RA) */
+    memcpy(&frame[4],  wifi->mlme_bssid, 6);
+    /* addr2 = our MAC (TA) */
+    memcpy(&frame[10], wifi->mac,        6);
+    /* addr3 = BSSID (DA in ToDS) */
+    memcpy(&frame[16], wifi->mlme_bssid, 6);
+
+    /* Sequence control: the hardware/driver is responsible for the real
+     * sequence number; zero is fine here. */
+
+    vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, sizeof(frame));
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_trace_info("wifi: keepalive null frame tx failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+    } else {
+        vsf_wifi_trace_debug("wifi: keepalive null frame sent"
+                VSF_TRACE_CFG_LINEEND);
+    }
+}
+
+static void __vsf_wifi_keepalive_cb(vsf_callback_timer_t *timer)
+{
+    vsf_wifi_t *wifi = vsf_container_of(timer, vsf_wifi_t, keepalive_timer);
+
+    if (wifi->mlme_state == WIFI_MLME_RUN) {
+        __vsf_wifi_keepalive_send(wifi);
+    }
+
+    vsf_callback_timer_add_ms(timer, wifi->keepalive_period_ms);
+}
+
+static void __vsf_wifi_keepalive_start(vsf_wifi_t *wifi)
+{
+    if (VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER != ENABLED) {
+        return;
+    }
+
+    uint32_t period_ms = VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS;
+    uint16_t ap_idle   = wifi->bss_max_idle_period;
+
+    if (ap_idle > 0) {
+        /* AP value is in units of 1000 TU (1 TU = 1024 us). */
+        uint32_t ap_ms = (uint32_t)ap_idle * 1024U;
+        period_ms = ap_ms / 2;
+        if (period_ms < VSF_WIFI_CFG_KEEPALIVE_MIN_PERIOD_MS) {
+            period_ms = VSF_WIFI_CFG_KEEPALIVE_MIN_PERIOD_MS;
+        }
+        if (period_ms > VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS) {
+            period_ms = VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS;
+        }
+        vsf_wifi_trace_info("wifi: keepalive period %u ms (AP BSS Max Idle=%u)"
+                VSF_TRACE_CFG_LINEEND,
+                (unsigned)period_ms, (unsigned)ap_idle);
+    }
+
+    wifi->keepalive_period_ms = period_ms;
+    vsf_callback_timer_add_ms(&wifi->keepalive_timer, period_ms);
+}
+
+static void __vsf_wifi_keepalive_stop(vsf_wifi_t *wifi)
+{
+    if (VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED) {
+        vsf_callback_timer_remove(&wifi->keepalive_timer);
+    }
+}
+#endif      /* VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0 */
 
 /*============================ HELPERS =======================================*/
 
@@ -556,6 +658,10 @@ void vsf_wifi_init(vsf_wifi_t *wifi,
     wifi->read_poll_timer.on_timer = __vsf_wifi_read_poll_timer_cb;
     vsf_callback_timer_init(&wifi->mlme_timer);
     wifi->mlme_timer.on_timer = __vsf_wifi_mlme_timer_cb;
+#   if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+    vsf_callback_timer_init(&wifi->keepalive_timer);
+    wifi->keepalive_timer.on_timer = __vsf_wifi_keepalive_cb;
+#   endif
 #endif
 }
 
@@ -655,6 +761,9 @@ void vsf_wifi_fini(vsf_wifi_t *wifi)
     vsf_callback_timer_remove(&wifi->scan_timer);
     vsf_callback_timer_remove(&wifi->read_poll_timer);
     vsf_callback_timer_remove(&wifi->mlme_timer);
+#   if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
+    vsf_callback_timer_remove(&wifi->keepalive_timer);
+#   endif
 #endif
 
     /* Step 2: notify user before tearing down chip state. */
@@ -743,7 +852,7 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
 {
     bool     qos     = ((frame[0] >> 4) & 0x0F) & 0x08;
     uint16_t hdr_len = qos ? 26 : 24;
-    if (len <= hdr_len)                          return 0;
+    if (len < hdr_len)                           return 0;
 
     uint16_t payload_len = len - hdr_len;
     uint16_t total       = hdr_len + 8 + payload_len + 8;
@@ -1480,7 +1589,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
         break;
 
     case __DOT11_STYPE_ASSOC_RESP:
-        /* assoc-resp: capability(2), status(2), AID(2). */
+        /* assoc-resp: capability(2), status(2), AID(2) + variable IEs. */
         if (wifi->mlme_state != WIFI_MLME_ASSOC) return;
         if (body_len < 6) return;
         {
@@ -1492,6 +1601,27 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                 return;
             }
             wifi->mlme_aid = __vsf_wifi_rd16(&body[4]) & 0x3FFF;
+        }
+        /* Parse variable IEs, notably BSS Max Idle Period (tag 90). */
+        wifi->bss_max_idle_period = 0;
+        if (body_len > 6) {
+            const uint8_t *ie = &body[6];
+            uint16_t remaining = body_len - 6;
+            while (remaining >= 2) {
+                uint8_t tag = ie[0];
+                uint8_t len = ie[1];
+                if (remaining < (uint16_t)(2 + len)) break;
+                if ((tag == 90) && (len >= 2)) {
+                    wifi->bss_max_idle_period = (uint16_t)ie[2]
+                                              | ((uint16_t)ie[3] << 8);
+                    vsf_wifi_trace_info("wifi: BSS Max Idle Period = %u (1000 TU)"
+                            VSF_TRACE_CFG_LINEEND,
+                            (unsigned)wifi->bss_max_idle_period);
+                    break;
+                }
+                ie += 2 + len;
+                remaining -= 2 + len;
+            }
         }
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
         vsf_callback_timer_remove(&wifi->mlme_timer);
@@ -1560,6 +1690,11 @@ const char * vsf_wifi_get_chip_name(vsf_wifi_t *wifi)
 const uint8_t * vsf_wifi_get_mac(vsf_wifi_t *wifi)
 {
     return wifi->mac;
+}
+
+uint16_t vsf_wifi_get_bss_max_idle_period(vsf_wifi_t *wifi)
+{
+    return wifi->bss_max_idle_period;
 }
 
 void vsf_wifi_set_channel(vsf_wifi_t *wifi, uint8_t channel)

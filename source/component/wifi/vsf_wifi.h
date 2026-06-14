@@ -407,6 +407,10 @@ uint8_t      vsf_wifi_get_channel  (vsf_wifi_t *wifi);
 const char * vsf_wifi_get_chip_name(vsf_wifi_t *wifi);
 bool         vsf_wifi_is_ready     (vsf_wifi_t *wifi);
 
+/* BSS Max Idle Period advertised by the AP in the assoc-resp (IE 90).
+ * Returned in units of 1000 TU; 0 means the AP did not advertise it. */
+uint16_t     vsf_wifi_get_bss_max_idle_period(vsf_wifi_t *wifi);
+
 /* Per-device MAC address discovered during chip bring-up (eFuse / EEPROM
  * read).  Returns a pointer to a 6-byte array inside the wifi struct;
  * all-zero until the chip driver finishes its EEPROM stage.  The pointer

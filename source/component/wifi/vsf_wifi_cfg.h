@@ -87,6 +87,21 @@
 #   endif
 #endif
 
+/*
+ * 802.11 keepalive: send a null data frame at regular intervals to prevent
+ * the AP from deauthenticating an idle STA.  The interval is derived from
+ * the BSS Max Idle Period IE advertised by the AP when available, otherwise
+ * the default below is used.  Set to 0 to disable.
+ */
+#ifndef VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS
+#   define VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS         10000
+#endif
+
+/* Hard lower bound for the dynamic keepalive period (avoid excessive airtime). */
+#ifndef VSF_WIFI_CFG_KEEPALIVE_MIN_PERIOD_MS
+#   define VSF_WIFI_CFG_KEEPALIVE_MIN_PERIOD_MS     2000
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

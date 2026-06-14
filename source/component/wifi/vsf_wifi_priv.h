@@ -163,6 +163,18 @@ struct vsf_wifi_t {
      */
     vsf_wifi_done_t            backend_chain_done;
 
+    /* BSS Max Idle Period from assoc-resp IE 90 (units of 1000 TU).
+     * 0 means the AP did not advertise it. */
+    uint16_t                   bss_max_idle_period;
+
+#if     (VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0)                    \
+    &&  (VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED)
+    /* 802.11 null-data-frame keepalive state.  Started on link-up and stopped
+     * on link-down / fini to keep the AP from deauthenticating an idle STA. */
+    vsf_callback_timer_t       keepalive_timer;
+    uint32_t                   keepalive_period_ms;
+#endif
+
     vsf_wifi_reg_op_t              scratch_ops[VSF_WIFI_CFG_SCRATCH_OPS];
 };
 
