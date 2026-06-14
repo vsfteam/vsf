@@ -19,14 +19,14 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_WIFI == ENABLED && VSF_USE_WIFI == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_RT2X00 == ENABLED && VSF_USE_WIFI == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 
 #include "kernel/vsf_kernel.h"
 #include "../../vsf_usbh.h"
-#include "./vsf_usbh_wifi_priv.h"
+#include "./vsf_usbh_wifi_rt2x00_priv.h"
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
 #   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
@@ -712,4 +712,4 @@ vsf_err_t vk_usbh_wifi_send(void *dev, uint8_t *frame, uint16_t len)
     return err;
 }
 
-#endif      // VSF_USE_USB_HOST && VSF_USBH_USE_WIFI && VSF_USE_WIFI
+#endif      // VSF_USE_USB_HOST && VSF_USBH_USE_RT2X00 && VSF_USE_WIFI

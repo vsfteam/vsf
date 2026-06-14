@@ -39,7 +39,7 @@
  * which chip drivers to compile in.  The switches are bus-agnostic; the
  * same chip driver object can be used by USB / SDIO / SPI shims.
  *
- * A bus shim (e.g. vsf_usbh_wifi) MUST require at least one chip driver
+ * A bus shim (e.g. vsf_usbh_wifi_rt2x00) MUST require at least one chip driver
  * to be enabled when the bus class itself is enabled.
  */
 #ifndef VSF_WIFI_USE_RT28XX

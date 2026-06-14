@@ -15,15 +15,15 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_USBH_WIFI_PRIV_H__
-#define __VSF_USBH_WIFI_PRIV_H__
+#ifndef __VSF_USBH_WIFI_RT2X00_PRIV_H__
+#define __VSF_USBH_WIFI_RT2X00_PRIV_H__
 
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 #include "../../vsf_usbh.h"
-#include "./vsf_usbh_wifi.h"
+#include "./vsf_usbh_wifi_rt2x00.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_WIFI == ENABLED && VSF_USE_WIFI == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_RT2X00 == ENABLED && VSF_USE_WIFI == ENABLED
 
 #include "component/wifi/vsf_wifi_priv.h"
 
@@ -116,5 +116,5 @@ struct vk_usbh_wifi_t {
 
 #define __this_wifi(__eda)   vsf_container_of(__eda, vk_usbh_wifi_t, eda)
 
-#endif // VSF_USE_USB_HOST && VSF_USBH_USE_WIFI && VSF_USE_WIFI
-#endif // __VSF_USBH_WIFI_PRIV_H__
+#endif // VSF_USE_USB_HOST && VSF_USBH_USE_RT2X00 && VSF_USE_WIFI
+#endif // __VSF_USBH_WIFI_RT2X00_PRIV_H__

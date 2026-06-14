@@ -15,13 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_USBH_WIFI_H__
-#define __VSF_USBH_WIFI_H__
+#ifndef __VSF_USBH_WIFI_RT2X00_H__
+#define __VSF_USBH_WIFI_RT2X00_H__
 
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_WIFI == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_RT2X00 == ENABLED
 
 #include "component/wifi/vsf_wifi.h"
 
@@ -62,5 +62,5 @@ vsf_wifi_t * vk_usbh_wifi_get_wifi(void *dev);
 #endif
 
 #endif      // VSF_USE_WIFI
-#endif      // VSF_USE_USB_HOST && VSF_USBH_USE_WIFI
-#endif      // __VSF_USBH_WIFI_H__
+#endif      // VSF_USE_USB_HOST && VSF_USBH_USE_RT2X00
+#endif      // __VSF_USBH_WIFI_RT2X00_H__
