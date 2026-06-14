@@ -134,13 +134,13 @@ vsf_err_t vsf_remapped_i2c_slave_request(vsf_remapped_i2c_t *i2c,
     return vsf_i2c_slave_request(i2c->target, transmit_or_receive, count, buffer);
 }
 
-uint_fast32_t vsf_remapped_i2c_master_get_transferred_count(vsf_remapped_i2c_t *i2c)
+uint_fast16_t vsf_remapped_i2c_master_get_transferred_count(vsf_remapped_i2c_t *i2c)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
     return vsf_i2c_master_get_transferred_count(i2c->target);
 }
 
-uint_fast32_t vsf_remapped_i2c_slave_get_transferred_count(vsf_remapped_i2c_t *i2c)
+uint_fast16_t vsf_remapped_i2c_slave_get_transferred_count(vsf_remapped_i2c_t *i2c)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
     return vsf_i2c_slave_get_transferred_count(i2c->target);

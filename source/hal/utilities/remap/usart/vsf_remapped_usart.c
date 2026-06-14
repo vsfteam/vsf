@@ -105,25 +105,25 @@ vsf_usart_capability_t vsf_remapped_usart_capability(vsf_remapped_usart_t *usart
     return vsf_usart_capability(usart->target);
 }
 
-uint_fast16_t vsf_remapped_usart_rxfifo_get_data_count(vsf_remapped_usart_t *usart)
+uint_fast32_t vsf_remapped_usart_rxfifo_get_data_count(vsf_remapped_usart_t *usart)
 {
     VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));
     return vsf_usart_rxfifo_get_data_count(usart->target);
 }
 
-uint_fast16_t vsf_remapped_usart_rxfifo_read(vsf_remapped_usart_t *usart, void *buffer, uint_fast16_t count)
+uint_fast32_t vsf_remapped_usart_rxfifo_read(vsf_remapped_usart_t *usart, void *buffer, uint_fast32_t count)
 {
     VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));
     return vsf_usart_rxfifo_read(usart->target, buffer, count);
 }
 
-uint_fast16_t vsf_remapped_usart_txfifo_get_free_count(vsf_remapped_usart_t *usart)
+uint_fast32_t vsf_remapped_usart_txfifo_get_free_count(vsf_remapped_usart_t *usart)
 {
     VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));
     return vsf_usart_txfifo_get_free_count(usart->target);
 }
 
-uint_fast16_t vsf_remapped_usart_txfifo_write(vsf_remapped_usart_t *usart, void *buffer, uint_fast16_t count)
+uint_fast32_t vsf_remapped_usart_txfifo_write(vsf_remapped_usart_t *usart, void *buffer, uint_fast32_t count)
 {
     VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));
     return vsf_usart_txfifo_write(usart->target, buffer, count);

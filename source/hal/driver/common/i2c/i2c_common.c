@@ -175,7 +175,7 @@ vsf_err_t vsf_i2c_slave_request(vsf_i2c_t *i2c_ptr, bool transmit_or_receive,
                                       buffer_ptr);
 }
 
-uint_fast32_t vsf_i2c_master_get_transferred_count(vsf_i2c_t *i2c_ptr)
+uint_fast16_t vsf_i2c_master_get_transferred_count(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
@@ -184,7 +184,7 @@ uint_fast32_t vsf_i2c_master_get_transferred_count(vsf_i2c_t *i2c_ptr)
     return i2c_ptr->op->master_get_transferred_count(i2c_ptr);
 }
 
-uint_fast32_t vsf_i2c_slave_get_transferred_count(vsf_i2c_t *i2c_ptr)
+uint_fast16_t vsf_i2c_slave_get_transferred_count(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
