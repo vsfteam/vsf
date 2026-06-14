@@ -306,6 +306,62 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
 #endif
 
 #if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED && !defined(__VSF_APPLET__)
+
+VSF_CAL_WEAK(wmemset)
+wchar_t * wmemset(wchar_t *dest, wchar_t c, size_t n)
+{
+    for (size_t i = 0; i < n; i++) {
+        dest[i] = c;
+    }
+    return dest;
+}
+
+VSF_CAL_WEAK(wmemchr)
+wchar_t * wmemchr(const wchar_t *str, wchar_t c, size_t n)
+{
+    for (size_t i = 0; i < n; i++) {
+        if (str[i] == c) {
+            return (wchar_t *)&str[i];
+        }
+    }
+    return NULL;
+}
+
+VSF_CAL_WEAK(wmemcmp)
+int wmemcmp(const wchar_t *s1, const wchar_t *s2, size_t n)
+{
+    for (size_t i = 0; i < n; i++) {
+        if (s1[i] != s2[i]) {
+            return (int)(s1[i] - s2[i]);
+        }
+    }
+    return 0;
+}
+
+VSF_CAL_WEAK(wmemcpy)
+wchar_t * wmemcpy(wchar_t *dest, const wchar_t *src, size_t n)
+{
+    for (size_t i = 0; i < n; i++) {
+        dest[i] = src[i];
+    }
+    return dest;
+}
+
+VSF_CAL_WEAK(wmemmove)
+wchar_t * wmemmove(wchar_t *dest, const wchar_t *src, size_t n)
+{
+    if (dest < src) {
+        for (size_t i = 0; i < n; i++) {
+            dest[i] = src[i];
+        }
+    } else if (dest > src) {
+        for (size_t i = n; i > 0; i--) {
+            dest[i - 1] = src[i - 1];
+        }
+    }
+    return dest;
+}
+
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_wchar_vplt_t vsf_linux_libc_wchar_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_wchar_vplt_t, 0, 0, true),
 
