@@ -33,7 +33,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #define MT76_RX_URB_SIZE            2048
-#define MT76_TX_URB_SIZE            2048
+#define MT76_TX_URB_SIZE            4096
 #define MT76_MCU_RESP_SIZE          2048
 
 #define MT76_EEPROM_SIZE            512
@@ -47,16 +47,49 @@ extern "C" {
  * buses (e.g. SDIO) the same chip driver would use a different bus_ops
  * implementation that maps to the appropriate host/controller primitives. */
 typedef struct vsf_wifi_mt76_bus_ops_t {
-    /* Send an MCU command / configuration request.  On USB this becomes an
-     * ep0 vendor request; the exact request layout is bus-driver private. */
-    vsf_err_t (*mcu_cmd)(vsf_wifi_t *wifi,
-        uint8_t req, uint8_t req_type, uint16_t value, uint16_t index,
-        void *buf, uint16_t len, vsf_wifi_done_t done);
+    /* Called by the chip driver once initialization is complete and the data
+     * path can be enabled.  The bus driver starts RX URBs / DMA here. */
+    void (*on_ready)(vsf_wifi_t *wifi);
 
-    /* Submit a TX frame (probe/auth/assoc/data).  On USB this is a bulk OUT
-     * transfer on one of the AC endpoints. */
+    /* Read a 32-bit configuration/register word.  On USB this becomes an
+     * ep0 vendor IN request; the exact layout is bus-driver private. */
+    vsf_err_t (*cfg_read)(vsf_wifi_t *wifi,
+        uint32_t addr, uint32_t *out, vsf_wifi_done_t done);
+
+    /* Write a 32-bit configuration/register word.  On USB this becomes an
+     * ep0 vendor OUT request; the exact layout is bus-driver private. */
+    vsf_err_t (*cfg_write)(vsf_wifi_t *wifi,
+        uint32_t addr, uint32_t val, vsf_wifi_done_t done);
+
+    /* Write an FCE (Forward Control Engine) DMA register.  Used during
+     * firmware upload to set the destination address/length before sending
+     * the firmware payload as an MCU command frame. */
+    vsf_err_t (*fce_write)(vsf_wifi_t *wifi,
+        uint32_t addr, uint32_t val, vsf_wifi_done_t done);
+
+    /* Issue a device-mode control command (reset, IVB load).
+     * On USB this is an ep0 vendor request. */
+    vsf_err_t (*dev_cmd)(vsf_wifi_t *wifi,
+        uint8_t req, uint16_t value, uint16_t index, vsf_wifi_done_t done);
+
+    /* Issue a device-mode class request (patch enable / WMT reset).
+     * On USB this is an ep0 class request with a small data stage. */
+    vsf_err_t (*dev_class_cmd)(vsf_wifi_t *wifi,
+        uint8_t req, uint16_t value, uint16_t index,
+        const uint8_t *data, uint16_t len, vsf_wifi_done_t done);
+
+    /* Send an MCU command frame.  On USB this is a bulk OUT transfer on the
+     * INBAND_CMD endpoint.  The buffer already contains the TXINFO + CMD
+     * header + payload layout required by the chip.  Completion is signalled
+     * when the bulk OUT URB finishes (the caller separately waits for the
+     * CMD_RESP via rx_submit). */
+    vsf_err_t (*mcu_cmd)(vsf_wifi_t *wifi,
+        const uint8_t *data, uint16_t len, vsf_wifi_done_t done);
+
+    /* Submit a TX 802.11 frame.  On USB this is a bulk OUT transfer on one of
+     * the AC endpoints.  The buffer already contains TXINFO + TXWI + frame. */
     vsf_err_t (*tx_frame)(vsf_wifi_t *wifi,
-        const uint8_t *data, uint16_t len, uint8_t queue_idx);
+        const uint8_t *data, uint16_t len, uint8_t queue_idx, vsf_wifi_done_t done);
 
     /* Start / re-arm a single RX reception.  On USB this is a bulk IN URB. */
     vsf_err_t (*rx_submit)(vsf_wifi_t *wifi,
@@ -64,7 +97,12 @@ typedef struct vsf_wifi_mt76_bus_ops_t {
 } vsf_wifi_mt76_bus_ops_t;
 
 typedef struct mt76_wifi_priv {
+    vsf_wifi_t              *wifi;
     void                    *bus_priv;
+
+    /* RX data/event delivery callback registered by the chip driver.  The bus
+     * driver invokes this for every completed bulk IN URB. */
+    void                    (*on_rx)(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
 
     uint32_t                asic_rev;
     uint8_t                 mac_addr[6];
@@ -76,6 +114,28 @@ typedef struct mt76_wifi_priv {
     /* async operation context */
     vsf_wifi_done_t         pending_done;
     uint16_t                pending_cmd;
+
+    /* firmware upload context */
+    uint8_t                 fw_state;
+    uint8_t                 fw_stage;
+    uint8_t                 fw_send_state;
+    uint8_t                 fw_send_next_state;
+    uint32_t                fw_idx;
+    uint32_t                fw_ilm_len;
+    uint32_t                fw_dlm_len;
+    const uint8_t           *fw_data;
+    uint32_t                fw_len;
+    uint32_t                fw_pos;
+    uint32_t                fw_dst_offset;
+    uint32_t                fw_max_payload;
+    uint32_t                fw_patch_reg;
+    uint32_t                fw_patch_mask;
+    uint32_t                fw_poll_mask;
+    uint16_t                fw_poll_ms;
+    uint16_t                fw_sem_ms;
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_t    fw_timer;
+#endif
 
     /* buffers */
     uint8_t                 rx_buf[MT76_RX_URB_SIZE];
