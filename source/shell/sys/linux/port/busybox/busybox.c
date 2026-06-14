@@ -68,6 +68,31 @@ int vsf_linux_init_main(int argc, char *argv[])
     vsh_run_scripts(VSF_LINUX_CFG_INIT_SCRIPT_FILE);
 #endif
 
+    // system() spawns child processes which share stdio fds via ref-counted
+    // priv pointers. Ensure stdin/stdout are still available before starting shell.
+    extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
+    if (NULL == vsf_linux_fd_get(STDIN_FILENO)) {
+        extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process,
+            vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op, int fd_min,
+            vsf_linux_fd_priv_t *priv);
+        extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
+        extern vsf_linux_process_t * vsf_linux_get_res_process(void);
+        vsf_linux_fd_t *sfd_from = __vsf_linux_fd_get_ex(vsf_linux_get_res_process(), STDIN_FILENO);
+        if (sfd_from != NULL) {
+            vsf_linux_fd_t *sfd;
+            __vsf_linux_fd_create_ex(NULL, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv);
+        }
+    }
+    if (NULL == vsf_linux_fd_get(STDOUT_FILENO)) {
+        extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
+        extern vsf_linux_process_t * vsf_linux_get_res_process(void);
+        vsf_linux_fd_t *sfd_from = __vsf_linux_fd_get_ex(vsf_linux_get_res_process(), STDOUT_FILENO);
+        if (sfd_from != NULL) {
+            vsf_linux_fd_t *sfd;
+            __vsf_linux_fd_create_ex(NULL, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv);
+        }
+    }
+
     return vsh_main(argc, argv);
 }
 
