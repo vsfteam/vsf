@@ -136,7 +136,7 @@ static const vsf_wifi_chip_drv_t * __vk_usbh_wifi_find_drv(
 
 /*============================ BUS OPS IMPLEMENTATION ========================*
  *
- * USB bus_ops: single reg write/read via ep0 vendor request 0x01, and
+ * USB reg_bus: single reg write/read via ep0 vendor request 0x01, and
  * block write via chunked ep0 transfers.  All async — completion is
  * delivered by VSF_EVT_MESSAGE on the wifi EDA.
  *
@@ -231,7 +231,7 @@ static void __usb_wifi_bus_finish(vk_usbh_wifi_t *uwifi, vsf_err_t err)
     }
 }
 
-/* bus_ops->reg_write */
+/* reg_bus->reg_write */
 static vsf_err_t __usb_wifi_reg_write(vsf_wifi_t *wifi, uint16_t reg,
         uint32_t val, vsf_wifi_done_t done)
 {
@@ -256,7 +256,7 @@ static vsf_err_t __usb_wifi_reg_write(vsf_wifi_t *wifi, uint16_t reg,
     return VSF_ERR_NONE;
 }
 
-/* bus_ops->reg_read */
+/* reg_bus->reg_read */
 static vsf_err_t __usb_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg,
         uint32_t *out, vsf_wifi_done_t done)
 {
@@ -281,7 +281,7 @@ static vsf_err_t __usb_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg,
     return VSF_ERR_NONE;
 }
 
-/* bus_ops->reg_block_write */
+/* reg_bus->reg_block_write */
 static vsf_err_t __usb_wifi_reg_block_write(vsf_wifi_t *wifi, uint16_t base,
         const uint8_t *data, uint32_t len, vsf_wifi_done_t done)
 {
@@ -309,7 +309,7 @@ static vsf_err_t __usb_wifi_reg_block_write(vsf_wifi_t *wifi, uint16_t base,
     return VSF_ERR_NONE;
 }
 
-/* bus_ops->vendor_request */
+/* reg_bus->vendor_request */
 static vsf_err_t __usb_wifi_vendor_request(vsf_wifi_t *wifi, uint8_t request,
         uint16_t value, uint16_t index, vsf_wifi_done_t done)
 {
@@ -349,7 +349,7 @@ static void __usb_wifi_on_ready(vsf_wifi_t *wifi)
 
 /*============================ BUS OPS: data_tx =============================*/
 
-/* bus_ops->data_tx — ship a chip-encoded TX payload over the bulk OUT
+/* reg_bus->data_tx — ship a chip-encoded TX payload over the bulk OUT
  * endpoint.  Thin wrapper around the existing vk_usbh_wifi_send(); the
  * generic layer hands us a buffer already built by drv->build_tx. */
 static vsf_err_t __usb_wifi_data_tx(vsf_wifi_t *wifi, uint8_t *data,
@@ -361,7 +361,7 @@ static vsf_err_t __usb_wifi_data_tx(vsf_wifi_t *wifi, uint8_t *data,
 
 /*============================ BUS OPS VTABLE ================================*/
 
-static const vsf_wifi_bus_ops_t __usb_wifi_bus_ops = {
+static const vsf_wifi_reg_bus_t __usb_wifi_reg_bus = {
     .reg_write       = __usb_wifi_reg_write,
     .reg_read        = __usb_wifi_reg_read,
     .reg_block_write = __usb_wifi_reg_block_write,
@@ -628,7 +628,7 @@ static void * __vk_usbh_wifi_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     uwifi->id.idVendor  = usbh->parser->desc_device->idVendor;
 
     /* Initialize the generic wifi layer (embedded). */
-    vsf_wifi_init(&uwifi->wifi, drv, &__usb_wifi_bus_ops, &uwifi->eda);
+    vsf_wifi_init(&uwifi->wifi, drv, &__usb_wifi_reg_bus, &uwifi->eda);
     vsf_wifi_set_attach_fail(&uwifi->wifi, __usb_wifi_attach_fail);
 
     /* Start EDA — VSF_EVT_INIT will call vsf_wifi_start(). */

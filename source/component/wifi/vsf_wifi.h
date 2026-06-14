@@ -111,7 +111,7 @@ enum {
 
 typedef struct vsf_wifi_t           vsf_wifi_t;
 typedef struct vsf_wifi_chip_drv_t  vsf_wifi_chip_drv_t;
-typedef struct vsf_wifi_bus_ops_t   vsf_wifi_bus_ops_t;
+typedef struct vsf_wifi_reg_bus_t   vsf_wifi_reg_bus_t;
 
 /*
  * Asynchronous-completion callback.  Invoked exactly once per async request
@@ -120,11 +120,11 @@ typedef struct vsf_wifi_bus_ops_t   vsf_wifi_bus_ops_t;
 typedef void (*vsf_wifi_done_t)(vsf_wifi_t *wifi, vsf_err_t err);
 
 /*
- * Predicate used by vsf_wifi_run_read_poll to decide whether the value just
+ * Predicate used by vsf_wifi_reg_read_poll to decide whether the value just
  * read from a register satisfies the wait condition.  Called from the bus
  * driver's EDA on every poll iteration; must be cheap and side-effect free.
  */
-typedef bool (*vsf_wifi_match_fn_t)(uint32_t val);
+typedef bool (*vsf_wifi_reg_match_fn_t)(uint32_t val);
 
 typedef struct vsf_wifi_scan_result_t {
     uint8_t  bssid[6];
@@ -166,44 +166,40 @@ typedef struct vsf_wifi_auth_cfg_t {
  * encode them (see RT_OP_BBP / RT_OP_RF in chip/rt28xx/vsf_wifi_rt28xx.c).
  * This keeps the wifi state machine free of chip-specific knowledge.
  */
-typedef struct vsf_wifi_op_t {
+typedef struct vsf_wifi_reg_op_t {
     uint16_t reg;
     uint32_t val;
-} vsf_wifi_op_t;
+} vsf_wifi_reg_op_t;
 
 /*
  * Bulk register-block payload (firmware blob, calibration table, etc.).
- * Each chunk is shipped via bus_ops->reg_block_write (or, when the bus
+ * Each chunk is shipped via reg_bus->reg_block_write (or, when the bus
  * lacks that primitive, decomposed into multiple reg_write calls by the
  * generic layer).  `data` MUST stay valid until the completion callback
  * fires — pointing at .rodata is fine on every supported bus.
  */
-typedef struct vsf_wifi_blob_t {
+typedef struct vsf_wifi_reg_blob_t {
     const uint8_t *data;
     uint32_t       len;
     uint16_t       base_reg;
     uint16_t       chunk_size;     /* hint; bus impl may override */
-} vsf_wifi_blob_t;
+} vsf_wifi_reg_blob_t;
 
-/*============================ BUS OPS =======================================*
+/*============================ REGISTER BUS OPS ==============================*
  *
- * Only the *most stable* bus primitives live in this vtable: single-register
- * 32-bit write / read, plus an optional contiguous register-block write.
- * These are guaranteed to be expressible on any addressable wifi NIC bus
- * (USB ep0 vendor request, SDIO CMD52/CMD53, SPI register frame, MMIO).
+ * Optional register-access helper for register-based WiFi chips (e.g.
+ * Ralink RT2X00).  Chips that do NOT speak a register protocol — such as
+ * MediaTek mt76, which uses firmware commands over bulk/interrupt endpoints
+ * — can leave wifi->reg_bus NULL and implement their own transport inside
+ * drv->tx / drv->init / etc.
  *
- * Higher-level concepts that vary across buses (bulk endpoint TX/RX, port
- * reset, PHY interrupts, doorbells) are intentionally NOT abstracted here
- * — those continue to live inside the bus driver until enough chip / bus
- * combinations exist to draw a clean line.
- *
- * Concurrency contract: at most one bus_ops call may be in flight at any
+ * Concurrency contract: at most one reg_bus call may be in flight at any
  * time.  Issuing a second call before the previous `done` callback has
  * fired is a programming error; the bus driver MAY return VSF_ERR_NOT_
  * AVAILABLE in that case.
  *==========================================================================*/
 
-struct vsf_wifi_bus_ops_t {
+struct vsf_wifi_reg_bus_t {
     /* Single-register 32-bit write.  REQUIRED.
      *
      * Returns VSF_ERR_NONE if the write was queued; completion is delivered
@@ -250,26 +246,26 @@ struct vsf_wifi_bus_ops_t {
      */
     void (*on_ready)(vsf_wifi_t *wifi);
 
-    /* Bulk data-frame transmit.  OPTIONAL — NULL on buses that have no bulk
-     * data endpoint (pure ep0).  `data` points at a fully chip-encoded TX
-     * payload (built by drv->build_tx); `len` is its total length.  Unlike
-     * the reg/script primitives this is fire-and-forget: the bus driver
-     * owns completion internally (TX URB pool).  Returns VSF_ERR_NONE when
-     * the frame was queued. */
+    /* Bulk data-frame transmit for register-based buses that also have a
+     * bulk data endpoint.  OPTIONAL — NULL when the register bus has no data
+     * endpoint (pure ep0) or when the chip drv->tx handles data transmission
+     * itself.  `data` points at a fully chip-encoded TX payload; `len` is its
+     * total length.  Fire-and-forget: the bus driver owns completion internally
+     * (TX URB pool).  Returns VSF_ERR_NONE when the frame was queued. */
     vsf_err_t (*data_tx)(vsf_wifi_t *wifi, uint8_t *data, uint16_t len);
 };
 
 /*============================ CHIP DRIVER VTABLE ============================*
  *
  * All chip operations are async: the chip driver builds an op-script (static
- * .rodata or wifi->scratch_ops) and submits it via vsf_wifi_run_script.  The
- * outer `done` callback fires when the entire script has been ACKed by the
+ * .rodata or wifi->scratch_ops) and submits it via vsf_wifi_reg_run_script.  The
+ * outer `done` callback fires when the entire register script has been ACKed by the
  * device.  Returning VSF_ERR_NONE from these hooks means the script was
  * successfully queued; actual completion arrives later via `done`.
  *
- * The wifi layer never calls bus_ops directly — it always goes through this
- * chip vtable.  Conversely the chip code only sees bus_ops, never the bus
- * driver's private types.
+ * The wifi layer never calls reg_bus directly — it always goes through the
+ * chip vtable.  Register-based chips use the helpers vsf_wifi_reg_run_script /
+ * run_blob / reg_read / reg_read_poll; command-based chips ignore reg_bus.
  *==========================================================================*/
 
 #if VSF_WIFI_USE_WPA == ENABLED
@@ -302,8 +298,8 @@ struct vsf_wifi_chip_drv_t {
     const char *name;
 
     /* Optional firmware uploader (rt2870.bin etc.).  Invoked once before
-     * init() during attach.  Pure ops can use vsf_wifi_run_script; bulk
-     * blob uploads call vsf_wifi_run_blob.  Leave NULL when the chip needs
+     * init() during attach.  Pure ops can use vsf_wifi_reg_run_script; bulk
+     * blob uploads call vsf_wifi_reg_run_blob.  Leave NULL when the chip needs
      * no firmware. */
     vsf_err_t (*firmware_load)(vsf_wifi_t *wifi, vsf_wifi_done_t done);
     vsf_err_t (*init)         (vsf_wifi_t *wifi, vsf_wifi_done_t done);
@@ -337,10 +333,17 @@ struct vsf_wifi_chip_drv_t {
      * chip-specific on-wire TX layout (e.g. RT2800 TXINFO + TXWI + frame +
      * pad) by writing into `dst` (capacity `dst_cap`).  Returns the total
      * byte count to ship over the data bus, or 0 on failure (dst too small
-     * / unsupported).  Bus-agnostic: the chip only knows the descriptor
-     * format; the bus driver (bus_ops->data_tx) performs the actual send. */
+     * / unsupported).  Used by drv->tx; may also be left NULL if tx builds
+     * its descriptor internally. */
     uint16_t  (*build_tx)     (vsf_wifi_t *wifi, uint8_t *dst, uint16_t dst_cap,
                               const uint8_t *frame, uint16_t frame_len);
+
+    /* Frame transmit hook.  The wifi layer routes all outbound 802.11 frames
+     * (active-scan probe-request, auth, assoc, deauth and data frames from
+     * the netdrv) through this hook.  The chip driver builds the on-wire
+     * payload and ships it over the bus.  REQUIRED; NULL returns
+     * VSF_ERR_NOT_SUPPORT from vsf_wifi_tx. */
+    vsf_err_t (*tx)           (vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len);
 
 #if VSF_WIFI_USE_WPA == ENABLED
     /* Optional hardware crypto backend (see vsf_wifi_crypto_ops_t above).
@@ -442,16 +445,16 @@ vsf_err_t    vsf_wifi_get_link_info(vsf_wifi_t *wifi,
                                     vsf_wifi_link_info_t *info);
 
 /*
- * Transmit a raw 802.11 frame.  The chip driver (drv->build_tx) wraps it
- * into the on-wire TX descriptor layout and the bus driver (bus_ops->
- * data_tx) ships it over the data endpoint.  Returns VSF_ERR_NOT_READY
- * before vsf_wifi_on_ready, VSF_ERR_NOT_SUPPORTED when the chip/bus lacks
- * a TX path, or a bus-level error.  Fire-and-forget: there is no per-frame
- * completion callback (use TX_STA_FIFO / TX_STA_CNT to inspect results). */
+ * Transmit a raw 802.11 frame.  The chip driver (drv->tx) is responsible for
+ * building the on-wire TX descriptor and shipping it over the bus.  Returns
+ * VSF_ERR_NOT_READY before vsf_wifi_on_ready, VSF_ERR_NOT_SUPPORTED when the
+ * chip driver has no tx hook, or a bus-level error.  Fire-and-forget: there
+ * is no per-frame completion callback (chip drivers use TX_STA_FIFO /
+ * TX_STA_CNT to inspect results). */
 vsf_err_t    vsf_wifi_tx           (vsf_wifi_t *wifi,
                                     const uint8_t *frame, uint16_t len);
 
-/*============================ BUS-LAYER API (used by USB shim, SDIO, ...) ==*
+/*============================ REGISTER-BUS LAYER API =========================*
  *
  * These are exported so a bus driver can drive the wifi state machine.
  * Application code does not call them directly.
@@ -459,7 +462,8 @@ vsf_err_t    vsf_wifi_tx           (vsf_wifi_t *wifi,
 
 /*
  * One-shot construction.  After this call:
- *   - wifi->drv / wifi->bus_ops are bound;
+ *   - wifi->drv is bound;
+ *   - wifi->reg_bus is bound (may be NULL for non-register-based chips);
  *   - all state fields are zero / cleared;
  *   - scan timer is initialised but not armed;
  *   - the wifi is NOT started yet (call vsf_wifi_start when ready).
@@ -470,7 +474,7 @@ vsf_err_t    vsf_wifi_tx           (vsf_wifi_t *wifi,
  */
 void vsf_wifi_init(vsf_wifi_t *wifi,
                    const vsf_wifi_chip_drv_t *drv,
-                   const vsf_wifi_bus_ops_t  *bus_ops,
+                   const vsf_wifi_reg_bus_t  *reg_bus,
                    vsf_eda_t                 *post_eda);
 
 /*
@@ -568,33 +572,33 @@ void vsf_wifi_on_mlme_retry_evt(vsf_wifi_t *wifi);
  * VSF_ERR_NOT_AVAILABLE when another script / blob is in flight, or a bus-
  * level synchronous error otherwise.
  */
-vsf_err_t vsf_wifi_run_script(vsf_wifi_t *wifi,
-                              const vsf_wifi_op_t *ops, uint16_t count,
+vsf_err_t vsf_wifi_reg_run_script(vsf_wifi_t *wifi,
+                              const vsf_wifi_reg_op_t *ops, uint16_t count,
                               vsf_wifi_done_t done);
 
 /*
  * Stream a contiguous register-block payload.  Internally calls
- * bus_ops->reg_block_write when available; otherwise decomposes into
+ * reg_bus->reg_block_write when available; otherwise decomposes into
  * ceil(len / 4) reg_write calls.
  *
- * Same concurrency rules as vsf_wifi_run_script: at most one script /
+ * Same concurrency rules as vsf_wifi_reg_run_script: at most one script /
  * blob in flight per wifi.
  */
-vsf_err_t vsf_wifi_run_blob(vsf_wifi_t *wifi,
-                            const vsf_wifi_blob_t *blob,
+vsf_err_t vsf_wifi_reg_run_blob(vsf_wifi_t *wifi,
+                            const vsf_wifi_reg_blob_t *blob,
                             vsf_wifi_done_t done);
 
 /*
  * Issue a single ep0 vendor request with no data stage (wLength=0) via
- * bus_ops->vendor_request.  Used by USB chips for control commands that are
+ * reg_bus->vendor_request.  Used by USB chips for control commands that are
  * not register writes (e.g. RT2800 USB_DEVICE_MODE to start the MCU firmware
  * or reset the digital core).  Completes with VSF_ERR_NOT_SUPPORTED when the
  * bus has no vendor_request primitive.
  *
- * Same concurrency rules as vsf_wifi_run_script: at most one script / blob /
+ * Same concurrency rules as vsf_wifi_reg_run_script: at most one script / blob /
  * vendor request in flight per wifi.
  */
-vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
+vsf_err_t vsf_wifi_reg_run_vendor(vsf_wifi_t *wifi, uint8_t request,
                               uint16_t value, uint16_t index,
                               vsf_wifi_done_t done);
 
@@ -615,8 +619,8 @@ vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
  *
  * Same single-flight constraint as run_script / run_blob.
  */
-vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
-                                 vsf_wifi_match_fn_t match,
+vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
+                                 vsf_wifi_reg_match_fn_t match,
                                  uint16_t max_retry, uint16_t interval_ms,
                                  vsf_wifi_done_t done);
 
@@ -625,11 +629,11 @@ vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
  * `done` fires; caller must keep `out` valid until then.  Same single-
  * flight constraint as run_script / run_blob / run_read_poll.
  */
-vsf_err_t vsf_wifi_run_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
+vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
                             vsf_wifi_done_t done);
 
 /* Per-wifi scratch op buffer (shared by parameterised chip ops). */
-vsf_wifi_op_t * vsf_wifi_get_scratch_ops(vsf_wifi_t *wifi);
+vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi);
 
 /*
  * Firmware blob declared by chip/rt28xx/vsf_wifi_rt2870_firmware.c (weak

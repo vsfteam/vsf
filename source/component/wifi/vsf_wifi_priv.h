@@ -27,14 +27,15 @@
 /*============================ TYPES =========================================*/
 
 /*
- * The wifi layer is intentionally bus-agnostic, so vsf_wifi_t holds NO
- * USB / SDIO / SPI specifics.  The bus driver embeds vsf_wifi_t inside a
- * larger struct (e.g. vk_usbh_wifi_t) and recovers its outer instance via
- * vsf_container_of() inside the bus_ops implementations.
+ * The wifi layer is chip-agnostic but knows about the optional register-bus
+ * helper used by register-based chips (e.g. RT2X00).  reg_bus may be NULL for
+ * chips that use a command/event-based bus (e.g. MediaTek mt76).  The bus
+ * driver embeds vsf_wifi_t inside a larger struct (e.g. vk_usbh_wifi_t) and
+ * recovers its outer instance via vsf_container_of().
  */
 struct vsf_wifi_t {
     const vsf_wifi_chip_drv_t *drv;
-    const vsf_wifi_bus_ops_t  *bus_ops;
+    const vsf_wifi_reg_bus_t  *reg_bus;
     vsf_eda_t                 *post_eda;
     vsf_wifi_attach_fail_t     attach_fail;
 
@@ -120,18 +121,18 @@ struct vsf_wifi_t {
 
     /* ---- Script / blob dispatcher state ----
      *
-     * Only one outstanding script or blob is allowed per wifi (the bus_ops
+     * Only one outstanding script or blob is allowed per wifi (the reg_bus
      * concurrency contract enforces the same limit at the bus level).  The
      * dispatcher walks the op array via the chained __script_step_done /
      * __blob_step_done callbacks, each of which feeds the next op to
-     * bus_ops.
+     * reg_bus.
      */
     bool                       script_busy;
     bool                       script_is_blob;
     vsf_wifi_done_t            script_done;
     union {
         struct {
-            const vsf_wifi_op_t *ops;
+            const vsf_wifi_reg_op_t *ops;
             uint16_t             count;
             uint16_t             idx;
         } script;
@@ -149,7 +150,7 @@ struct vsf_wifi_t {
             uint16_t              interval_ms;
             uint16_t              reserved;
             uint32_t              last_val;    /* read landing zone */
-            vsf_wifi_match_fn_t   match;
+            vsf_wifi_reg_match_fn_t   match;
         } read_poll;
     } s;
 
@@ -162,7 +163,7 @@ struct vsf_wifi_t {
      */
     vsf_wifi_done_t            backend_chain_done;
 
-    vsf_wifi_op_t              scratch_ops[VSF_WIFI_CFG_SCRATCH_OPS];
+    vsf_wifi_reg_op_t              scratch_ops[VSF_WIFI_CFG_SCRATCH_OPS];
 };
 
 #endif // VSF_USE_WIFI

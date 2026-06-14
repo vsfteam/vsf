@@ -34,7 +34,7 @@
  *
  * The chip driver checks `__rt2870_firmware_size != 0` at probe time:
  *   - size == 0  => skip firmware upload
- *   - size  > 0  => upload via vsf_wifi_run_blob, then issue post-fw
+ *   - size  > 0  => upload via vsf_wifi_reg_run_blob, then issue post-fw
  *                   handshake script defined in vsf_wifi_rt28xx.c.
  *
  * Loading protocol (per rt2x00 / rt2870 USB datasheet excerpt):

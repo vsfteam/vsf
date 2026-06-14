@@ -60,7 +60,7 @@ typedef struct vk_usbh_wifi_iocb_t {
 } vk_usbh_wifi_iocb_t;
 
 /*
- * Bus operation in-flight state.  At most one bus_ops call is active at a
+ * Bus operation in-flight state.  At most one reg_bus call is active at a
  * time (the generic layer's script_busy flag guarantees serialisation).
  */
 typedef enum {

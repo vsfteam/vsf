@@ -189,7 +189,7 @@ static void __vsf_wifi_attach_fail(vsf_wifi_t *wifi, vsf_err_t err)
  * The whole driver runs every chip operation through one tiny state machine.
  * No matter what the user-facing call is (init / set_channel / connect ...),
  * the chip backend builds a sequence of (reg, val) ops and submits it via
- * vsf_wifi_run_script().  Each op is shipped through bus_ops->reg_write; on
+ * vsf_wifi_reg_run_script().  Each op is shipped through reg_bus->reg_write; on
  * completion the bus driver invokes our `__vsf_wifi_script_step` which
  * advances `script.idx` and fires the next op until the array is exhausted.
  *
@@ -229,18 +229,19 @@ static void __vsf_wifi_script_step(vsf_wifi_t *wifi, vsf_err_t err)
         __vsf_wifi_script_finish(wifi, VSF_ERR_NONE);
         return;
     }
-    const vsf_wifi_op_t *op = &wifi->s.script.ops[wifi->s.script.idx];
-    err = wifi->bus_ops->reg_write(wifi, op->reg, op->val,
+    const vsf_wifi_reg_op_t *op = &wifi->s.script.ops[wifi->s.script.idx];
+    err = wifi->reg_bus->reg_write(wifi, op->reg, op->val,
             __vsf_wifi_script_step);
     if (VSF_ERR_NONE != err) {
         __vsf_wifi_script_finish(wifi, err);
     }
 }
 
-vsf_err_t vsf_wifi_run_script(vsf_wifi_t *wifi,
-        const vsf_wifi_op_t *ops, uint16_t count, vsf_wifi_done_t done)
+vsf_err_t vsf_wifi_reg_run_script(vsf_wifi_t *wifi,
+        const vsf_wifi_reg_op_t *ops, uint16_t count, vsf_wifi_done_t done)
 {
-    if (wifi->script_busy) return VSF_ERR_NOT_AVAILABLE;
+    if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
+    if (wifi->reg_bus == NULL)          return VSF_ERR_NOT_SUPPORT;
     if (count == 0 || ops == NULL) {
         if (done != NULL) done(wifi, VSF_ERR_NONE);
         return VSF_ERR_NONE;
@@ -253,7 +254,7 @@ vsf_err_t vsf_wifi_run_script(vsf_wifi_t *wifi,
     wifi->script_done    = done;
     wifi->script_busy    = true;
 
-    vsf_err_t err = wifi->bus_ops->reg_write(wifi, ops[0].reg, ops[0].val,
+    vsf_err_t err = wifi->reg_bus->reg_write(wifi, ops[0].reg, ops[0].val,
             __vsf_wifi_script_step);
     if (VSF_ERR_NONE != err) {
         wifi->script_busy = false;
@@ -267,7 +268,7 @@ vsf_err_t vsf_wifi_run_script(vsf_wifi_t *wifi,
  *
  * Two paths:
  *
- *   1. Fast path: bus_ops->reg_block_write available — hand the whole blob
+ *   1. Fast path: reg_bus->reg_block_write available — hand the whole blob
  *      to the bus in one call (USB ep0 picks 64-byte chunks internally;
  *      SDIO CMD53 picks block size; ...).  Single completion callback.
  *
@@ -307,7 +308,7 @@ static void __vsf_wifi_blob_step(vsf_wifi_t *wifi, vsf_err_t err)
     for (uint32_t i = 0; i < take; i++) {
         val |= ((uint32_t)wifi->s.blob.data[off + i]) << (i * 8);
     }
-    err = wifi->bus_ops->reg_write(wifi,
+    err = wifi->reg_bus->reg_write(wifi,
             (uint16_t)(wifi->s.blob.base_reg + off), val,
             __vsf_wifi_blob_step);
     if (VSF_ERR_NONE != err) {
@@ -315,10 +316,11 @@ static void __vsf_wifi_blob_step(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
-vsf_err_t vsf_wifi_run_blob(vsf_wifi_t *wifi,
-        const vsf_wifi_blob_t *blob, vsf_wifi_done_t done)
+vsf_err_t vsf_wifi_reg_run_blob(vsf_wifi_t *wifi,
+        const vsf_wifi_reg_blob_t *blob, vsf_wifi_done_t done)
 {
-    if (wifi->script_busy) return VSF_ERR_NOT_AVAILABLE;
+    if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
+    if (wifi->reg_bus == NULL)          return VSF_ERR_NOT_SUPPORT;
     if (blob == NULL || blob->data == NULL || blob->len == 0) {
         if (done != NULL) done(wifi, VSF_ERR_NONE);
         return VSF_ERR_NONE;
@@ -334,8 +336,8 @@ vsf_err_t vsf_wifi_run_blob(vsf_wifi_t *wifi,
     wifi->script_busy       = true;
 
     vsf_err_t err;
-    if (wifi->bus_ops->reg_block_write != NULL) {
-        err = wifi->bus_ops->reg_block_write(wifi, blob->base_reg,
+    if (wifi->reg_bus->reg_block_write != NULL) {
+        err = wifi->reg_bus->reg_block_write(wifi, blob->base_reg,
                 blob->data, blob->len, __vsf_wifi_blob_fast_done);
     } else {
         /* Fallback: kick first 4-byte write; subsequent writes chained
@@ -345,7 +347,7 @@ vsf_err_t vsf_wifi_run_blob(vsf_wifi_t *wifi,
         for (uint32_t i = 0; i < take; i++) {
             val |= ((uint32_t)blob->data[i]) << (i * 8);
         }
-        err = wifi->bus_ops->reg_write(wifi, blob->base_reg, val,
+        err = wifi->reg_bus->reg_write(wifi, blob->base_reg, val,
                 __vsf_wifi_blob_step);
     }
     if (VSF_ERR_NONE != err) {
@@ -364,11 +366,12 @@ static void __vsf_wifi_vendor_done(vsf_wifi_t *wifi, vsf_err_t err)
     __vsf_wifi_script_finish(wifi, err);
 }
 
-vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
+vsf_err_t vsf_wifi_reg_run_vendor(vsf_wifi_t *wifi, uint8_t request,
         uint16_t value, uint16_t index, vsf_wifi_done_t done)
 {
-    if (wifi->script_busy) return VSF_ERR_NOT_AVAILABLE;
-    if (wifi->bus_ops->vendor_request == NULL) {
+    if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
+    if (wifi->reg_bus == NULL ||
+            wifi->reg_bus->vendor_request == NULL) {
         if (done != NULL) done(wifi, VSF_ERR_NOT_SUPPORT);
         return VSF_ERR_NOT_SUPPORT;
     }
@@ -377,7 +380,7 @@ vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
     wifi->script_done    = done;
     wifi->script_busy    = true;
 
-    vsf_err_t err = wifi->bus_ops->vendor_request(wifi, request, value, index,
+    vsf_err_t err = wifi->reg_bus->vendor_request(wifi, request, value, index,
             __vsf_wifi_vendor_done);
     if (VSF_ERR_NONE != err) {
         wifi->script_busy = false;
@@ -387,14 +390,14 @@ vsf_err_t vsf_wifi_run_vendor(vsf_wifi_t *wifi, uint8_t request,
     return err;
 }
 
-vsf_wifi_op_t * vsf_wifi_get_scratch_ops(vsf_wifi_t *wifi)
+vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi)
 {
     return wifi->scratch_ops;
 }
 
 /*============================ READ-POLL DISPATCHER ==========================*
  *
- * Repeatedly issues bus_ops->reg_read against a single register, feeding
+ * Repeatedly issues reg_bus->reg_read against a single register, feeding
  * each result into a chip-supplied predicate.  Used by chip drivers to
  * wait for hardware-side state transitions whose duration is unknown at
  * compile time (firmware boot, EEPROM bus completion, BBP wakeup, ...).
@@ -411,7 +414,7 @@ static void __vsf_wifi_read_poll_issue(vsf_wifi_t *wifi)
         wifi->script_busy = false;
         return;
     }
-    vsf_err_t err = wifi->bus_ops->reg_read(wifi,
+    vsf_err_t err = wifi->reg_bus->reg_read(wifi,
             wifi->s.read_poll.reg, &wifi->s.read_poll.last_val,
             __vsf_wifi_read_poll_done);
     if (VSF_ERR_NONE != err) {
@@ -467,13 +470,14 @@ static void __vsf_wifi_read_poll_timer_cb(vsf_callback_timer_t *timer)
 }
 #endif
 
-vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
-        vsf_wifi_match_fn_t match, uint16_t max_retry, uint16_t interval_ms,
+vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
+        vsf_wifi_reg_match_fn_t match, uint16_t max_retry, uint16_t interval_ms,
         vsf_wifi_done_t done)
 {
     if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
     if (NULL == match)                  return VSF_ERR_INVALID_PARAMETER;
-    if (NULL == wifi->bus_ops->reg_read) return VSF_ERR_NOT_SUPPORT;
+    if (wifi->reg_bus == NULL ||
+            NULL == wifi->reg_bus->reg_read) return VSF_ERR_NOT_SUPPORT;
     if (max_retry == 0) max_retry = 1;
 
     wifi->script_is_blob          = false;
@@ -489,7 +493,7 @@ vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
     vsf_trace_info("wifi: read_poll start reg=0x%04X retry=%u interval=%ums" VSF_TRACE_CFG_LINEEND,
             (unsigned)reg, (unsigned)max_retry, (unsigned)interval_ms);
 
-    vsf_err_t err = wifi->bus_ops->reg_read(wifi, reg,
+    vsf_err_t err = wifi->reg_bus->reg_read(wifi, reg,
             &wifi->s.read_poll.last_val, __vsf_wifi_read_poll_done);
     if (VSF_ERR_NONE != err) {
         wifi->script_busy = false;
@@ -501,7 +505,7 @@ vsf_err_t vsf_wifi_run_read_poll(vsf_wifi_t *wifi, uint16_t reg,
 
 /*============================ READ DISPATCHER ===============================*
  *
- * Single-shot 32-bit register read.  Thin wrapper over bus_ops->reg_read;
+ * Single-shot 32-bit register read.  Thin wrapper over reg_bus->reg_read;
  * its only job beyond the bus call is to honour the script_busy single-
  * flight contract so chip drivers can mix run_read with run_script /
  * run_blob / run_read_poll without colliding on the dispatcher slot.
@@ -512,19 +516,20 @@ static void __vsf_wifi_read_done(vsf_wifi_t *wifi, vsf_err_t err)
     __vsf_wifi_script_finish(wifi, err);
 }
 
-vsf_err_t vsf_wifi_run_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
+vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
         vsf_wifi_done_t done)
 {
     if (wifi->script_busy)               return VSF_ERR_NOT_AVAILABLE;
     if (NULL == out)                     return VSF_ERR_INVALID_PARAMETER;
-    if (NULL == wifi->bus_ops->reg_read) return VSF_ERR_NOT_SUPPORT;
+    if (wifi->reg_bus == NULL ||
+            NULL == wifi->reg_bus->reg_read) return VSF_ERR_NOT_SUPPORT;
 
     wifi->script_is_blob = false;
     wifi->script_done    = done;
     memset(&wifi->s, 0, sizeof(wifi->s));
     wifi->script_busy    = true;
 
-    vsf_err_t err = wifi->bus_ops->reg_read(wifi, reg, out, __vsf_wifi_read_done);
+    vsf_err_t err = wifi->reg_bus->reg_read(wifi, reg, out, __vsf_wifi_read_done);
     if (VSF_ERR_NONE != err) {
         wifi->script_busy = false;
         wifi->script_done = NULL;
@@ -536,12 +541,12 @@ vsf_err_t vsf_wifi_run_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
 
 void vsf_wifi_init(vsf_wifi_t *wifi,
         const vsf_wifi_chip_drv_t *drv,
-        const vsf_wifi_bus_ops_t  *bus_ops,
+        const vsf_wifi_reg_bus_t  *reg_bus,
         vsf_eda_t                 *post_eda)
 {
     memset(wifi, 0, sizeof(*wifi));
     wifi->drv      = drv;
-    wifi->bus_ops  = bus_ops;
+    wifi->reg_bus  = reg_bus;
     wifi->post_eda = post_eda;
     wifi->channel  = 1;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
@@ -631,8 +636,8 @@ static void __vsf_wifi_on_rxfilter_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
     wifi->is_ready = true;
     vsf_trace_info("wifi: MCU ready, chip is up" VSF_TRACE_CFG_LINEEND);
-    if (wifi->bus_ops->on_ready != NULL) {
-        wifi->bus_ops->on_ready(wifi);
+    if (wifi->reg_bus != NULL && wifi->reg_bus->on_ready != NULL) {
+        wifi->reg_bus->on_ready(wifi);
     }
     vsf_wifi_on_ready(wifi);
 }
@@ -1702,33 +1707,17 @@ vsf_err_t vsf_wifi_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)
     return wifi->drv->get_link_info(wifi, info);
 }
 
-/* Staging buffer for the chip-encoded TX descriptor + frame.  A uint32_t
- * array guarantees the 4-byte alignment the RT2800 TXINFO/TXWI layout
- * expects.  Single-instance for now (the bus driver memcpy's it into its
- * own TX URB, so it is free to reuse immediately after data_tx returns). */
-#ifndef VSF_WIFI_CFG_TX_BUF_SIZE
-#   define VSF_WIFI_CFG_TX_BUF_SIZE     1600
-#endif
-
 /* Core TX path shared by vsf_wifi_tx (user API) and the active-scan probe-
  * request.  Deliberately does NOT check wifi->scanning so the scan scheduler
  * can transmit mid-scan; callers that must respect scanning check it first. */
 static vsf_err_t __vsf_wifi_tx_frame(vsf_wifi_t *wifi,
         const uint8_t *frame, uint16_t len)
 {
-    static uint32_t __tx_buf32[(VSF_WIFI_CFG_TX_BUF_SIZE + 3) / 4];
-    uint8_t *tx_buf = (uint8_t *)__tx_buf32;
-
     if (!wifi->is_ready)                return VSF_ERR_NOT_READY;
-    if (NULL == wifi->drv->build_tx)    return VSF_ERR_NOT_SUPPORT;
-    if (NULL == wifi->bus_ops->data_tx) return VSF_ERR_NOT_SUPPORT;
+    if (NULL == wifi->drv->tx)          return VSF_ERR_NOT_SUPPORT;
     if ((NULL == frame) || (0 == len))  return VSF_ERR_INVALID_PARAMETER;
 
-    uint16_t total = wifi->drv->build_tx(wifi, tx_buf,
-            (uint16_t)sizeof(__tx_buf32), frame, len);
-    if (0 == total) return VSF_ERR_FAIL;
-
-    return wifi->bus_ops->data_tx(wifi, tx_buf, total);
+    return wifi->drv->tx(wifi, frame, len);
 }
 
 vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
