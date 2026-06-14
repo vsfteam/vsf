@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="53b437fa-1527-3cd0-adf0-6fde86d15186" DefaultStartup="true">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="vsf_bin/component/3rd-party/lua/lua_main.vcxproj"/>
+		<BuildDependency Project="vsf_bin/component/3rd-party/lvgl/lvgl_bin/lvgl.vcxproj"/>
+		<BuildDependency Project="vsf_template.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6cf2e768-cdbb-32fe-84b0-7e17b3dbe37d"/>
+	<Project Path="vsf_bin/component/3rd-party/lua/lua_main.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b8e74e0c-5c9d-31b5-8fba-820d5381082f">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="vsf_bin/component/3rd-party/lvgl/lvgl_bin/lvgl.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="539c7ed1-1964-3a5d-972c-a177a285eefe">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="vsf_template.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4d702946-42fe-3423-9fd9-002cadafeade">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="vsf_bin/component/3rd-party/lua/lua_main.vcxproj"/>
+		<BuildDependency Project="vsf_bin/component/3rd-party/lvgl/lvgl_bin/lvgl.vcxproj"/>
+	</Project>
+</Solution>

@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_disp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_group.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_indev.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_obj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_refr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_style.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_arc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_blend.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_img.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_label.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_line.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_mask.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_rect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_triangle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_buf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_cache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_dejavu_16_persian_hebrew.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_fmt_txt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_loader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_10.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_12.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_12_subpx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_14.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_16.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_18.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_20.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_22.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_24.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_26.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_28.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_28_compressed.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_30.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_34.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_36.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_38.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_40.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_42.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_44.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_46.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_48.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_8.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_simsun_16_cjk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_unscii_16.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_unscii_8.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_nxp_pxp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_nxp_pxp_osa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_nxp_vglite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_stm32_dma2d.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_disp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_indev.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_tick.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_anim.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_area.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_async.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_bidi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_color.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_debug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_fs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_gc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_ll.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_log.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_math.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_mem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_printf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_task.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_templ.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_txt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_txt_ap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_empty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_template.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_arc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_bar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_btn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_btnmatrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_calendar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_canvas.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_chart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_checkbox.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_cont.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_cpicker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_dropdown.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_gauge.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_img.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_imgbtn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_keyboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_label.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_led.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_line.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_linemeter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_msgbox.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_objmask.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_objx_templ.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_page.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_roller.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_slider.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_spinbox.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_spinner.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_switch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_table.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_tabview.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_textarea.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_tileview.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_win.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{FF326BEE-7D07-343C-A535-ED0B4EAF5953}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

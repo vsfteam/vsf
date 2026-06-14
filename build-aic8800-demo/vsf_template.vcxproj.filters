@@ -1,0 +1,2047 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\fakefat32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\btstack_demo\btstack_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\btstack_demo\btstack_application.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\common\usrapp_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\common\usrapp_audio_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\common\usrapp_net_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\common\usrapp_ui_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\common\usrapp_usbd_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\common\usrapp_usbh_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\disp_demo\disp_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\freetype_demo\freetype_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\adc_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\dma_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\flash_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\gpio_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\hal_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\i2c_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\i2s_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\mmc_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\pm_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\pwm_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\rng_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\rtc_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\spi_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\timer_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\usart_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\hal_demo\wdt_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\kernel_test\cross_task_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\kernel_test\eda_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\kernel_test\fsm_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\kernel_test\sem_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\linux_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\libusb_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\mount_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\httpd_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\tty_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\dynloader_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\ntpdate_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\linux_demo\telnetd_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\lvgl_demo\lvgl_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\lvgl_demo\lvgl_application.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\lua_demo\love_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\lwip_demo\lwip_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\sdl2_demo\sdl2_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\tgui_demo\tgui_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\tgui_demo\tgui_demo\tgui_custom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\tgui_demo\tgui_demo\tgui_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\tgui_demo\tgui_demo\images\demo_images.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\usbd_demo\usbd_demo_cdc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\usbd_demo\usbd_demo_msc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\usbd_demo\usbd_demo_uac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\usbd_demo\usbd_demo_user.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\usbd_demo\usbd_demo_uvc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\usbh_demo\usbh_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\cpu_usage_demo\cpu_usage_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\scsi_demo\scsi_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\aic8800\aic8800_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\aic8800\bt_demo\bt_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\aic8800\wifi_demo\wifi_demo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\demo\aic8800\wifi_demo\luat_wlan_aic8800.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\vsf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\vsf_component.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\port\vsf_lvgl_port.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftbase.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftbbox.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftbdf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftbitmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftcid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftdebug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftfstype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftgasp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftglyph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftgxval.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftinit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftmm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftotval.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftpatent.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftpfr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftstroke.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftsynth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftsystem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\fttype1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\base\ftwinfnt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\autofit\autofit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\bdf\bdf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\bzip2\ftbzip2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\cache\ftcache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\cff\cff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\cid\type1cid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\gxvalid\gxvalid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\gzip\ftgzip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\lzw\ftlzw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\otvalid\otvalid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\pcf\pcf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\pfr\pfr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\psaux\psaux.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\pshinter\pshinter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\psnames\psnames.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\raster\raster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\sfnt\sfnt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\smooth\smooth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\truetype\truetype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\type1\type1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\type42\type42.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\raw\src\winfonts\winfnt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\freetype\extension\vplt\freetype_vplt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lwip\port\lwip_netdrv_adapter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\classic\btstack_link_key_db_memory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\port\btstack_run_loop_vsf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\port\hci_dump_vsf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\classic\hid_device.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\classic\rfcomm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\classic\sdp_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\classic\sdp_util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\classic\spp_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\btstack_hid_parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\ad_parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\btstack_linked_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\btstack_memory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\btstack_memory_pool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\btstack_run_loop.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\btstack_util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\hci.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\hci_cmd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\hci_dump.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\l2cap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\btstack\raw\src\l2cap_signaling.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\coremark\port\core_portme.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\coremark\raw\core_list_join.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\coremark\raw\core_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\coremark\raw\core_matrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\coremark\raw\core_state.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\coremark\raw\core_util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\lovevsf\modules\l_filesystem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\lovevsf\modules\l_font.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\lovevsf\modules\l_graphics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\lovevsf\modules\l_image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\lovevsf\modules\l_timer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\lovevsf\lovevsf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\extension\oo\lua_oo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\port\lua_port.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lauxlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lbaselib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lcode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lcorolib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lctype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ldblib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ldebug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ldo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ldump.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lfunc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lgc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\linit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\liolib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\llex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lmathlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lmem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\loadlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lobject.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lopcodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\loslib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lparser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lstate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lstring.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lstrlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ltable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ltablib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ltests.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\ltm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lundump.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lutf8lib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lvm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lzio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\cdjpeg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jaricom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcapimin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcapistd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jccoefct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jccolor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcdctmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jchuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcicc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcinit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcmainct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcmarker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcmaster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcomapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcparam.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcphuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcprepct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jcsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jctrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdapimin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdapistd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdatadst-tj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdatadst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdatasrc-tj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdatasrc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdcoefct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdcolor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jddctmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdhuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdicc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdinput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdmainct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdmarker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdmaster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdmerge.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdphuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdpostct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jdtrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jerror.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jfdctflt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jfdctfst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jfdctint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jidctflt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jidctfst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jidctint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jidctred.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jmemmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jmemnobs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jquant1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jquant2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jsimd_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\jutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\rdbmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\rdcolmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\rdgif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\rdppm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\rdswitch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\rdtarga.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\transupp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\wrbmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\wrgif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\wrppm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libjpeg-turbo\raw\wrtarga.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\png.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngerror.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngget.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngmem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngpread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngrio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngrtran.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngrutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngset.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngtrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngwio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngwrite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngwtran.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\pngwutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\arm\arm_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\arm\filter_neon_intrinsics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\libpng\raw\arm\palette_neon_intrinsics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\adler32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\compress.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\crc32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\deflate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\gzclose.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\gzlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\gzread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\gzwrite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\infback.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\inffast.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\inflate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\inftrees.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\trees.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\uncompr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\zlib\raw\zutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\nuconsole\raw\NuConsole.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\av\audio\vsf_audio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\av\audio\decoder\wav\vsf_wav.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\av\audio\driver\winsound\vsf_winsound.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\av\audio\driver\dummy\vsf_audio_dummy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\av\audio\driver\aic1000a\vsf_aic1000a.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\av\audio\driver\i2s\vsf_audio_i2s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\crypto\hash\crc\vsf_crc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\debugger\nulink\NuConsole_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\debugger\segger\segger_rtt_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\vsf_fs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\driver\fatfs\vsf_fatfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\driver\malfs\vsf_malfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\driver\memfs\vsf_memfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\driver\winfs\vsf_winfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\driver\littlefs\vsf_littlefs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\fs\driver\romfs\vsf_romfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\vsf_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\driver\hid\vsf_input_hid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\driver\nspro\vsf_input_nspro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\driver\touch_screen\hynitron\cst8\vsf_input_cst8.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\protocol\vsf_input_gamepad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\protocol\vsf_input_keyboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\protocol\vsf_input_mouse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\protocol\vsf_input_sensor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\input\protocol\vsf_input_touchscreen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\vsf_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\file_mal\vsf_file_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\mem_mal\vsf_mem_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\mim_mal\vsf_mim_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\scsi_mal\vsf_scsi_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\flash_mal\vsf_flash_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\mal\driver\cached_mal\vsf_cached_mal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\scsi\vsf_scsi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\scsi\driver\mal_scsi\vsf_mal_scsi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\tcpip\netdrv\vsf_netdrv.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\tcpip\socket\vsf_socket.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\tcpip\socket\driver\lwip\vsf_socket_lwip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\tcpip\protocol\http\client\vsf_http_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\vsf_disp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\fb\vsf_disp_fb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_spi_lcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\sitronix\st7789\vsf_disp_st7789.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\solomon-systech\common\vsf_disp_solomon_systech_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\disp\driver\did\vsf_disp_did.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\vsf_tgui.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\vsf_tgui_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\vsf_tgui_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\__vk_tgui_slider.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_button.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_controls_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_label.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_panel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\controls\vsf_tgui_text_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\utilities\vsf_tgui_text.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\vsf_tgui_v.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\template\vsf_tgui_v_button.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\template\vsf_tgui_v_container.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\template\vsf_tgui_v_control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\template\vsf_tgui_v_label.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\ui\tgui\view\template\vsf_tgui_v_panel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\vsf_usbd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\CDC\vsf_usbd_CDC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\CDC\vsf_usbd_CDCACM.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\CDC\vsf_usbd_CDCNCM.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\DFU\vsf_usbd_DFU.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\HID\vsf_usbd_HID.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\HID\vsf_usbd_hidmsc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\MSC\vsf_usbd_MSC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\UVC\vsf_usbd_UVC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\device\class\UAC\vsf_usbd_UAC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_lwip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_win.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\hcd\ohci\vsf_ohci.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_dcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\otg\musb\fdrc\__vsf_musb_fdrc_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_dcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_hcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\vsf_usbh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\CDC\vsf_usbh_CDC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\CDC\vsf_usbh_CDCECM.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\HID\vsf_usbh_ds4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\HID\vsf_usbh_HID.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\HID\vsf_usbh_nspro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\HID\vsf_usbh_xb360.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\HUB\vsf_usbh_HUB.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\libusb\vsf_usbh_libusb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\MSC\vsf_usbh_msc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\UAC\vsf_usbh_uac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\UVC\vsf_usbh_uvc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\XB1\vsf_usbh_xb1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\DFU\vsf_usbh_dfu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\vsf_hal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\arch\vsf_arch_abstraction.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\arch\arm\cortex-m\cortex_m_generic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\arch\arm\cortex-m\SysTick\systick_internal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\arch\arm\cortex-m\SysTick\systick.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\driver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\startup_AIC8800.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\adc\adc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\debug_uart\debug_uart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\flash\flash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\gpio\gpio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\i2c\i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll\ll.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\bt\btstack\hci_transport_aic8800.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\lwip\lwip_forward_compatibility.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos\rtos_al.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\pwm\pwm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\rtc\rtc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\spi\spi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\timer\timer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\timer\lp_timer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\trng\trng.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\uart\uart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\usb\usb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\usb\usb_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\usb\usb_lv0.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\usb\dc\usbd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\usb\hc\usbh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\sdio\sdio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\i2s\i2s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\wdt\wdt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\dhcps\dhcps.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_al.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_iperf_al.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_tg_al.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\sys_arch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\apps\mdns\mdns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\api_lib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\api_msg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\err.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\netbuf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\netdb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\netifapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\sockets.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\tcpip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\autoip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\dhcp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\etharp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\icmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\igmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\ip4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\ip4_addr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\ip4_frag.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\dhcp6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ethip6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\icmp6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\inet6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ip6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ip6_addr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ip6_frag.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\mld6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\nd6.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\def.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\dns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\inet_chksum.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\mem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\memp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\netif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\pbuf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\raw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\stats.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\sys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\tcp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\tcp_in.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\tcp_out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\timeouts.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\udp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\netif\ethernet.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_config.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\wifi\macif\rom_patch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_dlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_math.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_pool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_ring.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\src\dbg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\src\dbg_assert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\src\dbg_print.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_common_config.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_patch_table.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_table_u02.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_table_u03.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_u02.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_u03.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash\flash_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic\pwrkey_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sdmmc\sdmmc_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart\stdio_uart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\lp_ticker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\lp_ticker_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\ticker_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time\time_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_cfft_q15.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_cfft_radix4_q15.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng\trng_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\vsf_hal_distbus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\gpio\vsf_hal_distbus_gpio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\i2c\vsf_hal_distbus_i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\spi\vsf_hal_distbus_spi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\usart\vsf_hal_distbus_usart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\sdio\vsf_hal_distbus_sdio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\adc\vsf_hal_distbus_adc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\dac\vsf_hal_distbus_dac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\pwm\vsf_hal_distbus_pwm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\i2s\vsf_hal_distbus_i2s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\distbus\usbh\vsf_hal_distbus_usbh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\gpio\74hc165\vsf_gpio_74hc165.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\gpio\74hc595\vsf_gpio_74hc595.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\vsf\i2c\gpio_i2c\vsf_gpio_i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\adc\adc_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\adc\adc_interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\dac\dac_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\dma\dma_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\exti\exti_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\flash\flash_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\flash\flash_interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\gpio\exti_gpio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\gpio\gpio_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\i2c\i2c_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\i2c\i2c_request.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\i2c\mrequest_i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\i2c\multiplex_i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\pwm\pwm_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\rng\rng_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\rtc\rtc_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\spi\fifo2req_spi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\spi\spi_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\spi\spi_interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\timer\timer_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\usart\fifo2req_usart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\usart\usart_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\usart\usart_interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\sdio\sdio_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\sdio\sdio_probe.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\i2s\i2s_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\wdt\wdt_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\common\eth\eth_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\adc\vsf_remapped_adc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\dac\vsf_remapped_dac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\gpio\vsf_remapped_gpio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\i2c\vsf_remapped_i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\sdio\vsf_remapped_sdio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\spi\vsf_remapped_spi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\usart\vsf_remapped_usart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\rtc\vsf_remapped_rtc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\remap\rng\vsf_remapped_rng.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\utilities\i2c_util\vsf_i2c_util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\vsf_eda.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\vsf_eda_slist_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\vsf_evtq_array.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\vsf_evtq_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\vsf_kernel_bsp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\vsf_os.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\__eda\vsf_eda_bmpevt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\__eda\vsf_eda_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\__eda\vsf_eda_sync.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\__eda\vsf_eda_timer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\shell\vsf_shell.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\shell\simple\vsf_simple_bmpevt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\shell\simple\vsf_simple_task.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\task\vsf_task.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\kernel\task\vsf_thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\osa_service\vsf_osa_service.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\osa_service\msg_tree\vsf_msg_tree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\vsf_service.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\distbus\vsf_distbus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\distbus\transport\stream\vsf_distbus_transport_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\dynarr\vsf_dynarr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\dynstack\vsf_dynstack.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\fifo\vsf_fifo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\heap\vsf_heap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\json\vsf_json.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\pbuf\vsf_pbuf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\pbuf\vsf_pbuf_pool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\pool\vsf_pool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\stream\vsf_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\stream\vsf_stream_base.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\stream\vsf_stream_reader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\stream\vsf_stream_writer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\stream\pbuf_queue\vsf_pbuf_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\trace\vsf_trace.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\simple_stream\vsf_simple_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\simple_stream\block_stream\vsf_block_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\simple_stream\fifo_stream\vsf_fifo_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\simple_stream\mem_stream\vsf_mem_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\simple_stream\distbus_stream\vsf_distbus_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\simple_stream\queue_stream\vsf_queue_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\loader\vsf_loader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\loader\elf\vsf_elfloader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\loader\elf\arch\vsf_elfloader_arm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\loader\elf\arch\vsf_elfloader_x64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\service\loader\pe\vsf_peloader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\vsf_sdl2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\vsf_sdl2_event.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\vsf_sdl2_pixelformat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_bmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_gif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_jpg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_lbm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_pcx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_png.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_pnm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_svg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_tga.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_tif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_webp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_WIC.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xcf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xpm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xv.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xxx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\vsf_linux.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\port\busybox\busybox.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\port\busybox\shell\vsh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\libusb\vsf_linux_libusb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\getopt\getopt_long.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\regex\regcomp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\regex\regexec.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\regex\regerror.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\regex\regfree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\fnmatch\fnmatch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\lib\3rd-party\glob\glob.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\app\ntp\vsf_linux_ntp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\fs\vfs\devfs\alsa\vsf_linux_devfs_alsa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\fs\vfs\devfs\usbd\functionfs\vsf_linux_functionfs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\fs\vfs\devfs\drm\vsf_linux_drm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\socket\bluetooth\vsf_linux_socket_bluetooth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\vsf_linux_core.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\usb\vsf_linux_core_usb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\80211\vsf_linux_core_80211.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\input\vsf_linux_core_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\hid\vsf_linux_core_hid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\led\vsf_linux_core_led.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\linux\kernel\core\crypto\vsf_linux_core_crypto.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\shell\sys\xboot\vsf_xboot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\__common\__retarget_io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\retarget_io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\arm_compiler.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\vsf_compiler.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\language_extension\code_region.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\language_extension\delegate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\language_extension\simple_sprintf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\language_extension\simple_sscanf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\language_extension\simple_swprintf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\template\vsf_bitmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\template\vsf_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\template\vsf_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\yongxiang\work\vsfteam\vsf\example\template\project\cmake\aic8800\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_bitreversal2.S" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{FF326BEE-7D07-343C-A535-ED0B4EAF5953}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

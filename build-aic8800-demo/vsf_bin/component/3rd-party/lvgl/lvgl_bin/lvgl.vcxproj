@@ -1,0 +1,424 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{539C7ED1-1964-3A5D-972C-A177A285EEFE}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>lvgl</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lvgl.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">liblvgl</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.a</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lvgl.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">liblvgl</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.a</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">lvgl.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">liblvgl</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.a</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">lvgl.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">liblvgl</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.a</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -mcpu=cortex-m4 -mthumb -std=gnu11 -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections -fms-extensions -Og -g3</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization></Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary></RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -mcpu=cortex-m4 -mthumb -std=gnu11 -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections -fms-extensions</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization></Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary></RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -mcpu=cortex-m4 -mthumb -std=gnu11 -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections -fms-extensions</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization></Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary></RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -mcpu=cortex-m4 -mthumb -std=gnu11 -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections -fms-extensions</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization></Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary></RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);__AIC__;__AIC8800__;CFG_HW_PLATFORM=2;CFG_RF_MODE=0;CFG_ROM_VER=255;CFG_DACL_MIXER_MODE=1;CFG_DACR_MIXER_MODE=1;CFG_PMIC;CFG_PMIC_VER_LITE;CFG_PMIC_ITF_ASDMA;CFG_WIFI_STACK;CFG_RSSI_DATAPKT;CONFIG_RWNX;CONFIG_RWNX_LWIP;CFG_DBG;CFG_IPERF;CFG_AIC1000_MIC_MATRIX=0;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\yongxiang\work\vsfteam\vsf\example\template\config;C:\Users\yongxiang\work\vsfteam\vsf\source;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\arch\ll;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\port\rtos;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000aud_regs;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\common\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api;C:\Users\yongxiang\work\vsfteam\vsf\source\hal\driver\AIC\AIC8800\vendor\audio\common;C:\Users\yongxiang\work\vsfteam\vsf\example\template\config\3rd-party\lvgl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/yongxiang/work/vsfteam/vsf/source/component/3rd-party/lvgl/raw/lvgl/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Users\yongxiang\scoop\apps\cmake\current\bin\cmake.exe -SC:/Users/yongxiang/work/vsfteam/vsf/example/template/project/cmake/aic8800 -BC:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo --check-stamp-file C:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo/vsf_bin/component/3rd-party/lvgl/lvgl_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/yongxiang/work/vsfteam/vsf/source/component/3rd-party/lvgl/raw/lvgl/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Users\yongxiang\scoop\apps\cmake\current\bin\cmake.exe -SC:/Users/yongxiang/work/vsfteam/vsf/example/template/project/cmake/aic8800 -BC:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo --check-stamp-file C:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo/vsf_bin/component/3rd-party/lvgl/lvgl_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/yongxiang/work/vsfteam/vsf/source/component/3rd-party/lvgl/raw/lvgl/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Users\yongxiang\scoop\apps\cmake\current\bin\cmake.exe -SC:/Users/yongxiang/work/vsfteam/vsf/example/template/project/cmake/aic8800 -BC:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo --check-stamp-file C:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo/vsf_bin/component/3rd-party/lvgl/lvgl_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/yongxiang/work/vsfteam/vsf/source/component/3rd-party/lvgl/raw/lvgl/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Users\yongxiang\scoop\apps\cmake\current\bin\cmake.exe -SC:/Users/yongxiang/work/vsfteam/vsf/example/template/project/cmake/aic8800 -BC:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo --check-stamp-file C:/Users/yongxiang/work/vsfteam/vsf/build-aic8800-demo/vsf_bin/component/3rd-party/lvgl/lvgl_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\vsf_bin\component\3rd-party\lvgl\lvgl_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_disp.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_group.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_indev.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_obj.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_refr.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_style.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_arc.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_blend.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_img.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_label.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_line.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_mask.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_rect.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_triangle.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_buf.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_cache.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_dejavu_16_persian_hebrew.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_fmt_txt.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_loader.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_10.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_12.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_12_subpx.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_14.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_16.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_18.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_20.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_22.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_24.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_26.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_28.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_28_compressed.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_30.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_32.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_34.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_36.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_38.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_40.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_42.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_44.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_46.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_48.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_montserrat_8.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_simsun_16_cjk.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_unscii_16.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_unscii_8.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_nxp_pxp.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_nxp_pxp_osa.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_nxp_vglite.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_gpu\lv_gpu_stm32_dma2d.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_disp.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_indev.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_tick.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_anim.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_area.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_async.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_bidi.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_color.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_debug.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_fs.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_gc.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_ll.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_log.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_math.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_mem.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_printf.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_task.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_templ.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_txt.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_txt_ap.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_utils.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_empty.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_template.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_arc.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_bar.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_btn.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_btnmatrix.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_calendar.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_canvas.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_chart.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_checkbox.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_cont.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_cpicker.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_dropdown.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_gauge.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_img.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_imgbtn.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_keyboard.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_label.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_led.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_line.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_linemeter.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_list.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_msgbox.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_objmask.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_objx_templ.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_page.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_roller.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_slider.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_spinbox.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_spinner.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_switch.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_table.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_tabview.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_textarea.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_tileview.c" />
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_win.c" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\yongxiang\work\vsfteam\vsf\build-aic8800-demo\ZERO_CHECK.vcxproj">
+      <Project>{6CF2E768-CDBB-32FE-84B0-7E17B3DBE37D}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

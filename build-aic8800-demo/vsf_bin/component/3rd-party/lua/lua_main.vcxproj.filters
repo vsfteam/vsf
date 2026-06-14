@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\raw\lua.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\yongxiang\work\vsfteam\vsf\source\component\3rd-party\lua\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{FF326BEE-7D07-343C-A535-ED0B4EAF5953}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
