@@ -650,6 +650,10 @@ vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi);
 #   include "./chip/rt28xx/vsf_wifi_rt28xx.h"
 #endif
 
+#if VSF_WIFI_USE_MT76 == ENABLED
+#   include "./chip/mt76/vsf_wifi_mt76.h"
+#endif
+
 /*============================ LOGGING HELPERS ===============================*
  *
  * Compile-time log level gates for the WiFi subsystem and its sub-modules.

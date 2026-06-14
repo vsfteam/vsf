@@ -176,6 +176,27 @@ struct vsf_wifi_t {
 #endif
 
     vsf_wifi_reg_op_t              scratch_ops[VSF_WIFI_CFG_SCRATCH_OPS];
+
+    /* Chip-driver private data pointer.  Set by the bus driver after
+     * vsf_wifi_init() for command/event-based chips that need per-instance
+     * state beyond the generic wifi struct (e.g. MediaTek mt76).  The generic
+     * layer never touches this field. */
+    void                          *chip_priv;
+
+    /* Chip-specific bus operations.
+     *
+     * This abstracts the *communication semantics* between the chip driver and
+     * the host, not the underlying physical bus.  Register-based chips (e.g.
+     * Ralink RT28xx) use reg_bus above: the chip driver only knows "read/write
+     * a register", and the bus driver implements that with USB ep0 vendor
+     * requests, SDIO CMD53, etc.
+     *
+     * Command/event-based chips (e.g. MediaTek mt76) store a chip-defined
+     * vtable here (cast by the chip driver to the appropriate type).  The
+     * operations are named after what the *chip* does (send MCU command,
+     * submit TX frame, start RX, ...), so the same chip driver can plug into
+     * different physical buses without modification. */
+    const void                    *bus_ops;
 };
 
 #endif // VSF_USE_WIFI

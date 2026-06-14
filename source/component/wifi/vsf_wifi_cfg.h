@@ -46,6 +46,10 @@
 #   define VSF_WIFI_USE_RT28XX          ENABLED
 #endif
 
+#ifndef VSF_WIFI_USE_MT76
+#   define VSF_WIFI_USE_MT76            ENABLED
+#endif
+
 /*
  * Per-module log level.
  *
@@ -64,6 +68,9 @@
 #endif
 #ifndef VSF_WIFI_CFG_CHIP_RT28XX_LOG_LEVEL
 #   define VSF_WIFI_CFG_CHIP_RT28XX_LOG_LEVEL   VSF_WIFI_CFG_LOG_LEVEL
+#endif
+#ifndef VSF_WIFI_CFG_CHIP_MT76_LOG_LEVEL
+#   define VSF_WIFI_CFG_CHIP_MT76_LOG_LEVEL      VSF_WIFI_CFG_LOG_LEVEL
 #endif
 #ifndef VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL
 #   define VSF_WIFI_CFG_BUS_RT2X00_LOG_LEVEL    VSF_WIFI_CFG_LOG_LEVEL
