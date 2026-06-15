@@ -73,6 +73,7 @@ enum {
     WIFI_MLME_ASSOC     = 2,    /* assoc-req sent, awaiting assoc-resp    */
     WIFI_MLME_4WAY      = 4,    /* associated, WPA2 4-way handshake running */
     WIFI_MLME_RUN       = 3,    /* associated (link up)                  */
+    WIFI_MLME_KEY_INSTALL = 5,  /* hardware key install in progress       */
 };
 
 /*
@@ -279,7 +280,10 @@ struct vsf_wifi_reg_bus_t {
  *
  *   install_key : program a key.  key_idx 0 + pairwise == the unicast TK;
  *                 key_idx 1..3 + !pairwise == a GTK.  `mac` is the peer for
- *                 pairwise keys, NULL for group keys.  Returns VSF_ERR_NONE.
+ *                 pairwise keys, NULL for group keys.
+ *                 `done` is called when the register script finishes; the
+ *                 caller may be in an EDA context, so install_key MUST NOT
+ *                 block.  Returns VSF_ERR_NONE on successful submission.
  *   encrypt/decrypt : reserved per-frame overrides for chips that still need
  *                 wifi-layer framing with a chip-specific tweak; NULL means
  *                 "use the built-in software CCMP".
@@ -287,7 +291,7 @@ struct vsf_wifi_reg_bus_t {
 typedef struct vsf_wifi_crypto_ops_t {
     vsf_err_t (*install_key)(vsf_wifi_t *wifi, uint8_t key_idx, bool pairwise,
                              const uint8_t *key, uint8_t key_len,
-                             const uint8_t *mac);
+                             const uint8_t *mac, vsf_wifi_done_t done);
     vsf_err_t (*encrypt)    (vsf_wifi_t *wifi, uint8_t *dot11,
                              uint16_t *len, uint16_t cap);
     vsf_err_t (*decrypt)    (vsf_wifi_t *wifi, uint8_t *dot11, uint16_t *len);

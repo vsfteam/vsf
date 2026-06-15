@@ -425,12 +425,21 @@ static void __wpa_handle_group_m1(vsf_wifi_t *wifi, const uint8_t *ek,
         __wpa_parse_gtk(wifi, kd, out_len);
     }
 
-    /* If a hardware crypto backend owns the keys, re-program the new GTK. */
+    /* If a hardware crypto backend owns the keys, re-program the new GTK.
+     * The install is asynchronous; G2 is sent immediately so the AP does not
+     * retransmit group M1.  A transient mismatch means a few broadcast frames
+     * may be dropped until the key script finishes. */
     if (wifi->wpa_hw_crypto && (wifi->wpa_gtk_len > 0)
             && (wifi->drv != NULL) && (wifi->drv->crypto_ops != NULL)
             && (wifi->drv->crypto_ops->install_key != NULL)) {
-        wifi->drv->crypto_ops->install_key(wifi, wifi->wpa_gtk_keyidx,
-                false, wifi->wpa_gtk, wifi->wpa_gtk_len, NULL);
+        vsf_err_t err = wifi->drv->crypto_ops->install_key(wifi,
+                wifi->wpa_gtk_keyidx, false, wifi->wpa_gtk,
+                wifi->wpa_gtk_len, NULL, NULL);
+        if (err != VSF_ERR_NONE) {
+            vsf_wifi_trace_info(
+                    "wifi: hardware GTK rekey install failed (err=%d)"
+                    VSF_TRACE_CFG_LINEEND, (int)err);
+        }
     }
 
     /* Echo the AP's replay counter in G2. */

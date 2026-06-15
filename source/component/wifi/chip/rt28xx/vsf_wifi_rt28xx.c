@@ -271,6 +271,28 @@
 // We use WCID 1 for the associated AP (WCID 0 is reserved/multicast).
 #define RT28XX_STA_WCID                 1
 
+// Key table / IVEIV / shared-key-mode registers (ref rt2800.h:2045-2090)
+#define RT28XX_PAIRWISE_KEY_TABLE_BASE  0x4000
+#define RT28XX_PAIRWISE_KEY_ENTRY(idx)  (RT28XX_PAIRWISE_KEY_TABLE_BASE + ((idx) * 32))
+#define RT28XX_SHARED_KEY_TABLE_BASE    0x6C00
+#define RT28XX_SHARED_KEY_ENTRY(idx)    (RT28XX_SHARED_KEY_TABLE_BASE + ((idx) * 32))
+#define RT28XX_MAC_IVEIV_TABLE_BASE     0x6000
+#define RT28XX_MAC_IVEIV_ENTRY(idx)     (RT28XX_MAC_IVEIV_TABLE_BASE + ((idx) * 8))
+#define RT28XX_SHARED_KEY_MODE_BASE     0x7000
+#define RT28XX_SHARED_KEY_MODE_ENTRY(idx) (RT28XX_SHARED_KEY_MODE_BASE + ((idx) * 4))
+
+// MAC_WCID_ATTRIBUTE field values (ref rt2800.h:2081-2090)
+#define RT28XX_WCID_ATTR_KEYTAB         0x00000001
+#define RT28XX_WCID_ATTR_CIPHER_SHIFT   1
+#define RT28XX_WCID_ATTR_CIPHER_MASK    0x0000000E
+#define RT28XX_WCID_ATTR_WIUDF_SHIFT    7
+#define RT28XX_WCID_ATTR_WIUDF_MASK     0x00000380
+#define RT28XX_CIPHER_NONE              0
+#define RT28XX_CIPHER_AES               4
+
+// TXINFO_W0 WIV bit: 0 = hardware inserts IV from IVEIV, 1 = use descriptor IV.
+#define RT28XX_TXINFO_W0_WIV            (1u << 24)
+
 // MAC_SYS_CTRL bits
 #define RT28XX_MAC_SRST                 (1 << 0)
 #define RT28XX_BBP_HRST                 (1 << 1)
@@ -2767,6 +2789,101 @@ static int __rt28xx_emit_wcid(vsf_wifi_reg_op_t *ops, int n, const uint8_t mac[6
     return n;
 }
 
+#if VSF_WIFI_USE_WPA == ENABLED && VSF_WIFI_CFG_RT28XX_HW_CRYPTO == ENABLED
+
+/* Shadow of the four SHARED_KEY_MODE registers so we can update the cipher
+ * bits for group keys without an extra register read.  Cleared to 0 in init. */
+static uint32_t __rt28xx_shared_key_mode[4];
+
+
+static void __rt28xx_emit_key32(vsf_wifi_reg_op_t *ops, int *n,
+        uint16_t base, const uint8_t key[32])
+{
+    for (int i = 0; i < 8; i++) {
+        uint32_t v = ((uint32_t)key[i*4 + 0])
+                   | ((uint32_t)key[i*4 + 1] << 8)
+                   | ((uint32_t)key[i*4 + 2] << 16)
+                   | ((uint32_t)key[i*4 + 3] << 24);
+        ops[(*n)++] = (vsf_wifi_reg_op_t)RT_OP_REG(base + (i * 4), v);
+    }
+}
+
+static void __rt28xx_emit_iveiv(vsf_wifi_reg_op_t *ops, int *n,
+        uint8_t key_idx, uint16_t base)
+{
+    /* CCMP IV/EIV.  iv[3] bits: ExtIV=0x20, keyid in upper 2 bits. */
+    uint32_t iv_lo = 0x20 | ((uint32_t)(key_idx & 3) << 6);
+    ops[(*n)++] = (vsf_wifi_reg_op_t)RT_OP_REG(base, iv_lo);       /* iv[0..3] */
+    ops[(*n)++] = (vsf_wifi_reg_op_t)RT_OP_REG(base + 4, 0);       /* iv[4..7] */
+}
+
+static void __rt28xx_key_install_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_rt28xx_trace_info(
+                "wifi: rt28xx key install script failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+    }
+}
+
+static vsf_err_t __rt28xx_crypto_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
+        bool pairwise, const uint8_t *key, uint8_t key_len,
+        const uint8_t *mac, vsf_wifi_done_t done)
+{
+    (void)mac;
+    if ((key == NULL) || (key_len != 16)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    uint8_t full_key[32];
+    memset(full_key, 0, sizeof(full_key));
+    memcpy(full_key, key, key_len);
+
+    vsf_wifi_reg_op_t *ops = vsf_wifi_reg_get_scratch_ops(wifi);
+    int n = 0;
+
+    if (pairwise) {
+        uint16_t pbase = RT28XX_PAIRWISE_KEY_ENTRY(RT28XX_STA_WCID);
+        __rt28xx_emit_key32(ops, &n, pbase, full_key);
+
+        uint32_t attr = RT28XX_WCID_ATTR_KEYTAB
+                      | (RT28XX_CIPHER_AES << RT28XX_WCID_ATTR_CIPHER_SHIFT)
+                      | (RT28XX_CIPHER_AES << RT28XX_WCID_ATTR_WIUDF_SHIFT);
+        ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(
+                RT28XX_MAC_WCID_ATTR_ENTRY(RT28XX_STA_WCID), attr);
+        __rt28xx_emit_iveiv(ops, &n, 0, RT28XX_MAC_IVEIV_ENTRY(RT28XX_STA_WCID));
+    } else {
+        uint8_t gtk_idx = key_idx & 3;
+        uint8_t hw_idx  = gtk_idx;   /* bssidx = 0 in STA mode */
+        uint16_t sbase  = RT28XX_SHARED_KEY_ENTRY(hw_idx);
+        __rt28xx_emit_key32(ops, &n, sbase, full_key);
+
+        /* Update shadow and write the SHARED_KEY_MODE register this slot lives in. */
+        uint8_t mode_reg = hw_idx / 8;
+        uint8_t mode_bit = (hw_idx % 8) * 3;
+        __rt28xx_shared_key_mode[mode_reg] &= ~(0x7u << mode_bit);
+        __rt28xx_shared_key_mode[mode_reg] |= (uint32_t)RT28XX_CIPHER_AES << mode_bit;
+        ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(
+                RT28XX_SHARED_KEY_MODE_ENTRY(mode_reg),
+                __rt28xx_shared_key_mode[mode_reg]);
+
+        /* IVEIV for the shared key slot so hardware can insert/verify IV. */
+        __rt28xx_emit_iveiv(ops, &n, gtk_idx, RT28XX_MAC_IVEIV_ENTRY(hw_idx));
+    }
+
+    /* install_key is called from the wifi EDA and must follow the VSF
+     * non-blocking pattern: submit the register script and return.  The
+     * dispatcher invokes `done` when the script finishes. */
+    return vsf_wifi_reg_run_script(wifi, ops, (uint16_t)n,
+            done != NULL ? done : __rt28xx_key_install_done);
+}
+
+static const vsf_wifi_crypto_ops_t __rt28xx_crypto_ops = {
+    .install_key = __rt28xx_crypto_install_key,
+};
+
+#endif      /* VSF_WIFI_USE_WPA && VSF_WIFI_CFG_RT28XX_HW_CRYPTO */
+
 static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
         const uint8_t bssid[6], const uint8_t *ssid, uint8_t ssid_len,
         uint8_t channel, vsf_wifi_done_t done)
@@ -2870,6 +2987,13 @@ static vsf_err_t __rt28xx_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     n = __rt28xx_emit_bssid(ops, n, zero_bssid);                          /* 2 ops */
     n = __rt28xx_emit_wcid (ops, n, zero_bssid, 0x00000000);              /* 3 ops: clear WCID 1 */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0);   /* 1 op  */
+#if VSF_WIFI_USE_WPA == ENABLED && VSF_WIFI_CFG_RT28XX_HW_CRYPTO == ENABLED
+    /* Clear any programmed GTK cipher mode. */
+    for (int i = 0; i < 4; i++) {
+        __rt28xx_shared_key_mode[i] = 0;
+        ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_SHARED_KEY_MODE_ENTRY(i), 0);
+    }
+#endif
     return vsf_wifi_reg_run_script(wifi, ops, (uint16_t)n, done);
 }
 
@@ -2904,7 +3028,6 @@ static vsf_err_t __rt28xx_get_link_info(vsf_wifi_t *wifi,
 
 #define RT28XX_TXINFO_DESC_SIZE         4
 #define RT28XX_TXWI_DESC_SIZE_5592      20
-#define RT28XX_TXINFO_W0_WIV            (1u << 24)
 #define RT28XX_TXINFO_W0_QSEL_BE        (2u << 25)
 #define RT28XX_TXWI_W0_PHYMODE_OFDM     (1u << 30)
 #define RT28XX_TXWI_W1_ACK              (1u << 0)
@@ -2964,14 +3087,20 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
     }
 
     uint16_t pkt_len   = (uint16_t)(RT28XX_TXWI_DESC_SIZE_5592 + frame_pad);
-    uint32_t txinfo_w0 = ((uint32_t)pkt_len & 0xFFFFu)
-                       | RT28XX_TXINFO_W0_WIV
-                       | RT28XX_TXINFO_W0_QSEL_BE;
-    uint32_t txwi_w0   = RT28XX_TXWI_W0_PHYMODE_OFDM;   /* OFDM, MCS0 (6 Mbps) */
     bool is_data = (frame_len >= 2) && ((frame[0] & 0x0Cu) == 0x08u);
+    bool hw_encrypt = wifi->wpa_hw_crypto && is_data;
+    bool is_mcast   = (frame_len >= 6) && ((frame[4] & 0x01) != 0);
+    uint32_t txinfo_w0 = ((uint32_t)pkt_len & 0xFFFFu)
+                       | RT28XX_TXINFO_W0_QSEL_BE
+                       | (hw_encrypt ? 0u : RT28XX_TXINFO_W0_WIV);
+    uint32_t txwi_w0   = RT28XX_TXWI_W0_PHYMODE_OFDM;   /* OFDM, MCS0 (6 Mbps) */
+
+    uint8_t wcid = hw_encrypt ? (is_mcast ? wifi->wpa_gtk_keyidx : RT28XX_STA_WCID)
+                              : RT28XX_STA_WCID;
+
     uint32_t txwi_w1   = RT28XX_TXWI_W1_ACK
                        | (is_data ? RT28XX_TXWI_W1_NSEQ : 0u)
-                       | ((uint32_t)RT28XX_STA_WCID << 8)  /* WCID=1 */
+                       | ((uint32_t)wcid << 8)
                        | (((uint32_t)frame_len & 0x0FFFu) << 16)
                        | RT28XX_TXWI_W1_PACKETID_ENTRY1;
 
@@ -2985,6 +3114,19 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
     /* Copy header, insert L2PAD gap, then copy payload. */
     uint16_t payload_off = (hdr_len < frame_len) ? hdr_len : frame_len;
     memcpy(dst + hdr, frame, payload_off);              /* 802.11 hdr */
+    if (hw_encrypt) {
+        /* Hardware crypto: mark the frame as protected and let the chip
+         * insert the CCMP IV/EIV from the IVEIV registers. */
+        dst[hdr + 1] |= 0x40;
+        static uint32_t __hw_tx_cnt = 0;
+        if (++__hw_tx_cnt <= 20) {
+            vsf_wifi_chip_rt28xx_trace_info(
+                    "wifi: HW TX[%u] wcid=%u mcast=%u fc=%02X%02X len=%u"
+                    VSF_TRACE_CFG_LINEEND,
+                    (unsigned)__hw_tx_cnt, (unsigned)wcid, (unsigned)is_mcast,
+                    frame[0], frame[1], (unsigned)frame_len);
+        }
+    }
     if (l2pad > 0) {
         memset(dst + hdr + payload_off, 0, l2pad);      /* L2 padding */
     }
@@ -3036,6 +3178,9 @@ const vsf_wifi_chip_drv_t vsf_wifi_rt28xx_drv = {
     .parse_rx      = __rt28xx_parse_rx,
     .build_tx      = __rt28xx_build_tx,
     .tx            = __rt28xx_tx,
+#if VSF_WIFI_USE_WPA == ENABLED && VSF_WIFI_CFG_RT28XX_HW_CRYPTO == ENABLED
+    .crypto_ops    = &__rt28xx_crypto_ops,
+#endif
 };
 
 #endif      // VSF_USE_WIFI && VSF_WIFI_USE_RT28XX

@@ -1901,28 +1901,16 @@ void vsf_wifi_mlme_arm_timer(vsf_wifi_t *wifi, uint16_t ms)
 #endif
 }
 
-void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi)
+static bool __vsf_wifi_handshake_is_pending(vsf_wifi_t *wifi)
 {
-    if (wifi->mlme_state != WIFI_MLME_4WAY) return;
-#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
-    vsf_callback_timer_remove(&wifi->mlme_timer);
-#endif
+    return !wifi->disconnecting
+        && (wifi->mlme_state == WIFI_MLME_KEY_INSTALL);
+}
 
-    /* Install the negotiated keys.  A hardware crypto backend takes the TK /
-     * GTK directly (wpa_hw_crypto = true, software CCMP bypassed); otherwise
-     * fall back to the software CCMP path with a fresh TX PN counter. */
-    if ((wifi->drv->crypto_ops != NULL) &&
-            (wifi->drv->crypto_ops->install_key != NULL)) {
-        wifi->wpa_hw_crypto = true;
-        wifi->drv->crypto_ops->install_key(wifi, 0, true,
-                wifi->wpa_ptk + 32, VSF_WIFI_TK_LEN, wifi->mlme_bssid);
-        if (wifi->wpa_gtk_len > 0) {
-            wifi->drv->crypto_ops->install_key(wifi, wifi->wpa_gtk_keyidx,
-                    false, wifi->wpa_gtk, wifi->wpa_gtk_len, NULL);
-        }
-    } else {
-        wifi->wpa_hw_crypto = false;
-        memset(wifi->wpa_tx_pn, 0, sizeof(wifi->wpa_tx_pn));
+static void __vsf_wifi_handshake_link_up(vsf_wifi_t *wifi)
+{
+    if (!__vsf_wifi_handshake_is_pending(wifi)) {
+        return;
     }
 
     wifi->mlme_state = WIFI_MLME_RUN;
@@ -1936,6 +1924,82 @@ void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi)
         info.channel = wifi->mlme_channel;
         info.flags   = WIFI_LINK_FLAG_CONNECTED | WIFI_LINK_FLAG_AUTHORIZED;
         __vsf_wifi_deliver_link_up(wifi, &info);
+    }
+}
+
+static void __vsf_wifi_handshake_gtk_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (!__vsf_wifi_handshake_is_pending(wifi)) {
+        return;
+    }
+
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_trace_info(
+                "wifi: hardware GTK install failed (err=%d), falling back to software CCMP"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+        wifi->wpa_hw_crypto = false;
+        memset(wifi->wpa_tx_pn, 0, sizeof(wifi->wpa_tx_pn));
+    }
+    __vsf_wifi_handshake_link_up(wifi);
+}
+
+static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (!__vsf_wifi_handshake_is_pending(wifi)) {
+        return;
+    }
+
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_trace_info(
+                "wifi: hardware PTK install failed (err=%d), falling back to software CCMP"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+        wifi->wpa_hw_crypto = false;
+        memset(wifi->wpa_tx_pn, 0, sizeof(wifi->wpa_tx_pn));
+        __vsf_wifi_handshake_link_up(wifi);
+        return;
+    }
+
+    if ((wifi->wpa_gtk_len > 0)
+            && (wifi->drv->crypto_ops != NULL)
+            && (wifi->drv->crypto_ops->install_key != NULL)) {
+        err = wifi->drv->crypto_ops->install_key(wifi, wifi->wpa_gtk_keyidx,
+                false, wifi->wpa_gtk, wifi->wpa_gtk_len, NULL,
+                __vsf_wifi_handshake_gtk_done);
+        if (err != VSF_ERR_NONE) {
+            __vsf_wifi_handshake_gtk_done(wifi, err);
+        }
+        return;
+    }
+    __vsf_wifi_handshake_link_up(wifi);
+}
+
+void vsf_wifi_mlme_handshake_done(vsf_wifi_t *wifi)
+{
+    if (wifi->mlme_state != WIFI_MLME_4WAY) return;
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_remove(&wifi->mlme_timer);
+#endif
+
+    /* Move to a transient key-install state so duplicate M3s are ignored while
+     * the chip driver programs the hardware key tables asynchronously. */
+    wifi->mlme_state = WIFI_MLME_KEY_INSTALL;
+
+    /* Install the negotiated keys.  A hardware crypto backend takes the TK /
+     * GTK directly (wpa_hw_crypto = true, software CCMP bypassed); otherwise
+     * fall back to the software CCMP path with a fresh TX PN counter. */
+    if ((wifi->drv->crypto_ops != NULL) &&
+            (wifi->drv->crypto_ops->install_key != NULL)) {
+        wifi->wpa_hw_crypto = true;
+        vsf_err_t err = wifi->drv->crypto_ops->install_key(wifi, 0, true,
+                wifi->wpa_ptk + 32, VSF_WIFI_TK_LEN, wifi->mlme_bssid,
+                __vsf_wifi_handshake_ptk_done);
+        if (err != VSF_ERR_NONE) {
+            __vsf_wifi_handshake_ptk_done(wifi, err);
+        }
+    } else {
+        wifi->wpa_hw_crypto = false;
+        memset(wifi->wpa_tx_pn, 0, sizeof(wifi->wpa_tx_pn));
+        __vsf_wifi_handshake_link_up(wifi);
     }
 }
 

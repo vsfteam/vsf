@@ -95,6 +95,16 @@
 #endif
 
 /*
+ * RT28xx (RT2870/RT3070/RT3572/RT5370/RT5572) hardware CCMP offloading.
+ * When ENABLED the RT28xx chip driver registers crypto_ops and the wifi layer
+ * skips software CCMP encap/decap.  When DISABLED the existing software CCMP
+ * path is used.
+ */
+#ifndef VSF_WIFI_CFG_RT28XX_HW_CRYPTO
+#   define VSF_WIFI_CFG_RT28XX_HW_CRYPTO    ENABLED
+#endif
+
+/*
  * 802.11 keepalive: send a null data frame at regular intervals to prevent
  * the AP from deauthenticating an idle STA.  The interval is derived from
  * the BSS Max Idle Period IE advertised by the AP when available, otherwise
