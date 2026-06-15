@@ -27,6 +27,23 @@
 /*============================ TYPES =========================================*/
 
 /*
+ * Raw WiFi radio instance embedded in vsf_wifi_t.
+ *
+ * The public vsf_wifi_radio.h header only forward-declares this type; the
+ * full definition is private so the layout can carry internal adapter state.
+ */
+struct vsf_wifi_radio_t {
+    const vsf_wifi_radio_ops_t *ops;
+    vsf_wifi_radio_rx_cb_t      rx_cb;
+    void                       *rx_param;
+    vsf_wifi_t                 *wifi;
+
+    /* Internal adapter state: stores the user `done` callback when a raw
+     * radio operation is delegated to a vsf_wifi_done_t-style hook. */
+    vsf_wifi_radio_done_t       adapter_done;
+};
+
+/*
  * The wifi layer is chip-agnostic but knows about the optional register-bus
  * helper used by register-based chips (e.g. RT2X00).  reg_bus may be NULL for
  * chips that use a command/event-based bus (e.g. MediaTek mt76).  The bus
@@ -197,6 +214,14 @@ struct vsf_wifi_t {
      * submit TX frame, start RX, ...), so the same chip driver can plug into
      * different physical buses without modification. */
     const void                    *bus_ops;
+
+    /* ---- Raw WiFi radio state ----
+     *
+     * When raw_radio_active is true the instance is in raw-radio mode and the
+     * standard MLME/scan/WPA state machine is gated out.  Received frames are
+     * delivered to raw_radio.rx_cb instead of the normal netif/weak hooks. */
+    bool                           raw_radio_active;
+    vsf_wifi_radio_t               raw_radio;
 };
 
 #endif // VSF_USE_WIFI

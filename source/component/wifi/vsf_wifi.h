@@ -25,6 +25,7 @@
 #if VSF_USE_WIFI == ENABLED
 
 #include "kernel/vsf_kernel.h"
+#include "./vsf_wifi_radio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,6 +75,7 @@ enum {
     WIFI_MLME_4WAY      = 4,    /* associated, WPA2 4-way handshake running */
     WIFI_MLME_RUN       = 3,    /* associated (link up)                  */
     WIFI_MLME_KEY_INSTALL = 5,  /* hardware key install in progress       */
+    WIFI_MLME_RAW_RADIO = 6,    /* raw radio mode active                  */
 };
 
 /*
@@ -282,8 +284,9 @@ struct vsf_wifi_reg_bus_t {
  *                 key_idx 1..3 + !pairwise == a GTK.  `mac` is the peer for
  *                 pairwise keys, NULL for group keys.
  *                 `done` is called when the register script finishes; the
- *                 caller may be in an EDA context, so install_key MUST NOT
- *                 block.  Returns VSF_ERR_NONE on successful submission.
+ *                 caller may be in an EDA or interrupt context, so
+ *                 install_key MUST NOT block.  Returns VSF_ERR_NONE on
+ *                 successful submission.
  *   encrypt/decrypt : reserved per-frame overrides for chips that still need
  *                 wifi-layer framing with a chip-specific tweak; NULL means
  *                 "use the built-in software CCMP".
@@ -354,6 +357,10 @@ struct vsf_wifi_chip_drv_t {
      * NULL selects the software CCMP fallback. */
     const vsf_wifi_crypto_ops_t *crypto_ops;
 #endif
+
+    /* Optional raw WiFi radio backend.  NULL means the chip only supports
+     * the standard 802.11 station-mode interface. */
+    const vsf_wifi_radio_ops_t *radio_ops;
 };
 
 /*============================ APPLICATION CALLBACKS =========================*

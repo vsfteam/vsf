@@ -651,6 +651,8 @@ void vsf_wifi_init(vsf_wifi_t *wifi,
     wifi->reg_bus  = reg_bus;
     wifi->post_eda = post_eda;
     wifi->channel  = 1;
+    wifi->raw_radio.wifi = wifi;
+    wifi->raw_radio.ops  = (drv != NULL) ? drv->radio_ops : NULL;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_init(&wifi->scan_timer);
     wifi->scan_timer.on_timer = __vsf_wifi_scan_timer_cb;
@@ -756,6 +758,7 @@ void vsf_wifi_fini(vsf_wifi_t *wifi)
     wifi->disconnecting = true;
     wifi->is_ready      = false;
     wifi->scanning      = false;
+    wifi->raw_radio_active  = false;
 
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_remove(&wifi->scan_timer);
@@ -784,7 +787,8 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
      * the link is up) the parser also routes mgmt frames to vsf_wifi_mlme_rx
      * so auth / assoc-resp / deauth are observed.  Otherwise hand the raw
      * frame to the application. */
-    if ((wifi->scanning || (wifi->mlme_state != WIFI_MLME_IDLE))
+    if ((wifi->scanning || (wifi->mlme_state != WIFI_MLME_IDLE)
+                || wifi->raw_radio_active)
             && wifi->drv->parse_rx != NULL) {
         wifi->drv->parse_rx(wifi, frame, len);
     } else {
@@ -2008,5 +2012,148 @@ void vsf_wifi_mlme_handshake_fail(vsf_wifi_t *wifi, uint8_t reason)
     __vsf_wifi_mlme_finish(wifi, reason);
 }
 #endif
+
+/*============================ RAW RADIO LAYER ===============================*
+ * Thin, 802.11-frame-oriented raw access to the radio hardware.  Mutually
+ * exclusive with the standard station-mode MLME/WPA state machine.
+ *===========================================================================*/
+
+void vsf_wifi_radio_adapter_done_set(vsf_wifi_radio_t *radio, vsf_wifi_radio_done_t done)
+{
+    if (radio != NULL) {
+        radio->adapter_done = done;
+    }
+}
+
+void vsf_wifi_radio_adapter_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (wifi == NULL) return;
+    vsf_wifi_radio_t *radio = &wifi->raw_radio;
+    vsf_wifi_radio_done_t done = radio->adapter_done;
+    radio->adapter_done = NULL;
+    if (done != NULL) {
+        done(radio, err);
+    }
+}
+
+vsf_wifi_radio_t * vsf_wifi_radio_from_wifi(vsf_wifi_t *wifi)
+{
+    if ((wifi == NULL) || (wifi->raw_radio.ops == NULL)) {
+        return NULL;
+    }
+    return &wifi->raw_radio;
+}
+
+void vsf_wifi_radio_register_rx(vsf_wifi_radio_t *radio,
+        vsf_wifi_radio_rx_cb_t cb, void *param)
+{
+    if (radio != NULL) {
+        radio->rx_cb    = cb;
+        radio->rx_param = param;
+    }
+}
+
+void vsf_wifi_radio_on_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
+{
+    if ((wifi == NULL) || !wifi->raw_radio_active) return;
+    vsf_wifi_radio_t *radio = &wifi->raw_radio;
+    if (radio->rx_cb != NULL) {
+        radio->rx_cb(radio, radio->rx_param, frame, len);
+    }
+}
+
+vsf_err_t vsf_wifi_radio_init(vsf_wifi_radio_t *radio, vsf_wifi_radio_done_t done)
+{
+    if ((radio == NULL) || (radio->wifi == NULL)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_wifi_t *wifi = radio->wifi;
+    if (radio->ops == NULL) {
+        return VSF_ERR_NOT_SUPPORT;
+    }
+
+    /* Mutually exclusive with standard WiFi operation. */
+    if (!wifi->is_ready || wifi->scanning
+            || (wifi->mlme_state != WIFI_MLME_IDLE)
+            || wifi->raw_radio_active) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+
+    wifi->raw_radio_active = true;
+    /* Clear WPA state so raw frames are not encrypted/decrypted by the core. */
+#if VSF_WIFI_USE_WPA == ENABLED
+    wifi->wpa_ptk_valid = false;
+    wifi->wpa_hw_crypto = false;
+#endif
+
+    return radio->ops->init(radio, done);
+}
+
+vsf_err_t vsf_wifi_radio_fini(vsf_wifi_radio_t *radio, vsf_wifi_radio_done_t done)
+{
+    if ((radio == NULL) || (radio->wifi == NULL)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_wifi_t *wifi = radio->wifi;
+    if (!wifi->raw_radio_active) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+
+    wifi->raw_radio_active = false;
+    return radio->ops->fini(radio, done);
+}
+
+vsf_err_t vsf_wifi_radio_tx(vsf_wifi_radio_t *radio,
+        const uint8_t *frame, uint16_t len)
+{
+    if ((radio == NULL) || (radio->ops == NULL)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_wifi_t *wifi = radio->wifi;
+    if (!wifi->raw_radio_active) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+    return radio->ops->tx(radio, frame, len);
+}
+
+vsf_err_t vsf_wifi_radio_set_channel(vsf_wifi_radio_t *radio, uint8_t ch,
+        vsf_wifi_radio_done_t done)
+{
+    if ((radio == NULL) || (radio->ops == NULL)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_wifi_t *wifi = radio->wifi;
+    if (!wifi->raw_radio_active) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+    wifi->channel = ch;
+    return radio->ops->set_channel(radio, ch, done);
+}
+
+vsf_err_t vsf_wifi_radio_set_filter(vsf_wifi_radio_t *radio, uint32_t mask,
+        vsf_wifi_radio_done_t done)
+{
+    if ((radio == NULL) || (radio->ops == NULL)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_wifi_t *wifi = radio->wifi;
+    if (!wifi->raw_radio_active) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+    return radio->ops->set_filter(radio, mask, done);
+}
+
+vsf_err_t vsf_wifi_radio_set_ps(vsf_wifi_radio_t *radio, bool sleep,
+        vsf_wifi_radio_done_t done)
+{
+    if ((radio == NULL) || (radio->ops == NULL)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_wifi_t *wifi = radio->wifi;
+    if (!wifi->raw_radio_active) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+    return radio->ops->set_ps(radio, sleep, done);
+}
 
 #endif      // VSF_USE_WIFI

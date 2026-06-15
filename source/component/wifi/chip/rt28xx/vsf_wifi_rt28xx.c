@@ -1523,6 +1523,13 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 
     if (crc_err) goto __advance_frame;
 
+    /* Raw radio mode: deliver the de-descriptored 802.11 frame to the
+     * registered raw RX callback and skip the normal WiFi MLME path. */
+    if (wifi->raw_radio_active) {
+        vsf_wifi_radio_on_rx(wifi, (uint8_t *)hdr, mpdu_len);
+        goto __advance_frame;
+    }
+
     /* Diagnose post-handshake frame types (state >= 2 = 4WAY/RUN). */
     if (wifi->mlme_state >= 2) {
         static uint32_t __parse_run_cnt = 0;
@@ -3088,7 +3095,7 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
 
     uint16_t pkt_len   = (uint16_t)(RT28XX_TXWI_DESC_SIZE_5592 + frame_pad);
     bool is_data = (frame_len >= 2) && ((frame[0] & 0x0Cu) == 0x08u);
-    bool hw_encrypt = wifi->wpa_hw_crypto && is_data;
+    bool hw_encrypt = !wifi->raw_radio_active && wifi->wpa_hw_crypto && is_data;
     bool is_mcast   = (frame_len >= 6) && ((frame[4] & 0x01) != 0);
     uint32_t txinfo_w0 = ((uint32_t)pkt_len & 0xFFFFu)
                        | RT28XX_TXINFO_W0_QSEL_BE
@@ -3160,6 +3167,76 @@ static vsf_err_t __rt28xx_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t le
     return wifi->reg_bus->data_tx(wifi, tx_buf, total);
 }
 
+/*============================ RAW RADIO BACKEND =============================*
+ * Optional low-level 802.11-frame access for proprietary protocols.  Mutually
+ * exclusive with the standard station-mode state machine.
+ *===========================================================================*/
+
+#if VSF_USE_WIFI == ENABLED
+
+static void __rt28xx_radio_done_adapter(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    vsf_wifi_radio_adapter_done(wifi, err);
+}
+
+static vsf_err_t __rt28xx_radio_tx(vsf_wifi_radio_t *radio,
+        const uint8_t *frame, uint16_t len)
+{
+    return __rt28xx_tx(radio->wifi, frame, len);
+}
+
+static vsf_err_t __rt28xx_radio_set_channel(vsf_wifi_radio_t *radio, uint8_t ch,
+        vsf_wifi_radio_done_t done)
+{
+    vsf_wifi_radio_adapter_done_set(radio, done);
+    return __rt28xx_set_channel(radio->wifi, ch, __rt28xx_radio_done_adapter);
+}
+
+static vsf_err_t __rt28xx_radio_set_filter(vsf_wifi_radio_t *radio, uint32_t mask,
+        vsf_wifi_radio_done_t done)
+{
+    vsf_wifi_radio_adapter_done_set(radio, done);
+    return __rt28xx_set_rx_filter(radio->wifi, mask,
+            __rt28xx_radio_done_adapter);
+}
+
+static vsf_err_t __rt28xx_radio_init(vsf_wifi_radio_t *radio,
+        vsf_wifi_radio_done_t done)
+{
+    /* Same default filter used during a normal connect: accept beacons /
+     * probe-resp, management, broadcast/multicast and unicast-to-me, drop
+     * CRC/PHY/NOT_TO_ME errors.  The caller can override with set_filter(). */
+    return __rt28xx_radio_set_filter(radio, 0x00017F97, done);
+}
+
+static vsf_err_t __rt28xx_radio_fini(vsf_wifi_radio_t *radio,
+        vsf_wifi_radio_done_t done)
+{
+    /* Disable RX by dropping everything. */
+    return __rt28xx_radio_set_filter(radio, 0, done);
+}
+
+static vsf_err_t __rt28xx_radio_set_ps(vsf_wifi_radio_t *radio, bool sleep,
+        vsf_wifi_radio_done_t done)
+{
+    (void)radio; (void)sleep;
+    if (done != NULL) {
+        done(radio, VSF_ERR_NONE);
+    }
+    return VSF_ERR_NONE;
+}
+
+static const vsf_wifi_radio_ops_t __rt28xx_radio_ops = {
+    .init        = __rt28xx_radio_init,
+    .fini        = __rt28xx_radio_fini,
+    .tx          = __rt28xx_radio_tx,
+    .set_channel = __rt28xx_radio_set_channel,
+    .set_filter  = __rt28xx_radio_set_filter,
+    .set_ps      = __rt28xx_radio_set_ps,
+};
+
+#endif      /* VSF_USE_WIFI */
+
 /*============================ VTABLE INSTANCE ===============================*/
 
 const vsf_wifi_chip_drv_t vsf_wifi_rt28xx_drv = {
@@ -3181,6 +3258,7 @@ const vsf_wifi_chip_drv_t vsf_wifi_rt28xx_drv = {
 #if VSF_WIFI_USE_WPA == ENABLED && VSF_WIFI_CFG_RT28XX_HW_CRYPTO == ENABLED
     .crypto_ops    = &__rt28xx_crypto_ops,
 #endif
+    .radio_ops     = &__rt28xx_radio_ops,
 };
 
 #endif      // VSF_USE_WIFI && VSF_WIFI_USE_RT28XX
