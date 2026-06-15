@@ -53,6 +53,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "../../vsf_wifi.h"
+#include "../../vsf_wifi_priv.h"
 
 #include <stdlib.h>     /* rand() for fallback MAC generation */
 
@@ -1384,6 +1385,7 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                   && (ht[6] == wifi->mac[2]) && (ht[7] == wifi->mac[3])
                   && (ht[8] == wifi->mac[4]) && (ht[9] == wifi->mac[5]);
         if (wifi->scanning || to_us) {
+#if VSF_WIFI_CFG_CHIP_RT28XX_LOG_LEVEL >= 4
             uint16_t fct = (uint16_t)ht[0] | ((uint16_t)ht[1] << 8);
             vsf_wifi_chip_rt28xx_trace_debug("wifi: RAW-TOP fc=%04X type=%u sub=%u prot=%u mlme=%u buflen=%u"
                     " da=%02X:%02X:%02X:%02X:%02X:%02X bssid=%02X:%02X:%02X:%02X:%02X:%02X"
@@ -1411,6 +1413,7 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                 vsf_wifi_chip_rt28xx_trace_debug("wifi: RAW-DUMP n=%u %s" VSF_TRACE_CFG_LINEEND,
                         dump_n, hex);
             }
+#endif
         }
     }
 
@@ -3095,15 +3098,23 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
 
     uint16_t pkt_len   = (uint16_t)(RT28XX_TXWI_DESC_SIZE_5592 + frame_pad);
     bool is_data = (frame_len >= 2) && ((frame[0] & 0x0Cu) == 0x08u);
+#if VSF_WIFI_USE_WPA == ENABLED
     bool hw_encrypt = !wifi->raw_radio_active && wifi->wpa_hw_crypto && is_data;
+#else
+    bool hw_encrypt = false;
+#endif
     bool is_mcast   = (frame_len >= 6) && ((frame[4] & 0x01) != 0);
     uint32_t txinfo_w0 = ((uint32_t)pkt_len & 0xFFFFu)
                        | RT28XX_TXINFO_W0_QSEL_BE
                        | (hw_encrypt ? 0u : RT28XX_TXINFO_W0_WIV);
     uint32_t txwi_w0   = RT28XX_TXWI_W0_PHYMODE_OFDM;   /* OFDM, MCS0 (6 Mbps) */
 
+#if VSF_WIFI_USE_WPA == ENABLED
     uint8_t wcid = hw_encrypt ? (is_mcast ? wifi->wpa_gtk_keyidx : RT28XX_STA_WCID)
                               : RT28XX_STA_WCID;
+#else
+    uint8_t wcid = RT28XX_STA_WCID;
+#endif
 
     uint32_t txwi_w1   = RT28XX_TXWI_W1_ACK
                        | (is_data ? RT28XX_TXWI_W1_NSEQ : 0u)
