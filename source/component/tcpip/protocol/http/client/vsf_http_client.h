@@ -158,6 +158,9 @@ extern vsf_err_t vsf_http_client_init(vsf_http_client_t *http);
 // connection is still open. Safe to call on an init()-failed or already-fini'd handle.
 extern void vsf_http_client_fini(vsf_http_client_t *http);
 extern int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req);
+extern int vsf_http_client_request_with_redirect(vsf_http_client_t *http,
+                                                  vsf_http_client_req_t *req,
+                                                  int max_redirect);
 extern int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, size_t len);
 extern int vsf_http_client_write(vsf_http_client_t *http, uint8_t *buf, size_t len);
 

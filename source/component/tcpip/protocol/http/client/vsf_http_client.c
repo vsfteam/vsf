@@ -309,6 +309,221 @@ int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
     return vsf_http_client_fetch_headers(http, req);
 }
 
+// Parse a redirect URL into heap-allocated host/port/path strings.
+// Supports:
+//   - absolute URL: scheme://[user:pass@]host[:port]/path[?query][#fragment]
+//   - path-absolute relative URL: /path[?query][#fragment]
+// Returns 0 on success, -1 on failure.
+// On success, caller must free *host_out, *port_out, *path_out with vsf_heap_free.
+// For relative URLs, *host_out and *port_out are NULL, only *path_out is set.
+static int __vsf_http_client_parse_redirect_url(const char *url,
+                                                char **host_out,
+                                                char **port_out,
+                                                char **path_out)
+{
+    const char *p = strstr(url, "://");
+    if (p != NULL) {
+        const char *scheme = url;
+        size_t scheme_len = p - url;
+        p += sizeof("://") - 1;
+
+        // skip user:pass@
+        const char *at = strchr(p, '@');
+        if (at != NULL) {
+            p = at + 1;
+        }
+
+        // host
+        const char *host_end = p;
+        while (    *host_end
+               &&  *host_end != ':'
+               &&  *host_end != '/'
+               &&  *host_end != '?'
+               &&  *host_end != '#') {
+            host_end++;
+        }
+        size_t host_len = host_end - p;
+        char *host = (char *)vsf_heap_malloc(host_len + 1);
+        if (NULL == host) {
+            return -1;
+        }
+        memcpy(host, p, host_len);
+        host[host_len] = '\0';
+
+        // port
+        char *port;
+        if (*host_end == ':') {
+            const char *port_start = host_end + 1;
+            const char *port_end = port_start;
+            while (    *port_end
+                   &&  *port_end != '/'
+                   &&  *port_end != '?'
+                   &&  *port_end != '#') {
+                port_end++;
+            }
+            size_t port_len = port_end - port_start;
+            port = (char *)vsf_heap_malloc(port_len + 1);
+            if (NULL == port) {
+                vsf_heap_free(host);
+                return -1;
+            }
+            memcpy(port, port_start, port_len);
+            port[port_len] = '\0';
+            p = port_end;
+        } else {
+            port = (char *)vsf_heap_malloc(4);
+            if (NULL == port) {
+                vsf_heap_free(host);
+                return -1;
+            }
+            if (    (scheme_len == 5)
+                &&  (scheme[0] == 'h' || scheme[0] == 'H')
+                &&  (scheme[1] == 't' || scheme[1] == 'T')
+                &&  (scheme[2] == 't' || scheme[2] == 'T')
+                &&  (scheme[3] == 'p' || scheme[3] == 'P')
+                &&  (scheme[4] == 's' || scheme[4] == 'S')) {
+                strcpy(port, "443");
+            } else {
+                strcpy(port, "80");
+            }
+            p = host_end;
+        }
+
+        // path
+        char *path;
+        if ((*p == '\0') || (*p == '?') || (*p == '#')) {
+            path = (char *)vsf_heap_malloc(2);
+            if (NULL == path) {
+                vsf_heap_free(host);
+                vsf_heap_free(port);
+                return -1;
+            }
+            strcpy(path, "/");
+        } else {
+            const char *path_end = p;
+            while (*path_end && *path_end != '#') {
+                path_end++;
+            }
+            size_t path_len = path_end - p;
+            path = (char *)vsf_heap_malloc(path_len + 1);
+            if (NULL == path) {
+                vsf_heap_free(host);
+                vsf_heap_free(port);
+                return -1;
+            }
+            memcpy(path, p, path_len);
+            path[path_len] = '\0';
+        }
+
+        *host_out = host;
+        *port_out = port;
+        *path_out = path;
+        return 0;
+    } else if (url[0] == '/') {
+        // path-absolute relative URL
+        const char *frag = strchr(url, '#');
+        size_t len = frag ? (size_t)(frag - url) : strlen(url);
+        char *path = (char *)vsf_heap_malloc(len + 1);
+        if (NULL == path) {
+            return -1;
+        }
+        memcpy(path, url, len);
+        path[len] = '\0';
+        *host_out = NULL;
+        *port_out = NULL;
+        *path_out = path;
+        return 0;
+    }
+
+    return -1;
+}
+
+int vsf_http_client_request_with_redirect(vsf_http_client_t *http,
+                                          vsf_http_client_req_t *req,
+                                          int max_redirect)
+{
+    vsf_http_client_req_t cur_req = *req;
+    int redirect_count = 0;
+    int result;
+    char *host = NULL;
+    char *port = NULL;
+    char *path = NULL;
+
+
+    while (1) {
+        result = vsf_http_client_request(http, &cur_req);
+        if (result < 0) {
+            goto do_exit;
+        }
+
+        int status = http->resp_status;
+        if (    (status != 301) && (status != 302)
+            &&  (status != 303) && (status != 307)
+            &&  (status != 308)) {
+            break;
+        }
+
+        if ((max_redirect <= 0) || (redirect_count >= max_redirect)) {
+            result = -1;
+            goto do_exit;
+        }
+        if (http->redirect_path == NULL) {
+            result = -1;
+            goto do_exit;
+        }
+
+        // 303 See Other: change method to GET and drop body
+        if (status == 303) {
+            cur_req.verb = "GET";
+            cur_req.txdata = NULL;
+            cur_req.txdata_len = 0;
+        }
+
+        char *new_host = NULL, *new_port = NULL, *new_path = NULL;
+        if (__vsf_http_client_parse_redirect_url(http->redirect_path,
+                                                  &new_host, &new_port, &new_path) < 0) {
+            result = -1;
+            goto do_exit;
+        }
+
+        // Always close the current connection before following a redirect.
+        // The 3xx response body, if any, is discarded; reusing the buffer
+        // without clearing http->cur_size would corrupt the next response.
+        vsf_http_client_close(http);
+        http->cur_size = 0;
+        http->cur_buffer = NULL;
+
+        char *old_host = host;
+        char *old_port = port;
+        char *old_path = path;
+        if ((new_host != NULL) && (new_port != NULL)) {
+            host = new_host;
+            port = new_port;
+        } else {
+            // relative URL: keep current host/port
+            vsf_heap_free(new_host);
+            vsf_heap_free(new_port);
+        }
+        path = new_path;
+        vsf_heap_free(old_host);
+        vsf_heap_free(old_port);
+        vsf_heap_free(old_path);
+
+        cur_req.host = host;
+        cur_req.port = port;
+        cur_req.path = path;
+
+        redirect_count++;
+    }
+
+do_exit:
+    vsf_heap_free(host);
+    vsf_heap_free(port);
+    vsf_heap_free(path);
+    return result;
+}
+
+
 int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, size_t len)
 {
     int result = 0;
