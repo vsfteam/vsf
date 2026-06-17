@@ -32,21 +32,8 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t __mt76_eeprom_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
-{
-    /* TODO: read EEPROM via USB vendor request */
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-void __mt76_eeprom_parse_hw_cap(vsf_wifi_t *wifi)
-{
-    /* TODO: parse TX/RX path, PA/LNA, etc. */
-}
-
-const uint8_t *__mt76_eeprom_get_mac(vsf_wifi_t *wifi)
-{
-    mt76_wifi_priv_t *priv = (mt76_wifi_priv_t *)wifi->chip_priv;
-    return &priv->eeprom[MT76_EE_MAC_ADDR];
-}
+/* EEPROM helpers are currently implemented in vsf_wifi_mt76.c so they can
+ * reuse the chip-layer cfg_read/cfg_write macros.  This file is kept as a
+ * placeholder for future per-chip EEPROM parsing. */
 
 #endif      /* VSF_USE_WIFI == ENABLED && VSF_WIFI_USE_MT76 == ENABLED */

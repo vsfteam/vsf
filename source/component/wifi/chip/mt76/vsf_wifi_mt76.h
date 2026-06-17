@@ -38,6 +38,30 @@ extern "C" {
 
 #define MT76_EEPROM_SIZE            512
 
+/* EFUSE control registers */
+#define MT_EFUSE_CTRL               0x0024
+#define MT_EFUSE_CTRL_AOUT          0x0000003F
+#define MT_EFUSE_CTRL_MODE          0x000000C0
+#define MT_EFUSE_CTRL_AIN           0x03FF0000
+#define MT_EFUSE_CTRL_KICK          0x40000000
+#define MT_EFUSE_CTRL_SEL           0x80000000
+
+#define MT_EFUSE_DATA_BASE          0x0028
+#define MT_EFUSE_DATA(_n)           (MT_EFUSE_DATA_BASE + ((_n) << 2))
+
+/* MAC address / BSSID registers */
+#define MT_MAC_ADDR_DW0             0x1008
+#define MT_MAC_ADDR_DW1             0x100c
+#define MT_MAC_ADDR_DW1_U2ME_MASK   0x00FF0000
+
+#define MT_MAC_BSSID_DW0            0x1010
+#define MT_MAC_BSSID_DW1            0x1014
+#define MT_MAC_BSSID_DW1_ADDR       0x0000FFFF
+#define MT_MAC_BSSID_DW1_MBSS_MODE  0x00030000
+#define MT_MAC_BSSID_DW1_MBSS_LOCAL_BIT 0x00040000
+#define MT_MAC_BSSID_DW1_MBEACON_N  0x001C0000
+#define MT_MAC_BSSID_DW1_MBEACON_N_SHIFT 18
+
 /*============================ TYPES =========================================*/
 
 /* MT76 bus operations.
@@ -111,6 +135,13 @@ typedef struct mt76_wifi_priv {
     uint8_t                 mcu_seq;
     uint8_t                 state;
 
+    /* EEPROM loading context */
+    uint16_t                eeprom_offset;
+    uint8_t                 eeprom_step;
+    uint32_t                eeprom_ctrl;
+    uint32_t                eeprom_data[4];
+    vsf_wifi_done_t         eeprom_done;
+
     /* async operation context */
     vsf_wifi_done_t         pending_done;
     uint16_t                pending_cmd;
@@ -135,6 +166,10 @@ typedef struct mt76_wifi_priv {
     uint16_t                fw_sem_ms;
     uint8_t                 fw_rf_unit;
     uint8_t                 fw_rf_step;
+
+    /* MAC address programming context */
+    uint8_t                 mac_addr_step;
+    vsf_wifi_done_t         mac_addr_done;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t    fw_timer;
 #endif

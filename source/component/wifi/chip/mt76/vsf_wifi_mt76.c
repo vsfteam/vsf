@@ -97,6 +97,9 @@
 #define MT76_PWR_RADIO_ON                   0x31
 #define MT76_PWR_RADIO_OFF                  0x30
 
+#define MT_EE_READ                          0
+#define MT76_EE_MAC_ADDR                    0x004
+
 #define __mt76_put_le32(_p, _v)             do { \
         (_p)[0] = (uint8_t)(_v);                \
         (_p)[1] = (uint8_t)((_v) >> 8);         \
@@ -122,6 +125,8 @@ typedef enum {
     MT76_STATE_INIT_READ_ASIC,
     MT76_STATE_INIT_MCU_Q_SELECT,
     MT76_STATE_INIT_MCU_RADIO_ON,
+    MT76_STATE_INIT_EEPROM_LOAD,
+    MT76_STATE_INIT_MAC_ADDR,
     MT76_STATE_INIT_READY,
 } mt76_state_t;
 
@@ -228,6 +233,8 @@ static void __mt76_on_rx(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
 extern vsf_err_t __mt76_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done);
 extern vsf_err_t __mt76_init(vsf_wifi_t *wifi, vsf_wifi_done_t done);
 extern void __mt76_fini(vsf_wifi_t *wifi);
+extern vsf_err_t __mt76_eeprom_load(vsf_wifi_t *wifi, vsf_wifi_done_t done);
+extern const uint8_t *__mt76_eeprom_get_mac(vsf_wifi_t *wifi);
 extern vsf_err_t __mt76_set_channel(vsf_wifi_t *wifi, uint8_t channel,
                                     vsf_wifi_done_t done);
 extern vsf_err_t __mt76_set_rx_filter(vsf_wifi_t *wifi, uint32_t mask,
@@ -1309,6 +1316,202 @@ vsf_err_t __mt76_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     return VSF_ERR_NONE;
 }
 
+/*============================ EEPROM / MAC address ==========================*/
+
+static void __mt76_eeprom_load_continue(vsf_wifi_t *wifi, vsf_err_t err);
+
+vsf_err_t __mt76_eeprom_load_start(vsf_wifi_t *wifi, vsf_wifi_done_t done)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    priv->eeprom_offset = 0;
+    priv->eeprom_step   = 0;
+    priv->eeprom_done   = done;
+
+    uint32_t addr = priv->eeprom_offset & ~0xF;
+    uint32_t val  = MT_EFUSE_CTRL_KICK |
+                    ((uint32_t)MT_EE_READ << 6) |
+                    (addr << 16);
+
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT_EFUSE_CTRL, val,
+                                          __mt76_eeprom_load_continue);
+    if (step_err != VSF_ERR_NONE) {
+        priv->eeprom_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
+    return step_err;
+}
+
+static void __mt76_eeprom_load_continue(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->eeprom_done;
+
+    if (err != VSF_ERR_NONE) {
+        priv->eeprom_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    switch (priv->eeprom_step) {
+    case 0:
+        priv->eeprom_step = 1;
+        err = __mt76_cfg_read(wifi, MT_EFUSE_DATA(0), &priv->eeprom_data[0],
+                              __mt76_eeprom_load_continue);
+        break;
+    case 1:
+        priv->eeprom_step = 2;
+        err = __mt76_cfg_read(wifi, MT_EFUSE_DATA(1), &priv->eeprom_data[1],
+                              __mt76_eeprom_load_continue);
+        break;
+    case 2:
+        priv->eeprom_step = 3;
+        err = __mt76_cfg_read(wifi, MT_EFUSE_DATA(2), &priv->eeprom_data[2],
+                              __mt76_eeprom_load_continue);
+        break;
+    case 3:
+        priv->eeprom_step = 4;
+        err = __mt76_cfg_read(wifi, MT_EFUSE_DATA(3), &priv->eeprom_data[3],
+                              __mt76_eeprom_load_continue);
+        break;
+    case 4: {
+        uint8_t *dst = &priv->eeprom[priv->eeprom_offset];
+        for (int i = 0; i < 4; i++) {
+            uint32_t val = priv->eeprom_data[i];
+            dst[4 * i + 0] = (uint8_t)(val >> 0);
+            dst[4 * i + 1] = (uint8_t)(val >> 8);
+            dst[4 * i + 2] = (uint8_t)(val >> 16);
+            dst[4 * i + 3] = (uint8_t)(val >> 24);
+        }
+
+        priv->eeprom_offset += 16;
+        if (priv->eeprom_offset >= MT76_EEPROM_SIZE) {
+            priv->eeprom_done = NULL;
+            if (done != NULL) done(wifi, VSF_ERR_NONE);
+            return;
+        }
+
+        priv->eeprom_step = 0;
+        uint32_t addr = priv->eeprom_offset & ~0xF;
+        uint32_t val  = MT_EFUSE_CTRL_KICK |
+                        ((uint32_t)MT_EE_READ << 6) |
+                        (addr << 16);
+        err = __mt76_cfg_write(wifi, MT_EFUSE_CTRL, val,
+                               __mt76_eeprom_load_continue);
+        break;
+    }
+    default:
+        err = VSF_ERR_BUG;
+        break;
+    }
+
+    if (err != VSF_ERR_NONE) {
+        priv->eeprom_done = NULL;
+        if (done != NULL) done(wifi, err);
+    }
+}
+
+static void __mt76_mac_addr_program_continue(vsf_wifi_t *wifi, vsf_err_t err);
+
+static vsf_err_t __mt76_mac_addr_program_start(vsf_wifi_t *wifi,
+                                               const uint8_t mac[6],
+                                               vsf_wifi_done_t done)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    memcpy(priv->mac_addr, mac, 6);
+    priv->mac_addr_step = 0;
+    priv->mac_addr_done = done;
+
+    uint32_t dw0 = ((uint32_t)mac[0] << 0) |
+                   ((uint32_t)mac[1] << 8) |
+                   ((uint32_t)mac[2] << 16) |
+                   ((uint32_t)mac[3] << 24);
+
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT_MAC_ADDR_DW0, dw0,
+                                          __mt76_mac_addr_program_continue);
+    if (step_err != VSF_ERR_NONE) {
+        priv->mac_addr_done = NULL;
+        return step_err;
+    }
+    return VSF_ERR_NONE;
+}
+
+static void __mt76_mac_addr_program_continue(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->mac_addr_done;
+
+    if (err != VSF_ERR_NONE) {
+        priv->mac_addr_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    const uint8_t *mac = priv->mac_addr;
+    uint32_t dw1;
+    vsf_err_t step_err = VSF_ERR_NONE;
+
+    switch (priv->mac_addr_step) {
+    case 0:
+        dw1 = ((uint32_t)mac[4] << 0) |
+              ((uint32_t)mac[5] << 8) |
+              MT_MAC_ADDR_DW1_U2ME_MASK;
+        priv->mac_addr_step = 1;
+        step_err = __mt76_cfg_write(wifi, MT_MAC_ADDR_DW1, dw1,
+                                    __mt76_mac_addr_program_continue);
+        break;
+    case 1:
+        dw1 = ((uint32_t)mac[0] << 0) |
+              ((uint32_t)mac[1] << 8) |
+              ((uint32_t)mac[2] << 16) |
+              ((uint32_t)mac[3] << 24);
+        priv->mac_addr_step = 2;
+        step_err = __mt76_cfg_write(wifi, MT_MAC_BSSID_DW0, dw1,
+                                    __mt76_mac_addr_program_continue);
+        break;
+    case 2:
+        dw1 = ((uint32_t)mac[4] << 0) |
+              ((uint32_t)mac[5] << 8) |
+              MT_MAC_BSSID_DW1_MBSS_MODE |
+              MT_MAC_BSSID_DW1_MBSS_LOCAL_BIT |
+              (7U << MT_MAC_BSSID_DW1_MBEACON_N_SHIFT);
+        priv->mac_addr_step = 3;
+        step_err = __mt76_cfg_write(wifi, MT_MAC_BSSID_DW1, dw1,
+                                    __mt76_mac_addr_program_continue);
+        break;
+    case 3:
+        priv->mac_addr_done = NULL;
+        if (done != NULL) done(wifi, VSF_ERR_NONE);
+        return;
+    default:
+        step_err = VSF_ERR_BUG;
+        break;
+    }
+
+    if (step_err != VSF_ERR_NONE) {
+        priv->mac_addr_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
+}
+
+vsf_err_t __mt76_eeprom_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
+{
+    return __mt76_eeprom_load_start(wifi, done);
+}
+
+void __mt76_eeprom_parse_hw_cap(vsf_wifi_t *wifi)
+{
+    /* TODO: parse TX/RX path, PA/LNA, etc. */
+    (void)wifi;
+}
+
+const uint8_t *__mt76_eeprom_get_mac(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    return &priv->eeprom[MT76_EE_MAC_ADDR];
+}
+
 /*============================ Initialization ================================*/
 
 static void __mt76_init_mcu_q_select_done(vsf_wifi_t *wifi, vsf_err_t err)
@@ -1322,6 +1525,22 @@ static void __mt76_init_mcu_q_select_done(vsf_wifi_t *wifi, vsf_err_t err)
     __mt76_init_next(wifi, VSF_ERR_NONE);
 }
 
+static void __mt76_init_ready(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->pending_done;
+
+    priv->state = MT76_STATE_INIT_READY;
+    priv->on_rx = __mt76_on_rx;
+    /* Notify the bus driver that the data path can be enabled. */
+    __mt76_bus_ops(wifi)->on_ready(wifi);
+    priv->pending_done = NULL;
+    if (done != NULL) done(wifi, VSF_ERR_NONE);
+}
+
+static void __mt76_eeprom_load_done(vsf_wifi_t *wifi, vsf_err_t err);
+static void __mt76_mac_addr_done(vsf_wifi_t *wifi, vsf_err_t err);
+
 static void __mt76_init_mcu_radio_on_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
@@ -1333,12 +1552,56 @@ static void __mt76_init_mcu_radio_on_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
 
-    priv->state = MT76_STATE_INIT_READY;
-    priv->on_rx = __mt76_on_rx;
-    /* Notify the bus driver that the data path can be enabled. */
-    __mt76_bus_ops(wifi)->on_ready(wifi);
-    priv->pending_done = NULL;
-    if (done != NULL) done(wifi, VSF_ERR_NONE);
+    priv->state = MT76_STATE_INIT_EEPROM_LOAD;
+    vsf_err_t step_err = __mt76_eeprom_load(wifi, __mt76_eeprom_load_done);
+    if (step_err != VSF_ERR_NONE) {
+        priv->pending_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
+}
+
+static void __mt76_eeprom_load_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t init_done = priv->pending_done;
+
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_error(
+            "mt76: failed to load EEPROM" VSF_TRACE_CFG_LINEEND);
+        priv->pending_done = NULL;
+        if (init_done != NULL) init_done(wifi, err);
+        return;
+    }
+
+    const uint8_t *mac = __mt76_eeprom_get_mac(wifi);
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: EEPROM loaded, MAC=%02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
+        mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+    memcpy(wifi->mac, mac, 6);
+
+    priv->state = MT76_STATE_INIT_MAC_ADDR;
+    vsf_err_t step_err = __mt76_set_mac_addr(wifi, mac, __mt76_mac_addr_done);
+    if (step_err != VSF_ERR_NONE) {
+        priv->pending_done = NULL;
+        if (init_done != NULL) init_done(wifi, step_err);
+    }
+}
+
+static void __mt76_mac_addr_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_error(
+            "mt76: failed to set MAC address" VSF_TRACE_CFG_LINEEND);
+        vsf_wifi_done_t init_done = priv->pending_done;
+        priv->pending_done = NULL;
+        if (init_done != NULL) init_done(wifi, err);
+        return;
+    }
+
+    __mt76_init_ready(wifi);
 }
 
 static void __mt76_read_asic_done(vsf_wifi_t *wifi, vsf_err_t err)
@@ -1474,11 +1737,7 @@ vsf_err_t __mt76_set_rx_filter(vsf_wifi_t *wifi, uint32_t mask,
 vsf_err_t __mt76_set_mac_addr(vsf_wifi_t *wifi, const uint8_t mac[6],
                               vsf_wifi_done_t done)
 {
-    (void)wifi; (void)mac;
-    /* STUB: allow VSF WiFi attach to complete.
-     * TODO: read MAC from EEPROM and program it via cfg_write()/mcu_cmd(). */
-    if (done != NULL) done(wifi, VSF_ERR_NONE);
-    return VSF_ERR_NONE;
+    return __mt76_mac_addr_program_start(wifi, mac, done);
 }
 
 vsf_err_t __mt76_set_bssid(vsf_wifi_t *wifi, const uint8_t bssid[6],
