@@ -128,6 +128,10 @@ typedef struct mt76_wifi_priv {
      * driver invokes this for every completed bulk IN URB. */
     void                    (*on_rx)(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
 
+    /* RX packet callback for beacon/probe response frames received on the
+     * packet RX endpoint during scanning. */
+    void                    (*on_rx_pkt)(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
+
     uint32_t                asic_rev;
     uint8_t                 mac_addr[6];
     uint8_t                 eeprom[MT76_EEPROM_SIZE];

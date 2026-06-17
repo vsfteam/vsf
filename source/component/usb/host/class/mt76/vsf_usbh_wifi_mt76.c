@@ -436,7 +436,10 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (URB_OK == status && len > 0) {
                 uint8_t *buf = vk_usbh_urb_peek_buffer(&iocb->urb);
                 mt76_wifi_priv_t *priv = (mt76_wifi_priv_t *)uwifi->wifi.chip_priv;
-                if (priv->on_rx != NULL) {
+                if (iocb->ep_idx == MT76_EP_IN_PKT_RX &&
+                        priv->on_rx_pkt != NULL) {
+                    priv->on_rx_pkt(&uwifi->wifi, buf, (uint16_t)len);
+                } else if (priv->on_rx != NULL) {
                     priv->on_rx(&uwifi->wifi, buf, (uint16_t)len);
                 }
             }
@@ -707,7 +710,10 @@ static vsf_err_t __vk_usbh_wifi_mt76_mcu_cmd(vsf_wifi_t *wifi,
     }
 
     memcpy(cmd_buf, data, len);
-    vk_usbh_urb_set_buffer(&iocb->urb, cmd_buf, len);
+    /* Do NOT use vk_usbh_urb_set_buffer with the URB-owned buffer:
+     * set_buffer frees the current buffer and leaves free_buffer_param stale,
+     * causing use-after-free / double-free. Just update transfer length. */
+    iocb->urb.urb_hcd->transfer_length = len;
     iocb->is_busy = true;
     iocb->done    = done;
 
@@ -757,8 +763,13 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
     }
 
     memcpy(tx_buf, data, len);
-    vk_usbh_urb_set_buffer(&iocb->urb, tx_buf, len);
+    /* Do NOT use vk_usbh_urb_set_buffer with the URB-owned buffer:
+     * set_buffer frees the current buffer and leaves free_buffer_param stale,
+     * causing use-after-free / double-free. Just update transfer length. */
+    iocb->urb.urb_hcd->transfer_length = len;
     if (!vk_usbh_urb_is_alloced(&iocb->urb)) {
+        /* A pre-allocated IOCB may be bound to the firmware endpoint; re-prepare
+         * the pipe so the same IOCB can be used for any TX queue endpoint. */
         vk_usbh_urb_prepare(&iocb->urb, uwifi->dev, uwifi->out_ep[queue_idx].desc);
         if (VSF_ERR_NONE != vk_usbh_alloc_urb(uwifi->usbh, uwifi->dev, &iocb->urb))
             return VSF_ERR_NOT_ENOUGH_RESOURCES;

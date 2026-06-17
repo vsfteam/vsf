@@ -100,6 +100,114 @@
 #define MT_EE_READ                          0
 #define MT76_EE_MAC_ADDR                    0x004
 
+#define MT76_CMD_SWITCH_CHANNEL_OP          30
+
+/* RX filter register */
+#define MT_RX_FILTR_CFG                     0x1400
+#define MT_RX_FILTR_CFG_CRC_ERR             (1U << 0)
+#define MT_RX_FILTR_CFG_PHY_ERR             (1U << 1)
+#define MT_RX_FILTR_CFG_PROMISC             (1U << 2)
+#define MT_RX_FILTR_CFG_OTHER_BSS           (1U << 3)
+#define MT_RX_FILTR_CFG_VER_ERR             (1U << 4)
+#define MT_RX_FILTR_CFG_MCAST               (1U << 5)
+#define MT_RX_FILTR_CFG_BCAST               (1U << 6)
+#define MT_RX_FILTR_CFG_DUP                 (1U << 7)
+#define MT_RX_FILTR_CFG_CFACK               (1U << 8)
+#define MT_RX_FILTR_CFG_CFEND               (1U << 9)
+#define MT_RX_FILTR_CFG_ACK                 (1U << 10)
+#define MT_RX_FILTR_CFG_CTS                 (1U << 11)
+#define MT_RX_FILTR_CFG_RTS                 (1U << 12)
+#define MT_RX_FILTR_CFG_PSPOLL              (1U << 13)
+#define MT_RX_FILTR_CFG_BA                  (1U << 14)
+#define MT_RX_FILTR_CFG_BAR                 (1U << 15)
+#define MT_RX_FILTR_CFG_CTRL_RSV            (1U << 16)
+
+/* Default RX filter for STA mode (matches Linux mt76x2 initvals) */
+#define MT_RX_FILTR_CFG_DEFAULT             0x00015f97
+
+/* TX descriptor (TXINFO) flags */
+#define MT_TXD_INFO_LEN_MASK                0x0000FFFF
+#define MT_TXD_INFO_NEXT_VLD                (1U << 16)
+#define MT_TXD_INFO_TX_BURST                (1U << 17)
+#define MT_TXD_INFO_80211                   (1U << 19)
+#define MT_TXD_INFO_TSO                     (1U << 20)
+#define MT_TXD_INFO_CSO                     (1U << 21)
+#define MT_TXD_INFO_WIV                     (1U << 24)
+#define MT_TXD_INFO_QSEL_MASK               (3U << 25)
+#define MT_TXD_INFO_QSEL_SHIFT              25
+#define MT_TXD_INFO_DPORT_MASK              (7U << 27)
+#define MT_TXD_INFO_DPORT_SHIFT             27
+#define MT_TXD_INFO_TYPE_MASK               (3U << 30)
+
+#define MT_QSEL_MGMT                        0
+#define MT_QSEL_EDCA                        2
+#define MT_WLAN_PORT                        0
+
+/* TXWI */
+#define MT_TXWI_FLAGS_FRAG                  (1U << 0)
+#define MT_TXWI_FLAGS_MMPS                  (1U << 1)
+#define MT_TXWI_FLAGS_CFACK                 (1U << 2)
+#define MT_TXWI_FLAGS_TS                    (1U << 3)
+#define MT_TXWI_FLAGS_AMPDU                 (1U << 4)
+#define MT_TXWI_FLAGS_MPDU_DENSITY_MASK     (7U << 5)
+#define MT_TXWI_FLAGS_TXOP_MASK             (3U << 8)
+#define MT_TXWI_FLAGS_NDPS                  (1U << 10)
+#define MT_TXWI_FLAGS_RTSBWSIG              (1U << 11)
+#define MT_TXWI_FLAGS_NDP_BW_MASK           (3U << 12)
+#define MT_TXWI_FLAGS_SOUND                 (1U << 14)
+#define MT_TXWI_FLAGS_TX_RATE_LUT           (1U << 15)
+
+#define MT_TXWI_ACK_CTL_REQ                 (1U << 0)
+#define MT_TXWI_ACK_CTL_NSEQ                (1U << 1)
+#define MT_TXWI_ACK_CTL_BA_WINDOW_MASK      (0x3FU << 2)
+
+#define MT_RXWI_RATE_INDEX_MASK             0x003F
+#define MT_RXWI_RATE_LDPC                   (1U << 6)
+#define MT_RXWI_RATE_BW_MASK                (3U << 7)
+#define MT_RXWI_RATE_SGI                    (1U << 9)
+#define MT_RXWI_RATE_STBC                   (1U << 10)
+#define MT_RXWI_RATE_PHY_MASK               (7U << 13)
+
+#define MT_PHY_TYPE_CCK                     0
+#define MT_PHY_TYPE_OFDM                    1
+#define MT_PHY_TYPE_HT                      2
+
+/* USB RX DMA header + RXWI layout */
+#define MT_DMA_HDR_LEN                      4
+#define MT_RX_RXWI_LEN                      32
+#define MT_FCE_INFO_LEN                     4
+
+/* RXWI word0 (rxinfo) flags */
+#define MT_RXINFO_BA                        (1U << 0)
+#define MT_RXINFO_DATA                      (1U << 1)
+#define MT_RXINFO_NULL                      (1U << 2)
+#define MT_RXINFO_FRAG                      (1U << 3)
+#define MT_RXINFO_UNICAST                   (1U << 4)
+#define MT_RXINFO_MULTICAST                 (1U << 5)
+#define MT_RXINFO_BROADCAST                 (1U << 6)
+#define MT_RXINFO_MYBSS                     (1U << 7)
+#define MT_RXINFO_CRCERR                    (1U << 8)
+#define MT_RXINFO_ICVERR                    (1U << 9)
+#define MT_RXINFO_MICERR                    (1U << 10)
+#define MT_RXINFO_AMSDU                     (1U << 11)
+#define MT_RXINFO_HTC                       (1U << 12)
+#define MT_RXINFO_RSSI                      (1U << 13)
+#define MT_RXINFO_L2PAD                     (1U << 14)
+#define MT_RXINFO_AMPDU                     (1U << 15)
+#define MT_RXINFO_DECRYPT                   (1U << 16)
+#define MT_RXINFO_PN_LEN                    (7U << 19)
+#define MT_RXINFO_PROBE_RESP                (1U << 24)
+#define MT_RXINFO_BEACON                    (1U << 25)
+
+/* RXWI word1 (ctl) fields */
+#define MT_RXWI_CTL_WCID_MASK               0x00FF
+#define MT_RXWI_CTL_MPDU_LEN_MASK           (0x3FFFU << 16)
+#define MT_RXWI_CTL_MPDU_LEN_SHIFT          16
+#define MT_RXWI_CTL_EOF                     (1U << 31)
+
+/* RXWI size: 32 bytes */
+#define MT_RXWI_SIZE                        32
+
 #define __mt76_put_le32(_p, _v)             do { \
         (_p)[0] = (uint8_t)(_v);                \
         (_p)[1] = (uint8_t)((_v) >> 8);         \
@@ -114,6 +222,10 @@
 #define __mt76_get_le16(_p)                 \
     (   (uint16_t)(_p)[0]                   \
       | ((uint16_t)(_p)[1] << 8))
+#define __mt76_put_le16(_p, _v)             do { \
+        (_p)[0] = (uint8_t)(_v);                \
+        (_p)[1] = (uint8_t)((_v) >> 8);         \
+    } while (0)
 #define __mt76_round_up(_x, _n)             (((_x) + ((_n) - 1)) & ~((_n) - 1))
 #define __mt76_min(_a, _b)                  ((_a) < (_b) ? (_a) : (_b))
 #define __mt76_rev(_priv)                   ((uint16_t)((_priv)->asic_rev & 0xFFFF))
@@ -227,6 +339,7 @@ static void __mt76_fw_timer_start(vsf_wifi_t *wifi, uint32_t ms);
 static vsf_err_t __mt76_mcu_msg_send(vsf_wifi_t *wifi, uint8_t cmd,
     const uint8_t *payload, uint16_t payload_len, vsf_wifi_done_t done);
 static void __mt76_on_rx(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
+static void __mt76_on_rx_pkt(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -1532,6 +1645,7 @@ static void __mt76_init_ready(vsf_wifi_t *wifi)
 
     priv->state = MT76_STATE_INIT_READY;
     priv->on_rx = __mt76_on_rx;
+    priv->on_rx_pkt = __mt76_on_rx_pkt;
     /* Notify the bus driver that the data path can be enabled. */
     __mt76_bus_ops(wifi)->on_ready(wifi);
     priv->pending_done = NULL;
@@ -1699,13 +1813,19 @@ static void __mt76_on_rx(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len)
     uint8_t seq = (uint8_t)((info >> 16) & 0x0F);
 
     vsf_wifi_chip_mt76_trace_debug(
-        "mt76: rx evt=0x%02X seq=%u len=%u" VSF_TRACE_CFG_LINEEND,
+        "mt76: mcu evt=0x%02X seq=%u len=%u" VSF_TRACE_CFG_LINEEND,
         evt, seq, len);
 #else
     (void)info;
 #endif
 
-    /* TODO: parse CMD_RESP / PKT_RX and dispatch to scan/connect/rate/etc. */
+    /* CMD_RESP events are currently only logged; set_channel/power-on
+     * commands complete via their bulk-OUT done callbacks. */
+}
+
+static void __mt76_on_rx_pkt(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len)
+{
+    __mt76_parse_rx(wifi, buf, len);
 }
 
 void __mt76_fini(vsf_wifi_t *wifi)
@@ -1719,19 +1839,35 @@ void __mt76_fini(vsf_wifi_t *wifi)
 vsf_err_t __mt76_set_channel(vsf_wifi_t *wifi, uint8_t channel,
                              vsf_wifi_done_t done)
 {
-    (void)wifi; (void)channel; (void)done;
-    /* TODO: CMD_SWITCH_CHANNEL_OP via mcu_msg_send() */
-    return VSF_ERR_NOT_SUPPORT;
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    (void)priv;
+
+    uint8_t payload[8];
+    payload[0] = channel;       /* idx */
+    payload[1] = 0;             /* scan */
+    payload[2] = 0;             /* bw: 20 MHz */
+    payload[3] = 0;             /* pad */
+    /* chainmask: MT7612U is 2T2R, use 0x0202 */
+    payload[4] = 0x02;
+    payload[5] = 0x02;
+    /* ext_chan: 0xe0 for 20 MHz primary channel */
+    payload[6] = 0xe0;
+    payload[7] = 0;
+
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: set_channel=%u" VSF_TRACE_CFG_LINEEND, (unsigned)channel);
+
+    return __mt76_mcu_msg_send(wifi, MT76_CMD_SWITCH_CHANNEL_OP,
+                               payload, sizeof(payload), done);
 }
 
 vsf_err_t __mt76_set_rx_filter(vsf_wifi_t *wifi, uint32_t mask,
                                vsf_wifi_done_t done)
 {
-    (void)wifi; (void)mask;
-    /* STUB: allow VSF WiFi attach to complete.
-     * TODO: write MT_RX_FILTR_CFG via cfg_write(). */
-    if (done != NULL) done(wifi, VSF_ERR_NONE);
-    return VSF_ERR_NONE;
+    uint32_t filter = (mask != 0) ? mask : MT_RX_FILTR_CFG_DEFAULT;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: set_rx_filter=0x%08X" VSF_TRACE_CFG_LINEEND, (unsigned)filter);
+    return __mt76_cfg_write(wifi, MT_RX_FILTR_CFG, filter, done);
 }
 
 vsf_err_t __mt76_set_mac_addr(vsf_wifi_t *wifi, const uint8_t mac[6],
@@ -1781,17 +1917,214 @@ vsf_err_t __mt76_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)
     return VSF_ERR_NOT_SUPPORT;
 }
 
+/* Map RSN cipher suite type (IEEE 802.11-2012 Table 8-101) to VSF cipher. */
+static uint8_t __mt76_rsn_cipher(uint8_t cipher)
+{
+    switch (cipher) {
+    case 1: return WIFI_CIPHER_WEP40;
+    case 2: return WIFI_CIPHER_TKIP;
+    case 4: return WIFI_CIPHER_CCMP;
+    case 5: return WIFI_CIPHER_WEP104;
+    default: return WIFI_CIPHER_NONE;
+    }
+}
+
+/* Parse an RSN IE body (after tag+len) and fill security fields.
+ * Only WPA2-PSK is recognised (AKM suite 00-0F-AC-02). */
+static void __mt76_parse_rsn(const uint8_t *body, uint8_t len,
+                             vsf_wifi_scan_result_t *result)
+{
+    static const uint8_t oui[3] = { 0x00, 0x0F, 0xAC };
+    const uint8_t *p   = body;
+    const uint8_t *end = body + len;
+    uint16_t count, k;
+    bool     has_psk  = false;
+    uint8_t  pairwise = WIFI_CIPHER_NONE;
+    uint8_t  group    = WIFI_CIPHER_NONE;
+
+    if (len < 8) return;
+    p += 2;                             /* skip version */
+    if (!memcmp(p, oui, 3)) group = __mt76_rsn_cipher(p[3]);
+    p += 4;
+    if (p + 2 > end) return;
+    count = (uint16_t)(p[0] | ((uint16_t)p[1] << 8)); p += 2;
+    for (k = 0; k < count; k++) {
+        if (p + 4 > end) return;
+        if (!memcmp(p, oui, 3)) {
+            uint8_t c = __mt76_rsn_cipher(p[3]);
+            if (c == WIFI_CIPHER_CCMP)              pairwise = WIFI_CIPHER_CCMP;
+            else if (pairwise == WIFI_CIPHER_NONE)  pairwise = c;
+        }
+        p += 4;
+    }
+    if (p + 2 > end) return;
+    count = (uint16_t)(p[0] | ((uint16_t)p[1] << 8)); p += 2;
+    for (k = 0; k < count; k++) {
+        if (p + 4 > end) return;
+        if (!memcmp(p, oui, 3) && (p[3] == 2)) has_psk = true;
+        p += 4;
+    }
+
+    if (has_psk) {
+        result->auth_mode       = WIFI_AUTH_WPA2_PSK;
+        result->pairwise_cipher = (pairwise != WIFI_CIPHER_NONE)
+                                ? pairwise : WIFI_CIPHER_CCMP;
+        result->group_cipher    = group;
+    }
+}
+
 void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
-    /* TODO: parse beacon/probe response during scan */
-    (void)wifi; (void)frame; (void)len;
+    uint16_t pos = 0;
+
+    while (pos + MT_DMA_HDR_LEN <= len) {
+        uint16_t dma_len = (uint16_t)frame[pos] |
+                           ((uint16_t)frame[pos + 1] << 8);
+        uint16_t entry_total = MT_DMA_HDR_LEN + dma_len;
+        uint16_t next_pos = (entry_total + 3u) & ~3u;
+
+        if (dma_len == 0 || entry_total > len - pos) {
+            break;
+        }
+
+        uint8_t *entry = frame + pos;
+        uint8_t *rxwi  = entry + MT_DMA_HDR_LEN;
+        uint32_t rxinfo = __mt76_get_le32(rxwi);
+        uint32_t ctl    = __mt76_get_le32(rxwi + 4);
+        uint16_t mpdu_len = (uint16_t)((ctl & MT_RXWI_CTL_MPDU_LEN_MASK)
+                                        >> MT_RXWI_CTL_MPDU_LEN_SHIFT);
+        uint16_t hdr_pad  = (rxinfo & MT_RXINFO_L2PAD) ? 2 : 0;
+
+        if ((mpdu_len != 0) &&
+            (mpdu_len <= dma_len - MT_RX_RXWI_LEN - MT_FCE_INFO_LEN - hdr_pad)) {
+            uint8_t *dot11 = rxwi + MT_RX_RXWI_LEN + hdr_pad;
+
+            if ((dot11[0] & 0x0C) == 0x00) {          /* management type */
+                uint8_t subtype = (dot11[0] >> 4) & 0x0F;
+                if ((subtype == 5 || subtype == 8) && wifi->scanning) {
+                    const uint8_t *bssid = dot11 + 16;
+                    const uint8_t *body  = dot11 + 24;
+                    uint16_t body_len = mpdu_len - 24;
+
+                    if (body_len >= 12) {
+                        vsf_wifi_scan_result_t result;
+                        memset(&result, 0, sizeof(result));
+                        memcpy(result.bssid, bssid, 6);
+                        result.capability = (uint16_t)body[10] |
+                                            ((uint16_t)body[11] << 8);
+                        result.channel    = wifi->channel;
+                        result.flags      = (subtype == 5) ? 1u : 0u;
+                        result.rssi       = (int8_t)rxwi[12]; /* rssi[0] */
+
+                        const uint8_t *ie  = body + 12;
+                        const uint8_t *end = body + body_len;
+                        while (ie + 2 <= end) {
+                            uint8_t tag = ie[0];
+                            uint8_t l   = ie[1];
+                            if (ie + 2 + l > end) break;
+                            if (tag == 0 && l <= 32) {
+                                memcpy(result.ssid, ie + 2, l);
+                                result.ssid_len = l;
+                            } else if (tag == 3 && l == 1) {
+                                result.channel = ie[2];
+                            } else if (tag == 48) {
+                                __mt76_parse_rsn(ie + 2, l, &result);
+                            }
+                            ie += 2 + l;
+                        }
+
+                        vsf_wifi_chip_mt76_trace_debug(
+                            "mt76: scan bssid=%02X:%02X:%02X:%02X:%02X:%02X "
+                            "ssid=%.*s ch=%u rssi=%d caps=0x%04X"
+                            VSF_TRACE_CFG_LINEEND,
+                            bssid[0], bssid[1], bssid[2], bssid[3],
+                            bssid[4], bssid[5],
+                            result.ssid_len, result.ssid,
+                            result.channel, result.rssi, result.capability);
+
+                        vsf_wifi_on_scan_result(wifi, &result);
+                    }
+                }
+            }
+        }
+
+        if (next_pos <= pos) break;
+        pos = next_pos;
+    }
 }
+
+/* Queue index used for management frames (probe-request, auth, assoc).
+ * On USB this maps to the AC_BE bulk-out endpoint. */
+#define MT76_TX_QUEUE_MGMT                  1
 
 vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 {
-    (void)wifi; (void)frame; (void)len;
-    /* TODO: build TXINFO+TXWI and submit tx_frame(..., MT76_EP_OUT_AC_BE, NULL) */
-    return VSF_ERR_NOT_SUPPORT;
+    if (len < 2) return VSF_ERR_INVALID_PARAMETER;
+
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    /* Compute the 802.11 header length so we can insert the 2-byte
+     * L2 pad that MT76 hardware expects when the header length is odd. */
+    uint8_t  fc0      = frame[0];
+    uint8_t  fc1      = frame[1];
+    bool     to_ds    = (fc1 & 0x01) != 0;
+    bool     from_ds  = (fc1 & 0x02) != 0;
+    bool     qos      = ((fc0 >> 4) & 0x0F) >= 8; /* data subtype 8-15 */
+    bool     order    = (fc1 & 0x80) != 0;
+    uint16_t hdrlen   = 24;
+
+    if (to_ds && from_ds) hdrlen += 6; /*_addr4 */
+    if (qos)              hdrlen += 2;
+    if (order)            hdrlen += 4;
+
+    uint8_t  hdr_pad  = (hdrlen & 1) ? 2 : 0;
+    uint16_t txwi_len = 16;
+    uint16_t payload_after_txwi = len + hdr_pad;
+    uint16_t info_len = payload_after_txwi & ~3u;
+    if (payload_after_txwi & 3u) info_len += 4;
+    uint16_t total_after_txinfo = 4 + txwi_len + payload_after_txwi;
+    uint16_t pad = ((total_after_txinfo + 3u) & ~3u) + 4 - total_after_txinfo;
+    uint16_t total = total_after_txinfo + pad;
+
+    if (total > sizeof(priv->tx_buf)) {
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+    }
+
+    uint8_t *buf = priv->tx_buf;
+
+    uint32_t info = ((uint32_t)info_len & MT_TXD_INFO_LEN_MASK)
+                  | MT_TXD_INFO_80211
+                  | MT_TXD_INFO_WIV
+                  | (((uint32_t)MT_QSEL_MGMT & 3U) << MT_TXD_INFO_QSEL_SHIFT)
+                  | (((uint32_t)MT_WLAN_PORT & 7U) << MT_TXD_INFO_DPORT_SHIFT);
+    __mt76_put_le32(buf, info);
+
+    uint8_t *txwi = buf + 4;
+    memset(txwi, 0, txwi_len);
+    /* rate: OFDM 6 Mbps (basic rate for management frames) */
+    uint16_t rate = ((uint16_t)MT_PHY_TYPE_OFDM << 13);
+    __mt76_put_le16(txwi + 0, 0);       /* flags */
+    __mt76_put_le16(txwi + 2, rate);
+    txwi[4] = MT_TXWI_ACK_CTL_REQ;      /* ack_ctl */
+    txwi[5] = 0xff;                     /* wcid: broadcast / not assigned */
+    __mt76_put_le16(txwi + 6, len);     /* len_ctl = real MPDU length */
+    /* iv(4) + eiv(4) + aid + txstream + ctl2 + pktid remain zero */
+
+    uint8_t *dst = buf + 4 + txwi_len;
+    if (hdr_pad) {
+        dst[0] = 0;
+        dst[1] = 0;
+        dst += 2;
+    }
+    memcpy(dst, frame, len);
+    memset(buf + total - pad, 0, pad);
+
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: tx frame fc=0x%02X%02X len=%u total=%u hdr_pad=%u"
+        VSF_TRACE_CFG_LINEEND,
+        fc1, fc0, len, total, hdr_pad);
+
+    return __mt76_tx_frame(wifi, buf, total, MT76_TX_QUEUE_MGMT, NULL);
 }
 
 const vsf_wifi_chip_drv_t vsf_wifi_mt76_drv = {
