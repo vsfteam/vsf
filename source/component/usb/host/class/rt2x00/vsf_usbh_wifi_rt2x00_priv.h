@@ -92,7 +92,7 @@ struct vk_usbh_wifi_t {
     const uint8_t       *bus_block_data;
     uint32_t             bus_block_len;
     uint32_t             bus_block_offset;
-    uint16_t             bus_block_base;
+    uint32_t             bus_block_base;
     uint16_t             bus_block_chunk;
 
     /* Vendor-request (USB_DEVICE_MODE etc.) state: bRequest/wValue/wIndex,

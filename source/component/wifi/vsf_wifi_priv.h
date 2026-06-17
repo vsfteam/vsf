@@ -157,11 +157,11 @@ struct vsf_wifi_t {
             const uint8_t *data;
             uint32_t       len;
             uint32_t       offset;  /* used by the reg_write fallback path */
-            uint16_t       base_reg;
+            uint32_t       base_reg;
             uint16_t       chunk_size;
         } blob;
         struct {
-            uint16_t              reg;
+            uint32_t              reg;
             uint16_t              retry_left;  /* attempts remaining after
                                                 * the current in-flight read */
             uint16_t              interval_ms;
@@ -212,7 +212,15 @@ struct vsf_wifi_t {
      * vtable here (cast by the chip driver to the appropriate type).  The
      * operations are named after what the *chip* does (send MCU command,
      * submit TX frame, start RX, ...), so the same chip driver can plug into
-     * different physical buses without modification. */
+     * different physical buses without modification.
+     *
+     * Design rule: bus_ops MUST NOT contain physical-bus-specific primitives
+     * such as USB ep0 vendor_request.  If a chip genuinely needs a bus-specific
+     * control primitive, define a chip-private vtable whose FIRST member is
+     * vsf_wifi_reg_bus_t (when register semantics exist) or another chip-defined
+     * base, and place the private primitive after the shared part.  The bus
+     * driver supplies the private vtable; the chip driver casts bus_ops to the
+     * chip-private type. */
     const void                    *bus_ops;
 
     /* ---- Raw WiFi radio state ----

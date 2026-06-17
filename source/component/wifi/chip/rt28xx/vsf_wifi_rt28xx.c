@@ -412,7 +412,7 @@
  *   RT_OP_RF   — indirect RF register write    (via RF_CSR_CFG)
  *==========================================================================*/
 
-#define RT_OP_REG(r_, v_)   { (uint16_t)(r_), (uint32_t)(v_) }
+#define RT_OP_REG(r_, v_)   { (uint32_t)(r_), (uint32_t)(v_) }
 
 #define RT_OP_BBP(r_, v_)   RT_OP_REG(RT28XX_BBP_CSR_CFG,                      \
         RT28XX_BBP_BUSY | RT28XX_BBP_RW_MODE | (((uint32_t)(r_) & 0xFF) << 8)  \
@@ -2180,6 +2180,11 @@ static void __rt28xx_post_fw_done(vsf_wifi_t *wifi, vsf_err_t err)
 static void __rt28xx_fw_kick_done(vsf_wifi_t *wifi, vsf_err_t err);
 static void __rt28xx_pre_fw_done(vsf_wifi_t *wifi, vsf_err_t err);
 
+static const vsf_wifi_rt28xx_bus_ops_t * __rt28xx_bus_ops(vsf_wifi_t *wifi)
+{
+    return (const vsf_wifi_rt28xx_bus_ops_t *)wifi->bus_ops;
+}
+
 static void __rt28xx_blob_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (VSF_ERR_NONE != err) {
@@ -2207,14 +2212,23 @@ static void __rt28xx_pre_fw_done(vsf_wifi_t *wifi, vsf_err_t err)
     /* Start the MCU with the ep0 vendor request (USB_DEVICE_MODE /
      * USB_MODE_FIRMWARE).  This is NOT a register write -- it is the
      * documented firmware-download handshake.  Skipping it leaves the MCU
-     * dead, so no RF/PHY calibration runs and the receiver stays silent. */
-    err = vsf_wifi_reg_run_vendor(wifi, RT28XX_USB_DEVICE_MODE,
-            RT28XX_USB_MODE_FIRMWARE, 0, __rt28xx_fw_kick_done);
-    vsf_wifi_chip_rt28xx_trace_debug("rt28xx: USB_MODE_FIRMWARE vendor req submit err=%d" VSF_TRACE_CFG_LINEEND, err);
-    if (VSF_ERR_NONE != err) {
-        /* Bus has no vendor_request primitive: fall back to the old path so
-         * non-USB buses still work. */
-        __rt28xx_fw_kick_done(wifi, VSF_ERR_NONE);
+     * dead, so no RF/PHY calibration runs and the receiver stays silent.
+     *
+     * vendor_request lives in the chip-private bus-ops extension
+     * (vsf_wifi_rt28xx_bus_ops_t), not in the generic reg_bus, because it is
+     * a USB-specific primitive rather than a chip register semantic. */
+    const vsf_wifi_rt28xx_bus_ops_t *bus = __rt28xx_bus_ops(wifi);
+    if (bus != NULL && bus->vendor_request != NULL) {
+        err = bus->vendor_request(wifi, RT28XX_USB_DEVICE_MODE,
+                RT28XX_USB_MODE_FIRMWARE, 0, __rt28xx_fw_kick_done);
+        vsf_wifi_chip_rt28xx_trace_debug("rt28xx: USB_MODE_FIRMWARE vendor req submit err=%d" VSF_TRACE_CFG_LINEEND, err);
+        if (VSF_ERR_NONE != err) {
+            __rt28xx_chain_finish(wifi, err);
+        }
+    } else {
+        vsf_wifi_chip_rt28xx_trace_error(
+            "rt28xx: vendor_request missing from bus_ops" VSF_TRACE_CFG_LINEEND);
+        __rt28xx_chain_finish(wifi, VSF_ERR_NOT_SUPPORT);
     }
 }
 
@@ -2404,7 +2418,10 @@ static uint32_t __rt28xx_init_pbf;
  * MAC_SYS_CTRL=0 after the vendor reset (rt2800usb.c:291). */
 static void __rt28xx_reset_clear(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    (void)err;  /* a missing vendor primitive is non-fatal; still deassert */
+    if (VSF_ERR_NONE != err) {
+        __rt28xx_init_emit(wifi);
+        return;
+    }
     __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_SYS_CTRL, 0);
     __rt28xx_ops_buf[1] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_BBP_AGENT, 0);
     __rt28xx_ops_buf[2] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_MAILBOX_CSR, 0);
@@ -2420,12 +2437,15 @@ static void __rt28xx_reset_clear(vsf_wifi_t *wifi, vsf_err_t err)
 static void __rt28xx_reset_vendor_kick(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (VSF_ERR_NONE != err) { __rt28xx_init_emit(wifi); return; }
-    vsf_err_t e = vsf_wifi_reg_run_vendor(wifi, RT28XX_USB_DEVICE_MODE,
+    const vsf_wifi_rt28xx_bus_ops_t *bus = __rt28xx_bus_ops(wifi);
+    if (bus == NULL || bus->vendor_request == NULL) {
+        __rt28xx_init_emit(wifi);
+        return;
+    }
+    vsf_err_t e = bus->vendor_request(wifi, RT28XX_USB_DEVICE_MODE,
             RT28XX_USB_MODE_RESET, 0, __rt28xx_reset_clear);
     if (VSF_ERR_NONE != e) {
-        /* Bus has no vendor primitive: skip the digital-core reset but still
-         * complete the MAC/BBP reset deassert so bring-up proceeds. */
-        __rt28xx_reset_clear(wifi, VSF_ERR_NONE);
+        __rt28xx_init_emit(wifi);
     }
 }
 

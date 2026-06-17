@@ -170,7 +170,7 @@ typedef struct vsf_wifi_auth_cfg_t {
  * This keeps the wifi state machine free of chip-specific knowledge.
  */
 typedef struct vsf_wifi_reg_op_t {
-    uint16_t reg;
+    uint32_t reg;
     uint32_t val;
 } vsf_wifi_reg_op_t;
 
@@ -184,17 +184,23 @@ typedef struct vsf_wifi_reg_op_t {
 typedef struct vsf_wifi_reg_blob_t {
     const uint8_t *data;
     uint32_t       len;
-    uint16_t       base_reg;
+    uint32_t       base_reg;
     uint16_t       chunk_size;     /* hint; bus impl may override */
 } vsf_wifi_reg_blob_t;
 
 /*============================ REGISTER BUS OPS ==============================*
  *
- * Optional register-access helper for register-based WiFi chips (e.g.
- * Ralink RT2X00).  Chips that do NOT speak a register protocol — such as
- * MediaTek mt76, which uses firmware commands over bulk/interrupt endpoints
- * — can leave wifi->reg_bus NULL and implement their own transport inside
- * drv->tx / drv->init / etc.
+ * Optional register-access abstraction for register-based WiFi chips (e.g.
+ * Ralink RT2X00).  This vtable describes the chip's register semantics, NOT
+ * the underlying physical bus.  It therefore MUST NOT contain bus-specific
+ * primitives such as USB ep0 vendor requests; those belong in a chip-private
+ * bus-operations structure (placed in wifi->bus_ops) when a chip really needs
+ * them.
+ *
+ * Chips that do NOT speak a register protocol — such as MediaTek mt76, which
+ * uses firmware commands over bulk/interrupt endpoints — can leave
+ * wifi->reg_bus NULL and implement their own transport inside drv->tx /
+ * drv->init / etc.
  *
  * Concurrency contract: at most one reg_bus call may be in flight at any
  * time.  Issuing a second call before the previous `done` callback has
@@ -210,7 +216,7 @@ struct vsf_wifi_reg_bus_t {
      * errors (resource exhaustion, bus busy) are returned directly without
      * invoking `done`.
      */
-    vsf_err_t (*reg_write)      (vsf_wifi_t *wifi, uint16_t reg, uint32_t val,
+    vsf_err_t (*reg_write)      (vsf_wifi_t *wifi, uint32_t reg, uint32_t val,
                                  vsf_wifi_done_t done);
 
     /* Single-register 32-bit read.  REQUIRED.
@@ -218,7 +224,7 @@ struct vsf_wifi_reg_bus_t {
      * `out` is written before `done` fires; caller must keep it valid until
      * then.  Same async / error semantics as reg_write.
      */
-    vsf_err_t (*reg_read)       (vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
+    vsf_err_t (*reg_read)       (vsf_wifi_t *wifi, uint32_t reg, uint32_t *out,
                                  vsf_wifi_done_t done);
 
     /* Contiguous register-block write (firmware upload / calibration table
@@ -230,17 +236,8 @@ struct vsf_wifi_reg_bus_t {
      * vendor-request chunks, SDIO CMD53 picks block size, etc.).  `data`
      * must stay valid until `done` fires.
      */
-    vsf_err_t (*reg_block_write)(vsf_wifi_t *wifi, uint16_t base,
+    vsf_err_t (*reg_block_write)(vsf_wifi_t *wifi, uint32_t base,
                                  const uint8_t *data, uint32_t len,
-                                 vsf_wifi_done_t done);
-
-    /* Raw ep0 vendor request with no data stage (wLength=0).  OPTIONAL —
-     * NULL when the bus has no such concept.  Used by USB chips to issue
-     * USB_DEVICE_MODE (start MCU firmware / reset the digital core), which
-     * is NOT a register write.  `request`=bRequest, `value`=wValue,
-     * `index`=wIndex.  Same async / error semantics as reg_write. */
-    vsf_err_t (*vendor_request) (vsf_wifi_t *wifi, uint8_t request,
-                                 uint16_t value, uint16_t index,
                                  vsf_wifi_done_t done);
 
     /* Bus-layer ready notification.  OPTIONAL — called when the wifi init
@@ -604,20 +601,6 @@ vsf_err_t vsf_wifi_reg_run_blob(vsf_wifi_t *wifi,
                             vsf_wifi_done_t done);
 
 /*
- * Issue a single ep0 vendor request with no data stage (wLength=0) via
- * reg_bus->vendor_request.  Used by USB chips for control commands that are
- * not register writes (e.g. RT2800 USB_DEVICE_MODE to start the MCU firmware
- * or reset the digital core).  Completes with VSF_ERR_NOT_SUPPORTED when the
- * bus has no vendor_request primitive.
- *
- * Same concurrency rules as vsf_wifi_reg_run_script: at most one script / blob /
- * vendor request in flight per wifi.
- */
-vsf_err_t vsf_wifi_reg_run_vendor(vsf_wifi_t *wifi, uint8_t request,
-                              uint16_t value, uint16_t index,
-                              vsf_wifi_done_t done);
-
-/*
  * Periodically read `reg` until `match(val)` returns true.
  *
  *   reg          : MAC register to poll.
@@ -634,7 +617,7 @@ vsf_err_t vsf_wifi_reg_run_vendor(vsf_wifi_t *wifi, uint8_t request,
  *
  * Same single-flight constraint as run_script / run_blob.
  */
-vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
+vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint32_t reg,
                                  vsf_wifi_reg_match_fn_t match,
                                  uint16_t max_retry, uint16_t interval_ms,
                                  vsf_wifi_done_t done);
@@ -644,7 +627,7 @@ vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
  * `done` fires; caller must keep `out` valid until then.  Same single-
  * flight constraint as run_script / run_blob / run_read_poll.
  */
-vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
+vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint32_t reg, uint32_t *out,
                             vsf_wifi_done_t done);
 
 /* Per-wifi scratch op buffer (shared by parameterised chip ops). */

@@ -25,6 +25,7 @@
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 
 #include "kernel/vsf_kernel.h"
+#include "component/wifi/chip/rt28xx/vsf_wifi_rt28xx.h"
 #include "../../vsf_usbh.h"
 #include "./vsf_usbh_wifi_rt2x00_priv.h"
 
@@ -232,7 +233,7 @@ static void __usb_wifi_bus_finish(vk_usbh_wifi_t *uwifi, vsf_err_t err)
 }
 
 /* reg_bus->reg_write */
-static vsf_err_t __usb_wifi_reg_write(vsf_wifi_t *wifi, uint16_t reg,
+static vsf_err_t __usb_wifi_reg_write(vsf_wifi_t *wifi, uint32_t reg,
         uint32_t val, vsf_wifi_done_t done)
 {
     vk_usbh_wifi_t *uwifi = vsf_container_of(wifi, vk_usbh_wifi_t, wifi);
@@ -257,7 +258,7 @@ static vsf_err_t __usb_wifi_reg_write(vsf_wifi_t *wifi, uint16_t reg,
 }
 
 /* reg_bus->reg_read */
-static vsf_err_t __usb_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg,
+static vsf_err_t __usb_wifi_reg_read(vsf_wifi_t *wifi, uint32_t reg,
         uint32_t *out, vsf_wifi_done_t done)
 {
     vk_usbh_wifi_t *uwifi = vsf_container_of(wifi, vk_usbh_wifi_t, wifi);
@@ -282,7 +283,7 @@ static vsf_err_t __usb_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg,
 }
 
 /* reg_bus->reg_block_write */
-static vsf_err_t __usb_wifi_reg_block_write(vsf_wifi_t *wifi, uint16_t base,
+static vsf_err_t __usb_wifi_reg_block_write(vsf_wifi_t *wifi, uint32_t base,
         const uint8_t *data, uint32_t len, vsf_wifi_done_t done)
 {
     vk_usbh_wifi_t *uwifi = vsf_container_of(wifi, vk_usbh_wifi_t, wifi);
@@ -361,13 +362,15 @@ static vsf_err_t __usb_wifi_data_tx(vsf_wifi_t *wifi, uint8_t *data,
 
 /*============================ BUS OPS VTABLE ================================*/
 
-static const vsf_wifi_reg_bus_t __usb_wifi_reg_bus = {
-    .reg_write       = __usb_wifi_reg_write,
-    .reg_read        = __usb_wifi_reg_read,
-    .reg_block_write = __usb_wifi_reg_block_write,
-    .vendor_request  = __usb_wifi_vendor_request,
-    .on_ready        = __usb_wifi_on_ready,
-    .data_tx         = __usb_wifi_data_tx,
+static const vsf_wifi_rt28xx_bus_ops_t __usb_wifi_bus_ops = {
+    .base = {
+        .reg_write       = __usb_wifi_reg_write,
+        .reg_read        = __usb_wifi_reg_read,
+        .reg_block_write = __usb_wifi_reg_block_write,
+        .on_ready        = __usb_wifi_on_ready,
+        .data_tx         = __usb_wifi_data_tx,
+    },
+    .vendor_request = __usb_wifi_vendor_request,
 };
 
 /*============================ ATTACH FAIL HOOK ==============================*/
@@ -628,8 +631,11 @@ static void * __vk_usbh_wifi_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     uwifi->id.idProduct = usbh->parser->desc_device->idProduct;
     uwifi->id.idVendor  = usbh->parser->desc_device->idVendor;
 
-    /* Initialize the generic wifi layer (embedded). */
-    vsf_wifi_init(&uwifi->wifi, drv, &__usb_wifi_reg_bus, &uwifi->eda);
+    /* Initialize the generic wifi layer (embedded).  Pass the standard
+     * register-bus view of the chip-private vtable; stash the full vtable
+     * in wifi->bus_ops so the RT28xx chip driver can reach vendor_request. */
+    vsf_wifi_init(&uwifi->wifi, drv, &__usb_wifi_bus_ops.base, &uwifi->eda);
+    uwifi->wifi.bus_ops = &__usb_wifi_bus_ops;
     vsf_wifi_set_attach_fail(&uwifi->wifi, __usb_wifi_attach_fail);
 
     /* Start EDA — VSF_EVT_INIT will call vsf_wifi_start(). */

@@ -20,13 +20,30 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "../../vsf_wifi_cfg.h"
+#include "../../vsf_wifi.h"
 
 #if VSF_WIFI_USE_RT28XX == ENABLED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*============================ TYPES =========================================*/
+
+/*
+ * RT28xx chip-private bus operations.
+ *
+ * The first member MUST be vsf_wifi_reg_bus_t so the generic wifi layer can
+ * treat the structure as a plain register bus.  The USB bus driver embeds the
+ * standard register ops here and appends RT28xx-specific primitives (e.g. the
+ * USB ep0 vendor_request used for USB_DEVICE_MODE) after the shared part.
+ */
+typedef struct vsf_wifi_rt28xx_bus_ops_t {
+    vsf_wifi_reg_bus_t base;
+    vsf_err_t (*vendor_request)(vsf_wifi_t *wifi, uint8_t request,
+                                uint16_t value, uint16_t index,
+                                vsf_wifi_done_t done);
+} vsf_wifi_rt28xx_bus_ops_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

@@ -411,7 +411,7 @@ static void __vsf_wifi_blob_step(vsf_wifi_t *wifi, vsf_err_t err)
         val |= ((uint32_t)wifi->s.blob.data[off + i]) << (i * 8);
     }
     err = wifi->reg_bus->reg_write(wifi,
-            (uint16_t)(wifi->s.blob.base_reg + off), val,
+            wifi->s.blob.base_reg + off, val,
             __vsf_wifi_blob_step);
     if (VSF_ERR_NONE != err) {
         __vsf_wifi_script_finish(wifi, err);
@@ -461,37 +461,6 @@ vsf_err_t vsf_wifi_reg_run_blob(vsf_wifi_t *wifi,
     return err;
 }
 
-/*============================ VENDOR-REQUEST DISPATCHER =====================*/
-
-static void __vsf_wifi_vendor_done(vsf_wifi_t *wifi, vsf_err_t err)
-{
-    __vsf_wifi_script_finish(wifi, err);
-}
-
-vsf_err_t vsf_wifi_reg_run_vendor(vsf_wifi_t *wifi, uint8_t request,
-        uint16_t value, uint16_t index, vsf_wifi_done_t done)
-{
-    if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
-    if (wifi->reg_bus == NULL ||
-            wifi->reg_bus->vendor_request == NULL) {
-        if (done != NULL) done(wifi, VSF_ERR_NOT_SUPPORT);
-        return VSF_ERR_NOT_SUPPORT;
-    }
-
-    wifi->script_is_blob = false;
-    wifi->script_done    = done;
-    wifi->script_busy    = true;
-
-    vsf_err_t err = wifi->reg_bus->vendor_request(wifi, request, value, index,
-            __vsf_wifi_vendor_done);
-    if (VSF_ERR_NONE != err) {
-        wifi->script_busy = false;
-        wifi->script_done = NULL;
-        memset(&wifi->s, 0, sizeof(wifi->s));
-    }
-    return err;
-}
-
 vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi)
 {
     return wifi->scratch_ops;
@@ -531,21 +500,21 @@ static void __vsf_wifi_read_poll_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
     if (VSF_ERR_NONE != err) {
-        vsf_wifi_trace_info("wifi: read_poll reg=0x%04X bus err=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: read_poll reg=0x%08X bus err=%d" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg, (int)err);
         __vsf_wifi_script_finish(wifi, err);
         return;
     }
     if (wifi->s.read_poll.match != NULL
             && wifi->s.read_poll.match(wifi->s.read_poll.last_val)) {
-        vsf_wifi_trace_debug("wifi: read_poll reg=0x%04X matched val=0x%08X" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_debug("wifi: read_poll reg=0x%08X matched val=0x%08X" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg,
                 (unsigned)wifi->s.read_poll.last_val);
         __vsf_wifi_script_finish(wifi, VSF_ERR_NONE);
         return;
     }
     if (wifi->s.read_poll.retry_left == 0) {
-        vsf_wifi_trace_info("wifi: read_poll reg=0x%04X timeout, last=0x%08X" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: read_poll reg=0x%08X timeout, last=0x%08X" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg,
                 (unsigned)wifi->s.read_poll.last_val);
         __vsf_wifi_script_finish(wifi, VSF_ERR_TIMEOUT);
@@ -572,7 +541,7 @@ static void __vsf_wifi_read_poll_timer_cb(vsf_callback_timer_t *timer)
 }
 #endif
 
-vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
+vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint32_t reg,
         vsf_wifi_reg_match_fn_t match, uint16_t max_retry, uint16_t interval_ms,
         vsf_wifi_done_t done)
 {
@@ -592,7 +561,7 @@ vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint16_t reg,
     wifi->s.read_poll.last_val     = 0;
     wifi->script_busy              = true;
 
-    vsf_wifi_trace_debug("wifi: read_poll start reg=0x%04X retry=%u interval=%ums" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_trace_debug("wifi: read_poll start reg=0x%08X retry=%u interval=%ums" VSF_TRACE_CFG_LINEEND,
             (unsigned)reg, (unsigned)max_retry, (unsigned)interval_ms);
 
     vsf_err_t err = wifi->reg_bus->reg_read(wifi, reg,
@@ -618,7 +587,7 @@ static void __vsf_wifi_read_done(vsf_wifi_t *wifi, vsf_err_t err)
     __vsf_wifi_script_finish(wifi, err);
 }
 
-vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint16_t reg, uint32_t *out,
+vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint32_t reg, uint32_t *out,
         vsf_wifi_done_t done)
 {
     if (wifi->script_busy)               return VSF_ERR_NOT_AVAILABLE;
