@@ -784,11 +784,13 @@ static void __mt76_fw_check_patch_done(vsf_wifi_t *wifi, vsf_err_t err)
     if (priv->fw_idx & priv->fw_patch_mask) {
         vsf_wifi_chip_mt76_trace_info(
             "mt76: ROM patch already applied" VSF_TRACE_CFG_LINEEND);
-        priv->fw_stage = MT76_FW_STAGE_ILM;
-    } else {
-        priv->fw_stage = MT76_FW_STAGE_PATCH;
+        /* The previous firmware is still running (fini is currently a no-op).
+         * Skip the entire upload and use the existing runtime firmware. */
+        __mt76_fw_finish(wifi, VSF_ERR_NONE);
+        return;
     }
 
+    priv->fw_stage = MT76_FW_STAGE_PATCH;
     if (((uint16_t)(priv->asic_rev >> 16)) == MT76_CHIP_ID_7612) {
         priv->fw_state = MT76_FW_STATE_ENABLE_USB_DMA;
     } else {
