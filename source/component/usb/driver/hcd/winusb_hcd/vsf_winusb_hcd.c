@@ -743,6 +743,17 @@ static void __vk_winusb_hcd_init_thread(void *arg)
                             winusb_dev->ifs_num++;
                             __vk_winusb_hcd_assign_endpoints(winusb_dev, i + 1, 0);
                         }
+                        /* Reset every opened pipe so that a previously aborted
+                         * session (e.g. the process was killed) does not leave
+                         * the host-side endpoint in a state that blocks the
+                         * next run. */
+                        for (uint_fast8_t i = 0; i < dimof(winusb_dev->ep); i++) {
+                            int8_t ifs_idx = winusb_dev->ep[i].ep2ifs;
+                            if ((ifs_idx >= 0) && (winusb_dev->hUsbIfs[ifs_idx] != NULL)) {
+                                WinUsb_ResetPipe(winusb_dev->hUsbIfs[ifs_idx],
+                                        winusb_dev->ep[i].pipe_info.PipeId);
+                            }
+                        }
                         __vk_winusb_hcd_on_arrived(winusb_dev);
                     } else {
                         __vk_winusb_print_last_error("Fail to initialize winusb");
