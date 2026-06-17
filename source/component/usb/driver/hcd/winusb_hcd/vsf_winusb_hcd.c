@@ -594,6 +594,17 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
             VSF_USB_ASSERT((ifs_idx >= 0) && (winusb_dev->hUsbIfs[ifs_idx] != NULL));
             WINUSB_INTERFACE_HANDLE handle = winusb_dev->hUsbIfs[ifs_idx];
 
+            if ((pipe.type == USB_ENDPOINT_XFER_BULK) || (pipe.type == USB_ENDPOINT_XFER_INT)) {
+                // PIPE_TRANSFER_TIMEOUT is per-pipe state, so set it on every
+                // bulk/interrupt URB submission to honor the URB's timeout value.
+                // timeout == 0 means infinite wait in WinUSB.
+                // Note: PIPE_TRANSFER_TIMEOUT does not apply to isochronous pipes.
+                ULONG timeout_ms = urb->timeout;
+                WinUsb_SetPipePolicy(handle,
+                        pipe.endpoint | (pipe.dir_in1out0 ? 0x80 : 0x00),
+                        PIPE_TRANSFER_TIMEOUT, sizeof(timeout_ms), &timeout_ms);
+            }
+
             if (!__vk_winusb_hcd_sumbit_urb_epnz(urb, handle, &real_size)) {
                 return -GetLastError();
             }
@@ -635,8 +646,17 @@ static void __vk_winusb_hcd_dev_thread(void *arg)
             winusb_dev->evt_mask.is_detached = false;
         }
         if (winusb_dev->evt_mask.is_resetting) {
-            // TODO: reset hUsbIfs[0]
-//            WinUsb_Reset(winusb_dev->hUsbIfs[0]);
+            /* Reset every open pipe on the host side to give subsequent
+             * control/bulk transfers a clean start. */
+            for (int i = 0; (i < dimof(winusb_dev->hUsbIfs)) &&
+                            (winusb_dev->hUsbIfs[i] != NULL); i++) {
+                WINUSB_INTERFACE_HANDLE handle = winusb_dev->hUsbIfs[i];
+                for (int ep = 0; ep < dimof(winusb_dev->ep); ep++) {
+                    if (winusb_dev->ep[ep].ep2ifs == i) {
+                        WinUsb_ResetPipe(handle, winusb_dev->ep[ep].pipe_info.PipeId);
+                    }
+                }
+            }
             winusb_dev->evt_mask.is_resetting = false;
         }
     }

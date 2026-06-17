@@ -133,6 +133,8 @@ typedef struct mt76_wifi_priv {
     uint32_t                fw_poll_mask;
     uint16_t                fw_poll_ms;
     uint16_t                fw_sem_ms;
+    uint8_t                 fw_rf_unit;
+    uint8_t                 fw_rf_step;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t    fw_timer;
 #endif
