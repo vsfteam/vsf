@@ -38,6 +38,9 @@ extern "C" {
 
 #define MT76_EEPROM_SIZE            512
 
+/* USB endpoint indices shared between the chip driver and the USB bus driver. */
+#define MT76_EP_IN_CMD_RESP         1
+
 /* EFUSE control registers */
 #define MT_EFUSE_CTRL               0x0024
 #define MT_EFUSE_CTRL_AOUT          0x0000003F
@@ -66,24 +69,20 @@ extern "C" {
 
 /* MT76 bus operations.
  *
- * These are chip-level communication primitives, not USB-specific calls.  On
- * USB the bus driver maps them to ep0 vendor requests and bulk URBs; on other
- * buses (e.g. SDIO) the same chip driver would use a different bus_ops
- * implementation that maps to the appropriate host/controller primitives. */
+ * MT76 is a register-based chip (extensive cfg_read/cfg_write) plus chip-
+ * specific primitives for FCE writes, device commands, MCU command frames,
+ * TX frame submission and RX URB arming.  The first member MUST be
+ * vsf_wifi_reg_bus_t so the generic wifi layer can treat the structure as a
+ * standard register bus; chip-private operations follow the shared part.
+ *
+ * On USB the bus driver maps reg_read/reg_write to ep0 vendor requests and
+ * the private ops to bulk URBs / ep0 control transfers; on other buses (e.g.
+ * SDIO) the same chip driver would use a different bus_ops implementation
+ * that maps to the appropriate host/controller primitives. */
 typedef struct vsf_wifi_mt76_bus_ops_t {
-    /* Called by the chip driver once initialization is complete and the data
-     * path can be enabled.  The bus driver starts RX URBs / DMA here. */
-    void (*on_ready)(vsf_wifi_t *wifi);
-
-    /* Read a 32-bit configuration/register word.  On USB this becomes an
-     * ep0 vendor IN request; the exact layout is bus-driver private. */
-    vsf_err_t (*cfg_read)(vsf_wifi_t *wifi,
-        uint32_t addr, uint32_t *out, vsf_wifi_done_t done);
-
-    /* Write a 32-bit configuration/register word.  On USB this becomes an
-     * ep0 vendor OUT request; the exact layout is bus-driver private. */
-    vsf_err_t (*cfg_write)(vsf_wifi_t *wifi,
-        uint32_t addr, uint32_t val, vsf_wifi_done_t done);
+    /* Generic register-bus interface.  reg_read/reg_write are used for the
+     * many 32-bit configuration/register accesses that MT76 performs. */
+    vsf_wifi_reg_bus_t base;
 
     /* Write an FCE (Forward Control Engine) DMA register.  Used during
      * firmware upload to set the destination address/length before sending
@@ -139,6 +138,14 @@ typedef struct mt76_wifi_priv {
     uint8_t                 mcu_seq;
     uint8_t                 state;
 
+    /* MCU command response matching.
+     * Some firmware commands (LOAD_CR, SWITCH_CHANNEL_OP) require the host
+     * to drain the CMD_RESP endpoint and wait for EVT_CMD_DONE before the
+     * next command can be issued. */
+    bool                    mcu_wait_resp;
+    uint8_t                 mcu_wait_seq;
+    vsf_wifi_done_t         mcu_wait_done;
+
     /* EEPROM loading context */
     uint16_t                eeprom_offset;
     uint8_t                 eeprom_step;
@@ -174,6 +181,18 @@ typedef struct mt76_wifi_priv {
     /* MAC address programming context */
     uint8_t                 mac_addr_step;
     vsf_wifi_done_t         mac_addr_done;
+
+    /* Hardware init context (mt76x2u_init_hardware steps) */
+    uint16_t                init_idx;
+    uint16_t                init_idx2;
+    uint8_t                 init_substate;
+    uint8_t                 xtal_step;
+    uint16_t                xtal_val;
+
+    /* set_channel context */
+    uint8_t                 set_channel_channel;
+    uint8_t                 set_channel_scan;
+    uint8_t                 set_channel_bw_index;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t    fw_timer;
 #endif

@@ -67,10 +67,10 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 static void __vk_usbh_wifi_mt76_attach_fail(vsf_wifi_t *wifi, vsf_err_t err);
 static void __vk_usbh_wifi_mt76_on_eda_terminate(vsf_eda_t *eda);
 static void __vk_usbh_wifi_mt76_on_ready(vsf_wifi_t *wifi);
-static vsf_err_t __vk_usbh_wifi_mt76_cfg_read(vsf_wifi_t *wifi,
-    uint32_t addr, uint32_t *out, vsf_wifi_done_t done);
-static vsf_err_t __vk_usbh_wifi_mt76_cfg_write(vsf_wifi_t *wifi,
-    uint32_t addr, uint32_t val, vsf_wifi_done_t done);
+static vsf_err_t __vk_usbh_wifi_mt76_reg_read(vsf_wifi_t *wifi,
+    uint32_t reg, uint32_t *out, vsf_wifi_done_t done);
+static vsf_err_t __vk_usbh_wifi_mt76_reg_write(vsf_wifi_t *wifi,
+    uint32_t reg, uint32_t val, vsf_wifi_done_t done);
 static vsf_err_t __vk_usbh_wifi_mt76_fce_write(vsf_wifi_t *wifi,
     uint32_t addr, uint32_t val, vsf_wifi_done_t done);
 static vsf_err_t __vk_usbh_wifi_mt76_dev_cmd(vsf_wifi_t *wifi,
@@ -126,22 +126,16 @@ static vk_usbh_wifi_mt76_iocb_t *__vk_usbh_wifi_mt76_find_iocb(
 
 static bool __vk_usbh_wifi_mt76_start_rx(vk_usbh_wifi_mt76_t *uwifi)
 {
-    vk_usbh_dev_t *dev = uwifi->dev;
     int submitted = 0;
 
     if (uwifi->in_ep[MT76_EP_IN_PKT_RX].desc != NULL) {
         for (int i = 0; i < dimof(uwifi->rx_pkt_iocb); i++) {
             vk_usbh_wifi_mt76_iocb_t *iocb = &uwifi->rx_pkt_iocb[i];
-            vk_usbh_urb_prepare(&iocb->urb, dev, uwifi->in_ep[MT76_EP_IN_PKT_RX].desc);
-            if (VSF_ERR_NONE != vk_usbh_alloc_urb(uwifi->usbh, dev, &iocb->urb))
-                return false;
-            if (NULL == vk_usbh_urb_alloc_buffer(&iocb->urb,
-                    VSF_USBH_WIFI_MT76_CFG_RX_BUFSIZE))
-                return false;
             iocb->urb.urb_hcd->timeout = 5000;
             iocb->is_rx        = true;
             iocb->is_supported = true;
             iocb->ep_idx       = MT76_EP_IN_PKT_RX;
+            iocb->is_busy      = true;
             if (VSF_ERR_NONE != vk_usbh_submit_urb(uwifi->usbh, &iocb->urb))
                 return false;
             submitted++;
@@ -150,16 +144,11 @@ static bool __vk_usbh_wifi_mt76_start_rx(vk_usbh_wifi_mt76_t *uwifi)
 
     if (uwifi->in_ep[MT76_EP_IN_CMD_RESP].desc != NULL) {
         vk_usbh_wifi_mt76_iocb_t *iocb = &uwifi->rx_cmd_iocb;
-        vk_usbh_urb_prepare(&iocb->urb, dev, uwifi->in_ep[MT76_EP_IN_CMD_RESP].desc);
-        if (VSF_ERR_NONE != vk_usbh_alloc_urb(uwifi->usbh, dev, &iocb->urb))
-            return false;
-        if (NULL == vk_usbh_urb_alloc_buffer(&iocb->urb,
-                VSF_USBH_WIFI_MT76_CFG_RX_BUFSIZE))
-            return false;
         iocb->urb.urb_hcd->timeout = 5000;
         iocb->is_rx        = true;
         iocb->is_supported = true;
         iocb->ep_idx       = MT76_EP_IN_CMD_RESP;
+        iocb->is_busy      = true;
         if (VSF_ERR_NONE != vk_usbh_submit_urb(uwifi->usbh, &iocb->urb))
             return false;
         submitted++;
@@ -269,15 +258,39 @@ static void *__vk_usbh_wifi_mt76_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         iocb->is_supported = true;
     }
 
+    /* Pre-allocate RX URBs/buffers so that response and packet URBs can be
+     * armed on demand without runtime allocation overhead. */
+    for (int i = 0; i < dimof(uwifi->rx_pkt_iocb); i++) {
+        vk_usbh_wifi_mt76_iocb_t *iocb = &uwifi->rx_pkt_iocb[i];
+        vk_usbh_urb_prepare(&iocb->urb, dev, uwifi->in_ep[MT76_EP_IN_PKT_RX].desc);
+        if (VSF_ERR_NONE != vk_usbh_alloc_urb(usbh, dev, &iocb->urb))
+            goto free_all;
+        if (NULL == vk_usbh_urb_alloc_buffer(&iocb->urb,
+                VSF_USBH_WIFI_MT76_CFG_RX_BUFSIZE))
+            goto free_all;
+    }
+    if (uwifi->in_ep[MT76_EP_IN_CMD_RESP].desc != NULL) {
+        vk_usbh_wifi_mt76_iocb_t *iocb = &uwifi->rx_cmd_iocb;
+        vk_usbh_urb_prepare(&iocb->urb, dev, uwifi->in_ep[MT76_EP_IN_CMD_RESP].desc);
+        if (VSF_ERR_NONE != vk_usbh_alloc_urb(usbh, dev, &iocb->urb))
+            goto free_all;
+        if (NULL == vk_usbh_urb_alloc_buffer(&iocb->urb,
+                VSF_USBH_WIFI_MT76_CFG_RX_BUFSIZE))
+            goto free_all;
+    }
+
     uwifi->mt76_priv.bus_priv = uwifi;
     uwifi->mt76_priv.wifi     = &uwifi->wifi;
 
-    /* MT76 is a command/event chip; it does not use the register-bus helper.
-     * It uses a chip-specific bus_ops vtable instead. */
+    /* MT76 is a register-based chip with chip-private extensions.  The shared
+     * register-bus part goes to wifi->reg_bus so the generic helper can be
+     * used; the full vtable goes to wifi->bus_ops for the chip driver. */
     static const vsf_wifi_mt76_bus_ops_t __vk_usbh_wifi_mt76_bus_ops = {
-        .on_ready       = __vk_usbh_wifi_mt76_on_ready,
-        .cfg_read       = __vk_usbh_wifi_mt76_cfg_read,
-        .cfg_write      = __vk_usbh_wifi_mt76_cfg_write,
+        .base = {
+            .reg_write  = __vk_usbh_wifi_mt76_reg_write,
+            .reg_read   = __vk_usbh_wifi_mt76_reg_read,
+            .on_ready   = __vk_usbh_wifi_mt76_on_ready,
+        },
         .fce_write      = __vk_usbh_wifi_mt76_fce_write,
         .dev_cmd        = __vk_usbh_wifi_mt76_dev_cmd,
         .dev_class_cmd  = __vk_usbh_wifi_mt76_dev_class_cmd,
@@ -285,7 +298,8 @@ static void *__vk_usbh_wifi_mt76_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         .tx_frame       = __vk_usbh_wifi_mt76_tx_frame,
         .rx_submit      = __vk_usbh_wifi_mt76_rx_submit,
     };
-    vsf_wifi_init(&uwifi->wifi, &vsf_wifi_mt76_drv, NULL, &uwifi->eda);
+    vsf_wifi_init(&uwifi->wifi, &vsf_wifi_mt76_drv,
+            &__vk_usbh_wifi_mt76_bus_ops.base, &uwifi->eda);
     uwifi->wifi.chip_priv = &uwifi->mt76_priv;
     uwifi->wifi.bus_ops   = &__vk_usbh_wifi_mt76_bus_ops;
     vsf_wifi_set_attach_fail(&uwifi->wifi, __vk_usbh_wifi_mt76_attach_fail);
@@ -383,7 +397,7 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             uint16_t len = uwifi->ep0_req.wLength;
             vsf_wifi_done_t done = uwifi->ep0_done;
 
-            vsf_wifi_chip_mt76_trace_info(
+            vsf_wifi_chip_mt76_trace_debug(
                 "mt76usb: ep0 done state=%d ok=%d status=%d req=0x%02X" VSF_TRACE_CFG_LINEEND,
                 uwifi->ep0_state, ok, status, uwifi->ep0_req.bRequest);
 
@@ -427,12 +441,44 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
         /* Bulk RX/TX completion */
         vk_usbh_wifi_mt76_iocb_t *iocb = __vk_usbh_wifi_mt76_find_iocb(uwifi, urb_hcd);
-        VSF_USB_ASSERT(iocb != NULL);
+        if (iocb == NULL) {
+            vsf_wifi_chip_mt76_trace_error(
+                "mt76usb: iocb not found for urb_hcd=%p ep=0x%02X status=%d actual=%u" VSF_TRACE_CFG_LINEEND,
+                (void *)urb_hcd, urb_hcd->pipe.endpoint,
+                vk_usbh_urb_get_status((vk_usbh_urb_t *)urb_hcd),
+                (unsigned)vk_usbh_urb_get_actual_length((vk_usbh_urb_t *)urb_hcd));
+            for (int __i = 0; __i < dimof(uwifi->rx_pkt_iocb); __i++) {
+                vsf_wifi_chip_mt76_trace_error(
+                    "  rx_pkt_iocb[%d] urb_hcd=%p ep=0x%02X is_rx=%u" VSF_TRACE_CFG_LINEEND,
+                    __i, (void *)uwifi->rx_pkt_iocb[__i].urb.urb_hcd,
+                    uwifi->rx_pkt_iocb[__i].urb.urb_hcd ? uwifi->rx_pkt_iocb[__i].urb.urb_hcd->pipe.endpoint : 0xFF,
+                    uwifi->rx_pkt_iocb[__i].is_rx);
+            }
+            vsf_wifi_chip_mt76_trace_error(
+                "  rx_cmd_iocb urb_hcd=%p ep=0x%02X" VSF_TRACE_CFG_LINEEND,
+                (void *)uwifi->rx_cmd_iocb.urb.urb_hcd,
+                uwifi->rx_cmd_iocb.urb.urb_hcd ? uwifi->rx_cmd_iocb.urb.urb_hcd->pipe.endpoint : 0xFF);
+            vsf_wifi_chip_mt76_trace_error(
+                "  mcu_cmd_iocb urb_hcd=%p ep=0x%02X" VSF_TRACE_CFG_LINEEND,
+                (void *)uwifi->mcu_cmd_iocb.urb.urb_hcd,
+                uwifi->mcu_cmd_iocb.urb.urb_hcd ? uwifi->mcu_cmd_iocb.urb.urb_hcd->pipe.endpoint : 0xFF);
+            for (int __i = 0; __i < dimof(uwifi->tx_iocb); __i++) {
+                vsf_wifi_chip_mt76_trace_error(
+                    "  tx_iocb[%d] urb_hcd=%p ep=0x%02X is_rx=%u" VSF_TRACE_CFG_LINEEND,
+                    __i, (void *)uwifi->tx_iocb[__i].urb.urb_hcd,
+                    uwifi->tx_iocb[__i].urb.urb_hcd ? uwifi->tx_iocb[__i].urb.urb_hcd->pipe.endpoint : 0xFF,
+                    uwifi->tx_iocb[__i].is_rx);
+            }
+            VSF_USB_ASSERT(iocb != NULL);
+        }
 
         if (iocb->is_rx) {
             int status = vk_usbh_urb_get_status(&iocb->urb);
             uint32_t len = (URB_OK == status)
                     ? vk_usbh_urb_get_actual_length(&iocb->urb) : 0;
+            vsf_wifi_chip_mt76_trace_debug(
+                "mt76usb: rx done ep=0x%02X status=%d len=%u" VSF_TRACE_CFG_LINEEND,
+                iocb->urb.urb_hcd->pipe.endpoint, status, (unsigned)len);
             if (URB_OK == status && len > 0) {
                 uint8_t *buf = vk_usbh_urb_peek_buffer(&iocb->urb);
                 mt76_wifi_priv_t *priv = (mt76_wifi_priv_t *)uwifi->wifi.chip_priv;
@@ -443,17 +489,27 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     priv->on_rx(&uwifi->wifi, buf, (uint16_t)len);
                 }
             }
-            vsf_err_t err = vk_usbh_submit_urb(uwifi->usbh, &iocb->urb);
-            if (VSF_ERR_NONE != err) {
-                vk_usbh_remove_interface(uwifi->usbh, uwifi->dev, uwifi->ifs);
+            if (iocb->ep_idx == MT76_EP_IN_PKT_RX) {
+                vsf_err_t err = vk_usbh_submit_urb(uwifi->usbh, &iocb->urb);
+                if (VSF_ERR_NONE != err) {
+                    vk_usbh_remove_interface(uwifi->usbh, uwifi->dev, uwifi->ifs);
+                }
+            } else {
+                iocb->is_busy = false;
             }
         } else {
             int status = vk_usbh_urb_get_status(&iocb->urb);
             uint32_t actual = vk_usbh_urb_get_actual_length(&iocb->urb);
             vsf_err_t done_err = (URB_OK == status) ? VSF_ERR_NONE : VSF_ERR_FAIL;
-            vsf_wifi_chip_mt76_trace_info(
-                "mt76usb: tx done status=%d actual=%u" VSF_TRACE_CFG_LINEEND,
-                status, (unsigned)actual);
+            if (status == URB_OK) {
+                vsf_wifi_chip_mt76_trace_debug(
+                    "mt76usb: tx done status=%d actual=%u" VSF_TRACE_CFG_LINEEND,
+                    status, (unsigned)actual);
+            } else {
+                vsf_wifi_chip_mt76_trace_info(
+                    "mt76usb: tx done status=%d actual=%u" VSF_TRACE_CFG_LINEEND,
+                    status, (unsigned)actual);
+            }
             iocb->is_busy = false;
             if (iocb->done != NULL) {
                 vsf_wifi_done_t done = iocb->done;
@@ -480,13 +536,15 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 static void __vk_usbh_wifi_mt76_on_ready(vsf_wifi_t *wifi)
 {
     vk_usbh_wifi_mt76_t *uwifi = __vk_usbh_wifi_mt76_from_wifi(wifi);
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76usb: on_ready called" VSF_TRACE_CFG_LINEEND);
     if (!__vk_usbh_wifi_mt76_start_rx(uwifi)) {
         vk_usbh_remove_interface(uwifi->usbh, uwifi->dev, uwifi->ifs);
     }
 }
 
-static vsf_err_t __vk_usbh_wifi_mt76_cfg_read(vsf_wifi_t *wifi,
-    uint32_t addr, uint32_t *out, vsf_wifi_done_t done)
+static vsf_err_t __vk_usbh_wifi_mt76_reg_read(vsf_wifi_t *wifi,
+    uint32_t reg, uint32_t *out, vsf_wifi_done_t done)
 {
     vk_usbh_wifi_mt76_t *uwifi = __vk_usbh_wifi_mt76_from_wifi(wifi);
     vk_usbh_dev_t *dev = uwifi->dev;
@@ -495,16 +553,16 @@ static vsf_err_t __vk_usbh_wifi_mt76_cfg_read(vsf_wifi_t *wifi,
     VSF_USB_ASSERT(uwifi->ep0_state == MT76_EP0_IDLE);
 
     req_usb->bRequestType = USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE;
-    if ((addr & MT76_VEND_TYPE_MASK) == MT76_VEND_TYPE_CFG) {
+    if ((reg & MT76_VEND_TYPE_MASK) == MT76_VEND_TYPE_CFG) {
         req_usb->bRequest = MT76_VEND_READ_CFG;
-    } else if ((addr & MT76_VEND_TYPE_MASK) == MT76_VEND_TYPE_EEPROM) {
+    } else if ((reg & MT76_VEND_TYPE_MASK) == MT76_VEND_TYPE_EEPROM) {
         req_usb->bRequest = MT76_VEND_READ_EEPROM;
     } else {
         req_usb->bRequest = MT76_VEND_MULTI_READ;
     }
-    addr &= ~MT76_VEND_TYPE_MASK;
-    req_usb->wValue       = (uint16_t)(addr >> 16);
-    req_usb->wIndex       = (uint16_t)(addr & 0xFFFF);
+    reg &= ~MT76_VEND_TYPE_MASK;
+    req_usb->wValue       = (uint16_t)(reg >> 16);
+    req_usb->wIndex       = (uint16_t)(reg & 0xFFFF);
     req_usb->wLength      = sizeof(uint32_t);
 
     uwifi->ep0_state = MT76_EP0_MCU_CMD;
@@ -531,8 +589,8 @@ static vsf_err_t __vk_usbh_wifi_mt76_cfg_read(vsf_wifi_t *wifi,
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_usbh_wifi_mt76_cfg_write(vsf_wifi_t *wifi,
-    uint32_t addr, uint32_t val, vsf_wifi_done_t done)
+static vsf_err_t __vk_usbh_wifi_mt76_reg_write(vsf_wifi_t *wifi,
+    uint32_t reg, uint32_t val, vsf_wifi_done_t done)
 {
     vk_usbh_wifi_mt76_t *uwifi = __vk_usbh_wifi_mt76_from_wifi(wifi);
     vk_usbh_dev_t *dev = uwifi->dev;
@@ -541,14 +599,14 @@ static vsf_err_t __vk_usbh_wifi_mt76_cfg_write(vsf_wifi_t *wifi,
     VSF_USB_ASSERT(uwifi->ep0_state == MT76_EP0_IDLE);
 
     req_usb->bRequestType = USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE;
-    if ((addr & MT76_VEND_TYPE_MASK) == MT76_VEND_TYPE_CFG) {
+    if ((reg & MT76_VEND_TYPE_MASK) == MT76_VEND_TYPE_CFG) {
         req_usb->bRequest = MT76_VEND_WRITE_CFG;
     } else {
         req_usb->bRequest = MT76_VEND_MULTI_WRITE;
     }
-    addr &= ~MT76_VEND_TYPE_MASK;
-    req_usb->wValue       = (uint16_t)(addr >> 16);
-    req_usb->wIndex       = (uint16_t)(addr & 0xFFFF);
+    reg &= ~MT76_VEND_TYPE_MASK;
+    req_usb->wValue       = (uint16_t)(reg >> 16);
+    req_usb->wIndex       = (uint16_t)(reg & 0xFFFF);
     req_usb->wLength      = sizeof(uint32_t);
 
     uwifi->ep0_state = MT76_EP0_MCU_CMD;
@@ -701,10 +759,9 @@ static vsf_err_t __vk_usbh_wifi_mt76_mcu_cmd(vsf_wifi_t *wifi,
 
     uint8_t *cmd_buf = vk_usbh_urb_peek_buffer(&iocb->urb);
     if (NULL == cmd_buf) {
-        vk_usbh_urb_prepare(&iocb->urb, uwifi->dev,
-                            uwifi->out_ep[MT76_EP_OUT_INBAND_CMD].desc);
-        if (VSF_ERR_NONE != vk_usbh_alloc_urb(uwifi->usbh, uwifi->dev, &iocb->urb))
-            return VSF_ERR_NOT_ENOUGH_RESOURCES;
+        /* The URB was pre-allocated in probe. Only the buffer may have been
+         * freed by the HCD; re-allocate just the buffer, never the URB itself,
+         * or the old HCD URB will leak and produce stray completion events. */
         cmd_buf = vk_usbh_urb_alloc_buffer(&iocb->urb, VSF_USBH_WIFI_MT76_CFG_TX_BUFSIZE);
         if (NULL == cmd_buf) return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
@@ -719,7 +776,8 @@ static vsf_err_t __vk_usbh_wifi_mt76_mcu_cmd(vsf_wifi_t *wifi,
 
     vsf_err_t err = vk_usbh_submit_urb_ex(uwifi->usbh, &iocb->urb,
             0, &uwifi->eda);
-    vsf_trace_info("mt76usb: submit_urb err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    vsf_trace_info("mt76usb: submit_urb ep_hcd=0x%02X err=%d" VSF_TRACE_CFG_LINEEND,
+            iocb->urb.urb_hcd->pipe.endpoint, (int)err);
     if (VSF_ERR_NONE != err) {
         iocb->is_busy = false;
         iocb->done    = NULL;
@@ -756,8 +814,9 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
 
     uint8_t *tx_buf = vk_usbh_urb_peek_buffer(&iocb->urb);
     if (NULL == tx_buf) {
-        if (VSF_ERR_NONE != vk_usbh_alloc_urb(uwifi->usbh, uwifi->dev, &iocb->urb))
-            return VSF_ERR_NOT_ENOUGH_RESOURCES;
+        /* The URB was pre-allocated in probe. Only the buffer may have been
+         * freed by the HCD; re-allocate just the buffer, never the URB itself,
+         * or the old HCD URB will leak and produce stray completion events. */
         tx_buf = vk_usbh_urb_alloc_buffer(&iocb->urb, VSF_USBH_WIFI_MT76_CFG_TX_BUFSIZE);
         if (NULL == tx_buf) return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
@@ -767,15 +826,18 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
      * set_buffer frees the current buffer and leaves free_buffer_param stale,
      * causing use-after-free / double-free. Just update transfer length. */
     iocb->urb.urb_hcd->transfer_length = len;
-    if (!vk_usbh_urb_is_alloced(&iocb->urb)) {
-        /* A pre-allocated IOCB may be bound to the firmware endpoint; re-prepare
-         * the pipe so the same IOCB can be used for any TX queue endpoint. */
-        vk_usbh_urb_prepare(&iocb->urb, uwifi->dev, uwifi->out_ep[queue_idx].desc);
-        if (VSF_ERR_NONE != vk_usbh_alloc_urb(uwifi->usbh, uwifi->dev, &iocb->urb))
-            return VSF_ERR_NOT_ENOUGH_RESOURCES;
-        if (NULL == vk_usbh_urb_alloc_buffer(&iocb->urb, VSF_USBH_WIFI_MT76_CFG_TX_BUFSIZE))
-            return VSF_ERR_NOT_ENOUGH_RESOURCES;
+
+    vk_usbh_pipe_t target_pipe = vk_usbh_get_pipe_from_ep_desc(uwifi->dev,
+            uwifi->out_ep[queue_idx].desc);
+    vsf_trace_info("mt76usb: tx before switch iocb_ep=%d target_ep=%d" VSF_TRACE_CFG_LINEEND,
+            iocb->urb.urb_hcd->pipe.endpoint, target_pipe.endpoint);
+    if (iocb->urb.urb_hcd->pipe.endpoint != target_pipe.endpoint) {
+        /* A pre-allocated IOCB may be bound to the firmware endpoint; switch
+         * the underlying HCD pipe to the target TX queue endpoint. */
+        iocb->urb.urb_hcd->pipe = target_pipe;
     }
+    vsf_trace_info("mt76usb: tx after switch iocb_ep=%d" VSF_TRACE_CFG_LINEEND,
+            iocb->urb.urb_hcd->pipe.endpoint);
     iocb->is_busy = true;
     iocb->ep_idx  = queue_idx;
     iocb->done    = done;
@@ -804,7 +866,7 @@ static vsf_err_t __vk_usbh_wifi_mt76_rx_submit(vsf_wifi_t *wifi,
     } else {
         iocb = NULL;
         for (int i = 0; i < dimof(uwifi->rx_pkt_iocb); i++) {
-            if (uwifi->rx_pkt_iocb[i].ep_idx == queue_idx && !uwifi->rx_pkt_iocb[i].is_busy) {
+            if (!uwifi->rx_pkt_iocb[i].is_busy) {
                 iocb = &uwifi->rx_pkt_iocb[i];
                 break;
             }
@@ -812,9 +874,20 @@ static vsf_err_t __vk_usbh_wifi_mt76_rx_submit(vsf_wifi_t *wifi,
     }
     if (NULL == iocb) return VSF_ERR_NOT_AVAILABLE;
 
-    vk_usbh_urb_set_buffer(&iocb->urb, buf, len);
-    vk_usbh_urb_prepare(&iocb->urb, uwifi->dev, uwifi->in_ep[queue_idx].desc);
-    iocb->is_busy = true;
+    if (buf != NULL) {
+        vk_usbh_urb_set_buffer(&iocb->urb, buf, len);
+    } else {
+        iocb->urb.urb_hcd->transfer_length = VSF_USBH_WIFI_MT76_CFG_RX_BUFSIZE;
+    }
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76usb: rx_submit ep=0x%02X len=%u" VSF_TRACE_CFG_LINEEND,
+        iocb->urb.urb_hcd->pipe.endpoint,
+        (unsigned)iocb->urb.urb_hcd->transfer_length);
+    iocb->urb.urb_hcd->timeout = 5000;
+    iocb->is_rx        = true;
+    iocb->is_supported = true;
+    iocb->ep_idx       = queue_idx;
+    iocb->is_busy      = true;
 
     vsf_err_t err = vk_usbh_submit_urb_ex(uwifi->usbh, &iocb->urb, 0, &uwifi->eda);
     if (VSF_ERR_NONE != err) {

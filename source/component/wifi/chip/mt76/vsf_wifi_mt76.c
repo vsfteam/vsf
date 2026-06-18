@@ -29,8 +29,16 @@
 
 #define MT76_ASIC_VERSION                   0x0000
 #define MT76_USB_U3DMA_CFG                  (MT76_VEND_TYPE_CFG | 0x9018)
+#define MT76_USB_DMA_CFG_RX_DROP_OR_PAD     (1U << 18)
+#define MT76_USB_DMA_CFG_RX_BULK_AGG_EN     (1U << 21)
+#define MT76_USB_DMA_CFG_RX_BULK_EN         (1U << 22)
+#define MT76_USB_DMA_CFG_TX_BULK_EN         (1U << 23)
 #define MT76_WPDMA_GLO_CFG                  0x0208
 #define MT76_MAC_SYS_CTRL                   0x1004
+#define MT76_MAC_SYS_CTRL_RESET_CSR         (1U << 0)
+#define MT76_MAC_SYS_CTRL_RESET_BBP         (1U << 1)
+#define MT76_MAC_SYS_CTRL_ENABLE_TX         (1U << 2)
+#define MT76_MAC_SYS_CTRL_ENABLE_RX         (1U << 3)
 #define MT76_RX_FILTR_CFG                   0x1400
 
 #define MT76_FCE_DMA_ADDR                   0x0230
@@ -77,11 +85,154 @@
 
 #define MT76_MAC_CSR0                       0x1000
 
+/* Additional MAC/BBP registers needed for mt76x2u_init_hardware() */
+#define MT76_WPDMA_GLO_CFG_TX_DMA_EN        (1U << 0)
+#define MT76_WPDMA_GLO_CFG_TX_DMA_BUSY      (1U << 1)
+#define MT76_WPDMA_GLO_CFG_RX_DMA_EN        (1U << 2)
+#define MT76_WPDMA_GLO_CFG_RX_DMA_BUSY      (1U << 3)
+
+#define MT76_US_CYC_CFG                     0x02a4
+#define MT76_US_CYC_CNT                     0x1e
+
+#define MT76_PBF_SYS_CTRL                   0x0400
+#define MT76_PBF_CFG                        0x0404
+#define MT76_PBF_TX_MAX_PCNT                0x0408
+#define MT76_PBF_RX_MAX_PCNT                0x040c
+#define MT76_BCN_OFFSET_BASE                0x041c
+#define MT76_BCN_OFFSET(_n)                 (MT76_BCN_OFFSET_BASE + ((_n) << 2))
+
+#define MT76_MAC_ADDR_DW0                   0x1008
+#define MT76_MAC_ADDR_DW1                   0x100c
+#define MT76_MAC_ADDR_DW1_U2ME_MASK         0x00ff0000
+#define MT76_MAC_BSSID_DW0                  0x1010
+#define MT76_MAC_BSSID_DW1                  0x1014
+#define MT76_MAC_BSSID_DW1_MBSS_MODE        (3U << 16)
+#define MT76_MAC_BSSID_DW1_MBSS_LOCAL_BIT   (1U << 21)
+#define MT76_MAC_BSSID_DW1_MBEACON_N_SHIFT  18
+
+#define MT76_MAX_LEN_CFG                    0x1018
+#define MT76_AMPDU_MAX_LEN_20M1S            0x1030
+#define MT76_AMPDU_MAX_LEN_20M2S            0x1034
+
+#define MT76_BCN_BYPASS_MASK                0x108c
+#define MT76_XIFS_TIME_CFG                  0x1100
+#define MT76_BKOFF_SLOT_CFG                 0x1104
+#define MT76_BEACON_TIME_CFG                0x1114
+#define MT76_BEACON_TIME_CFG_SYNC_MODE      (3U << 17)
+#define MT76_TBTT_SYNC_CFG                  0x1118
+#define MT76_MAC_STATUS                     0x1200
+#define MT76_MAC_STATUS_TX                  (1U << 0)
+#define MT76_MAC_STATUS_RX                  (1U << 1)
+#define MT76_PWR_PIN_CFG                    0x1204
+#define MT76_AUX_CLK_CFG                    0x120c
+#define MT76_DACCLK_EN_DLY_CFG              0x1264
+
+#define MT76_TX_SW_CFG0                     0x1330
+#define MT76_TX_SW_CFG1                     0x1334
+#define MT76_TX_SW_CFG2                     0x1338
+#define MT76_TXOP_CTRL_CFG                  0x1340
+#define MT76_TX_RTS_CFG                     0x1344
+#define MT76_TX_TIMEOUT_CFG                 0x1348
+#define MT76_FCE_L2_STUFF                   0x080c
+#define MT76_FCE_L2_STUFF_WR_MPDU_LEN_EN    (1U << 4)
+#define MT76_RF_BYPASS_0                    0x0504
+#define MT76_RF_SETTING_0                   0x050c
+#define MT76_TX_RETRY_CFG                   0x134c
+#define MT76_PIFS_TX_CFG                    0x1388
+#define MT76_TX_LINK_CFG                    0x1350
+#define MT76_HEADER_TRANS_CTRL_REG          0x0260
+#define MT76_TSO_CTRL                       0x0250
+#define MT76_TX_ALC_VGA3                    0x0778
+#define MT76_VHT_HT_FBK_CFG1                0x1358
+#define MT76_CCK_PROT_CFG                   0x1364
+#define MT76_OFDM_PROT_CFG                  0x1368
+#define MT76_MM20_PROT_CFG                  0x136c
+#define MT76_MM40_PROT_CFG                  0x1370
+#define MT76_GF20_PROT_CFG                  0x1374
+#define MT76_GF40_PROT_CFG                  0x1378
+#define MT76_EXP_ACK_TIME                   0x1380
+#define MT76_HT_FBK_TO_LEGACY               0x1384
+#define MT76_TX_PROT_CFG6                   0x13e0
+#define MT76_TX_PROT_CFG7                   0x13e4
+#define MT76_TX_PROT_CFG8                   0x13e8
+#define MT76_TX_PWR_CFG_0                   0x1314
+#define MT76_TX_PWR_CFG_1                   0x1318
+#define MT76_TX_PWR_CFG_2                   0x131c
+#define MT76_TX_PWR_CFG_3                   0x1320
+#define MT76_TX_PWR_CFG_4                   0x1324
+#define MT76_TX_PWR_CFG_7                   0x13d4
+#define MT76_TX_PWR_CFG_8                   0x13d8
+#define MT76_TX_PWR_CFG_9                   0x13dc
+
+#define MT76_LEGACY_BASIC_RATE              0x1408
+#define MT76_HT_BASIC_RATE                  0x140c
+#define MT76_HT_CTRL_CFG                    0x1410
+#define MT76_TX_SW_CFG3                     0x1478
+#define MT76_PN_PAD_MODE                    0x150c
+#define MT76_TXOP_HLDR_ET                   0x1608
+#define MT76_PROT_AUTO_TX_CFG               0x1648
+
+#define MT76_EFUSE_CTRL                     0x0024
+#define MT76_PAUSE_ENABLE_CONTROL1          0x0a38
+#define MT76_FCE_WLAN_FLOW_CONTROL1         0x0824
+#define MT76_WPDMA_DELAY_INT_CFG            0x0210
+
+#define MT76_WCID_ATTR_BASE                 0xa800
+#define MT76_WCID_ATTR(_n)                  (MT76_WCID_ATTR_BASE + (_n) * 4)
+#define MT76_WCID_ATTR_BSS_IDX              (0U << 4)
+#define MT76_WCID_ADDR_BASE                 0x1800
+#define MT76_WCID_ADDR(_n)                  (MT76_WCID_ADDR_BASE + (_n) * 8)
+
+#define MT76_SKEY_BASE_0                    0xac00
+#define MT76_SKEY_BASE_1                    0xb400
+#define MT76_SKEY(_bss, _idx)               \
+    (((_bss) & 8) ? (MT76_SKEY_BASE_1 + (4 * ((_bss) & 7) + (_idx)) * 32) \
+                  : (MT76_SKEY_BASE_0 + (4 * (_bss) + (_idx)) * 32))
+#define MT76_SKEY_MODE_BASE_0               0xb000
+#define MT76_SKEY_MODE_BASE_1               0xb3f0
+#define MT76_SKEY_MODE(_bss)                \
+    (((_bss) & 8) ? (MT76_SKEY_MODE_BASE_1 + ((((_bss) & 7) / 2) << 2)) \
+                  : (MT76_SKEY_MODE_BASE_0 + (((_bss) / 2) << 2)))
+
+/* BBP indirect registers */
+#define MT76_BBP_CORE_BASE                  0x2000
+#define MT76_BBP_IBI_BASE                   0x2100
+#define MT76_BBP_AGC_BASE                   0x2300
+#define MT76_BBP_TXBE_BASE                  0x2700
+#define MT76_BBP(_type, _n)                 (MT76_BBP_##_type##_BASE + ((_n) << 2))
+
+#define MT76_XO_CTRL5                       0x0114
+#define MT76_XO_CTRL5_C2_VAL_MASK           0x7f00
+#define MT76_XO_CTRL5_C2_VAL_SHIFT          8
+#define MT76_XO_CTRL6                       0x0118
+#define MT76_XO_CTRL6_C2_CTRL_MASK          0x7f00
+#define MT76_XO_CTRL6_C2_CTRL_SHIFT         8
+#define MT76_XO_CTRL7                       0x011c
+#define MT76_COEXCFG0                       0x0040
+#define MT76_COEXCFG0_COEX_EN               (1U << 0)
+#define MT76_TX_ALC_CFG_4                   0x077c
+#define MT76_TX_ALC_CFG_4_MPDU_2ND_TC       (1U << 31)
+#define MT76_EXT_CCA_CFG                    0x1260
+#define MT76_AUTO_RSP_CFG                   0x110c
+#define MT76_WMM_AIFSN                      0x0214
+#define MT76_WMM_CWMIN                      0x0218
+#define MT76_WMM_CWMAX                      0x021c
+
+#define MT76_MCU_MSG_CMD_LOAD_CR            2
+#define MT76_RF_BBP_CR                      2
+
 #define MT76_MCU_MSG_TYPE_CMD               ((uint32_t)1 << 30)
 #define MT76_MCU_MSG_CMD_TYPE_SHIFT         20
 #define MT76_MCU_MSG_CMD_SEQ_SHIFT          16
 #define MT76_MCU_MSG_PORT_SHIFT             27
 #define MT76_MCU_MSG_LEN_MASK               0xFFFF
+
+/* USB DMA header (TXD_INFO) prepended to MCU commands on the INBAND_CMD
+ * bulk endpoint.  Firmware upload uses a different (FCE-based) path and does
+ * not need this header. */
+#define MT76_TXD_INFO_LEN_MASK              0xFFFF
+#define MT76_TXD_INFO_DPORT_SHIFT           27
+#define MT76_TXD_INFO_TYPE_CMD              ((uint32_t)1 << 30)
 
 #define MT76_CPU_TX_PORT                    2
 #define MT76_WLAN_PORT                      0
@@ -99,6 +250,17 @@
 
 #define MT_EE_READ                          0
 #define MT76_EE_MAC_ADDR                    0x004
+#define MT76_EE_NIC_CONF_0                  0x034
+#define MT76_EE_NIC_CONF_1                  0x036
+#define MT76_EE_XTAL_TRIM_1                 0x03a
+#define MT76_EE_XTAL_TRIM_2                 0x09e
+#define MT76_EE_NIC_CONF_2                  0x042
+
+static uint16_t __mt76_eeprom_get_u16(mt76_wifi_priv_t *priv, uint16_t offset)
+{
+    return (uint16_t)priv->eeprom[offset] |
+           ((uint16_t)priv->eeprom[offset + 1] << 8);
+}
 
 #define MT76_CMD_SWITCH_CHANNEL_OP          30
 
@@ -230,6 +392,97 @@
 #define __mt76_min(_a, _b)                  ((_a) < (_b) ? (_a) : (_b))
 #define __mt76_rev(_priv)                   ((uint16_t)((_priv)->asic_rev & 0xFFFF))
 
+/* Protection config values from Linux mt76x2/init.c */
+#define MT76_PROT_CFG_RATE(_v)              (((_v) & 0x7fff) << 0)
+#define MT76_PROT_CFG_NAV(_v)               (((_v) & 0x1) << 15)
+#define MT76_PROT_CFG_CTRL(_v)              (((_v) & 0x1) << 16)
+#define MT76_PROT_CFG_TXOP_ALLOW(_v)        (((_v) & 0x3f) << 17)
+#define MT76_PROT_CFG_RTS_THRESH            (1U << 23)
+
+#define MT76_DEFAULT_PROT_CFG_CCK           \
+    (MT76_PROT_CFG_RATE(0x3) | MT76_PROT_CFG_NAV(1) | \
+     MT76_PROT_CFG_TXOP_ALLOW(0x3f) | MT76_PROT_CFG_RTS_THRESH)
+#define MT76_DEFAULT_PROT_CFG_OFDM          \
+    (MT76_PROT_CFG_RATE(0x2004) | MT76_PROT_CFG_NAV(1) | \
+     MT76_PROT_CFG_TXOP_ALLOW(0x3f) | MT76_PROT_CFG_RTS_THRESH)
+#define MT76_DEFAULT_PROT_CFG_20            \
+    (MT76_PROT_CFG_RATE(0x2004) | MT76_PROT_CFG_CTRL(1) | \
+     MT76_PROT_CFG_NAV(1) | MT76_PROT_CFG_TXOP_ALLOW(0x17))
+#define MT76_DEFAULT_PROT_CFG_40            \
+    (MT76_PROT_CFG_RATE(0x2084) | MT76_PROT_CFG_CTRL(1) | \
+     MT76_PROT_CFG_NAV(1) | MT76_PROT_CFG_TXOP_ALLOW(0x3f))
+
+typedef struct mt76_reg_pair_t {
+    uint32_t reg;
+    uint32_t val;
+} mt76_reg_pair_t;
+
+static const mt76_reg_pair_t __mt76_mac_initvals[] = {
+    { MT76_PBF_SYS_CTRL,        0x00080c00 },
+    { MT76_PBF_CFG,             0x1efebcff },
+    { MT76_FCE_PSE_CTRL,        0x00000001 },
+    { MT76_MAC_SYS_CTRL,        0x00000000 },
+    { MT76_MAX_LEN_CFG,         0x003e3f00 },
+    { MT76_AMPDU_MAX_LEN_20M1S, 0xaaa99887 },
+    { MT76_AMPDU_MAX_LEN_20M2S, 0x000000aa },
+    { MT76_XIFS_TIME_CFG,       0x33a40d0a },
+    { MT76_BKOFF_SLOT_CFG,      0x00000209 },
+    { MT76_TBTT_SYNC_CFG,       0x00422010 },
+    { MT76_PWR_PIN_CFG,         0x00000000 },
+    { 0x1238,                   0x001700c8 },
+    { MT76_TX_SW_CFG0,          0x00101001 },
+    { MT76_TX_SW_CFG1,          0x00010000 },
+    { MT76_TX_SW_CFG2,          0x00000000 },
+    { MT76_TXOP_CTRL_CFG,       0x0400583f },
+    { MT76_TX_RTS_CFG,          0x00ffff20 },
+    { MT76_TX_TIMEOUT_CFG,      0x000a2290 },
+    { MT76_TX_RETRY_CFG,        0x47f01f0f },
+    { MT76_EXP_ACK_TIME,        0x002c00dc },
+    { MT76_TX_PROT_CFG6,        0xe3f42004 },
+    { MT76_TX_PROT_CFG7,        0xe3f42084 },
+    { MT76_TX_PROT_CFG8,        0xe3f42104 },
+    { MT76_PIFS_TX_CFG,         0x00060fff },
+    { MT_RX_FILTR_CFG,          0x00015f97 },
+    { MT76_LEGACY_BASIC_RATE,   0x0000017f },
+    { MT76_HT_BASIC_RATE,       0x00004003 },
+    { MT76_PN_PAD_MODE,         0x00000003 },
+    { MT76_TXOP_HLDR_ET,        0x00000002 },
+    { 0x0a44,                   0x00000000 },
+    { MT76_HEADER_TRANS_CTRL_REG, 0x00000000 },
+    { MT76_TSO_CTRL,            0x00000000 },
+    { MT76_AUX_CLK_CFG,         0x00000000 },
+    { MT76_DACCLK_EN_DLY_CFG,   0x00000000 },
+    { MT76_TX_ALC_CFG_4,        0x00000000 },
+    { MT76_TX_ALC_VGA3,         0x00000000 },
+    { MT76_TX_PWR_CFG_0,        0x3a3a3a3a },
+    { MT76_TX_PWR_CFG_1,        0x3a3a3a3a },
+    { MT76_TX_PWR_CFG_2,        0x3a3a3a3a },
+    { MT76_TX_PWR_CFG_3,        0x3a3a3a3a },
+    { MT76_TX_PWR_CFG_4,        0x3a3a3a3a },
+    { MT76_TX_PWR_CFG_7,        0x3a3a3a3a },
+    { MT76_TX_PWR_CFG_8,        0x0000003a },
+    { MT76_TX_PWR_CFG_9,        0x0000003a },
+    { MT76_EFUSE_CTRL,          0x0000d000 },
+    { MT76_PAUSE_ENABLE_CONTROL1, 0x0000000a },
+    { MT76_FCE_WLAN_FLOW_CONTROL1, 0x60401c18 },
+    { MT76_WPDMA_DELAY_INT_CFG, 0x94ff0000 },
+    { MT76_TX_SW_CFG3,          0x00000004 },
+    { MT76_HT_FBK_TO_LEGACY,    0x00001818 },
+    { MT76_VHT_HT_FBK_CFG1,     0xedcba980 },
+    { MT76_PROT_AUTO_TX_CFG,    0x00830083 },
+    { MT76_HT_CTRL_CFG,         0x000001ff },
+    { MT76_TX_LINK_CFG,         0x00001020 },
+};
+
+static const mt76_reg_pair_t __mt76_prot_initvals[] = {
+    { MT76_CCK_PROT_CFG,  MT76_DEFAULT_PROT_CFG_CCK },
+    { MT76_OFDM_PROT_CFG, MT76_DEFAULT_PROT_CFG_OFDM },
+    { MT76_MM20_PROT_CFG, MT76_DEFAULT_PROT_CFG_20 },
+    { MT76_MM40_PROT_CFG, MT76_DEFAULT_PROT_CFG_40 },
+    { MT76_GF20_PROT_CFG, MT76_DEFAULT_PROT_CFG_20 },
+    { MT76_GF40_PROT_CFG, MT76_DEFAULT_PROT_CFG_40 },
+};
+
 /*============================ TYPES =========================================*/
 
 typedef enum {
@@ -239,6 +492,15 @@ typedef enum {
     MT76_STATE_INIT_MCU_RADIO_ON,
     MT76_STATE_INIT_EEPROM_LOAD,
     MT76_STATE_INIT_MAC_ADDR,
+    MT76_STATE_INIT_USB_DMA,
+    MT76_STATE_INIT_MAC_RESET,
+    MT76_STATE_INIT_WCID_RESET,
+    MT76_STATE_INIT_KEY_RESET,
+    MT76_STATE_INIT_BEACON,
+    MT76_STATE_INIT_MISC,
+    MT76_STATE_INIT_LOAD_CR,
+    MT76_STATE_INIT_PHY,
+    MT76_STATE_INIT_MAC_STOP,
     MT76_STATE_INIT_READY,
 } mt76_state_t;
 
@@ -264,6 +526,8 @@ typedef enum {
     MT76_FW_STATE_CHECK_PATCH,
     MT76_FW_STATE_ACQUIRE_SEM,
     MT76_FW_STATE_ENABLE_USB_DMA,
+    MT76_FW_STATE_VENDOR_RESET_DELAY,
+    MT76_FW_STATE_ENABLE_USB_DMA_CFG,
     MT76_FW_STATE_FCE_PSE,
     MT76_FW_STATE_FCE_BASE,
     MT76_FW_STATE_FCE_MAX,
@@ -334,10 +598,17 @@ static void __mt76_fw_poll_fw_ready_done(vsf_wifi_t *wifi, vsf_err_t err);
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 static void __mt76_fw_timer(vsf_callback_timer_t *timer);
 static void __mt76_fw_timer_start(vsf_wifi_t *wifi, uint32_t ms);
+static void __mt76_xtal_timer(vsf_callback_timer_t *timer);
+static void __mt76_xtal_timer_start(vsf_wifi_t *wifi, uint32_t ms);
 #endif
 
+static vsf_err_t __mt76_mac_fixup_xtal_start(vsf_wifi_t *wifi);
+static void __mt76_mac_fixup_xtal_continue(vsf_wifi_t *wifi, vsf_err_t err);
+
 static vsf_err_t __mt76_mcu_msg_send(vsf_wifi_t *wifi, uint8_t cmd,
-    const uint8_t *payload, uint16_t payload_len, vsf_wifi_done_t done);
+    const uint8_t *payload, uint16_t payload_len, bool wait_resp,
+    vsf_wifi_done_t done);
+static void __mt76_mcu_msg_out_done(vsf_wifi_t *wifi, vsf_err_t err);
 static void __mt76_on_rx(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
 static void __mt76_on_rx_pkt(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len);
 
@@ -384,8 +655,8 @@ static const vsf_wifi_mt76_bus_ops_t *__mt76_bus_ops(vsf_wifi_t *wifi)
     return (const vsf_wifi_mt76_bus_ops_t *)wifi->bus_ops;
 }
 
-#define __mt76_cfg_read(__wifi, ...)      __mt76_bus_ops(__wifi)->cfg_read(__wifi, __VA_ARGS__)
-#define __mt76_cfg_write(__wifi, ...)     __mt76_bus_ops(__wifi)->cfg_write(__wifi, __VA_ARGS__)
+#define __mt76_cfg_read(__wifi, ...)      __mt76_bus_ops(__wifi)->base.reg_read(__wifi, __VA_ARGS__)
+#define __mt76_cfg_write(__wifi, ...)     __mt76_bus_ops(__wifi)->base.reg_write(__wifi, __VA_ARGS__)
 #define __mt76_fce_write(__wifi, ...)     __mt76_bus_ops(__wifi)->fce_write(__wifi, __VA_ARGS__)
 #define __mt76_dev_cmd(__wifi, ...)       __mt76_bus_ops(__wifi)->dev_cmd(__wifi, __VA_ARGS__)
 #define __mt76_dev_class_cmd(__wifi, ...) __mt76_bus_ops(__wifi)->dev_class_cmd(__wifi, __VA_ARGS__)
@@ -395,12 +666,48 @@ static const vsf_wifi_mt76_bus_ops_t *__mt76_bus_ops(vsf_wifi_t *wifi)
 
 /*============================ MCU helpers ===================================*/
 
+static void __mt76_mcu_msg_out_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        /* OUT transfer failed; the command was not accepted. */
+        priv->mcu_wait_resp = false;
+        vsf_wifi_done_t done = priv->mcu_wait_done;
+        priv->mcu_wait_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    /* Linux mt76x02u_mcu_send_msg submits the OUT URB first, waits for it
+     * to complete, and then waits for the CMD_RESP IN URB.  Keep the same
+     * ordering here: arm the response URB only after the OUT transfer has
+     * been ACKed by the device. */
+    if (priv->mcu_wait_resp) {
+        vsf_err_t rx_err = __mt76_rx_submit(wifi, NULL, 0,
+                             MT76_EP_IN_CMD_RESP);
+        if (rx_err != VSF_ERR_NONE) {
+            priv->mcu_wait_resp = false;
+            vsf_wifi_done_t done = priv->mcu_wait_done;
+            priv->mcu_wait_done = NULL;
+            if (done != NULL) done(wifi, rx_err);
+        }
+    }
+}
+
 static vsf_err_t __mt76_mcu_msg_send(vsf_wifi_t *wifi, uint8_t cmd,
-    const uint8_t *payload, uint16_t payload_len, vsf_wifi_done_t done)
+    const uint8_t *payload, uint16_t payload_len, bool wait_resp,
+    vsf_wifi_done_t done)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     uint16_t padded = (payload_len + 3) & ~3;
-    uint16_t total  = 4 + padded + 4;
+    /* USB DMA header + padded payload + trailing zero.
+     * The MCU command type/seq/cmd fields live in the dma_info flags,
+     * matching the Linux mt76x02u_skb_dma_info layout.
+     * The length field in TXINFO is the rounded payload length (xfer len),
+     * not including the 4-byte TXINFO header. */
+    uint16_t xfer_len = padded;
+    uint16_t total    = 4 + xfer_len + 4;
 
     if (total > sizeof(priv->tx_buf)) {
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
@@ -412,18 +719,36 @@ static vsf_err_t __mt76_mcu_msg_send(vsf_wifi_t *wifi, uint8_t cmd,
     }
     seq &= 0x0F;
 
-    uint32_t info = MT76_MCU_MSG_TYPE_CMD
-                  | (((uint32_t)cmd & 0x7F) << MT76_MCU_MSG_CMD_TYPE_SHIFT)
-                  | (((uint32_t)seq & 0x0F) << MT76_MCU_MSG_CMD_SEQ_SHIFT)
-                  | (((uint32_t)MT76_CPU_TX_PORT & 0x07) << MT76_MCU_MSG_PORT_SHIFT)
-                  | ((uint32_t)payload_len & MT76_MCU_MSG_LEN_MASK);
+    if (wait_resp) {
+        priv->mcu_wait_resp = true;
+        priv->mcu_wait_seq  = seq;
+        priv->mcu_wait_done = done;
+        done = __mt76_mcu_msg_out_done;
+    }
+
+    uint32_t dma_info = ((uint32_t)xfer_len & MT76_TXD_INFO_LEN_MASK)
+                      | (((uint32_t)MT76_CPU_TX_PORT & 0x07) << MT76_TXD_INFO_DPORT_SHIFT)
+                      | MT76_MCU_MSG_TYPE_CMD
+                      | (((uint32_t)cmd & 0x7F) << MT76_MCU_MSG_CMD_TYPE_SHIFT)
+                      | (((uint32_t)seq & 0x0F) << MT76_MCU_MSG_CMD_SEQ_SHIFT);
 
     uint8_t *buf = priv->tx_buf;
-    __mt76_put_le32(buf, info);
+    __mt76_put_le32(buf + 0, dma_info);
     if (payload_len > 0) {
         memcpy(buf + 4, payload, payload_len);
     }
-    memset(buf + 4 + payload_len, 0, (padded - payload_len) + 4);
+    memset(buf + 4 + payload_len, 0, total - 4 - payload_len);
+
+    {
+        char hex[128];
+        int pos = 0;
+        for (int __i = 0; __i < (int)total && pos < (int)sizeof(hex) - 3; __i++) {
+            pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", buf[__i]);
+        }
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: mcu_msg cmd=%u seq=%u wait=%d total=%u buf=%s" VSF_TRACE_CFG_LINEEND,
+            (unsigned)cmd, (unsigned)seq, (int)wait_resp, (unsigned)total, hex);
+    }
 
     return __mt76_mcu_cmd(wifi, priv->tx_buf, total, done);
 }
@@ -444,10 +769,29 @@ static void __mt76_fw_timer_start(vsf_wifi_t *wifi, uint32_t ms)
     priv->fw_timer.on_timer = __mt76_fw_timer;
     vsf_callback_timer_add_ms(&priv->fw_timer, ms);
 }
+static void __mt76_xtal_timer(vsf_callback_timer_t *timer)
+{
+    mt76_wifi_priv_t *priv = vsf_container_of(timer, mt76_wifi_priv_t, fw_timer);
+    __mt76_mac_fixup_xtal_continue(priv->wifi, VSF_ERR_NONE);
+}
+
+static void __mt76_xtal_timer_start(vsf_wifi_t *wifi, uint32_t ms)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_callback_timer_init(&priv->fw_timer);
+    priv->fw_timer.on_timer = __mt76_xtal_timer;
+    vsf_callback_timer_add_ms(&priv->fw_timer, ms);
+}
 #else
 static void __mt76_fw_timer_start(vsf_wifi_t *wifi, uint32_t ms)
 {
     (void)wifi; (void)ms;
+}
+
+static void __mt76_xtal_timer_start(vsf_wifi_t *wifi, uint32_t ms)
+{
+    (void)wifi; (void)ms;
+    __mt76_mac_fixup_xtal_continue(wifi, VSF_ERR_NONE);
 }
 #endif
 
@@ -1291,8 +1635,20 @@ static void __mt76_fw_next(vsf_wifi_t *wifi, vsf_err_t err)
         break;
 
     case MT76_FW_STATE_ENABLE_USB_DMA:
-        /* Windows driver does not issue MT_VEND_DEV_MODE reset before FCE
-         * setup; skip it to match the successful Windows enumeration sequence. */
+        /* Linux issues MT_VEND_DEV_MODE reset before each FCE setup;
+         * match its enumeration sequence. */
+        priv->fw_state = MT76_FW_STATE_VENDOR_RESET_DELAY;
+        step_err = __mt76_dev_cmd(wifi, MT76_VEND_DEV_MODE, 0x1, 0,
+                                  __mt76_fw_next);
+        break;
+
+    case MT76_FW_STATE_VENDOR_RESET_DELAY:
+        priv->fw_state = MT76_FW_STATE_ENABLE_USB_DMA_CFG;
+        __mt76_fw_timer_start(wifi, 10);
+        step_err = VSF_ERR_NONE;
+        break;
+
+    case MT76_FW_STATE_ENABLE_USB_DMA_CFG:
         priv->fw_state = MT76_FW_STATE_FCE_PSE;
         step_err = __mt76_cfg_write(wifi, MT76_USB_U3DMA_CFG,
                                     MT76_USB_DMA_CFG_VAL, __mt76_fw_next);
@@ -1627,6 +1983,227 @@ const uint8_t *__mt76_eeprom_get_mac(vsf_wifi_t *wifi)
     return &priv->eeprom[MT76_EE_MAC_ADDR];
 }
 
+static void __mt76_init_mac_reset_reenable_dma_done(vsf_wifi_t *wifi, vsf_err_t err);
+
+static void __mt76_mac_fixup_dma_read_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    /* Preserve all current USB DMA bits and only flip the ones Linux
+     * init_dma toggles.  This keeps the lower-byte aggregation timeout and
+     * EP_OUT_VALID mask intact while ensuring TX/RX bulk and drop-or-pad
+     * are enabled and aggregation is disabled. */
+    uint32_t val = priv->fw_idx;
+    val |= MT76_USB_DMA_CFG_RX_DROP_OR_PAD |
+           MT76_USB_DMA_CFG_RX_BULK_EN |
+           MT76_USB_DMA_CFG_TX_BULK_EN;
+    val &= ~MT76_USB_DMA_CFG_RX_BULK_AGG_EN;
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_USB_U3DMA_CFG, val,
+                                          __mt76_init_mac_reset_reenable_dma_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_mac_fixup_xtal_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    /* Re-enable USB DMA after mac_reset with a read-modify-write so we do
+     * not clobber device-specific bits (e.g. EP_OUT_VALID, aggregation
+     * timeout) that the firmware already configured. */
+    vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_USB_U3DMA_CFG, &priv->fw_idx,
+                                          __mt76_mac_fixup_dma_read_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_init_mac_reset_reenable_dma_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    priv->state = MT76_STATE_INIT_MAC_ADDR;
+    priv->init_substate = 0;
+    __mt76_init_next(wifi, VSF_ERR_NONE);
+}
+
+static vsf_err_t __mt76_mac_fixup_xtal_start(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    uint16_t eep_val = __mt76_eeprom_get_u16(priv, MT76_EE_XTAL_TRIM_2);
+    int8_t offset = 0;
+
+    offset = (int8_t)(eep_val & 0x7f);
+    if ((eep_val & 0xff) == 0xff) {
+        offset = 0;
+    } else if (eep_val & 0x80) {
+        offset = -offset;
+    }
+
+    eep_val >>= 8;
+    if ((eep_val == 0) || (eep_val == 0xff)) {
+        eep_val = __mt76_eeprom_get_u16(priv, MT76_EE_XTAL_TRIM_1) & 0xff;
+        if ((eep_val == 0) || (eep_val == 0xff)) {
+            eep_val = 0x14;
+        }
+    }
+
+    eep_val &= 0x7f;
+    priv->xtal_val = (uint16_t)(eep_val + offset);
+    priv->xtal_step = 0;
+    __mt76_mac_fixup_xtal_continue(wifi, VSF_ERR_NONE);
+    return VSF_ERR_NONE;
+}
+
+static void __mt76_mac_fixup_xtal_continue(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_err_t step_err = VSF_ERR_NONE;
+
+    if (err != VSF_ERR_NONE) {
+        __mt76_mac_fixup_xtal_done(wifi, err);
+        return;
+    }
+
+    switch (priv->xtal_step) {
+    case 0: {
+        priv->xtal_step = 1;
+        step_err = __mt76_cfg_read(wifi,
+            MT76_VEND_TYPE_CFG | MT76_XO_CTRL5, &priv->fw_idx,
+            __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 1: {
+        uint32_t val = priv->fw_idx;
+        val &= ~MT76_XO_CTRL5_C2_VAL_MASK;
+        val |= ((uint32_t)priv->xtal_val & 0x7f) << MT76_XO_CTRL5_C2_VAL_SHIFT;
+        priv->xtal_step = 2;
+        step_err = __mt76_cfg_write(wifi,
+            MT76_VEND_TYPE_CFG | MT76_XO_CTRL5, val,
+            __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 2: {
+        priv->xtal_step = 3;
+        step_err = __mt76_cfg_read(wifi,
+            MT76_VEND_TYPE_CFG | MT76_XO_CTRL6, &priv->fw_idx,
+            __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 3: {
+        uint32_t val = priv->fw_idx | MT76_XO_CTRL6_C2_CTRL_MASK;
+        priv->xtal_step = 4;
+        step_err = __mt76_cfg_write(wifi,
+            MT76_VEND_TYPE_CFG | MT76_XO_CTRL6, val,
+            __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 4: {
+        priv->xtal_step = 5;
+        step_err = __mt76_cfg_write(wifi, MT76_RF_BYPASS_0, 0x06000000,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 5: {
+        priv->xtal_step = 6;
+        step_err = __mt76_cfg_write(wifi, MT76_RF_SETTING_0, 0x08800000,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 6: {
+        priv->xtal_step = 7;
+        __mt76_xtal_timer_start(wifi, 5);
+        break;
+    }
+    case 7: {
+        priv->xtal_step = 8;
+        step_err = __mt76_cfg_write(wifi, MT76_RF_BYPASS_0, 0,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 8: {
+        priv->xtal_step = 9;
+        step_err = __mt76_cfg_read(wifi, MT76_XIFS_TIME_CFG, &priv->fw_idx,
+                                   __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 9: {
+        uint32_t val = priv->fw_idx;
+        val &= ~((uint32_t)0xFF << 8);
+        val |= ((uint32_t)0x0D << 8);
+        priv->xtal_step = 10;
+        step_err = __mt76_cfg_write(wifi, MT76_XIFS_TIME_CFG, val,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 10: {
+        priv->xtal_step = 11;
+        step_err = __mt76_cfg_read(wifi, MT76_BKOFF_SLOT_CFG, &priv->fw_idx,
+                                   __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 11: {
+        uint32_t val = priv->fw_idx;
+        val &= ~((uint32_t)0x0F << 8);
+        val |= ((uint32_t)0x01 << 8);
+        priv->xtal_step = 12;
+        step_err = __mt76_cfg_write(wifi, MT76_BKOFF_SLOT_CFG, val,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 12: {
+        priv->xtal_step = 13;
+        step_err = __mt76_cfg_read(wifi, MT76_FCE_L2_STUFF, &priv->fw_idx,
+                                   __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 13: {
+        uint32_t val = priv->fw_idx & ~MT76_FCE_L2_STUFF_WR_MPDU_LEN_EN;
+        priv->xtal_step = 14;
+        step_err = __mt76_cfg_write(wifi, MT76_FCE_L2_STUFF, val,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 14: {
+        uint16_t nic_conf2 = __mt76_eeprom_get_u16(priv, MT76_EE_NIC_CONF_2);
+        uint32_t xo7;
+        switch ((nic_conf2 >> 9) & 0x03) {
+        case 1:
+            xo7 = 0x5c1feed0;
+            break;
+        case 0:
+        default:
+            xo7 = 0x5c1fee80;
+            break;
+        }
+        priv->xtal_step = 15;
+        step_err = __mt76_cfg_write(wifi, MT76_XO_CTRL7, xo7,
+                                    __mt76_mac_fixup_xtal_continue);
+        break;
+    }
+    case 15:
+        __mt76_mac_fixup_xtal_done(wifi, VSF_ERR_NONE);
+        return;
+    default:
+        step_err = VSF_ERR_BUG;
+        break;
+    }
+
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_mac_fixup_xtal_done(wifi, step_err);
+    }
+}
+
 /*============================ Initialization ================================*/
 
 static void __mt76_init_mcu_q_select_done(vsf_wifi_t *wifi, vsf_err_t err)
@@ -1640,18 +2217,30 @@ static void __mt76_init_mcu_q_select_done(vsf_wifi_t *wifi, vsf_err_t err)
     __mt76_init_next(wifi, VSF_ERR_NONE);
 }
 
-static void __mt76_init_ready(vsf_wifi_t *wifi)
+static void __mt76_init_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     vsf_wifi_done_t done = priv->pending_done;
 
+    priv->pending_done = NULL;
+    if (done != NULL) done(wifi, err);
+}
+
+static void __mt76_init_ready(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
     priv->state = MT76_STATE_INIT_READY;
     priv->on_rx = __mt76_on_rx;
     priv->on_rx_pkt = __mt76_on_rx_pkt;
-    /* Notify the bus driver that the data path can be enabled. */
-    __mt76_bus_ops(wifi)->on_ready(wifi);
-    priv->pending_done = NULL;
-    if (done != NULL) done(wifi, VSF_ERR_NONE);
+    /* Enable MAC TX/RX so the firmware can deliver packets/beacons.
+     * Linux does this in mt76x02u_mac_start after interface up. */
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_MAC_SYS_CTRL,
+        MT76_MAC_SYS_CTRL_ENABLE_TX | MT76_MAC_SYS_CTRL_ENABLE_RX,
+        __mt76_init_ready_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_ready_done(wifi, step_err);
+    }
 }
 
 static void __mt76_eeprom_load_done(vsf_wifi_t *wifi, vsf_err_t err);
@@ -1696,11 +2285,34 @@ static void __mt76_eeprom_load_done(vsf_wifi_t *wifi, vsf_err_t err)
 
     memcpy(wifi->mac, mac, 6);
 
-    priv->state = MT76_STATE_INIT_MAC_ADDR;
-    vsf_err_t step_err = __mt76_set_mac_addr(wifi, mac, __mt76_mac_addr_done);
+    priv->state = MT76_STATE_INIT_USB_DMA;
+    __mt76_init_next(wifi, VSF_ERR_NONE);
+}
+
+static void __mt76_init_mac_addr_wait_idle_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_error(
+            "mt76: mac_addr wait idle err=%d" VSF_TRACE_CFG_LINEEND, err);
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: mac_addr wait idle status=0x%08X idx=%u" VSF_TRACE_CFG_LINEEND,
+        (unsigned)priv->fw_idx, priv->init_idx);
+    if ((priv->fw_idx & (MT76_MAC_STATUS_TX | MT76_MAC_STATUS_RX)) == 0 ||
+            priv->init_idx == 0) {
+        priv->state = MT76_STATE_INIT_WCID_RESET;
+        priv->init_substate = 0;
+        __mt76_init_next(wifi, VSF_ERR_NONE);
+        return;
+    }
+    priv->init_idx--;
+    vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS, &priv->fw_idx,
+                                         __mt76_init_mac_addr_wait_idle_done);
     if (step_err != VSF_ERR_NONE) {
-        priv->pending_done = NULL;
-        if (init_done != NULL) init_done(wifi, step_err);
+        __mt76_init_next(wifi, step_err);
     }
 }
 
@@ -1717,7 +2329,43 @@ static void __mt76_mac_addr_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
 
-    __mt76_init_ready(wifi);
+    /* Wait for MAC TX/RX to become idle after setting the MAC address,
+     * matching Linux mt76x02_wait_for_txrx_idle() in init_hardware(). */
+    priv->state = MT76_STATE_INIT_MAC_ADDR;
+    priv->init_idx = 100;
+    vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS, &priv->fw_idx,
+                                         __mt76_init_mac_addr_wait_idle_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_init_usb_dma_read_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+
+    uint32_t val = priv->fw_idx;
+    val |= MT76_USB_DMA_CFG_RX_DROP_OR_PAD |
+           MT76_USB_DMA_CFG_RX_BULK_EN |
+           MT76_USB_DMA_CFG_TX_BULK_EN;
+    val &= ~MT76_USB_DMA_CFG_RX_BULK_AGG_EN;
+
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: init usb_dma cfg=0x%08X -> 0x%08X" VSF_TRACE_CFG_LINEEND,
+        (unsigned)priv->fw_idx, (unsigned)val);
+
+    priv->state = MT76_STATE_INIT_MAC_RESET;
+    priv->init_substate = 0;
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_USB_U3DMA_CFG, val,
+                                          __mt76_init_next);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
 }
 
 static void __mt76_read_asic_done(vsf_wifi_t *wifi, vsf_err_t err)
@@ -1742,7 +2390,7 @@ static void __mt76_read_asic_done(vsf_wifi_t *wifi, vsf_err_t err)
         "mt76: ASIC version = 0x%08X" VSF_TRACE_CFG_LINEEND,
         (unsigned)priv->asic_rev);
 
-    priv->state = MT76_STATE_INIT_MCU_Q_SELECT;
+    priv->state = MT76_STATE_INIT_READ_ASIC;
     __mt76_init_next(wifi, VSF_ERR_NONE);
 }
 
@@ -1751,14 +2399,158 @@ vsf_err_t __mt76_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     priv->pending_done = done;
     priv->state        = MT76_STATE_INIT_READ_ASIC;
+    /* Install RX handlers early so that MCU command responses received
+     * during the init sequence (e.g. LOAD_CR) are routed to the chip
+     * driver instead of being dropped. */
+    priv->on_rx        = __mt76_on_rx;
+    priv->on_rx_pkt    = __mt76_on_rx_pkt;
     return __mt76_cfg_read(wifi, MT76_ASIC_VERSION,
                            &priv->asic_rev, __mt76_read_asic_done);
+}
+
+static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err);
+
+static void __mt76_init_table_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    priv->init_idx++;
+    __mt76_init_next(wifi, VSF_ERR_NONE);
+}
+
+static void __mt76_init_mac_reset_substate_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    priv->init_substate++;
+    __mt76_init_next(wifi, VSF_ERR_NONE);
+}
+
+static void __mt76_init_wcid_reset_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    priv->init_idx++;
+    if (priv->init_idx >= 256) {
+        __mt76_init_next(wifi, VSF_ERR_NONE);
+        return;
+    }
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_WCID_ATTR(priv->init_idx),
+                                          MT76_WCID_ATTR_BSS_IDX,
+                                          __mt76_init_wcid_reset_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_init_key_reset_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    priv->init_idx2++;
+    if (priv->init_idx2 >= 4) {
+        priv->init_idx2 = 0;
+        priv->init_idx++;
+        if (priv->init_idx >= 16) {
+            __mt76_init_next(wifi, VSF_ERR_NONE);
+            return;
+        }
+    }
+    vsf_err_t step_err = __mt76_cfg_write(wifi,
+        MT76_SKEY(priv->init_idx, priv->init_idx2), 0,
+        __mt76_init_key_reset_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_init_beacon_offset_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    priv->init_idx++;
+    if (priv->init_idx >= 4) {
+        __mt76_init_next(wifi, VSF_ERR_NONE);
+        return;
+    }
+    uint32_t slot_size = (8192 / 16) & ~63;
+    uint32_t offset = priv->init_idx * slot_size;
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BCN_OFFSET(priv->init_idx),
+                                          offset,
+                                          __mt76_init_beacon_offset_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_init_txrx_idle_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_error(
+            "mt76: txrx idle err=%d" VSF_TRACE_CFG_LINEEND, err);
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: txrx idle poll status=0x%08X idx=%u" VSF_TRACE_CFG_LINEEND,
+        (unsigned)priv->fw_idx, priv->init_idx);
+    if ((priv->fw_idx & (MT76_MAC_STATUS_TX | MT76_MAC_STATUS_RX)) == 0 ||
+            priv->init_idx == 0) {
+        if (priv->state == MT76_STATE_INIT_MAC_RESET) {
+            priv->state = MT76_STATE_INIT_MAC_ADDR;
+        } else {
+            priv->state = MT76_STATE_INIT_READY;
+        }
+        priv->init_substate = 0;
+        __mt76_init_next(wifi, VSF_ERR_NONE);
+        return;
+    }
+    priv->init_idx--;
+    vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS, &priv->fw_idx,
+                                         __mt76_init_txrx_idle_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, step_err);
+    }
+}
+
+static void __mt76_init_load_cr_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (err != VSF_ERR_NONE) {
+        __mt76_init_next(wifi, err);
+        return;
+    }
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    priv->state = MT76_STATE_INIT_PHY;
+    priv->init_substate = 0;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: init phy start" VSF_TRACE_CFG_LINEEND);
+    __mt76_init_next(wifi, VSF_ERR_NONE);
 }
 
 static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     vsf_wifi_done_t done = priv->pending_done;
+
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: init_next state=%d err=%d" VSF_TRACE_CFG_LINEEND,
+        (int)priv->state, (int)err);
 
     if (err != VSF_ERR_NONE) {
         priv->pending_done = NULL;
@@ -1773,7 +2565,7 @@ static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err)
         __mt76_put_le32(payload + 4, 1);
         priv->state = MT76_STATE_INIT_MCU_Q_SELECT;
         vsf_err_t step_err = __mt76_mcu_msg_send(wifi, MT76_CMD_FUN_SET_OP,
-                                    payload, sizeof(payload),
+                                    payload, sizeof(payload), false,
                                     __mt76_init_mcu_q_select_done);
         if (step_err != VSF_ERR_NONE) {
             __mt76_init_next(wifi, step_err);
@@ -1781,19 +2573,377 @@ static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err)
         break;
     }
 
-    case MT76_STATE_INIT_MCU_Q_SELECT: {
+    case MT76_STATE_INIT_MCU_RADIO_ON: {
         uint8_t payload[8];
         __mt76_put_le32(payload + 0, MT76_PWR_RADIO_ON);
         __mt76_put_le32(payload + 4, 0);
-        priv->state = MT76_STATE_INIT_MCU_RADIO_ON;
+        priv->state = MT76_STATE_INIT_EEPROM_LOAD;
         vsf_err_t step_err = __mt76_mcu_msg_send(wifi, MT76_CMD_POWER_SAVING_OP,
-                                    payload, sizeof(payload),
+                                    payload, sizeof(payload), false,
                                     __mt76_init_mcu_radio_on_done);
         if (step_err != VSF_ERR_NONE) {
             __mt76_init_next(wifi, step_err);
         }
         break;
     }
+
+    case MT76_STATE_INIT_USB_DMA: {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: init usb_dma" VSF_TRACE_CFG_LINEEND);
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_USB_U3DMA_CFG,
+                                             &priv->fw_idx,
+                                             __mt76_init_usb_dma_read_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_init_next(wifi, step_err);
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_MAC_ADDR: {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: init mac_addr" VSF_TRACE_CFG_LINEEND);
+        vsf_err_t step_err = __mt76_set_mac_addr(wifi, wifi->mac,
+                                                 __mt76_mac_addr_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_init_next(wifi, step_err);
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_MAC_RESET: {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: init mac_reset sub=%u idx=%u" VSF_TRACE_CFG_LINEEND,
+            priv->init_substate, priv->init_idx);
+        switch (priv->init_substate) {
+        case 0: {
+            /* Reset WPDMA global configuration before reloading initvals. */
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_WPDMA_GLO_CFG,
+                                                  0x00000030,
+                                                  __mt76_init_mac_reset_substate_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 1: {
+            /* PBF max counts */
+            static const mt76_reg_pair_t pbf_vals[] = {
+                { MT76_PBF_TX_MAX_PCNT, 0xefef3f1f },
+                { MT76_PBF_RX_MAX_PCNT, 0xfebf },
+            };
+            if (priv->init_idx < (sizeof(pbf_vals) / sizeof(pbf_vals[0]))) {
+                vsf_err_t step_err = __mt76_cfg_write(wifi,
+                    pbf_vals[priv->init_idx].reg,
+                    pbf_vals[priv->init_idx].val,
+                    __mt76_init_table_done);
+                if (step_err != VSF_ERR_NONE) {
+                    __mt76_init_next(wifi, step_err);
+                }
+                break;
+            }
+            priv->init_idx = 0;
+            priv->init_substate = 2;
+        }
+        /* fall through */
+        case 2: {
+            /* main mac initvals */
+            if (priv->init_idx < (sizeof(__mt76_mac_initvals) / sizeof(__mt76_mac_initvals[0]))) {
+                vsf_err_t step_err = __mt76_cfg_write(wifi,
+                    __mt76_mac_initvals[priv->init_idx].reg,
+                    __mt76_mac_initvals[priv->init_idx].val,
+                    __mt76_init_table_done);
+                if (step_err != VSF_ERR_NONE) {
+                    __mt76_init_next(wifi, step_err);
+                }
+                break;
+            }
+            priv->init_idx = 0;
+            priv->init_substate = 3;
+        }
+        /* fall through */
+        case 3: {
+            /* protection initvals */
+            if (priv->init_idx < (sizeof(__mt76_prot_initvals) / sizeof(__mt76_prot_initvals[0]))) {
+                vsf_err_t step_err = __mt76_cfg_write(wifi,
+                    __mt76_prot_initvals[priv->init_idx].reg,
+                    __mt76_prot_initvals[priv->init_idx].val,
+                    __mt76_init_table_done);
+                if (step_err != VSF_ERR_NONE) {
+                    __mt76_init_next(wifi, step_err);
+                }
+                break;
+            }
+            priv->init_idx = 0;
+            priv->init_substate = 4;
+        }
+        /* fall through */
+        case 4: {
+            /* post-initval direct writes */
+            static const mt76_reg_pair_t post_vals[] = {
+                { MT76_TX_LINK_CFG,   0x00001020 },
+                { MT76_AUTO_RSP_CFG,  0x00000013 },
+                { MT76_MAX_LEN_CFG,   0x00002f00 },
+                { MT76_WMM_AIFSN,     0x00002273 },
+                { MT76_WMM_CWMIN,     0x00002344 },
+                { MT76_WMM_CWMAX,     0x000034aa },
+            };
+            if (priv->init_idx < (sizeof(post_vals) / sizeof(post_vals[0]))) {
+                vsf_err_t step_err = __mt76_cfg_write(wifi,
+                    post_vals[priv->init_idx].reg,
+                    post_vals[priv->init_idx].val,
+                    __mt76_init_table_done);
+                if (step_err != VSF_ERR_NONE) {
+                    __mt76_init_next(wifi, step_err);
+                }
+                break;
+            }
+            priv->init_idx = 0;
+            priv->init_substate = 5;
+        }
+        /* fall through */
+        case 5: {
+            /* De-assert MAC/BBP reset. */
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_MAC_SYS_CTRL, 0,
+                                                  __mt76_init_mac_reset_substate_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 6: {
+            /* MT76x2-specific fix-ups inside mt76x2u_mac_reset(). */
+            static const mt76_reg_pair_t fixup_vals[] = {
+                { MT76_COEXCFG0,      0x00000000 },
+                { MT76_EXT_CCA_CFG,   0x0000f000 },
+                { MT76_TX_ALC_CFG_4,  0x00000000 },
+            };
+            if (priv->init_idx < (sizeof(fixup_vals) / sizeof(fixup_vals[0]))) {
+                vsf_err_t step_err = __mt76_cfg_write(wifi,
+                    fixup_vals[priv->init_idx].reg,
+                    fixup_vals[priv->init_idx].val,
+                    __mt76_init_table_done);
+                if (step_err != VSF_ERR_NONE) {
+                    __mt76_init_next(wifi, step_err);
+                }
+                break;
+            }
+            priv->init_idx = 0;
+            priv->init_substate = 7;
+        }
+        /* fall through */
+        case 7: {
+            /* USB xtal fixup: handled by a dedicated sub-state machine. */
+            vsf_err_t step_err = __mt76_mac_fixup_xtal_start(wifi);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_WCID_RESET: {
+        if (priv->init_idx >= 256) {
+            priv->state = MT76_STATE_INIT_KEY_RESET;
+            priv->init_idx = 0;
+            priv->init_idx2 = 0;
+            __mt76_init_next(wifi, VSF_ERR_NONE);
+            break;
+        }
+        vsf_err_t step_err = __mt76_cfg_write(wifi,
+                                              MT76_WCID_ATTR(priv->init_idx),
+                                              MT76_WCID_ATTR_BSS_IDX,
+                                              __mt76_init_wcid_reset_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_init_next(wifi, step_err);
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_KEY_RESET: {
+        if (priv->init_idx >= 16) {
+            priv->state = MT76_STATE_INIT_BEACON;
+            priv->init_substate = 0;
+            __mt76_init_next(wifi, VSF_ERR_NONE);
+            break;
+        }
+        vsf_err_t step_err = __mt76_cfg_write(wifi,
+                                              MT76_SKEY(priv->init_idx, priv->init_idx2),
+                                              0,
+                                              __mt76_init_key_reset_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_init_next(wifi, step_err);
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_BEACON: {
+        switch (priv->init_substate) {
+        case 0: {
+            /* Disable beacon timer/TBTT, set sync mode */
+            priv->init_substate = 1;
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BEACON_TIME_CFG,
+                MT76_BEACON_TIME_CFG_SYNC_MODE,
+                __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 1: {
+            /* Beacon bypass mask */
+            priv->init_idx = 0;
+            priv->init_substate = 2;
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BCN_BYPASS_MASK,
+                                                  0xffff,
+                                                  __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 2: {
+            /* BCN_OFFSET[0..3] */
+            priv->init_substate = 3;
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BCN_OFFSET(0), 0,
+                                                  __mt76_init_beacon_offset_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 3:
+            priv->state = MT76_STATE_INIT_MISC;
+            priv->init_substate = 0;
+            vsf_wifi_chip_mt76_trace_info(
+                "mt76: init misc start" VSF_TRACE_CFG_LINEEND);
+            __mt76_init_next(wifi, VSF_ERR_NONE);
+            break;
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_MISC: {
+        static const mt76_reg_pair_t misc_vals[] = {
+            { MT76_US_CYC_CFG,      0x1e },
+            { MT76_TXOP_CTRL_CFG,   0x583f },
+        };
+        if (priv->init_idx < (sizeof(misc_vals) / sizeof(misc_vals[0]))) {
+            vsf_err_t step_err = __mt76_cfg_write(wifi,
+                misc_vals[priv->init_idx].reg,
+                misc_vals[priv->init_idx].val,
+                __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+        priv->init_idx = 0;
+        priv->state = MT76_STATE_INIT_LOAD_CR;
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: init load_cr start" VSF_TRACE_CFG_LINEEND);
+        __mt76_init_next(wifi, VSF_ERR_NONE);
+        break;
+    }
+
+    case MT76_STATE_INIT_LOAD_CR: {
+        uint8_t payload[8];
+        uint16_t nic_conf0 = __mt76_eeprom_get_u16(priv, MT76_EE_NIC_CONF_0);
+        uint16_t nic_conf1 = __mt76_eeprom_get_u16(priv, MT76_EE_NIC_CONF_1);
+        uint32_t cfg = (1U << 31) |
+                       ((uint32_t)(nic_conf0 >> 8) & 0x00FF) |
+                       (((uint32_t)nic_conf1 & 0x00FF) << 8);
+        payload[0] = MT76_RF_BBP_CR;  /* cr_mode  */
+        payload[1] = 0;               /* temp     */
+        payload[2] = 0;               /* channel  */
+        payload[3] = 0;               /* _pad0    */
+        __mt76_put_le32(payload + 4, cfg);
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: load_cr cfg=0x%08X conf0=0x%04X conf1=0x%04X" VSF_TRACE_CFG_LINEEND,
+            (unsigned)cfg, (unsigned)nic_conf0, (unsigned)nic_conf1);
+        vsf_err_t step_err = __mt76_mcu_msg_send(wifi,
+            MT76_MCU_MSG_CMD_LOAD_CR, payload, sizeof(payload), true,
+            __mt76_init_load_cr_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_init_next(wifi, step_err);
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_PHY: {
+        switch (priv->init_substate) {
+        case 0: {
+            priv->init_substate = 1;
+            vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_BBP(AGC, 0),
+                                                 &priv->fw_idx,
+                                                 __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 1: {
+            uint32_t val = priv->fw_idx & ~(1U << 3);
+            priv->init_substate = 2;
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BBP(AGC, 0), val,
+                                                  __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 2: {
+            priv->init_substate = 3;
+            vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_BBP(TXBE, 5),
+                                                 &priv->fw_idx,
+                                                 __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+
+        case 3: {
+            uint32_t val = priv->fw_idx & ~0x3U;
+            priv->state = MT76_STATE_INIT_MAC_STOP;
+            priv->init_substate = 0;
+            vsf_wifi_chip_mt76_trace_info(
+                "mt76: init mac_stop start" VSF_TRACE_CFG_LINEEND);
+            vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BBP(TXBE, 5), val,
+                                                  __mt76_init_table_done);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_init_next(wifi, step_err);
+            }
+            break;
+        }
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_MAC_STOP: {
+        priv->init_idx = 100;
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS,
+                                             &priv->fw_idx,
+                                             __mt76_init_txrx_idle_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_init_next(wifi, step_err);
+        }
+        break;
+    }
+
+    case MT76_STATE_INIT_READY:
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: init ready" VSF_TRACE_CFG_LINEEND);
+        __mt76_init_ready(wifi);
+        break;
 
     default:
         priv->pending_done = NULL;
@@ -1802,27 +2952,62 @@ static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
+static void __mt76_mcu_wait_timeout(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_chip_mt76_trace_error(
+        "mt76: mcu resp timeout, wanted seq=%u" VSF_TRACE_CFG_LINEEND,
+        (unsigned)priv->mcu_wait_seq);
+    priv->mcu_wait_resp = false;
+    vsf_wifi_done_t done = priv->mcu_wait_done;
+    priv->mcu_wait_done = NULL;
+    if (done != NULL) done(wifi, VSF_ERR_FAIL);
+}
+
 static void __mt76_on_rx(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
-    (void)priv;
 
-    if (len < 4) return;
+    if (!priv->mcu_wait_resp) {
+        return;
+    }
+
+    if (len < 4) {
+        /* RX URB timed out or completed with error while we were waiting. */
+        __mt76_mcu_wait_timeout(wifi);
+        return;
+    }
 
     uint32_t info = __mt76_get_le32(buf);
-#if VSF_WIFI_CFG_CHIP_MT76_LOG_LEVEL >= 4
-    uint8_t evt = (uint8_t)((info >> 20) & 0x7F);
+    uint8_t evt = (uint8_t)((info >> 20) & 0x0F);
     uint8_t seq = (uint8_t)((info >> 16) & 0x0F);
 
-    vsf_wifi_chip_mt76_trace_debug(
-        "mt76: mcu evt=0x%02X seq=%u len=%u" VSF_TRACE_CFG_LINEEND,
-        evt, seq, len);
-#else
-    (void)info;
-#endif
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: mcu evt=0x%02X seq=%u len=%u wait=%d" VSF_TRACE_CFG_LINEEND,
+        evt, seq, len, (int)priv->mcu_wait_resp);
 
-    /* CMD_RESP events are currently only logged; set_channel/power-on
-     * commands complete via their bulk-OUT done callbacks. */
+    /* Commands that expect a response (LOAD_CR, SWITCH_CHANNEL_OP) complete
+     * only after we drain CMD_RESP and see EVT_CMD_DONE for our sequence.
+     * If a stale response arrives first, drop it and re-arm the RX URB so we
+     * can receive the response for the current command. */
+    if ((seq == priv->mcu_wait_seq) && (evt == 0)) {
+        priv->mcu_wait_resp = false;
+        vsf_wifi_done_t done = priv->mcu_wait_done;
+        priv->mcu_wait_done = NULL;
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: mcu resp matched seq=%u" VSF_TRACE_CFG_LINEEND, seq);
+        if (done != NULL) done(wifi, VSF_ERR_NONE);
+        return;
+    }
+
+    /* Stale response: re-submit RX to keep draining the response queue. */
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: mcu resp stale seq=%u wanted=%u, re-arm rx" VSF_TRACE_CFG_LINEEND,
+        seq, (unsigned)priv->mcu_wait_seq);
+    vsf_err_t rx_err = __mt76_rx_submit(wifi, NULL, 0, MT76_EP_IN_CMD_RESP);
+    if (rx_err != VSF_ERR_NONE) {
+        __mt76_mcu_wait_timeout(wifi);
+    }
 }
 
 static void __mt76_on_rx_pkt(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len)
@@ -1838,38 +3023,108 @@ void __mt76_fini(vsf_wifi_t *wifi)
 
 /*============================ WiFi hooks ====================================*/
 
+static void __mt76_set_channel_second_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->pending_done;
+    priv->pending_done = NULL;
+    if (done != NULL) done(wifi, err);
+}
+
+static void __mt76_set_channel_first_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        __mt76_set_channel_second_done(wifi, err);
+        return;
+    }
+
+    uint8_t payload[8];
+    payload[0] = priv->set_channel_channel; /* idx */
+    payload[1] = priv->set_channel_scan;    /* scan */
+    payload[2] = 0;                         /* bw: 20 MHz */
+    payload[3] = 0;                         /* pad */
+    /* chainmask: MT7612U is 2T2R, use 0x0202 */
+    payload[4] = 0x02;
+    payload[5] = 0x02;
+    /* ext_chan: 0xe0 + bw_index for 20 MHz primary channel */
+    payload[6] = 0xe0 + priv->set_channel_bw_index;
+    payload[7] = 0;
+
+    vsf_err_t step_err = __mt76_mcu_msg_send(wifi,
+        MT76_CMD_SWITCH_CHANNEL_OP, payload, sizeof(payload), true,
+        __mt76_set_channel_second_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_set_channel_second_done(wifi, step_err);
+    }
+}
+
 vsf_err_t __mt76_set_channel(vsf_wifi_t *wifi, uint8_t channel,
                              vsf_wifi_done_t done)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
-    (void)priv;
+
+    priv->set_channel_channel  = channel;
+    priv->set_channel_scan     = 1;     /* scan mode */
+    priv->set_channel_bw_index = 0;     /* 20 MHz */
+    priv->pending_done         = done;
 
     uint8_t payload[8];
     payload[0] = channel;       /* idx */
-    payload[1] = 0;             /* scan */
+    payload[1] = 1;             /* scan */
     payload[2] = 0;             /* bw: 20 MHz */
     payload[3] = 0;             /* pad */
     /* chainmask: MT7612U is 2T2R, use 0x0202 */
     payload[4] = 0x02;
     payload[5] = 0x02;
-    /* ext_chan: 0xe0 for 20 MHz primary channel */
-    payload[6] = 0xe0;
+    /* first command has no extension channel info */
+    payload[6] = 0;
     payload[7] = 0;
 
     vsf_wifi_chip_mt76_trace_info(
         "mt76: set_channel=%u" VSF_TRACE_CFG_LINEEND, (unsigned)channel);
 
     return __mt76_mcu_msg_send(wifi, MT76_CMD_SWITCH_CHANNEL_OP,
-                               payload, sizeof(payload), done);
+                               payload, sizeof(payload), true,
+                               __mt76_set_channel_first_done);
+}
+
+static void __mt76_test_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->pending_done;
+    priv->pending_done = NULL;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: test mcu cmd done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    if (done != NULL) done(wifi, err);
+}
+
+static void __mt76_set_rx_filter_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (err != VSF_ERR_NONE) {
+        __mt76_test_done(wifi, err);
+        return;
+    }
+    uint8_t payload[8];
+    __mt76_put_le32(payload + 0, MT76_FUN_Q_SELECT);
+    __mt76_put_le32(payload + 4, 1);
+    vsf_err_t step_err = __mt76_mcu_msg_send(wifi, MT76_CMD_FUN_SET_OP,
+                                payload, sizeof(payload), false,
+                                __mt76_test_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_test_done(wifi, step_err);
+    }
 }
 
 vsf_err_t __mt76_set_rx_filter(vsf_wifi_t *wifi, uint32_t mask,
                                vsf_wifi_done_t done)
 {
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     uint32_t filter = (mask != 0) ? mask : MT_RX_FILTR_CFG_DEFAULT;
     vsf_wifi_chip_mt76_trace_info(
         "mt76: set_rx_filter=0x%08X" VSF_TRACE_CFG_LINEEND, (unsigned)filter);
-    return __mt76_cfg_write(wifi, MT_RX_FILTR_CFG, filter, done);
+    priv->pending_done = done;
+    return __mt76_cfg_write(wifi, MT_RX_FILTR_CFG, filter, __mt76_set_rx_filter_done);
 }
 
 vsf_err_t __mt76_set_mac_addr(vsf_wifi_t *wifi, const uint8_t mac[6],
