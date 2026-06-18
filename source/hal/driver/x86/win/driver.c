@@ -112,6 +112,7 @@ int __vsf_arch_trace(int level, const char *format, ...)
             WriteConsoleA(h, buff, (DWORD)size, &wsize, NULL);
         } else {
             WriteFile(h, buff, (DWORD)size, &wsize, NULL);
+            FlushFileBuffers(h);
         }
     }
     return size;
@@ -158,6 +159,7 @@ static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
         WriteConsoleA(h, buf, size, &wsize, NULL);
     } else {
         WriteFile(h, buf, size, &wsize, NULL);
+        FlushFileBuffers(h);
     }
     return wsize;
 #       else
