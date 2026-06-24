@@ -757,13 +757,13 @@ static void __ecdh_nist_p384_init_tfm(struct crypto_tfm *tfm)
 static inline u8 *ecdh_pack_data(void *dst, const void *src, size_t sz)
 {
     memcpy(dst, src, sz);
-    return dst + sz;
+    return (u8 *)dst + sz;
 }
 
 static inline const u8 *ecdh_unpack_data(void *dst, const void *src, size_t sz)
 {
     memcpy(dst, src, sz);
-    return src + sz;
+    return (const u8 *)src + sz;
 }
 
 unsigned int crypto_ecdh_key_len(const struct ecdh *params)

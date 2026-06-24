@@ -776,7 +776,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
 
-            urb_buffer = vk_usbh_urb_peek_buffer(urb) + 2;
+            urb_buffer = (uint8_t *)vk_usbh_urb_peek_buffer(urb) + 2;
             for (uint_fast8_t i = 0; i < VSF_USBH_ECM_ETH_HEADER_SIZE; i++, urb_buffer += 4) {
                 ecm->netdrv.macaddr.addr_buf[i] = (vsf_usb_hex_to_bin(urb_buffer[0]) << 4) | (vsf_usb_hex_to_bin(urb_buffer[2]) << 0);
             }
