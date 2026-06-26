@@ -122,10 +122,13 @@ static uint16_t __wifi_dot11_to_eth(const uint8_t *frame, uint16_t len,
     return (uint16_t)(__WIFI_NETDRV_ETH_HDR_SIZE + payload_len);
 }
 
-/* Ethernet II -> 802.11 data (ToDS, to AP).  Returns the 802.11 frame length
- * written into `dot11` (capacity `dot11_cap`), or 0 on failure.  Produces a
- * QoS data frame (FC = 0x8801) because the association negotiated WMM:
- *   addr1 = BSSID (RA), addr2 = SA (TA, our MAC), addr3 = DA. */
+/* Ethernet II -> 802.11 QoS Data (ToDS, to AP).  Returns the 802.11 frame
+ * length written into `dot11` (capacity `dot11_cap`), or 0 on failure.
+ * Linux/mac80211 sends normal data as QoS Data; using the same subtype lets
+ * the AP classify the frame onto the correct AC and avoids drops caused by
+ * plain Data frames after a QoS association.  The MT76 MAC previously corrupted
+ * the Duration of *unprotected* QoS Data EAPOL frames, but protected QoS Data
+ * keeps the CCMP header intact, so this path is safe for post-handshake data. */
 static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
         const uint8_t *eth, uint16_t eth_len,
         uint8_t *dot11, uint16_t dot11_cap)
@@ -141,12 +144,15 @@ static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
     }
 
     memset(dot11, 0, 26);
-    dot11[0] = 0x88;                                /* QoS data             */
+    dot11[0] = 0x88;                                /* QoS Data             */
     dot11[1] = 0x01;                                /* ToDS                 */
     memcpy(&dot11[4],  bssid,    6);                /* addr1 = BSSID (RA)   */
     memcpy(&dot11[10], &eth[6],  6);                /* addr2 = SA  (TA)     */
     memcpy(&dot11[16], &eth[0],  6);                /* addr3 = DA           */
-    /* dot11[24..25] = QoS control (TID 0), already zeroed. */
+    /* QoS Control: AC_BE (TID 0).  Group-addressed frames must set the
+     * Ack Policy to "No Ack" (bits 5:6 = 01); otherwise the AP is asked to
+     * ACK a broadcast/multicast and typically drops the frame. */
+    dot11[24] = (eth[0] & 0x01) ? 0x20 : 0x00;      /* QoS Control          */
 
     uint8_t *llc = &dot11[26];
     llc[0] = 0xAA; llc[1] = 0xAA; llc[2] = 0x03;
@@ -289,7 +295,7 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
                 uint8_t  proto = eth[23];
                 uint16_t sport = (eth[14 + ihl] << 8) | eth[14 + ihl + 1];
                 uint16_t dport = (eth[14 + ihl + 2] << 8) | eth[14 + ihl + 3];
-                vsf_wifi_netdrv_trace_debug("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
+                vsf_wifi_netdrv_trace_info("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
                         " SA=%02X%02X%02X%02X%02X%02X IPv4 proto=%u sport=%u dport=%u"
                         VSF_TRACE_CFG_LINEEND,
                         (unsigned)__tx_cnt, (unsigned)eth_len,
@@ -298,7 +304,7 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
                         (unsigned)proto, (unsigned)sport, (unsigned)dport);
                 (void)proto; (void)sport; (void)dport;
             } else {
-                vsf_wifi_netdrv_trace_debug("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
+                vsf_wifi_netdrv_trace_info("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
                         " et=%02X%02X" VSF_TRACE_CFG_LINEEND,
                         (unsigned)__tx_cnt, (unsigned)eth_len,
                         eth[0],eth[1],eth[2],eth[3],eth[4],eth[5],
@@ -356,14 +362,14 @@ static void __vk_netdrv_wifi_on_rx(void *param, vsf_wifi_t *wifi,
                 uint8_t  proto = b[23];
                 uint16_t sport = (b[14 + ihl] << 8) | b[14 + ihl + 1];
                 uint16_t dport = (b[14 + ihl + 2] << 8) | b[14 + ihl + 3];
-                vsf_wifi_netdrv_trace_debug("wifi-netdrv: rx->lwIP #%u eth_len=%u IPv4"
+                vsf_wifi_netdrv_trace_info("wifi-netdrv: rx->lwIP #%u eth_len=%u IPv4"
                         " proto=%u sport=%u dport=%u dst=%u.%u.%u.%u"
                         VSF_TRACE_CFG_LINEEND, (unsigned)__rx_cnt,
                         (unsigned)eth_len, proto, sport, dport,
                         b[30], b[31], b[32], b[33]);
                 (void)proto; (void)sport; (void)dport;
             } else {
-                vsf_wifi_netdrv_trace_debug("wifi-netdrv: rx->lwIP #%u eth_len=%u et=%02X%02X"
+                vsf_wifi_netdrv_trace_info("wifi-netdrv: rx->lwIP #%u eth_len=%u et=%02X%02X"
                         VSF_TRACE_CFG_LINEEND, (unsigned)__rx_cnt,
                         (unsigned)eth_len, b[12], b[13]);
             }

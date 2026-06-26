@@ -65,6 +65,12 @@ extern "C" {
 #define MT_MAC_BSSID_DW1_MBEACON_N  0x001C0000
 #define MT_MAC_BSSID_DW1_MBEACON_N_SHIFT 18
 
+/* APC BSSID registers: one 64-bit entry per BSS (low 32 + high 16). */
+#define MT_MAC_APC_BSSID_BASE       0x1090
+#define MT_MAC_APC_BSSID_L(_n)      (MT_MAC_APC_BSSID_BASE + ((_n) * 8))
+#define MT_MAC_APC_BSSID_H(_n)      (MT_MAC_APC_BSSID_BASE + ((_n) * 8 + 4))
+#define MT_MAC_APC_BSSID_H_ADDR     0x0000FFFF
+
 /*============================ TYPES =========================================*/
 
 /* MT76 bus operations.
@@ -135,6 +141,12 @@ typedef struct mt76_wifi_priv {
     uint8_t                 mac_addr[6];
     uint8_t                 eeprom[MT76_EEPROM_SIZE];
 
+    /* Hardware capability: chainmask from EEPROM (rx = low nibble, tx = high nibble).
+     * MT7612U is 2T2R -> 0x0202. */
+    uint16_t                chainmask;
+    /* Cached RX filter value; updated after MAC reset and during scan. */
+    uint32_t                rxfilter;
+
     uint8_t                 mcu_seq;
     uint8_t                 state;
 
@@ -193,8 +205,21 @@ typedef struct mt76_wifi_priv {
     uint8_t                 set_channel_channel;
     uint8_t                 set_channel_scan;
     uint8_t                 set_channel_bw_index;
+    uint8_t                 set_channel_state;    /* top-level state */
+    uint8_t                 set_channel_substate; /* mac_stop sub-state */
+    uint32_t                set_channel_saved_rts;
+    vsf_wifi_done_t         set_channel_done;     /* original caller callback */
+
+    /* connect context */
+    vsf_wifi_done_t         connect_done;
+
+    /* hardware crypto install context */
+    vsf_wifi_done_t         crypto_done;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t    fw_timer;
+    /* one-shot TX status poll for debugging handshake ACK failures */
+    vsf_callback_timer_t    txstat_timer;
+    uint32_t                txstat_val;
 #endif
 
     /* buffers */

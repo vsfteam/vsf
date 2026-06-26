@@ -782,7 +782,8 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
  *        0x08|0x10|0x20) masked; Protected (0x40) forced on.
  *   SC : sequence number masked out, fragment number kept.
  * aad = FC(2)|A1(6)|A2(6)|A3(6)|SC(2)[|QC(2)]; nonce = prio(1)|A2(6)|PN(6).
- * pn[] is little-endian (pn[0] = LSB); the nonce carries PN MSB-first. */
+ * pn[] is little-endian (pn[0] = LSB); the CCM nonce carries PN MSB-first
+ * (IEEE 802.11-2012 11.4.3.3.3 / hostap wlantest). */
 static void __ccmp_aad_nonce(const uint8_t *dot11, uint16_t hdr_len, bool qos,
         const uint8_t pn[6], uint8_t *aad, uint16_t *aad_len, uint8_t nonce[13])
 {
@@ -805,6 +806,7 @@ static void __ccmp_aad_nonce(const uint8_t *dot11, uint16_t hdr_len, bool qos,
 
     nonce[0] = prio;
     memcpy(&nonce[1], &dot11[10], 6);           /* A2 */
+    /* PN in the CCM nonce is MSB-first while pn[] is LSB-first. */
     nonce[7]  = pn[5];
     nonce[8]  = pn[4];
     nonce[9]  = pn[3];
@@ -839,12 +841,22 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     memcpy(out, frame, hdr_len);
     out[1] |= 0x40;
 
-    /* CCMP header (Ext IV, key id 0). */
+    /* Select key: all frames transmitted by a STA in an infrastructure BSS
+     * (unicast or broadcast DA) are protected with the PTK (key id 0).
+     * The GTK (key id 1) is only used by the AP for group-addressed frames
+     * it sends to the STA; using GTK here would make the AP drop the frame.
+     * addr3 is the DA in ToDS data frames produced by the netdrv. */
+    const uint8_t *da = &frame[16];
+    (void)da;
+    uint8_t keyid = 0;
+    const uint8_t *tk = wifi->wpa_ptk + 32;
+
+    /* CCMP header (Ext IV, key id). */
     uint8_t *cc = out + hdr_len;
     cc[0] = pn[0];
     cc[1] = pn[1];
     cc[2] = 0;
-    cc[3] = 0x20;
+    cc[3] = 0x20 | (keyid << 6);
     cc[4] = pn[2];
     cc[5] = pn[3];
     cc[6] = pn[4];
@@ -854,33 +866,6 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     uint16_t aad_len;
     __ccmp_aad_nonce(out, hdr_len, qos, pn, aad, &aad_len, nonce);
 
-    /* Diagnostic: dump AAD, nonce, and TK for the first few frames. */
-    {
-        static uint32_t __aad_dump_cnt = 0;
-        if (++__aad_dump_cnt <= 3) {
-            vsf_wifi_trace_debug("wifi: CCMP encap #%u hdr=%u qos=%u pn=%02X%02X%02X%02X%02X%02X"
-                    VSF_TRACE_CFG_LINEEND,
-                    (unsigned)__aad_dump_cnt, hdr_len, (unsigned)qos,
-                    pn[5], pn[4], pn[3], pn[2], pn[1], pn[0]);
-            char buf[80]; int pos = 0;
-            for (uint16_t i = 0; i < aad_len && i < 24; i++)
-                pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", aad[i]);
-            vsf_wifi_trace_debug("  AAD(%u): %s" VSF_TRACE_CFG_LINEEND,
-                    (unsigned)aad_len, buf);
-            pos = 0;
-            for (int i = 0; i < 13; i++)
-                pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", nonce[i]);
-            vsf_wifi_trace_debug("  NONCE: %s" VSF_TRACE_CFG_LINEEND, buf);
-            const uint8_t *tk2 = wifi->wpa_ptk + 32;
-            vsf_wifi_trace_debug("  TK: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
-                    VSF_TRACE_CFG_LINEEND,
-                    tk2[0],tk2[1],tk2[2],tk2[3],tk2[4],tk2[5],tk2[6],tk2[7],
-                    tk2[8],tk2[9],tk2[10],tk2[11],tk2[12],tk2[13],tk2[14],tk2[15]);
-            (void)tk2;
-        }
-    }
-
-    const uint8_t *tk = wifi->wpa_ptk + 32;
     if (vsf_wifi_ccmp_encrypt(tk, aad, aad_len, nonce,
             frame + hdr_len, payload_len, cc + 8, mic) != VSF_ERR_NONE) {
         return 0;
@@ -897,6 +882,22 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
             if (vlen == 0) {
                 vsf_wifi_trace_error("wifi: CCMP TX self-verify FAILED (decrypt returned 0)"
                         VSF_TRACE_CFG_LINEEND);
+                char buf[80]; int pos = 0;
+                for (uint16_t i = 0; i < aad_len && i < 32; i++)
+                    pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", aad[i]);
+                vsf_wifi_trace_error("  AAD(%u): %s" VSF_TRACE_CFG_LINEEND, (unsigned)aad_len, buf);
+                pos = 0;
+                for (int i = 0; i < 13; i++)
+                    pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", nonce[i]);
+                vsf_wifi_trace_error("  NONCE: %s" VSF_TRACE_CFG_LINEEND, buf);
+                vsf_wifi_trace_error("  TK: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
+                        VSF_TRACE_CFG_LINEEND,
+                        tk[0],tk[1],tk[2],tk[3],tk[4],tk[5],tk[6],tk[7],
+                        tk[8],tk[9],tk[10],tk[11],tk[12],tk[13],tk[14],tk[15]);
+                pos = 0;
+                for (uint16_t i = 0; i < payload_len && i < 16; i++)
+                    pos += snprintf(&buf[pos], sizeof(buf)-pos, "%02X", frame[hdr_len + i]);
+                vsf_wifi_trace_error("  payload(%u): %s" VSF_TRACE_CFG_LINEEND, (unsigned)payload_len, buf);
             } else if (vlen != len) {
                 vsf_wifi_trace_error("wifi: CCMP TX self-verify LEN MISMATCH enc_in=%u dec_out=%u orig=%u"
                         VSF_TRACE_CFG_LINEEND, (unsigned)total, (unsigned)vlen, (unsigned)len);
@@ -951,9 +952,19 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
     uint16_t aad_len;
     __ccmp_aad_nonce(dot11, hdr_len, qos, pn, aad, &aad_len, nonce);
 
-    /* Unicast (A1 individual addr) uses the pairwise TK; group-addressed
-     * frames (A1 bit0 == 1) use the GTK installed from M3. */
-    const uint8_t *tk = (dot11[4] & 0x01) ? wifi->wpa_gtk : (wifi->wpa_ptk + 32);
+    /* Select TK based on frame direction and destination address.
+     * In infrastructure BSS:
+     *   - ToDS (STA -> AP): always use the PTK, even for broadcast/multicast DA.
+     *   - FromDS (AP -> STA): unicast DA uses PTK, group DA uses GTK.
+     */
+    uint8_t ds = dot11[1] & 0x03;
+    const uint8_t *da = (ds == 0x01) ? &dot11[16] : &dot11[4];
+    const uint8_t *tk;
+    if (ds == 0x01) {                       /* ToDS: PTK for all DA */
+        tk = wifi->wpa_ptk + 32;
+    } else {                                /* FromDS / WDS */
+        tk = (da[0] & 0x01) ? wifi->wpa_gtk : (wifi->wpa_ptk + 32);
+    }
 
     memcpy(out, dot11, hdr_len);
     out[1] &= ~0x40;
@@ -965,7 +976,7 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
                     "A1=%02X:%02X:%02X:%02X:%02X:%02X A2=%02X:%02X:%02X:%02X:%02X:%02X"
                     " pn=%02X%02X%02X%02X%02X%02X keyid=%u" VSF_TRACE_CFG_LINEEND,
                     (unsigned)__ccmp_mic_fail, (unsigned)len, (unsigned)cipher_len,
-                    (dot11[4] & 0x01) ? "MC" : "UC",
+                    (da[0] & 0x01) ? "MC" : "UC",
                     dot11[4], dot11[5], dot11[6], dot11[7], dot11[8], dot11[9],
                     dot11[10], dot11[11], dot11[12], dot11[13], dot11[14], dot11[15],
                     pn[5], pn[4], pn[3], pn[2], pn[1], pn[0],
@@ -1415,7 +1426,7 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         char buf[384]; int pos = 0;
         for (uint16_t k = 0; k < i && pos < (int)sizeof(buf) - 3; k++)
             pos += snprintf(&buf[pos], sizeof(buf) - pos, "%02X", frame[k]);
-        vsf_wifi_trace_debug("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_info("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
                 (unsigned)i, buf);
     }
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);

@@ -117,11 +117,34 @@ vsf_err_t vsf_wifi_prf_ptk(const uint8_t pmk[32],
     blocks = (VSF_WIFI_PTK_LEN + VSF_WIFI_SHA1_LEN - 1) / VSF_WIFI_SHA1_LEN;
     for (i = 0; i < blocks; i++) {
         buf[pos] = i;       /* single-byte counter at the tail */
+#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
+        {
+            char hbuf[256];
+            int hpos = 0;
+            for (uint16_t k = 0; k < pos + 1 && hpos < (int)sizeof(hbuf) - 3; k++) {
+                hpos += snprintf(&hbuf[hpos], sizeof(hbuf) - hpos, "%02X", buf[k]);
+            }
+            vsf_trace_info("wifi: prf input[%u] len=%u: %s" VSF_TRACE_CFG_LINEEND,
+                    (unsigned)i, (unsigned)(pos + 1), hbuf);
+        }
+#endif
         ret = mbedtls_md_hmac(info, pmk, VSF_WIFI_PMK_LEN,
                 buf, pos + 1, &out[i * VSF_WIFI_SHA1_LEN]);
         if (ret != 0) {
             break;
         }
+#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
+        {
+            char hbuf[64];
+            int hpos = 0;
+            for (uint16_t k = 0; k < VSF_WIFI_SHA1_LEN && hpos < (int)sizeof(hbuf) - 3; k++) {
+                hpos += snprintf(&hbuf[hpos], sizeof(hbuf) - hpos, "%02X",
+                        out[i * VSF_WIFI_SHA1_LEN + k]);
+            }
+            vsf_trace_info("wifi: prf out[%u]: %s" VSF_TRACE_CFG_LINEEND,
+                    (unsigned)i, hbuf);
+        }
+#endif
     }
     if (ret == 0) {
         memcpy(ptk, out, VSF_WIFI_PTK_LEN);

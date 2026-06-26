@@ -118,7 +118,11 @@
 #define MT76_XIFS_TIME_CFG                  0x1100
 #define MT76_BKOFF_SLOT_CFG                 0x1104
 #define MT76_BEACON_TIME_CFG                0x1114
+#define MT76_BEACON_TIME_CFG_INTVAL_MASK    0xFFFFu
+#define MT76_BEACON_TIME_CFG_TIMER_EN       (1U << 16)
 #define MT76_BEACON_TIME_CFG_SYNC_MODE      (3U << 17)
+#define MT76_BEACON_TIME_CFG_SYNC_MODE_STA  (1U << 17)
+#define MT76_BEACON_TIME_CFG_TBTT_EN        (1U << 19)
 #define MT76_TBTT_SYNC_CFG                  0x1118
 #define MT76_MAC_STATUS                     0x1200
 #define MT76_MAC_STATUS_TX                  (1U << 0)
@@ -131,7 +135,9 @@
 #define MT76_TX_SW_CFG1                     0x1334
 #define MT76_TX_SW_CFG2                     0x1338
 #define MT76_TXOP_CTRL_CFG                  0x1340
+#define MT76_TXOP_ED_CCA_EN                 (1U << 20)
 #define MT76_TX_RTS_CFG                     0x1344
+#define MT76_TX_RTS_CFG_RETRY_LIMIT         0x000000FF
 #define MT76_TX_TIMEOUT_CFG                 0x1348
 #define MT76_FCE_L2_STUFF                   0x080c
 #define MT76_FCE_L2_STUFF_WR_MPDU_LEN_EN    (1U << 4)
@@ -142,6 +148,7 @@
 #define MT76_TX_LINK_CFG                    0x1350
 #define MT76_HEADER_TRANS_CTRL_REG          0x0260
 #define MT76_TSO_CTRL                       0x0250
+#define MT76_TX_ALC_CFG_0                   0x13b0
 #define MT76_TX_ALC_VGA3                    0x0778
 #define MT76_VHT_HT_FBK_CFG1                0x1358
 #define MT76_CCK_PROT_CFG                   0x1364
@@ -151,6 +158,16 @@
 #define MT76_GF20_PROT_CFG                  0x1374
 #define MT76_GF40_PROT_CFG                  0x1378
 #define MT76_EXP_ACK_TIME                   0x1380
+
+#define MT_TX_STAT_FIFO                     0x1718
+#define MT_TX_STAT_FIFO_VALID               (1U << 0)
+#define MT_TX_STAT_FIFO_SUCCESS             (1U << 5)
+#define MT_TX_STAT_FIFO_AGGR                (1U << 6)
+#define MT_TX_STAT_FIFO_ACKREQ              (1U << 7)
+#define MT_TX_STAT_FIFO_WCID_M              0x0000FF00
+#define MT_TX_STAT_FIFO_WCID_S              8
+#define MT_TX_STAT_FIFO_RATE_M              0xFFFF0000
+#define MT_TX_STAT_FIFO_RATE_S              16
 #define MT76_HT_FBK_TO_LEGACY               0x1384
 #define MT76_TX_PROT_CFG6                   0x13e0
 #define MT76_TX_PROT_CFG7                   0x13e4
@@ -170,6 +187,7 @@
 #define MT76_TX_SW_CFG3                     0x1478
 #define MT76_PN_PAD_MODE                    0x150c
 #define MT76_TXOP_HLDR_ET                   0x1608
+#define MT76_TXOP_HLDR_TX40M_BLK_EN         (1U << 1)
 #define MT76_PROT_AUTO_TX_CFG               0x1648
 
 #define MT76_EFUSE_CTRL                     0x0024
@@ -179,9 +197,49 @@
 
 #define MT76_WCID_ATTR_BASE                 0xa800
 #define MT76_WCID_ATTR(_n)                  (MT76_WCID_ATTR_BASE + (_n) * 4)
+#define MT76_WCID_ATTR_PAIRWISE             (1U << 0)
+#define MT76_WCID_ATTR_PKEY_MODE            (0x7U << 1)
+#define MT76_WCID_ATTR_PKEY_MODE_SHIFT      1
 #define MT76_WCID_ATTR_BSS_IDX              (0U << 4)
+#define MT76_WCID_ATTR_BSS_IDX_EXT          (1U << 11)
 #define MT76_WCID_ADDR_BASE                 0x1800
 #define MT76_WCID_ADDR(_n)                  (MT76_WCID_ADDR_BASE + (_n) * 8)
+
+#define MT76_WCID_DROP_BASE                 0x106c
+#define MT76_WCID_DROP(_n)                  (MT76_WCID_DROP_BASE + ((_n) >> 5) * 4)
+#define MT76_WCID_DROP_MASK(_n)             (1U << ((_n) % 32))
+
+#define MT76_WCID_TX_INFO_BASE              0xc000
+#define MT76_WCID_TX_INFO(_n)               (MT76_WCID_TX_INFO_BASE + ((_n) * 4))
+
+#define MT76_WCID_KEY_BASE                  0x8000
+#define MT76_WCID_KEY(_n)                   (MT76_WCID_KEY_BASE + (_n) * 32)
+#define MT76_WCID_IV_BASE                   0xa000
+#define MT76_WCID_IV(_n)                    (MT76_WCID_IV_BASE + (_n) * 8)
+
+#define MT_VIF_WCID(_n)                     (254 - ((_n) & 7))
+
+#define MT76_SKEY_MODE_MASK                 0xFU
+#define MT76_SKEY_MODE_SHIFT(_bss, _idx)    (4 * ((_idx) + 4 * ((_bss) & 1)))
+
+enum mt76x02_cipher_type {
+    MT76X02_CIPHER_NONE,
+    MT76X02_CIPHER_WEP40,
+    MT76X02_CIPHER_WEP104,
+    MT76X02_CIPHER_TKIP,
+    MT76X02_CIPHER_AES_CCMP,
+    MT76X02_CIPHER_CKIP40,
+    MT76X02_CIPHER_CKIP104,
+    MT76X02_CIPHER_CKIP128,
+    MT76X02_CIPHER_WAPI,
+};
+#define MT_WCID_TX_INFO_RATE                0x0000FFFFU
+#define MT_WCID_TX_INFO_RATE_S              0
+#define MT_WCID_TX_INFO_NSS_SHIFT           16
+#define MT_WCID_TX_INFO_NSS_MASK            0x00030000U
+#define MT_WCID_TX_INFO_TXPWR_ADJ_SHIFT     18
+#define MT_WCID_TX_INFO_TXPWR_ADJ_MASK      0x03FC0000U
+#define MT_WCID_TX_INFO_SET                 0x80000000U
 
 #define MT76_SKEY_BASE_0                    0xac00
 #define MT76_SKEY_BASE_1                    0xb400
@@ -217,6 +275,11 @@
 #define MT76_WMM_AIFSN                      0x0214
 #define MT76_WMM_CWMIN                      0x0218
 #define MT76_WMM_CWMAX                      0x021c
+#define MT76_WMM_TXOP_BASE                  0x0220
+#define MT76_WMM_TXOP(_n)                   (MT76_WMM_TXOP_BASE + (((_n) >> 1) << 2))
+#define MT76_EDCA_CFG_BASE                  0x1300
+#define MT76_EDCA_CFG_AC(_n)                (MT76_EDCA_CFG_BASE + ((_n) << 2))
+#define MT76_TXOP_THRES_CFG                 0x13ec
 
 #define MT76_MCU_MSG_CMD_LOAD_CR            2
 #define MT76_RF_BBP_CR                      2
@@ -454,6 +517,7 @@ static const mt76_reg_pair_t __mt76_mac_initvals[] = {
     { MT76_DACCLK_EN_DLY_CFG,   0x00000000 },
     { MT76_TX_ALC_CFG_4,        0x00000000 },
     { MT76_TX_ALC_VGA3,         0x00000000 },
+    { MT76_TX_ALC_CFG_0,        0x3a3a3a3a },
     { MT76_TX_PWR_CFG_0,        0x3a3a3a3a },
     { MT76_TX_PWR_CFG_1,        0x3a3a3a3a },
     { MT76_TX_PWR_CFG_2,        0x3a3a3a3a },
@@ -670,6 +734,11 @@ static void __mt76_mcu_msg_out_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
 
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: mcu out_done err=%d wait_resp=%d wanted_seq=%u"
+        VSF_TRACE_CFG_LINEEND,
+        (int)err, (int)priv->mcu_wait_resp, (unsigned)priv->mcu_wait_seq);
+
     if (err != VSF_ERR_NONE) {
         /* OUT transfer failed; the command was not accepted. */
         priv->mcu_wait_resp = false;
@@ -686,6 +755,8 @@ static void __mt76_mcu_msg_out_done(vsf_wifi_t *wifi, vsf_err_t err)
     if (priv->mcu_wait_resp) {
         vsf_err_t rx_err = __mt76_rx_submit(wifi, NULL, 0,
                              MT76_EP_IN_CMD_RESP);
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: mcu rx_submit err=%d" VSF_TRACE_CFG_LINEEND, (int)rx_err);
         if (rx_err != VSF_ERR_NONE) {
             priv->mcu_wait_resp = false;
             vsf_wifi_done_t done = priv->mcu_wait_done;
@@ -738,17 +809,6 @@ static vsf_err_t __mt76_mcu_msg_send(vsf_wifi_t *wifi, uint8_t cmd,
         memcpy(buf + 4, payload, payload_len);
     }
     memset(buf + 4 + payload_len, 0, total - 4 - payload_len);
-
-    {
-        char hex[128];
-        int pos = 0;
-        for (int __i = 0; __i < (int)total && pos < (int)sizeof(hex) - 3; __i++) {
-            pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", buf[__i]);
-        }
-        vsf_wifi_chip_mt76_trace_info(
-            "mt76: mcu_msg cmd=%u seq=%u wait=%d total=%u buf=%s" VSF_TRACE_CFG_LINEEND,
-            (unsigned)cmd, (unsigned)seq, (int)wait_resp, (unsigned)total, hex);
-    }
 
     return __mt76_mcu_cmd(wifi, priv->tx_buf, total, done);
 }
@@ -2285,6 +2345,21 @@ static void __mt76_eeprom_load_done(vsf_wifi_t *wifi, vsf_err_t err)
 
     memcpy(wifi->mac, mac, 6);
 
+    /* Default chainmask: MT76x2 (7612/7632/7662) is 2T2R, MT7602 is 1T1R. */
+    {
+        uint16_t chip_id = (uint16_t)(priv->asic_rev >> 16);
+        if ((chip_id == MT76_CHIP_ID_7612) ||
+            (chip_id == MT76_CHIP_ID_7632) ||
+            (chip_id == MT76_CHIP_ID_7662)) {
+            priv->chainmask = 0x0202;
+        } else {
+            priv->chainmask = 0x0101;
+        }
+    }
+
+    /* Cache the RX filter value that mac_reset initvals will write. */
+    priv->rxfilter = MT_RX_FILTR_CFG_DEFAULT;
+
     priv->state = MT76_STATE_INIT_USB_DMA;
     __mt76_init_next(wifi, VSF_ERR_NONE);
 }
@@ -2890,7 +2965,17 @@ static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err)
         }
 
         case 1: {
-            uint32_t val = priv->fw_idx & ~(1U << 3);
+            /* mt76x02_phy_set_rxpath: clear bit 4, set/clear bit 3
+             * according to the number of RX chains. */
+            uint32_t val = priv->fw_idx & ~((1U << 4) | (1U << 3));
+            if ((priv->chainmask & 0x0F) == 2) {
+                val |= (1U << 3);
+            }
+            vsf_wifi_chip_mt76_trace_info(
+                "mt76: phy_set_rxpath agc0=0x%08X -> 0x%08X mask=0x%04X"
+                VSF_TRACE_CFG_LINEEND,
+                (unsigned)priv->fw_idx, (unsigned)val,
+                (unsigned)priv->chainmask);
             priv->init_substate = 2;
             vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_BBP(AGC, 0), val,
                                                   __mt76_init_table_done);
@@ -2912,7 +2997,17 @@ static void __mt76_init_next(vsf_wifi_t *wifi, vsf_err_t err)
         }
 
         case 3: {
+            /* mt76x02_phy_set_txdac: set/clear bits [1:0] according to
+             * the number of TX chains. */
             uint32_t val = priv->fw_idx & ~0x3U;
+            if (((priv->chainmask >> 8) & 0x0F) == 2) {
+                val |= 0x3U;
+            }
+            vsf_wifi_chip_mt76_trace_info(
+                "mt76: phy_set_txdac txbe5=0x%08X -> 0x%08X mask=0x%04X"
+                VSF_TRACE_CFG_LINEEND,
+                (unsigned)priv->fw_idx, (unsigned)val,
+                (unsigned)priv->chainmask);
             priv->state = MT76_STATE_INIT_MAC_STOP;
             priv->init_substate = 0;
             vsf_wifi_chip_mt76_trace_info(
@@ -3023,19 +3118,244 @@ void __mt76_fini(vsf_wifi_t *wifi)
 
 /*============================ WiFi hooks ====================================*/
 
-static void __mt76_set_channel_second_done(vsf_wifi_t *wifi, vsf_err_t err)
+/* mt76x2_mac_resume: re-enable MAC TX/RX after a channel switch. */
+static void __mt76_mac_start_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     vsf_wifi_done_t done = priv->pending_done;
     priv->pending_done = NULL;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: mac_start done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
     if (done != NULL) done(wifi, err);
+}
+
+static vsf_err_t __mt76_mac_start(vsf_wifi_t *wifi, vsf_wifi_done_t done)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    priv->pending_done = done;
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: mac_start" VSF_TRACE_CFG_LINEEND);
+    return __mt76_cfg_write(wifi, MT76_MAC_SYS_CTRL,
+        MT76_MAC_SYS_CTRL_ENABLE_TX | MT76_MAC_SYS_CTRL_ENABLE_RX,
+        __mt76_mac_start_done);
+}
+
+/* mt76x2_mac_stop: halt MAC TX/RX before switching channel.
+ * Uses priv->set_channel_substate as the state counter and
+ * priv->set_channel_saved_rts to preserve TX_RTS_CFG. */
+static void __mt76_mac_stop_done(vsf_wifi_t *wifi, vsf_err_t err);
+
+static void __mt76_mac_stop_step(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        __mt76_mac_stop_done(wifi, err);
+        return;
+    }
+
+    switch (priv->set_channel_substate) {
+    case 0: {
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_TXOP_CTRL_CFG,
+                                             &priv->fw_idx,
+                                             __mt76_mac_stop_step);
+        priv->set_channel_substate = 1;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 1: {
+        uint32_t val = priv->fw_idx & ~MT76_TXOP_ED_CCA_EN;
+        vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_TXOP_CTRL_CFG, val,
+                                              __mt76_mac_stop_step);
+        priv->set_channel_substate = 2;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 2: {
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_TXOP_HLDR_ET,
+                                             &priv->fw_idx,
+                                             __mt76_mac_stop_step);
+        priv->set_channel_substate = 3;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 3: {
+        uint32_t val = priv->fw_idx & ~MT76_TXOP_HLDR_TX40M_BLK_EN;
+        vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_TXOP_HLDR_ET, val,
+                                              __mt76_mac_stop_step);
+        priv->set_channel_substate = 4;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 4: {
+        vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_MAC_SYS_CTRL, 0,
+                                              __mt76_mac_stop_step);
+        priv->set_channel_substate = 5;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 5: {
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_TX_RTS_CFG,
+                                             &priv->set_channel_saved_rts,
+                                             __mt76_mac_stop_step);
+        priv->set_channel_substate = 6;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 6: {
+        uint32_t val = priv->set_channel_saved_rts &
+                       ~MT76_TX_RTS_CFG_RETRY_LIMIT;
+        vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_TX_RTS_CFG, val,
+                                              __mt76_mac_stop_step);
+        priv->set_channel_substate = 7;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 7: {
+        /* Start polling: init_idx is the retry budget (max 300). */
+        priv->init_idx = 300;
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS,
+                                             &priv->fw_idx,
+                                             __mt76_mac_stop_step);
+        priv->set_channel_substate = 8;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 8: {
+        if ((priv->fw_idx & (MT76_MAC_STATUS_TX | MT76_MAC_STATUS_RX)) != 0) {
+            /* MAC still active; continue polling or time out. */
+            if (priv->init_idx == 0) {
+                vsf_wifi_chip_mt76_trace_info(
+                    "mt76: mac_stop tx/rx active timeout"
+                    VSF_TRACE_CFG_LINEEND);
+                __mt76_mac_stop_done(wifi, VSF_ERR_FAIL);
+                return;
+            }
+            priv->init_idx--;
+            vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS,
+                                                 &priv->fw_idx,
+                                                 __mt76_mac_stop_step);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_mac_stop_done(wifi, step_err);
+            }
+            return;
+        }
+        /* MAC TX/RX idle; check BBP(IBI,12). */
+        vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_BBP(IBI, 12),
+                                             &priv->fw_idx,
+                                             __mt76_mac_stop_step);
+        priv->set_channel_substate = 9;
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+
+    case 9: {
+        if (priv->fw_idx != 0) {
+            /* BBP busy; continue polling from MAC_STATUS or time out. */
+            if (priv->init_idx == 0) {
+                vsf_wifi_chip_mt76_trace_info(
+                    "mt76: mac_stop bbp busy timeout"
+                    VSF_TRACE_CFG_LINEEND);
+                __mt76_mac_stop_done(wifi, VSF_ERR_FAIL);
+                return;
+            }
+            priv->init_idx--;
+            priv->set_channel_substate = 8;
+            vsf_err_t step_err = __mt76_cfg_read(wifi, MT76_MAC_STATUS,
+                                                 &priv->fw_idx,
+                                                 __mt76_mac_stop_step);
+            if (step_err != VSF_ERR_NONE) {
+                __mt76_mac_stop_done(wifi, step_err);
+            }
+            return;
+        }
+        /* MAC fully stopped: restore RTS config and finish. */
+        vsf_err_t step_err = __mt76_cfg_write(wifi, MT76_TX_RTS_CFG,
+                                              priv->set_channel_saved_rts,
+                                              __mt76_mac_stop_done);
+        if (step_err != VSF_ERR_NONE) {
+            __mt76_mac_stop_done(wifi, step_err);
+        }
+        break;
+    }
+    }
+}
+
+static void __mt76_mac_stop_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->pending_done;
+    priv->pending_done = NULL;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: mac_stop done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    if (done != NULL) done(wifi, err);
+}
+
+static vsf_err_t __mt76_mac_stop(vsf_wifi_t *wifi, vsf_wifi_done_t done)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    priv->pending_done = done;
+    priv->set_channel_substate = 0;
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: mac_stop" VSF_TRACE_CFG_LINEEND);
+    __mt76_mac_stop_step(wifi, VSF_ERR_NONE);
+    return VSF_ERR_NONE;
+}
+
+static void __mt76_set_channel_start_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: set_channel_start_done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    vsf_wifi_done_t done = priv->set_channel_done;
+    priv->set_channel_done = NULL;
+    if (done != NULL) done(wifi, err);
+}
+
+static void __mt76_set_channel_second_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: set_channel_second_done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    if (err != VSF_ERR_NONE) {
+        __mt76_set_channel_start_done(wifi, err);
+        return;
+    }
+    __mt76_mac_start(wifi, __mt76_set_channel_start_done);
 }
 
 static void __mt76_set_channel_first_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: set_channel_first_done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
     if (err != VSF_ERR_NONE) {
-        __mt76_set_channel_second_done(wifi, err);
+        __mt76_set_channel_start_done(wifi, err);
         return;
     }
 
@@ -3055,25 +3375,25 @@ static void __mt76_set_channel_first_done(vsf_wifi_t *wifi, vsf_err_t err)
         MT76_CMD_SWITCH_CHANNEL_OP, payload, sizeof(payload), true,
         __mt76_set_channel_second_done);
     if (step_err != VSF_ERR_NONE) {
-        __mt76_set_channel_second_done(wifi, step_err);
+        __mt76_set_channel_start_done(wifi, step_err);
     }
 }
 
-vsf_err_t __mt76_set_channel(vsf_wifi_t *wifi, uint8_t channel,
-                             vsf_wifi_done_t done)
+static void __mt76_set_channel_filter_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
-
-    priv->set_channel_channel  = channel;
-    priv->set_channel_scan     = 1;     /* scan mode */
-    priv->set_channel_bw_index = 0;     /* 20 MHz */
-    priv->pending_done         = done;
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
 
     uint8_t payload[8];
-    payload[0] = channel;       /* idx */
-    payload[1] = 1;             /* scan */
-    payload[2] = 0;             /* bw: 20 MHz */
-    payload[3] = 0;             /* pad */
+    payload[0] = priv->set_channel_channel; /* idx */
+    payload[1] = priv->set_channel_scan;    /* scan */
+    payload[2] = 0;                         /* bw: 20 MHz */
+    payload[3] = 0;                         /* pad */
     /* chainmask: MT7612U is 2T2R, use 0x0202 */
     payload[4] = 0x02;
     payload[5] = 0x02;
@@ -3081,12 +3401,62 @@ vsf_err_t __mt76_set_channel(vsf_wifi_t *wifi, uint8_t channel,
     payload[6] = 0;
     payload[7] = 0;
 
-    vsf_wifi_chip_mt76_trace_info(
-        "mt76: set_channel=%u" VSF_TRACE_CFG_LINEEND, (unsigned)channel);
+    vsf_err_t step_err = __mt76_mcu_msg_send(wifi,
+        MT76_CMD_SWITCH_CHANNEL_OP, payload, sizeof(payload), true,
+        __mt76_set_channel_first_done);
+    if (step_err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
+}
 
-    return __mt76_mcu_msg_send(wifi, MT76_CMD_SWITCH_CHANNEL_OP,
-                               payload, sizeof(payload), true,
-                               __mt76_set_channel_first_done);
+static void __mt76_set_channel_stop_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    /* Scan mode: clear OTHER_BSS so beacons/probe-responses from any BSS
+     * are received. */
+    uint32_t filter = priv->rxfilter & ~MT_RX_FILTR_CFG_OTHER_BSS;
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: scan rx_filter=0x%08X" VSF_TRACE_CFG_LINEEND,
+        (unsigned)filter);
+    vsf_err_t step_err = __mt76_cfg_write(wifi, MT_RX_FILTR_CFG, filter,
+                                          __mt76_set_channel_filter_done);
+    if (step_err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
+}
+
+static vsf_err_t __mt76_set_channel_ex(vsf_wifi_t *wifi, uint8_t channel,
+                                       bool scan, vsf_wifi_done_t done)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    priv->set_channel_channel  = channel;
+    priv->set_channel_scan     = scan ? 1 : 0;
+    priv->set_channel_bw_index = 0;     /* 20 MHz */
+    priv->set_channel_done     = done;
+
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: set_channel=%u scan=%d" VSF_TRACE_CFG_LINEEND,
+        (unsigned)channel, (int)scan);
+
+    return __mt76_mac_stop(wifi, __mt76_set_channel_stop_done);
+}
+
+vsf_err_t __mt76_set_channel(vsf_wifi_t *wifi, uint8_t channel,
+                             vsf_wifi_done_t done)
+{
+    return __mt76_set_channel_ex(wifi, channel, true, done);
 }
 
 static void __mt76_test_done(vsf_wifi_t *wifi, vsf_err_t err)
@@ -3094,7 +3464,7 @@ static void __mt76_test_done(vsf_wifi_t *wifi, vsf_err_t err)
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     vsf_wifi_done_t done = priv->pending_done;
     priv->pending_done = NULL;
-    vsf_wifi_chip_mt76_trace_info(
+    vsf_wifi_chip_mt76_trace_debug(
         "mt76: test mcu cmd done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
     if (done != NULL) done(wifi, err);
 }
@@ -3121,7 +3491,7 @@ vsf_err_t __mt76_set_rx_filter(vsf_wifi_t *wifi, uint32_t mask,
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     uint32_t filter = (mask != 0) ? mask : MT_RX_FILTR_CFG_DEFAULT;
-    vsf_wifi_chip_mt76_trace_info(
+    vsf_wifi_chip_mt76_trace_debug(
         "mt76: set_rx_filter=0x%08X" VSF_TRACE_CFG_LINEEND, (unsigned)filter);
     priv->pending_done = done;
     return __mt76_cfg_write(wifi, MT_RX_FILTR_CFG, filter, __mt76_set_rx_filter_done);
@@ -3133,21 +3503,168 @@ vsf_err_t __mt76_set_mac_addr(vsf_wifi_t *wifi, const uint8_t mac[6],
     return __mt76_mac_addr_program_start(wifi, mac, done);
 }
 
+static void __mt76_set_bssid_script_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->pending_done;
+    priv->pending_done = NULL;
+    if (done != NULL) done(wifi, err);
+}
+
 vsf_err_t __mt76_set_bssid(vsf_wifi_t *wifi, const uint8_t bssid[6],
                            vsf_wifi_done_t done)
 {
-    (void)wifi; (void)bssid; (void)done;
-    /* TODO: program BSSID via cfg_write()/mcu_cmd() */
-    return VSF_ERR_NOT_SUPPORT;
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
+
+    ops[0].reg = MT_MAC_APC_BSSID_L(0);
+    ops[0].val = ((uint32_t)bssid[0])        |
+                 ((uint32_t)bssid[1] << 8)  |
+                 ((uint32_t)bssid[2] << 16) |
+                 ((uint32_t)bssid[3] << 24);
+    ops[1].reg = MT_MAC_APC_BSSID_H(0);
+    ops[1].val = ((uint32_t)bssid[4])        |
+                 ((uint32_t)bssid[5] << 8);
+
+    priv->pending_done = done;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: set_bssid=%02X:%02X:%02X:%02X:%02X:%02X"
+        VSF_TRACE_CFG_LINEEND,
+        bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
+
+    return vsf_wifi_reg_run_script(wifi, ops, 2,
+                                   __mt76_set_bssid_script_done);
 }
 
 vsf_err_t __mt76_set_auth_mode(vsf_wifi_t *wifi,
                                const vsf_wifi_auth_cfg_t *cfg,
                                vsf_wifi_done_t done)
 {
-    (void)wifi; (void)cfg; (void)done;
-    /* TODO: store auth config for connect() */
-    return VSF_ERR_NOT_SUPPORT;
+    (void)wifi; (void)cfg;
+    /* MT76 does not need the auth config programmed ahead of connect; the
+     * WPA2 4-way handshake is handled by the wifi layer with software CCMP. */
+    if (done != NULL) done(wifi, VSF_ERR_NONE);
+    return VSF_ERR_NONE;
+}
+
+static void __mt76_connect_script_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->connect_done;
+    priv->connect_done = NULL;
+    if (done != NULL) done(wifi, err);
+}
+
+static void __mt76_connect_channel_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->connect_done;
+        priv->connect_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    /* Program the AP BSSID so the hardware accepts frames from this BSS,
+     * then allocate WCID 1 for the AP so that subsequent data frames
+     * (EAPOL, 4-way handshake) are treated as unicast by the MAC.
+     * Linux mt76x02_sta_add uses WCID 1 for the first station in STA mode
+     * and vif_idx=0, so the WCID attribute uses BSS_IDX=0 (no extension).
+     *
+     * Also enable STA-mode TSF sync and program standard WMM EDCA parameters;
+     * these are normally done by mac80211 bss_info_changed/conf_tx after
+     * association and are required for the AP to accept uplink data frames. */
+    const uint8_t *bssid = wifi->mlme_bssid;
+    vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
+    ops[0].reg = MT_MAC_APC_BSSID_L(0);
+    ops[0].val = ((uint32_t)bssid[0])        |
+                 ((uint32_t)bssid[1] << 8)  |
+                 ((uint32_t)bssid[2] << 16) |
+                 ((uint32_t)bssid[3] << 24);
+    ops[1].reg = MT_MAC_APC_BSSID_H(0);
+    ops[1].val = ((uint32_t)bssid[4])        |
+                 ((uint32_t)bssid[5] << 8);
+
+    /* WCID 1 is used for unicast RX decryption: match frames addressed to
+     * our STA MAC (RA) so PTK-encrypted frames from the AP are decrypted.
+     * Using the AP BSSID here causes broadcast/multicast frames from the AP
+     * to match this pairwise WCID and fail hardware decryption. */
+    const uint8_t *sta_mac = wifi->mac;
+    ops[2].reg = MT76_WCID_ATTR(1);
+    ops[2].val = MT76_WCID_ATTR_BSS_IDX;
+    ops[3].reg = MT76_WCID_ADDR(1);
+    ops[3].val = ((uint32_t)sta_mac[0])        |
+                 ((uint32_t)sta_mac[1] << 8)  |
+                 ((uint32_t)sta_mac[2] << 16) |
+                 ((uint32_t)sta_mac[3] << 24);
+    ops[4].reg = MT76_WCID_ADDR(1) + 4;
+    ops[4].val = ((uint32_t)sta_mac[4])        |
+                 ((uint32_t)sta_mac[5] << 8);
+    ops[5].reg = MT76_WCID_DROP(1);
+    ops[5].val = 0;
+
+    /* WCID TX info: tell the hardware the default rate/nss/power for this
+     * station.  Without the SET flag the chip may fall back to unknown
+     * parameters and silently fail to transmit data frames (EAPOL M2/M4).
+     * Use CCK 1 Mbps / nss=1 / txpwr_adj=0 as the conservative default. */
+    ops[6].reg = MT76_WCID_TX_INFO(1);
+    ops[6].val = MT_WCID_TX_INFO_SET
+               | (1U << MT_WCID_TX_INFO_NSS_SHIFT)
+               | 0x0000U;               /* CCK 1 Mbps */
+
+    /* Beacon interval 100 TU << 4, timer enable, STA TSF sync, TBTT enable. */
+    ops[7].reg = MT76_BEACON_TIME_CFG;
+    ops[7].val = (100U << 4)
+               | MT76_BEACON_TIME_CFG_TIMER_EN
+               | MT76_BEACON_TIME_CFG_SYNC_MODE_STA
+               | MT76_BEACON_TIME_CFG_TBTT_EN;
+
+    /* Standard WMM EDCA parameters (AP uses these for admission control). */
+    ops[8].reg = MT76_EDCA_CFG_AC(0);  /* BE */
+    ops[8].val = (10U << 16) | (4U << 12) | (3U << 8) | 0U;
+    ops[9].reg = MT76_EDCA_CFG_AC(1);  /* BK */
+    ops[9].val = (10U << 16) | (4U << 12) | (7U << 8) | 0U;
+    ops[10].reg = MT76_EDCA_CFG_AC(2);  /* VI */
+    ops[10].val = (4U << 16) | (3U << 12) | (2U << 8) | 94U;
+    ops[11].reg = MT76_EDCA_CFG_AC(3); /* VO */
+    ops[11].val = (3U << 16) | (2U << 12) | (2U << 8) | 47U;
+
+    ops[12].reg = MT76_WMM_TXOP(0);    /* BE/BK TXOP = 0 */
+    ops[12].val = 0x00000000U;
+    ops[13].reg = MT76_WMM_TXOP(1);    /* VI/VO TXOP = 94/47 */
+    ops[13].val = 0x002F005EU;
+
+    /* Group/multicast WCID for this BSS (used for broadcast data frames).
+     * Set its address to broadcast so frames with RA = ff:ff:ff:ff:ff:ff
+     * match this WCID and use the GTK instead of falling back to a pairwise
+     * WCID that lacks the group key. */
+    ops[14].reg = MT76_WCID_ATTR(MT_VIF_WCID(0));
+    ops[14].val = MT76_WCID_ATTR_BSS_IDX;
+    ops[15].reg = MT76_WCID_ADDR(MT_VIF_WCID(0));
+    ops[15].val = 0xFFFFFFFFU;
+    ops[16].reg = MT76_WCID_ADDR(MT_VIF_WCID(0)) + 4;
+    ops[16].val = 0x0000FFFFU;
+    ops[17].reg = MT76_WCID_DROP(MT_VIF_WCID(0));
+    ops[17].val = 0;
+    ops[18].reg = MT76_WCID_TX_INFO(MT_VIF_WCID(0));
+    ops[18].val = MT_WCID_TX_INFO_SET
+                | (1U << MT_WCID_TX_INFO_NSS_SHIFT)
+                | 0x0000U;               /* CCK 1 Mbps */
+
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: program wcid=1 bssid=%02X:%02X:%02X:%02X:%02X:%02X bssidx=0 tx_info=0x%08X"
+        VSF_TRACE_CFG_LINEEND,
+        bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5],
+        (unsigned)ops[6].val);
+
+    vsf_err_t step_err = vsf_wifi_reg_run_script(wifi, ops, 19,
+                                                 __mt76_connect_script_done);
+    if (step_err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->connect_done;
+        priv->connect_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
 }
 
 vsf_err_t __mt76_connect(vsf_wifi_t *wifi,
@@ -3155,9 +3672,36 @@ vsf_err_t __mt76_connect(vsf_wifi_t *wifi,
                          uint8_t ssid_len, uint8_t channel,
                          vsf_wifi_done_t done)
 {
-    (void)wifi; (void)bssid; (void)ssid; (void)ssid_len; (void)channel; (void)done;
-    /* TODO: set BSSID/WCID/key via mcu_cmd, start rx_submit */
-    return VSF_ERR_NOT_SUPPORT;
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    (void)bssid; (void)ssid; (void)ssid_len;
+    if (priv->connect_done != NULL) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+
+    priv->connect_done = done;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: connect ch=%u bssid=%02X:%02X:%02X:%02X:%02X:%02X"
+        VSF_TRACE_CFG_LINEEND,
+        (unsigned)channel,
+        wifi->mlme_bssid[0], wifi->mlme_bssid[1], wifi->mlme_bssid[2],
+        wifi->mlme_bssid[3], wifi->mlme_bssid[4], wifi->mlme_bssid[5]);
+
+    /* If we are already on the target channel (e.g. after a single-channel
+     * scan), skip the channel switch and just program the BSSID.  This avoids
+     * a firmware stall seen when re-issuing SWITCH_CHANNEL_OP with scan=0. */
+    vsf_err_t err;
+    if (wifi->channel == channel) {
+        __mt76_connect_channel_done(wifi, VSF_ERR_NONE);
+        err = VSF_ERR_NONE;
+    } else {
+        err = __mt76_set_channel_ex(wifi, channel, false,
+                                    __mt76_connect_channel_done);
+    }
+    if (err != VSF_ERR_NONE) {
+        priv->connect_done = NULL;
+    }
+    return err;
 }
 
 vsf_err_t __mt76_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
@@ -3241,6 +3785,9 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
         uint16_t next_pos = (entry_total + 3u) & ~3u;
 
         if (dma_len == 0 || entry_total > len - pos) {
+            vsf_wifi_chip_mt76_trace_debug(
+                "mt76: parse_rx break pos=%u len=%u dma_len=%u entry_total=%u"
+                VSF_TRACE_CFG_LINEEND, pos, len, dma_len, entry_total);
             break;
         }
 
@@ -3252,16 +3799,71 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                                         >> MT_RXWI_CTL_MPDU_LEN_SHIFT);
         uint16_t hdr_pad  = (rxinfo & MT_RXINFO_L2PAD) ? 2 : 0;
 
-        if ((mpdu_len != 0) &&
-            (mpdu_len <= dma_len - MT_RX_RXWI_LEN - MT_FCE_INFO_LEN - hdr_pad)) {
-            uint8_t *dot11 = rxwi + MT_RX_RXWI_LEN + hdr_pad;
+        vsf_wifi_chip_mt76_trace_debug(
+            "mt76: parse_rx entry pos=%u dma_len=%u mpdu_len=%u hdr_pad=%u "
+            "fc=0x%02X%02X scanning=%d"
+            VSF_TRACE_CFG_LINEEND,
+            pos, dma_len, mpdu_len, hdr_pad,
+            rxwi[MT_RX_RXWI_LEN + 1], rxwi[MT_RX_RXWI_LEN],
+            (int)wifi->scanning);
 
-            if ((dot11[0] & 0x0C) == 0x00) {          /* management type */
+        if ((mpdu_len != 0) &&
+            (mpdu_len <= dma_len - MT_RX_RXWI_LEN - hdr_pad)) {
+            /* The 802.11 frame starts right after the RXWI.  When
+             * MT_RXINFO_L2PAD is set the hardware inserts 2 padding bytes
+             * between the 802.11 header and the body; remove them in-place
+             * so the upper layer sees a contiguous header+body. */
+            uint8_t *dot11    = rxwi + MT_RX_RXWI_LEN;
+            uint16_t frame_len = mpdu_len;
+
+            if (hdr_pad != 0) {
+                uint8_t type = dot11[0] & 0x0C;
+                uint16_t hdr_len = 24;
+                if (type == 0x08) {
+                    uint8_t subtype = (dot11[0] >> 4) & 0x0F;
+                    if (subtype & 0x08) hdr_len += 2;
+                }
+                if (frame_len > hdr_len) {
+                    memmove(dot11 + hdr_len,
+                            dot11 + hdr_len + hdr_pad,
+                            frame_len - hdr_len);
+                }
+            }
+
+            /* If the hardware decrypted the frame (MT_RXINFO_DECRYPT), the CCMP
+             * header has already been stripped and the remaining length is
+             * reduced by PN_LEN*4 bytes.  Tell the upper layer the frame is
+             * plaintext by clearing the Protected bit so software CCMP decap
+             * is skipped. */
+            vsf_wifi_chip_mt76_trace_debug(
+                "mt76: rxinfo=0x%08X ctl=0x%08X wcid=%u key_idx=%u bss_idx=%u"
+                VSF_TRACE_CFG_LINEEND,
+                (unsigned)rxinfo, (unsigned)ctl,
+                (unsigned)(ctl & MT_RXWI_CTL_WCID_MASK),
+                (unsigned)((ctl >> 8) & 0x03U),
+                (unsigned)((ctl >> 10) & 0x07U));
+            if (rxinfo & MT_RXINFO_DECRYPT) {
+                uint8_t pn_len = (uint8_t)((rxinfo & MT_RXINFO_PN_LEN) >> 19);
+                if (pn_len != 0) {
+                    uint16_t strip = (uint16_t)(pn_len * 4);
+                    if (frame_len >= strip) {
+                        frame_len -= strip;
+                    }
+                }
+                dot11[1] &= ~0x40U;
+            }
+
+            uint8_t type = dot11[0] & 0x0C;
+            if (type == 0x00) {                       /* management type */
                 uint8_t subtype = (dot11[0] >> 4) & 0x0F;
+                vsf_wifi_chip_mt76_trace_debug(
+                    "mt76: parse_rx mgmt subtype=%u scanning=%d"
+                    VSF_TRACE_CFG_LINEEND,
+                    (unsigned)subtype, (int)wifi->scanning);
                 if ((subtype == 5 || subtype == 8) && wifi->scanning) {
                     const uint8_t *bssid = dot11 + 16;
                     const uint8_t *body  = dot11 + 24;
-                    uint16_t body_len = mpdu_len - 24;
+                    uint16_t body_len = frame_len - 24;
 
                     if (body_len >= 12) {
                         vsf_wifi_scan_result_t result;
@@ -3290,7 +3892,7 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                             ie += 2 + l;
                         }
 
-                        vsf_wifi_chip_mt76_trace_debug(
+                        vsf_wifi_chip_mt76_trace_info(
                             "mt76: scan bssid=%02X:%02X:%02X:%02X:%02X:%02X "
                             "ssid=%.*s ch=%u rssi=%d caps=0x%04X"
                             VSF_TRACE_CFG_LINEEND,
@@ -3300,7 +3902,27 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                             result.channel, result.rssi, result.capability);
 
                         vsf_wifi_on_scan_result(wifi, &result);
+                    } else {
+                        vsf_wifi_chip_mt76_trace_info(
+                            "mt76: scan body too short body_len=%u"
+                            VSF_TRACE_CFG_LINEEND, body_len);
                     }
+                } else if (!wifi->scanning &&
+                           (subtype == 0xB || subtype == 0x1 ||
+                            subtype == 0xC || subtype == 0xA)) {
+                    /* auth / assoc-resp / deauth / disassoc -> MLME */
+                    vsf_wifi_mlme_rx(wifi, dot11, frame_len);
+                }
+            } else if (type == 0x08) {                /* data type */
+                vsf_wifi_chip_mt76_trace_debug(
+                    "mt76: parse_rx data fc=0x%02X%02X len=%u state=%u"
+                    VSF_TRACE_CFG_LINEEND,
+                    dot11[1], dot11[0],
+                    (unsigned)frame_len, (unsigned)wifi->mlme_state);
+                if (!wifi->scanning &&
+                    ((wifi->mlme_state == WIFI_MLME_4WAY) ||
+                     (wifi->mlme_state == WIFI_MLME_RUN))) {
+                    vsf_wifi_data_rx(wifi, dot11, frame_len);
                 }
             }
         }
@@ -3310,9 +3932,188 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     }
 }
 
+/*============================================================================
+ * TX status FIFO polling (debug): after each data frame read MT_TX_STAT_FIFO
+ * once to see whether the AP ACKed it.  This is a one-shot delayed read so it
+ * does not block the caller.
+ *===========================================================================*/
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+static void __mt76_txstat_read_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: txstat read failed err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+        return;
+    }
+    uint32_t v = priv->txstat_val;
+    if (!(v & MT_TX_STAT_FIFO_VALID)) {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: txstat FIFO empty" VSF_TRACE_CFG_LINEEND);
+        return;
+    }
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: txstat success=%u ack_req=%u wcid=%u rate=0x%04X raw=0x%08X"
+        VSF_TRACE_CFG_LINEEND,
+        !!(v & MT_TX_STAT_FIFO_SUCCESS),
+        !!(v & MT_TX_STAT_FIFO_ACKREQ),
+        (unsigned)((v & MT_TX_STAT_FIFO_WCID_M) >> MT_TX_STAT_FIFO_WCID_S),
+        (unsigned)((v & MT_TX_STAT_FIFO_RATE_M) >> MT_TX_STAT_FIFO_RATE_S),
+        (unsigned)v);
+}
+
+static void __mt76_txstat_timer(vsf_callback_timer_t *timer)
+{
+    mt76_wifi_priv_t *priv = vsf_container_of(timer, mt76_wifi_priv_t, txstat_timer);
+    __mt76_cfg_read(priv->wifi, MT_TX_STAT_FIFO, &priv->txstat_val,
+                    __mt76_txstat_read_done);
+}
+
+static void __mt76_txstat_poll(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_callback_timer_init(&priv->txstat_timer);
+    priv->txstat_timer.on_timer = __mt76_txstat_timer;
+    vsf_callback_timer_add_ms(&priv->txstat_timer, 150);
+}
+#else
+static void __mt76_txstat_poll(vsf_wifi_t *wifi) { (void)wifi; }
+#endif
+
+#if VSF_WIFI_USE_WPA == ENABLED
+static void __mt76_crypto_key_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_done_t done = priv->crypto_done;
+
+    priv->crypto_done = NULL;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: crypto install done err=%d" VSF_TRACE_CFG_LINEEND,
+        (int)err);
+    if (done != NULL) {
+        done(wifi, err);
+    }
+
+    /* Hardware TX encryption is not yet reliable on this chip/driver
+     * combination (broadcast/unicast CCMP frames are ACKed but appear to be
+     * dropped by the AP upper layer).  Keep the keys in the WCID tables for
+     * hardware RX decryption and let the generic WPA layer perform software
+     * CCMP encap on TX.  This isolates the RX path while the TX bug is being
+     * root-caused. */
+    if (err == VSF_ERR_NONE) {
+        wifi->wpa_hw_crypto = false;
+    }
+}
+
+static vsf_err_t __mt76_crypto_install_key(vsf_wifi_t *wifi,
+    uint8_t key_idx, bool pairwise,
+    const uint8_t *key, uint8_t key_len,
+    const uint8_t *mac, vsf_wifi_done_t done)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    (void)mac;
+
+    if (priv->crypto_done != NULL) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+    if (key_len > 32) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    /* The generic handshake sets wpa_hw_crypto = true when crypto_ops is
+     * supplied.  Program the keys into the MT76 WCID key table so the firmware
+     * can hardware-encrypt/decrypt CCMP data frames. */
+
+    uint8_t key_data[32];
+    memset(key_data, 0, sizeof(key_data));
+    if ((key != NULL) && (key_len > 0)) {
+        memcpy(key_data, key, key_len);
+    }
+
+    uint8_t wcid = pairwise ? 1 : MT_VIF_WCID(0);
+    uint8_t iv_data[8];
+    /* Start the CCMP PN at 1; a zero PN is rejected by many APs as an
+     * invalid initial value.  The layout follows Linux mt76x02_mac_wcid_set_key
+     * for CCMP with Ext IV:
+     *   pn[15:0]  -> iv_data[1:0]
+     *   pn[47:16] -> iv_data[7:4]
+     *   iv_data[3] = 0x20 | (key_idx << 6) (Ext IV flag + key index). */
+    uint64_t pn = 1;
+    memset(iv_data, 0, sizeof(iv_data));
+    iv_data[0] = (uint8_t)(pn & 0xFFU);
+    iv_data[1] = (uint8_t)((pn >> 8) & 0xFFU);
+    iv_data[2] = 0;
+    iv_data[3] = (uint8_t)(0x20U | (key_idx << 6));
+    iv_data[4] = (uint8_t)((pn >> 16) & 0xFFU);
+    iv_data[5] = (uint8_t)((pn >> 24) & 0xFFU);
+    iv_data[6] = (uint8_t)((pn >> 32) & 0xFFU);
+    iv_data[7] = (uint8_t)((pn >> 40) & 0xFFU);
+
+    /* Linux uses vif_idx=0 in STA mode, so BSS_IDX=0 (no extension).  The
+     * cipher mode and pairwise flag are the only non-zero attribute bits. */
+    uint32_t attr = (MT76X02_CIPHER_AES_CCMP << MT76_WCID_ATTR_PKEY_MODE_SHIFT);
+    if (pairwise) {
+        attr |= MT76_WCID_ATTR_PAIRWISE;
+    }
+
+    vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
+    uint16_t n = 0;
+
+    for (int i = 0; i < 8; i++) {
+        ops[n].reg = MT76_WCID_KEY(wcid) + i * 4;
+        ops[n].val = __mt76_get_le32(key_data + i * 4);
+        n++;
+    }
+    ops[n].reg = MT76_WCID_IV(wcid);
+    ops[n].val = __mt76_get_le32(iv_data + 0);
+    n++;
+    ops[n].reg = MT76_WCID_IV(wcid) + 4;
+    ops[n].val = __mt76_get_le32(iv_data + 4);
+    n++;
+    ops[n].reg = MT76_WCID_ATTR(wcid);
+    ops[n].val = attr;
+    n++;
+
+    if (!pairwise) {
+        for (int i = 0; i < 8; i++) {
+            ops[n].reg = MT76_SKEY(0, key_idx) + i * 4;
+            ops[n].val = __mt76_get_le32(key_data + i * 4);
+            n++;
+        }
+        ops[n].reg = MT76_SKEY_MODE(0);
+        ops[n].val = (uint32_t)MT76X02_CIPHER_AES_CCMP
+                   << MT76_SKEY_MODE_SHIFT(0, key_idx);
+        n++;
+    }
+
+    priv->crypto_done = done;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: install_key pairwise=%d key_idx=%u wcid=%u n=%u"
+        VSF_TRACE_CFG_LINEEND,
+        (int)pairwise, (unsigned)key_idx, (unsigned)wcid, (unsigned)n);
+
+    vsf_err_t err = vsf_wifi_reg_run_script(wifi, ops, n,
+                                            __mt76_crypto_key_done);
+    if (err != VSF_ERR_NONE) {
+        priv->crypto_done = NULL;
+    }
+    return err;
+}
+
+static const vsf_wifi_crypto_ops_t __mt76_crypto_ops = {
+    .install_key = __mt76_crypto_install_key,
+};
+#endif      /* VSF_WIFI_USE_WPA == ENABLED */
+
 /* Queue index used for management frames (probe-request, auth, assoc).
  * On USB this maps to the AC_BE bulk-out endpoint. */
 #define MT76_TX_QUEUE_MGMT                  1
+
+/* Software-managed 802.11 sequence number for MT76.  The chip's NSEQ bit
+ * does not seem to increment the sequence number for our current WCID setup,
+ * leaving every data frame with seq=0; the AP ACKs the radio frame but drops
+ * it as a duplicate, causing the 4-way handshake to stall. */
+static uint16_t __mt76_tx_seq;
 
 vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 {
@@ -3320,26 +4121,94 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
 
-    /* Compute the 802.11 header length so we can insert the 2-byte
-     * L2 pad that MT76 hardware expects when the header length is odd. */
-    uint8_t  fc0      = frame[0];
-    uint8_t  fc1      = frame[1];
+    /* The MT76 MAC overwrites the Duration field of *unprotected* QoS Data
+     * frames to 0, which causes APs to discard unprotected frames (EAPOL-Key
+     * M2/M4) at higher layers even though they ACK them at the PHY.  Convert
+     * only unprotected QoS EAPOL-Key frames to plain Data so the Duration we
+     * write is preserved.  Post-handshake data frames are left as QoS Data to
+     * match the RT5572 reference and Linux mt76x02 behavior. */
+    uint8_t  frame_buf[1536];
+    const uint8_t *tx_frame = frame;
+    uint16_t tx_len = len;
+    uint8_t  fc0 = frame[0];
+    uint8_t  fc1 = frame[1];
+    uint8_t  subtype = (fc0 >> 4) & 0x0F;
+    bool     qos = subtype == 8;
+    bool     protected = (fc1 & 0x40) != 0;
+    bool     is_eapol = false;
+    bool     is_null = (subtype == 4);
+    if ((fc0 & 0x0C) == 0x08) {
+        /* Detect EAPOL before any header rewrite.  The netdrv always sends QoS
+         * Data with LLC/SNAP at offset 26; if QoS has already been stripped the
+         * SNAP header moves to offset 24. */
+        uint16_t snap_off = (qos && !protected && len >= 34) ? 26 : 24;
+        if (len >= snap_off + 8) {
+            is_eapol = (frame[snap_off + 0] == 0xAA)
+                    && (frame[snap_off + 1] == 0xAA)
+                    && (frame[snap_off + 6] == 0x88)
+                    && (frame[snap_off + 7] == 0x8E);
+        }
+    }
+    if (qos && !protected && is_eapol && len >= 26 && len <= sizeof(frame_buf)) {
+        frame_buf[0] = (fc0 & 0x0F);            /* subtype 0: Data, keep Type */
+        memcpy(frame_buf + 1, frame + 1, 23);   /* FC[1], Duration, addrs, Seq */
+        memcpy(frame_buf + 24, frame + 26, len - 26); /* skip QoS Control */
+        tx_frame = frame_buf;
+        tx_len = len - 2;
+        fc0 = frame_buf[0];
+        qos = false;
+        vsf_wifi_chip_mt76_trace_debug(
+            "mt76: QoS->plain Data EAPOL tx_len=%u"
+            VSF_TRACE_CFG_LINEEND, (unsigned)tx_len);
+    }
+
+    /* Compute the 802.11 header length so we can insert the L2 pad that
+     * MT76 hardware expects when the header is not a multiple of 4 bytes.
+     * The payload must start at a 4-byte aligned offset from the TXWI;
+     * for a 26-byte QoS Data header this means 2 bytes of padding.
+     * Ref: RT5572 reference path uses (-hdr_len) & 3 for the same purpose. */
+    fc1 = tx_frame[1];
     bool     to_ds    = (fc1 & 0x01) != 0;
     bool     from_ds  = (fc1 & 0x02) != 0;
-    bool     qos      = ((fc0 >> 4) & 0x0F) >= 8; /* data subtype 8-15 */
-    bool     order    = (fc1 & 0x80) != 0;
     uint16_t hdrlen   = 24;
 
     if (to_ds && from_ds) hdrlen += 6; /*_addr4 */
     if (qos)              hdrlen += 2;
-    if (order)            hdrlen += 4;
+    if ((fc1 & 0x80) != 0) hdrlen += 4;
 
-    uint8_t  hdr_pad  = (hdrlen & 1) ? 2 : 0;
-    uint16_t txwi_len = 16;
-    uint16_t payload_after_txwi = len + hdr_pad;
-    uint16_t info_len = payload_after_txwi & ~3u;
-    if (payload_after_txwi & 3u) info_len += 4;
-    uint16_t total_after_txinfo = 4 + txwi_len + payload_after_txwi;
+    /* Classify the frame before allocating the DMA buffer. */
+    uint8_t type    = fc0 & 0x0C;
+    bool    is_data = (type == 0x08);
+    bool    multicast = (tx_frame[16] & 0x01) != 0;
+    /* Null Data frames (keepalive) must stay unencrypted: the AP needs to ACK
+     * them at the PHY/MAC layer, and many APs do not decrypt/ACK an encrypted
+     * Null frame from a STA.  This matches the RT5572 reference path. */
+    bool hw_encrypt = wifi->wpa_hw_crypto && is_data && !is_eapol && !is_null;
+    /* For hardware CCMP the firmware inserts the CCMP header/MIC from the
+     * WCID_IV/key registers, so the host frame must be plaintext and WIV=0.
+     * For software CCMP (and all non-data frames) WIV=1 keeps the firmware
+     * from overwriting the IV already placed in the frame/TWI. */
+
+    /* For hardware-encrypted broadcast/multicast frames the firmware builds
+     * the CCMP AAD from only the QoS TID bits, while the AP verifies the
+     * standard AAD that includes the Ack Policy bits.  The netdrv sets Ack
+     * Policy = No Ack (byte0 = 0x20) for broadcasts, which produces an AAD
+     * mismatch; strip QoS so the AAD is unambiguous.
+     * For software-encrypted frames the MIC is already computed over the
+     * original QoS header, so stripping it here would corrupt the AAD and
+     * make the AP drop the frame. */
+    bool     strip_qos    = multicast && qos && hw_encrypt;
+    uint16_t air_hdr_len  = hdrlen - (strip_qos ? 2U : 0U);
+
+    uint16_t mpdu_len = tx_len - (hdrlen - air_hdr_len);
+    uint8_t  hdr_pad  = (uint8_t)((-air_hdr_len) & 3U);
+    uint16_t txwi_len = 20;
+    uint16_t payload_after_txwi = mpdu_len + hdr_pad;
+    /* MT_TXD_INFO_LEN = length of (TXWI + 802.11 frame + header pad) rounded
+     * up to 4 bytes.  The 4-byte TXINFO itself and a 4-byte trailing pad are
+     * added by the USB layer and must NOT be counted in this field. */
+    uint16_t info_len = (txwi_len + payload_after_txwi + 3u) & ~3u;
+    uint16_t total_after_txinfo = 4 + info_len;
     uint16_t pad = ((total_after_txinfo + 3u) & ~3u) + 4 - total_after_txinfo;
     uint16_t total = total_after_txinfo + pad;
 
@@ -3349,39 +4218,177 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 
     uint8_t *buf = priv->tx_buf;
 
+    /* The TX buffer is reused for firmware commands and frames.  Zero the
+     * whole transfer first so the 4-byte DMA alignment padding between the
+     * end of the 802.11 frame and the trailing pad is not filled with stale
+     * bytes from a previous command.  Such garbage becomes part of the MPDU
+     * if the firmware uses the USB transfer length instead of len_ctl,
+     * causing FCS errors and making the AP miss handshake frames like M2. */
+    memset(buf, 0, total);
+
+    /* USB queue 1 is the AC_BE bulk endpoint; Linux uses EDCA qsel for all
+     * non-HCCA frames on this endpoint. */
+    uint8_t qsel = MT_QSEL_EDCA;
+
     uint32_t info = ((uint32_t)info_len & MT_TXD_INFO_LEN_MASK)
                   | MT_TXD_INFO_80211
-                  | MT_TXD_INFO_WIV
-                  | (((uint32_t)MT_QSEL_MGMT & 3U) << MT_TXD_INFO_QSEL_SHIFT)
+                  | (((uint32_t)qsel & 3U) << MT_TXD_INFO_QSEL_SHIFT)
                   | (((uint32_t)MT_WLAN_PORT & 7U) << MT_TXD_INFO_DPORT_SHIFT);
+    /* WIV=1 for software-managed IV; WIV=0 for firmware-managed WCID IV. */
+    if (!hw_encrypt) {
+        info |= MT_TXD_INFO_WIV;
+    }
     __mt76_put_le32(buf, info);
 
     uint8_t *txwi = buf + 4;
     memset(txwi, 0, txwi_len);
-    /* rate: OFDM 6 Mbps (basic rate for management frames) */
-    uint16_t rate = ((uint16_t)MT_PHY_TYPE_OFDM << 13);
+    /* Management frames (auth/assoc/probe) and post-handshake data are sent at
+     * CCK 1 Mbps.  OFDM 6 Mbps was tried earlier, but this AP/STA combination
+     * ACKs the frames while the upper layer appears to drop them; falling back
+     * to the same CCK rate that works for EAPOL isolates whether the issue is
+     * the rate/MCS selection. */
+    uint16_t rate = 0;                          /* CCK 1 Mbps for EAPOL/mgmt */
+    /* Linux mt76x02: WCID 1 is used for unicast ACK routing; WCID 254 is the
+     * group/multicast WCID for this BSS.  For hardware-encrypted data frames
+     * the firmware uses the key stored in the selected WCID. */
+    uint8_t wcid;
+    if (is_data) {
+        if (protected && !hw_encrypt) {
+            /* Software CCMP: the frame already carries a valid CCMP header/MIC.
+             * Do not route it through the WCID key table, or the hardware will
+             * encrypt it a second time.  Use WCID 0xff (no key) and keep WIV=1
+             * so the firmware forwards the MPDU as-is.  This matches Linux
+             * mt76x02_mac_write_txwi() when no hw_key is assigned. */
+            wcid = 0xff;
+        } else if (multicast) {
+            /* Broadcast/multicast frames transmitted by a STA are encrypted
+             * with the GTK, not the pairwise key.  The GTK lives in the group
+             * WCID (254) programmed during M3.  Linux mt76x02 routes these
+             * frames through the VIF WCID so the firmware picks up the GTK
+             * and the correct key index for the CCMP header. */
+            wcid = MT_VIF_WCID(0);
+        } else {
+            /* Unicast data to the AP uses the pairwise key in WCID 1. */
+            wcid = 1;
+        }
+    } else {
+        wcid = 0xff;
+    }
+    /* Post-handshake unicast data frames are sent at OFDM 6 Mbps.  Broadcast
+     * /multicast data and EAPOL-Key frames use CCK 1 Mbps for robust delivery. */
+    if (is_data && !is_eapol && !multicast) {
+        rate = 0x2000U;                     /* OFDM 6 Mbps */
+    }
     __mt76_put_le16(txwi + 0, 0);       /* flags */
     __mt76_put_le16(txwi + 2, rate);
-    txwi[4] = MT_TXWI_ACK_CTL_REQ;      /* ack_ctl */
-    txwi[5] = 0xff;                     /* wcid: broadcast / not assigned */
-    __mt76_put_le16(txwi + 6, len);     /* len_ctl = real MPDU length */
-    /* iv(4) + eiv(4) + aid + txstream + ctl2 + pktid remain zero */
+    /* ack_ctl: request ACK for unicast frames only.  Broadcast/multicast
+     * frames must not expect an ACK; otherwise the firmware keeps retrying
+     * and never reports TX done.  Do NOT use NSEQ: on this chip/driver combo
+     * the hardware leaves the sequence number at 0 for every frame, causing
+     * the AP to treat M2/M4 as duplicates.  We assign a software-managed seq. */
+    txwi[4] = multicast ? 0 : MT_TXWI_ACK_CTL_REQ;
+    txwi[5] = wcid;                     /* wcid: 1=AP unicast, 254=bcast/mcast, ff=mgmt */
+    __mt76_put_le16(txwi + 6, mpdu_len);/* len_ctl = real MPDU length */
+    txwi[16] = (uint8_t)(wifi->mlme_aid & 0xFFU);   /* AID low byte */
+    /* txstream: Linux mt76x02 uses the number of TX chains (chainmask low
+     * nibble) and selects the stream encoding by PHY type:
+     *   - E4+ and HT/VHT frames: 0x13
+     *   - E3+ and non-HT (CCK/OFDM) frames: 0x93
+     * MT7612U is 2T2R and rev 0x44 >= E4.  The wrong encoding for CCK/OFDM
+     * EAPOL frames causes the chip to report TX success while the frame is
+     * never radiated, so the 4-way handshake stalls. */
+    {
+        uint8_t nstreams = (uint8_t)(priv->chainmask & 0x0F);
+        uint16_t rev = __mt76_rev(priv);
+        uint8_t phy = (uint8_t)((rate & MT_RXWI_RATE_PHY_MASK) >> 13);
+        if (nstreams > 1) {
+            if (rev >= 0x40) {
+                txwi[17] = (phy == MT_PHY_TYPE_HT) ? 0x13 : 0x93;
+            } else if (rev >= MT76_REV_E3) {
+                txwi[17] = 0x93;
+            }
+        } else {
+            txwi[17] = 0;
+        }
+    }
+    txwi[18] = 0;                       /* ctl2 (TX power adjustment) */
+    /* pktid: non-zero pktid makes the hardware push a TX status entry
+     * for this frame; without it MT_TX_STAT_FIFO stays empty. */
+    txwi[19] = is_data ? 1 : 0;         /* pktid */
 
     uint8_t *dst = buf + 4 + txwi_len;
-    if (hdr_pad) {
-        dst[0] = 0;
-        dst[1] = 0;
-        dst += 2;
+    if (hw_encrypt) {
+        if (tx_len < hdrlen) {
+            return VSF_ERR_INVALID_PARAMETER;
+        }
+        memcpy(dst, tx_frame, air_hdr_len);
+        /* Firmware-managed CCMP: mark the frame Protected and let the chip
+         * insert the IV/EIV from the WCID_IV registers. */
+        dst[1] |= 0x40U;                            /* Protected */
+    } else {
+        memcpy(dst, tx_frame, air_hdr_len);
     }
-    memcpy(dst, frame, len);
+    if (strip_qos) {
+        /* Convert QoS Data -> plain Data by clearing the subtype bits. */
+        dst[0] &= 0x0FU;
+    }
+    if (hdr_pad) {
+        memset(dst + air_hdr_len, 0, hdr_pad);
+    }
+    memcpy(dst + air_hdr_len + hdr_pad, tx_frame + hdrlen, tx_len - hdrlen);
+
+    /* iv(4) at txwi[8..11] and eiv(4) at txwi[12..15].
+     * Linux mt76x02 leaves these zero for software-encrypted frames: WIV=1
+     * tells the firmware to use the CCMP header already present in the MPDU,
+     * and WCID=0xff ensures it does not run the frame through the WCID key
+     * table.  Copying PN here caused the firmware to re-encrypt with a
+     * firmware-generated PN, producing an undecryptable double-encrypted
+     * frame. */
+    (void)protected;
+
+    /* EAPOL-Key frames (4-way handshake) must be sent at a rate the AP will
+     * ACK reliably.  MT76 at OFDM 6 Mbps results in no ACK and deauth reason 15.
+     * Use CCK 1 Mbps and the same Duration that the RT5572 reference driver
+     * uses for M2/M4 (0x002c); a larger value seems to be overwritten to 0 by
+     * the MT76 MAC when the frame is sent as QoS Data, so we converted the
+     * frame to plain Data above. */
+    if (is_eapol) {
+        rate = 0;                                   /* CCK 1 Mbps */
+        __mt76_put_le16(txwi + 2, rate);
+    }
+    /* MT76 does not auto-fill Duration for plain Data frames; a zero Duration
+     * causes many APs to drop the frame even if they ACK it.  Use the same
+     * NAV value that works for EAPOL-Key frames (0x002c) for unicast frames
+     * only.  Broadcast/multicast frames must keep Duration=0 because they set
+     * no NAV; a non-zero value makes many APs discard them.
+     * For software-CCMP frames the MPDU is already encrypted when it reaches
+     * us; overwriting Duration here would corrupt the MIC and make the AP
+     * drop the frame silently.  Those frames already carry the duration chosen
+     * by the upper layer (0 for broadcasts, which is correct). */
+    if ((type == 0x08) && !protected && !multicast) {
+        __mt76_put_le16(dst + 2, 0x002CU);
+    }
+
+    if (mpdu_len >= 24) {
+        __mt76_tx_seq++;
+        __mt76_put_le16(dst + 22, (uint16_t)(__mt76_tx_seq << 4));
+    }
     memset(buf + total - pad, 0, pad);
 
     vsf_wifi_chip_mt76_trace_debug(
-        "mt76: tx frame fc=0x%02X%02X len=%u total=%u hdr_pad=%u"
+        "mt76: tx frame fc=0x%02X%02X len=%u total=%u hdr_pad=%u wcid=%u rate=0x%04X hw_enc=%u"
         VSF_TRACE_CFG_LINEEND,
-        fc1, fc0, len, total, hdr_pad);
+        fc1, fc0, (unsigned)mpdu_len, (unsigned)total, hdr_pad,
+        (unsigned)wcid, (unsigned)rate, (unsigned)hw_encrypt);
 
-    return __mt76_tx_frame(wifi, buf, total, MT76_TX_QUEUE_MGMT, NULL);
+    vsf_err_t err = __mt76_tx_frame(wifi, buf, total, MT76_TX_QUEUE_MGMT, NULL);
+    if ((err == VSF_ERR_NONE) && (type == 0x08)) {
+        /* Temporarily disabled: txstat polling uses EP0 reg_read and collides
+         * with other cfg_read calls after link-up, triggering an assertion.
+         * Re-enable once EP0 accesses are properly serialized. */
+        // __mt76_txstat_poll(wifi);
+    }
+    return err;
 }
 
 const vsf_wifi_chip_drv_t vsf_wifi_mt76_drv = {
@@ -3400,6 +4407,13 @@ const vsf_wifi_chip_drv_t vsf_wifi_mt76_drv = {
     .parse_rx       = __mt76_parse_rx,
     .build_tx       = NULL,
     .tx             = __mt76_tx,
+/* Hardware key-table programming is required: without a valid WCID key the
+ * MT76 firmware silently drops protected data frames (software-CCMP TX with
+ * WIV=1 never reaches the air).  For WIV=0 the firmware inserts the CCMP
+ * header/MIC itself from the WCID key/IV registers. */
+#if (VSF_WIFI_USE_WPA == ENABLED)
+    .crypto_ops     = &__mt76_crypto_ops,
+#endif
 };
 
 #endif      /* VSF_USE_WIFI == ENABLED && VSF_WIFI_USE_MT76 == ENABLED */

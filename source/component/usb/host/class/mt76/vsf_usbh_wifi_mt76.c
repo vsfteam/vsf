@@ -476,9 +476,17 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             int status = vk_usbh_urb_get_status(&iocb->urb);
             uint32_t len = (URB_OK == status)
                     ? vk_usbh_urb_get_actual_length(&iocb->urb) : 0;
-            vsf_wifi_chip_mt76_trace_debug(
-                "mt76usb: rx done ep=0x%02X status=%d len=%u" VSF_TRACE_CFG_LINEEND,
-                iocb->urb.urb_hcd->pipe.endpoint, status, (unsigned)len);
+            if (len > 0) {
+                vsf_wifi_chip_mt76_trace_debug(
+                    "mt76usb: rx done ep=0x%02X status=%d len=%u"
+                    VSF_TRACE_CFG_LINEEND,
+                    iocb->urb.urb_hcd->pipe.endpoint, status, (unsigned)len);
+            } else {
+                vsf_wifi_chip_mt76_trace_debug(
+                    "mt76usb: rx done ep=0x%02X status=%d len=%u"
+                    VSF_TRACE_CFG_LINEEND,
+                    iocb->urb.urb_hcd->pipe.endpoint, status, (unsigned)len);
+            }
             if (URB_OK == status && len > 0) {
                 uint8_t *buf = vk_usbh_urb_peek_buffer(&iocb->urb);
                 mt76_wifi_priv_t *priv = (mt76_wifi_priv_t *)uwifi->wifi.chip_priv;
@@ -500,16 +508,12 @@ static void __vk_usbh_wifi_mt76_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         } else {
             int status = vk_usbh_urb_get_status(&iocb->urb);
             uint32_t actual = vk_usbh_urb_get_actual_length(&iocb->urb);
+            (void)actual;
             vsf_err_t done_err = (URB_OK == status) ? VSF_ERR_NONE : VSF_ERR_FAIL;
-            if (status == URB_OK) {
-                vsf_wifi_chip_mt76_trace_debug(
-                    "mt76usb: tx done status=%d actual=%u" VSF_TRACE_CFG_LINEEND,
-                    status, (unsigned)actual);
-            } else {
-                vsf_wifi_chip_mt76_trace_info(
-                    "mt76usb: tx done status=%d actual=%u" VSF_TRACE_CFG_LINEEND,
-                    status, (unsigned)actual);
-            }
+            vsf_wifi_chip_mt76_trace_debug(
+                "mt76usb: tx done queue=%u status=%d actual=%u"
+                VSF_TRACE_CFG_LINEEND,
+                iocb->ep_idx, status, (unsigned)actual);
             iocb->is_busy = false;
             if (iocb->done != NULL) {
                 vsf_wifi_done_t done = iocb->done;
@@ -776,7 +780,7 @@ static vsf_err_t __vk_usbh_wifi_mt76_mcu_cmd(vsf_wifi_t *wifi,
 
     vsf_err_t err = vk_usbh_submit_urb_ex(uwifi->usbh, &iocb->urb,
             0, &uwifi->eda);
-    vsf_trace_info("mt76usb: submit_urb ep_hcd=0x%02X err=%d" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_chip_mt76_trace_debug("mt76usb: submit_urb ep_hcd=0x%02X err=%d" VSF_TRACE_CFG_LINEEND,
             iocb->urb.urb_hcd->pipe.endpoint, (int)err);
     if (VSF_ERR_NONE != err) {
         iocb->is_busy = false;
@@ -790,7 +794,7 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
 {
     vk_usbh_wifi_mt76_t *uwifi = __vk_usbh_wifi_mt76_from_wifi(wifi);
 
-    vsf_trace_info("mt76usb: tx_frame queue=%u len=%u ep=0x%02X" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_chip_mt76_trace_debug("mt76usb: tx_frame queue=%u len=%u ep=0x%02X" VSF_TRACE_CFG_LINEEND,
             queue_idx, len,
             uwifi->out_ep[queue_idx].desc ? uwifi->out_ep[queue_idx].desc->bEndpointAddress : 0xFF);
 
@@ -808,7 +812,7 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
     if (NULL == iocb) return VSF_ERR_NOT_AVAILABLE;
     iocb->is_supported = true;
 
-    vsf_trace_info("mt76usb: selected iocb=%d alloced=%d ep_hcd=0x%02X" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_chip_mt76_trace_debug("mt76usb: selected iocb=%d alloced=%d ep_hcd=0x%02X" VSF_TRACE_CFG_LINEEND,
             (int)(iocb - uwifi->tx_iocb), (int)vk_usbh_urb_is_alloced(&iocb->urb),
             vk_usbh_urb_is_alloced(&iocb->urb) ? iocb->urb.urb_hcd->pipe.endpoint : 0xFF);
 

@@ -95,6 +95,16 @@
 #endif
 
 /*
+ * WPA debug logging: PMK / PTK / SNonce / PRF input/output dumps.
+ * These traces are verbose and, when combined with synchronous log flushing,
+ * can delay the M2 response enough to cause 4-way handshake timeouts.
+ * Keep DISABLED for normal operation; enable only when debugging key derivation.
+ */
+#ifndef VSF_WIFI_CFG_WPA_DEBUG_LOG
+#   define VSF_WIFI_CFG_WPA_DEBUG_LOG   DISABLED
+#endif
+
+/*
  * RT28xx (RT2870/RT3070/RT3572/RT5370/RT5572) hardware CCMP offloading.
  * When ENABLED the RT28xx chip driver registers crypto_ops and the wifi layer
  * skips software CCMP encap/decap.  When DISABLED the existing software CCMP

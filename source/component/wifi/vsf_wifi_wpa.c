@@ -129,8 +129,11 @@ static vsf_err_t __wpa_send_eapol(vsf_wifi_t *wifi, uint8_t ver,
     memcpy(&buf[10], wifi->mac,        6);
     memcpy(&buf[16], wifi->mlme_bssid, 6);
     /* bytes 22-23: seq control (hardware fills) */
-    /* bytes 24-25: QoS Control = 0x0007 (TID 7, Voice, highest priority) */
-    buf[24] = 0x07; buf[25] = 0x00;
+    /* bytes 24-25: QoS Control = 0x0000 (TID 0, BE).
+     * The AP sends EAPOL-Key M1 with TID 0; mirror that for M2/M4 so the
+     * frame is not classified into an AC that the AP may drop before the
+     * 4-way handshake completes. */
+    buf[24] = 0x00; buf[25] = 0x00;
 
     /* LLC/SNAP + EAPOL ethertype. */
     memcpy(&buf[26], snap, 8);
@@ -192,13 +195,9 @@ static void __wpa_parse_gtk(vsf_wifi_t *wifi, const uint8_t *data, uint16_t len)
             wifi->wpa_gtk_keyidx = (uint8_t)(p[6] & 0x03);
             memcpy(wifi->wpa_gtk, &p[8], glen);
             wifi->wpa_gtk_len = glen;
-            vsf_trace_info("wifi: GTK extracted keyidx=%u len=%u"
-                    " tk=%02X%02X%02X%02X%02X%02X%02X%02X..."
+            vsf_wifi_trace_debug("wifi: GTK extracted keyidx=%u len=%u"
                     VSF_TRACE_CFG_LINEEND,
-                    (unsigned)wifi->wpa_gtk_keyidx, (unsigned)glen,
-                    wifi->wpa_gtk[0], wifi->wpa_gtk[1], wifi->wpa_gtk[2],
-                    wifi->wpa_gtk[3], wifi->wpa_gtk[4], wifi->wpa_gtk[5],
-                    wifi->wpa_gtk[6], wifi->wpa_gtk[7]);
+                    (unsigned)wifi->wpa_gtk_keyidx, (unsigned)glen);
             return;
         }
         p += 2 + l;                             /* skip entire IE          */
@@ -214,6 +213,8 @@ static void __wpa_parse_gtk(vsf_wifi_t *wifi, const uint8_t *data, uint16_t len)
 static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
         uint16_t key_len)
 {
+    vsf_wifi_trace_debug("wifi: 4-way M1 received, key_len=%u"
+            VSF_TRACE_CFG_LINEEND, (unsigned)key_len);
     bool is_retransmit = (memcmp(&ek[EK_NONCE_OFF], wifi->wpa_anonce, 32) == 0)
                       && (wifi->wpa_snonce[0] | wifi->wpa_snonce[1]);
 
@@ -222,16 +223,47 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
     if (!is_retransmit) {
         memcpy(wifi->wpa_anonce, &ek[EK_NONCE_OFF], 32);
         __wpa_gen_snonce(wifi, wifi->wpa_snonce);
+#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
+        vsf_wifi_trace_info("wifi: SNonce after gen: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X ..." VSF_TRACE_CFG_LINEEND,
+                wifi->wpa_snonce[0], wifi->wpa_snonce[1], wifi->wpa_snonce[2], wifi->wpa_snonce[3],
+                wifi->wpa_snonce[4], wifi->wpa_snonce[5], wifi->wpa_snonce[6], wifi->wpa_snonce[7],
+                wifi->wpa_snonce[8], wifi->wpa_snonce[9], wifi->wpa_snonce[10], wifi->wpa_snonce[11],
+                wifi->wpa_snonce[12], wifi->wpa_snonce[13], wifi->wpa_snonce[14], wifi->wpa_snonce[15]);
+#endif
 
         /* PTK = PRF(PMK, AA=BSSID, SPA=our MAC, ANonce, SNonce). */
         if (vsf_wifi_prf_ptk(wifi->wpa_auth.psk, wifi->mlme_bssid, wifi->mac,
                 wifi->wpa_anonce, wifi->wpa_snonce, wifi->wpa_ptk)
                 != VSF_ERR_NONE) {
+            vsf_wifi_trace_info("wifi: PTK derivation failed"
+                    VSF_TRACE_CFG_LINEEND);
             vsf_wifi_mlme_handshake_fail(wifi, WIFI_REASON_UNSPECIFIED);
             return;
         }
+        vsf_wifi_trace_debug("wifi: PTK derived OK"
+                VSF_TRACE_CFG_LINEEND);
+#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
+        vsf_wifi_trace_info("wifi: PMK: %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
+                wifi->wpa_auth.psk[0], wifi->wpa_auth.psk[1], wifi->wpa_auth.psk[2], wifi->wpa_auth.psk[3],
+                wifi->wpa_auth.psk[4], wifi->wpa_auth.psk[5], wifi->wpa_auth.psk[6], wifi->wpa_auth.psk[7],
+                wifi->wpa_auth.psk[8], wifi->wpa_auth.psk[9], wifi->wpa_auth.psk[10], wifi->wpa_auth.psk[11],
+                wifi->wpa_auth.psk[12], wifi->wpa_auth.psk[13], wifi->wpa_auth.psk[14], wifi->wpa_auth.psk[15],
+                wifi->wpa_auth.psk[16], wifi->wpa_auth.psk[17], wifi->wpa_auth.psk[18], wifi->wpa_auth.psk[19],
+                wifi->wpa_auth.psk[20], wifi->wpa_auth.psk[21], wifi->wpa_auth.psk[22], wifi->wpa_auth.psk[23],
+                wifi->wpa_auth.psk[24], wifi->wpa_auth.psk[25], wifi->wpa_auth.psk[26], wifi->wpa_auth.psk[27],
+                wifi->wpa_auth.psk[28], wifi->wpa_auth.psk[29], wifi->wpa_auth.psk[30], wifi->wpa_auth.psk[31]);
+        vsf_wifi_trace_info("wifi: PTK: %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X ..." VSF_TRACE_CFG_LINEEND,
+                wifi->wpa_ptk[0], wifi->wpa_ptk[1], wifi->wpa_ptk[2], wifi->wpa_ptk[3],
+                wifi->wpa_ptk[4], wifi->wpa_ptk[5], wifi->wpa_ptk[6], wifi->wpa_ptk[7],
+                wifi->wpa_ptk[8], wifi->wpa_ptk[9], wifi->wpa_ptk[10], wifi->wpa_ptk[11],
+                wifi->wpa_ptk[12], wifi->wpa_ptk[13], wifi->wpa_ptk[14], wifi->wpa_ptk[15],
+                wifi->wpa_ptk[16], wifi->wpa_ptk[17], wifi->wpa_ptk[18], wifi->wpa_ptk[19],
+                wifi->wpa_ptk[20], wifi->wpa_ptk[21], wifi->wpa_ptk[22], wifi->wpa_ptk[23],
+                wifi->wpa_ptk[24], wifi->wpa_ptk[25], wifi->wpa_ptk[26], wifi->wpa_ptk[27],
+                wifi->wpa_ptk[28], wifi->wpa_ptk[29], wifi->wpa_ptk[30], wifi->wpa_ptk[31]);
+#endif
     } else {
-        vsf_trace_info("wifi: 4-way M1 retransmit, re-sending M2"
+        vsf_wifi_trace_debug("wifi: 4-way M1 retransmit, re-sending M2"
                 VSF_TRACE_CFG_LINEEND);
     }
 
@@ -243,13 +275,24 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
      * to send M3, so we miss M3 and the handshake stalls (exactly the symptom
      * seen on iPhone/ChinaNet).  M1 retransmits from the AP (handled via the
      * is_retransmit path above) provide the retry mechanism if M2 is lost. */
-    if (__wpa_send_eapol(wifi, ek[0], KI_M2, key_len, wifi->wpa_snonce,
-            wifi->wpa_rsn_ie, wifi->wpa_rsn_ie_len) != VSF_ERR_NONE) {
-        vsf_trace_warning("wifi: EAPOL M2 tx failed" VSF_TRACE_CFG_LINEEND);
+#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
+    vsf_wifi_trace_info("wifi: SNonce before M2 send: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X ..." VSF_TRACE_CFG_LINEEND,
+            wifi->wpa_snonce[0], wifi->wpa_snonce[1], wifi->wpa_snonce[2], wifi->wpa_snonce[3],
+            wifi->wpa_snonce[4], wifi->wpa_snonce[5], wifi->wpa_snonce[6], wifi->wpa_snonce[7],
+            wifi->wpa_snonce[8], wifi->wpa_snonce[9], wifi->wpa_snonce[10], wifi->wpa_snonce[11],
+            wifi->wpa_snonce[12], wifi->wpa_snonce[13], wifi->wpa_snonce[14], wifi->wpa_snonce[15]);
+#endif
+    vsf_err_t m2_err = __wpa_send_eapol(wifi, ek[0], KI_M2, key_len,
+            wifi->wpa_snonce, wifi->wpa_rsn_ie, wifi->wpa_rsn_ie_len);
+    if (m2_err != VSF_ERR_NONE) {
+        vsf_trace_warning("wifi: EAPOL M2 tx failed err=%d"
+                VSF_TRACE_CFG_LINEEND, (int)m2_err);
+    } else {
+        vsf_wifi_trace_debug("wifi: 4-way M2 sent (single)%s"
+                VSF_TRACE_CFG_LINEEND,
+                is_retransmit ? " [on M1 retx]" : "");
     }
     vsf_wifi_mlme_arm_timer(wifi, __WPA_STEP_TIMEOUT_MS);
-    vsf_trace_info("wifi: 4-way M2 sent (single)%s" VSF_TRACE_CFG_LINEEND,
-            is_retransmit ? " [on M1 retx]" : "");
 }
 
 /* Handle EAPOL-Key M3 (ANonce, ACK, MIC, install, encrypted GTK): verify
@@ -362,7 +405,7 @@ static void __wpa_handle_m3(vsf_wifi_t *wifi, const uint8_t *ek,
     /* PTK/GTK derived; the cipher backend installation lands in Task 5.  Mark
      * the keys valid and bring the link up. */
     wifi->wpa_ptk_valid = true;
-    vsf_trace_info("wifi: 4-way M3 rx, M4 sent (keys ready)"
+    vsf_wifi_trace_debug("wifi: 4-way M3 rx, M4 sent (keys ready)"
             VSF_TRACE_CFG_LINEEND);
     vsf_wifi_mlme_handshake_done(wifi);
 }
@@ -460,6 +503,12 @@ static void __wpa_handle_group_m1(vsf_wifi_t *wifi, const uint8_t *ek,
 
 void vsf_wifi_eapol_rx(vsf_wifi_t *wifi, const uint8_t *eapol, uint16_t len)
 {
+    vsf_wifi_trace_debug(
+        "wifi: eapol_rx len=%u state=%u type=%u desc=%u key_info=0x%04X"
+        VSF_TRACE_CFG_LINEEND,
+        (unsigned)len, (unsigned)wifi->mlme_state,
+        (unsigned)eapol[EAPOL_TYPE_OFF], (unsigned)eapol[EK_DESCTYPE_OFF],
+        (unsigned)__wpa_rd16be(&eapol[EK_KEYINFO_OFF]));
     if ((wifi == NULL) || (eapol == NULL)) return;
     /* Accept EAPOL both during the 4-way handshake and when already connected.
      * In RUN state this handles AP M3 retries (AP didn't receive our M4):

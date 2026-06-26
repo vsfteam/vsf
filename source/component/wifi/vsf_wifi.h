@@ -98,11 +98,11 @@ enum {
  * chip op (set_channel / connect / disconnect ...) can issue.  Static const
  * scripts (e.g. the chip init table) are not bounded by this.
  *
- * Worst case today is RT28xx connect: 2 BSSID + 4 TX cfg + 4 RF + 1 RX filter
- * = 11 ops.  Default 16 leaves headroom.
+ * Worst case today is MT76 hardware-CCMP key install: 8 WCID key + 2 WCID IV +
+ * 1 WCID attr + 8 shared key + 1 SKEY_MODE = 20 ops.  Default 24 leaves headroom.
  */
 #ifndef VSF_WIFI_CFG_SCRATCH_OPS
-#   define VSF_WIFI_CFG_SCRATCH_OPS     16
+#   define VSF_WIFI_CFG_SCRATCH_OPS     24
 #endif
 
 /* Maximum number of channels in a single active scan (2.4 GHz + 5 GHz). */
