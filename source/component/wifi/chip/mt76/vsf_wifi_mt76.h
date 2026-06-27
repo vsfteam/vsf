@@ -218,6 +218,9 @@ typedef struct mt76_wifi_priv {
     /* connect context */
     vsf_wifi_done_t         connect_done;
 
+    /* disconnect context */
+    vsf_wifi_done_t         disconnect_done;
+
     /* hardware crypto install context */
     vsf_wifi_done_t         crypto_done;
     /* Multicast/broadcast software-CCMP PN.  MT76 firmware overrides the QoS
