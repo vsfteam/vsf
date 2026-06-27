@@ -4304,15 +4304,13 @@ static vsf_err_t __mt76_crypto_install_key(vsf_wifi_t *wifi,
                   | MT76_WCID_ATTR_BSS_IDX_EXT;
     if (pairwise) {
         attr |= MT76_WCID_ATTR_PAIRWISE;
-        /* Seed the software-CCMP PN for broadcast/multicast frames away from
-         * the hardware unicast PN (which starts at 1) to avoid replay-counter
-         * collisions at the AP.  0x0000FFFFFFFF + 1 -> 0x000100000000. */
-        priv->mcast_pn[0] = 0xFF;
-        priv->mcast_pn[1] = 0xFF;
-        priv->mcast_pn[2] = 0xFF;
-        priv->mcast_pn[3] = 0xFF;
-        priv->mcast_pn[4] = 0x00;
-        priv->mcast_pn[5] = 0x00;
+        /* Start the software-CCMP PN for broadcast/multicast frames at 1, the
+         * same as the hardware unicast PN.  The previous large seed
+         * (0x000100000000) was rejected by the test AP's replay counter when
+         * it was the first PN seen on the PTK.  Long-term collision avoidance
+         * between unicast and multicast PN may need a different scheme; for
+         * now test whether the AP accepts PN=1 for multicast. */
+        memset(priv->mcast_pn, 0, sizeof(priv->mcast_pn));
     }
 
     vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
@@ -4429,25 +4427,26 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     /* The MT76 firmware overrides the QoS Control Ack Policy of WIV=0
      * broadcast/multicast frames, clearing the No Ack bit set by the netdrv.
      * Software-encrypt multicast data locally so the frame is sent with
-     * WIV=1 and the original QoS Control (including No Ack) is preserved. */
+     * WIV=1 and the original QoS Control (including No Ack) is preserved.
+     *
+     * The CCMP encap routine writes the 8-byte CCMP header into the output
+     * buffer before encrypting the payload from the input buffer.  Passing
+     * the same buffer for input and output overwrites the first 8 bytes of
+     * the plaintext payload with the CCMP header, so use frame_buf as a
+     * separate output buffer. */
     if (is_data && multicast && !protected && wifi->wpa_hw_crypto) {
-        if (tx_frame == frame) {
-            if (tx_len > sizeof(frame_buf)) {
-                return VSF_ERR_NOT_ENOUGH_RESOURCES;
-            }
-            memcpy(frame_buf, tx_frame, tx_len);
-            tx_frame = frame_buf;
+        if (tx_len > sizeof(frame_buf)) {
+            return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
-        uint16_t enc_len = vsf_wifi_ccmp_encap_with_pn(wifi, tx_frame, tx_len,
-                (uint8_t *)tx_frame,
-                (uint16_t)(sizeof(frame_buf) - (tx_frame - frame_buf)),
-                priv->mcast_pn);
+        uint16_t enc_len = vsf_wifi_ccmp_encap_with_pn(wifi, frame, tx_len,
+                frame_buf, (uint16_t)sizeof(frame_buf), priv->mcast_pn);
         if (enc_len == 0) {
             vsf_wifi_chip_mt76_trace_error(
                 "mt76: multicast software CCMP encap failed"
                 VSF_TRACE_CFG_LINEEND);
             return VSF_ERR_FAIL;
         }
+        tx_frame = frame_buf;
         tx_len = enc_len;
         fc0 = tx_frame[0];
         fc1 = tx_frame[1];
