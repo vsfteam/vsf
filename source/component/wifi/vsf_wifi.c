@@ -820,10 +820,12 @@ static uint16_t __vsf_wifi_ccmp_decap(vsf_wifi_t *wifi,
         const uint8_t *dot11, uint16_t len, uint8_t *out, uint16_t cap);
 
 /* CCMP-encrypt a plaintext data MPDU `frame` (802.11 hdr + payload) into
- * `out` (capacity `cap`).  Advances wifi->wpa_tx_pn.  Returns the encrypted
- * MPDU length, or 0 on failure. */
+ * `out` (capacity `cap`).  Advances the caller-supplied 48-bit PN counter
+ * `pn` (little-endian, pn[0] = LSB); if `pn` is NULL wifi->wpa_tx_pn is
+ * used.  Returns the encrypted MPDU length, or 0 on failure. */
 static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
-        const uint8_t *frame, uint16_t len, uint8_t *out, uint16_t cap)
+        const uint8_t *frame, uint16_t len, uint8_t *out, uint16_t cap,
+        uint8_t pn[6])
 {
     bool     qos     = ((frame[0] >> 4) & 0x0F) & 0x08;
     uint16_t hdr_len = qos ? 26 : 24;
@@ -834,7 +836,9 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     if (total > cap)                             return 0;
 
     /* Advance the 48-bit PN (little-endian). */
-    uint8_t *pn = wifi->wpa_tx_pn;
+    if (pn == NULL) {
+        pn = wifi->wpa_tx_pn;
+    }
     for (int i = 0; i < 6; i++) { if (++pn[i] != 0) break; }
 
     /* Header with Protected bit set. */
@@ -912,6 +916,15 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     }
 
     return total;
+}
+
+/* Public variant that lets chip drivers encrypt with their own PN counter.
+ * Falls back to wifi->wpa_tx_pn when pn is NULL. */
+uint16_t vsf_wifi_ccmp_encap_with_pn(vsf_wifi_t *wifi,
+        const uint8_t *frame, uint16_t len, uint8_t *out, uint16_t cap,
+        uint8_t pn[6])
+{
+    return __vsf_wifi_ccmp_encap(wifi, frame, len, out, cap, pn);
 }
 
 /* CCMP-decrypt an encrypted data MPDU `dot11` into `out` (capacity `cap`),
@@ -1855,7 +1868,7 @@ vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
         static uint32_t __ccmp_tx32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
         uint8_t *enc = (uint8_t *)__ccmp_tx32;
         uint16_t total = __vsf_wifi_ccmp_encap(wifi, frame, len,
-                enc, (uint16_t)sizeof(__ccmp_tx32));
+                enc, (uint16_t)sizeof(__ccmp_tx32), wifi->wpa_tx_pn);
         if (total == 0) return VSF_ERR_FAIL;
         return __vsf_wifi_tx_frame(wifi, enc, total);
     }

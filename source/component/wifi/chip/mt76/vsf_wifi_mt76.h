@@ -215,6 +215,11 @@ typedef struct mt76_wifi_priv {
 
     /* hardware crypto install context */
     vsf_wifi_done_t         crypto_done;
+    /* Multicast/broadcast software-CCMP PN.  MT76 firmware overrides the QoS
+     * Control Ack Policy of WIV=0 broadcast frames, so multicast data is
+     * software-encrypted locally using this counter while unicast data uses
+     * the hardware WCID PN.  Little-endian, mcast_pn[0] = LSB. */
+    uint8_t                 mcast_pn[6];
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t    fw_timer;
     /* one-shot TX status poll for debugging handshake ACK failures */

@@ -23,6 +23,13 @@
 
 #include "../../vsf_wifi_priv.h"
 
+/* Force software CCMP TX encap as a temporary debug knob.  When ENABLED the
+ * driver keeps the keys in the WCID tables for hardware RX decryption but
+ * disables hardware TX encryption.  Set to DISABLED to test hardware CCMP TX. */
+#ifndef VSF_WIFI_MT76_CFG_FORCE_SW_CCMP_TX
+#   define VSF_WIFI_MT76_CFG_FORCE_SW_CCMP_TX       ENABLED
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define MT76_VEND_TYPE_CFG                  ((uint32_t)1 << 30)
@@ -3586,21 +3593,21 @@ static void __mt76_connect_channel_done(vsf_wifi_t *wifi, vsf_err_t err)
     ops[1].val = ((uint32_t)bssid[4])        |
                  ((uint32_t)bssid[5] << 8);
 
-    /* WCID 1 is used for unicast RX decryption: match frames addressed to
-     * our STA MAC (RA) so PTK-encrypted frames from the AP are decrypted.
-     * Using the AP BSSID here causes broadcast/multicast frames from the AP
-     * to match this pairwise WCID and fail hardware decryption. */
-    const uint8_t *sta_mac = wifi->mac;
+    /* WCID 1 represents the AP peer in STA mode.  The hardware matches it by
+     * the AP BSSID (RA on TX, TA on RX) and uses the pairwise key installed
+     * here for both directions.  Linux mt76x02 uses bssidx = 8 in STA mode,
+     * so BSS_IDX_EXT must be set for the hardware to associate this WCID with
+     * the BSSID programmed in APC_BSSID(0). */
     ops[2].reg = MT76_WCID_ATTR(1);
-    ops[2].val = MT76_WCID_ATTR_BSS_IDX;
+    ops[2].val = MT76_WCID_ATTR_BSS_IDX | MT76_WCID_ATTR_BSS_IDX_EXT;
     ops[3].reg = MT76_WCID_ADDR(1);
-    ops[3].val = ((uint32_t)sta_mac[0])        |
-                 ((uint32_t)sta_mac[1] << 8)  |
-                 ((uint32_t)sta_mac[2] << 16) |
-                 ((uint32_t)sta_mac[3] << 24);
+    ops[3].val = ((uint32_t)bssid[0])        |
+                 ((uint32_t)bssid[1] << 8)  |
+                 ((uint32_t)bssid[2] << 16) |
+                 ((uint32_t)bssid[3] << 24);
     ops[4].reg = MT76_WCID_ADDR(1) + 4;
-    ops[4].val = ((uint32_t)sta_mac[4])        |
-                 ((uint32_t)sta_mac[5] << 8);
+    ops[4].val = ((uint32_t)bssid[4])        |
+                 ((uint32_t)bssid[5] << 8);
     ops[5].reg = MT76_WCID_DROP(1);
     ops[5].val = 0;
 
@@ -3635,16 +3642,16 @@ static void __mt76_connect_channel_done(vsf_wifi_t *wifi, vsf_err_t err)
     ops[13].reg = MT76_WMM_TXOP(1);    /* VI/VO TXOP = 94/47 */
     ops[13].val = 0x002F005EU;
 
-    /* Group/multicast WCID for this BSS (used for broadcast data frames).
-     * Set its address to broadcast so frames with RA = ff:ff:ff:ff:ff:ff
-     * match this WCID and use the GTK instead of falling back to a pairwise
-     * WCID that lacks the group key. */
+    /* Group/multicast WCID for this BSS.  Linux leaves the address zeroed
+     * and only uses this entry as a fallback TX queue mapping; GTK-encrypted
+     * RX frames are decrypted using the BSS shared key table indexed by the
+     * bssidx derived from the peer WCID. */
     ops[14].reg = MT76_WCID_ATTR(MT_VIF_WCID(0));
-    ops[14].val = MT76_WCID_ATTR_BSS_IDX;
+    ops[14].val = MT76_WCID_ATTR_BSS_IDX | MT76_WCID_ATTR_BSS_IDX_EXT;
     ops[15].reg = MT76_WCID_ADDR(MT_VIF_WCID(0));
-    ops[15].val = 0xFFFFFFFFU;
+    ops[15].val = 0x00000000U;
     ops[16].reg = MT76_WCID_ADDR(MT_VIF_WCID(0)) + 4;
-    ops[16].val = 0x0000FFFFU;
+    ops[16].val = 0x00000000U;
     ops[17].reg = MT76_WCID_DROP(MT_VIF_WCID(0));
     ops[17].val = 0;
     ops[18].reg = MT76_WCID_TX_INFO(MT_VIF_WCID(0));
@@ -3994,15 +4001,14 @@ static void __mt76_crypto_key_done(vsf_wifi_t *wifi, vsf_err_t err)
         done(wifi, err);
     }
 
-    /* Hardware TX encryption is not yet reliable on this chip/driver
-     * combination (broadcast/unicast CCMP frames are ACKed but appear to be
-     * dropped by the AP upper layer).  Keep the keys in the WCID tables for
-     * hardware RX decryption and let the generic WPA layer perform software
-     * CCMP encap on TX.  This isolates the RX path while the TX bug is being
-     * root-caused. */
+    /* Temporary debug knob: keep the keys in the WCID tables for hardware RX
+     * decryption but let the generic WPA layer perform software CCMP encap on
+     * TX.  Disable VSF_WIFI_MT76_CFG_FORCE_SW_CCMP_TX to test hardware CCMP TX. */
+#if VSF_WIFI_MT76_CFG_FORCE_SW_CCMP_TX == ENABLED
     if (err == VSF_ERR_NONE) {
         wifi->wpa_hw_crypto = false;
     }
+#endif
 }
 
 static vsf_err_t __mt76_crypto_install_key(vsf_wifi_t *wifi,
@@ -4049,11 +4055,23 @@ static vsf_err_t __mt76_crypto_install_key(vsf_wifi_t *wifi,
     iv_data[6] = (uint8_t)((pn >> 32) & 0xFFU);
     iv_data[7] = (uint8_t)((pn >> 40) & 0xFFU);
 
-    /* Linux uses vif_idx=0 in STA mode, so BSS_IDX=0 (no extension).  The
-     * cipher mode and pairwise flag are the only non-zero attribute bits. */
-    uint32_t attr = (MT76X02_CIPHER_AES_CCMP << MT76_WCID_ATTR_PKEY_MODE_SHIFT);
+    /* Linux mt76x02 shifts the STA-mode bss index by 8 (vif_idx += 8), so the
+     * WCID attribute must have BSS_IDX_EXT set for the hardware to associate
+     * this WCID with the BSSID programmed in MT_MAC_APC_BSSID(0). */
+    uint32_t attr = (MT76X02_CIPHER_AES_CCMP << MT76_WCID_ATTR_PKEY_MODE_SHIFT)
+                  | MT76_WCID_ATTR_BSS_IDX
+                  | MT76_WCID_ATTR_BSS_IDX_EXT;
     if (pairwise) {
         attr |= MT76_WCID_ATTR_PAIRWISE;
+        /* Seed the software-CCMP PN for broadcast/multicast frames away from
+         * the hardware unicast PN (which starts at 1) to avoid replay-counter
+         * collisions at the AP.  0x0000FFFFFFFF + 1 -> 0x000100000000. */
+        priv->mcast_pn[0] = 0xFF;
+        priv->mcast_pn[1] = 0xFF;
+        priv->mcast_pn[2] = 0xFF;
+        priv->mcast_pn[3] = 0xFF;
+        priv->mcast_pn[4] = 0x00;
+        priv->mcast_pn[5] = 0x00;
     }
 
     vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
@@ -4162,6 +4180,43 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
             VSF_TRACE_CFG_LINEEND, (unsigned)tx_len);
     }
 
+    /* Classify the frame before header-length / encryption decisions. */
+    uint8_t type    = fc0 & 0x0C;
+    bool    is_data = (type == 0x08);
+    bool    multicast = (tx_frame[16] & 0x01) != 0;
+
+    /* The MT76 firmware overrides the QoS Control Ack Policy of WIV=0
+     * broadcast/multicast frames, clearing the No Ack bit set by the netdrv.
+     * Software-encrypt multicast data locally so the frame is sent with
+     * WIV=1 and the original QoS Control (including No Ack) is preserved. */
+    if (is_data && multicast && !protected && wifi->wpa_hw_crypto) {
+        if (tx_frame == frame) {
+            if (tx_len > sizeof(frame_buf)) {
+                return VSF_ERR_NOT_ENOUGH_RESOURCES;
+            }
+            memcpy(frame_buf, tx_frame, tx_len);
+            tx_frame = frame_buf;
+        }
+        uint16_t enc_len = vsf_wifi_ccmp_encap_with_pn(wifi, tx_frame, tx_len,
+                (uint8_t *)tx_frame,
+                (uint16_t)(sizeof(frame_buf) - (tx_frame - frame_buf)),
+                priv->mcast_pn);
+        if (enc_len == 0) {
+            vsf_wifi_chip_mt76_trace_error(
+                "mt76: multicast software CCMP encap failed"
+                VSF_TRACE_CFG_LINEEND);
+            return VSF_ERR_FAIL;
+        }
+        tx_len = enc_len;
+        fc0 = tx_frame[0];
+        fc1 = tx_frame[1];
+        protected = true;
+        qos = ((fc0 >> 4) & 0x0F) == 8;
+        vsf_wifi_chip_mt76_trace_debug(
+            "mt76: multicast sw-CCMP encap tx_len=%u"
+            VSF_TRACE_CFG_LINEEND, (unsigned)tx_len);
+    }
+
     /* Compute the 802.11 header length so we can insert the L2 pad that
      * MT76 hardware expects when the header is not a multiple of 4 bytes.
      * The payload must start at a 4-byte aligned offset from the TXWI;
@@ -4176,29 +4231,28 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     if (qos)              hdrlen += 2;
     if ((fc1 & 0x80) != 0) hdrlen += 4;
 
-    /* Classify the frame before allocating the DMA buffer. */
-    uint8_t type    = fc0 & 0x0C;
-    bool    is_data = (type == 0x08);
-    bool    multicast = (tx_frame[16] & 0x01) != 0;
     /* Null Data frames (keepalive) must stay unencrypted: the AP needs to ACK
      * them at the PHY/MAC layer, and many APs do not decrypt/ACK an encrypted
-     * Null frame from a STA.  This matches the RT5572 reference path. */
-    bool hw_encrypt = wifi->wpa_hw_crypto && is_data && !is_eapol && !is_null;
+     * Null frame from a STA.  This matches the RT5572 reference path.
+     * Broadcast/multicast data is software-encrypted above, so it must not be
+     * routed through the hardware WCID key table. */
+    bool hw_encrypt = wifi->wpa_hw_crypto && is_data && !is_eapol && !is_null && !multicast;
     /* For hardware CCMP the firmware inserts the CCMP header/MIC from the
      * WCID_IV/key registers, so the host frame must be plaintext and WIV=0.
      * For software CCMP (and all non-data frames) WIV=1 keeps the firmware
      * from overwriting the IV already placed in the frame/TWI. */
 
-    /* For hardware-encrypted broadcast/multicast frames the firmware builds
-     * the CCMP AAD from only the QoS TID bits, while the AP verifies the
-     * standard AAD that includes the Ack Policy bits.  The netdrv sets Ack
-     * Policy = No Ack (byte0 = 0x20) for broadcasts, which produces an AAD
-     * mismatch; strip QoS so the AAD is unambiguous.
+    /* For hardware-encrypted data frames the firmware builds the CCMP AAD
+     * from only the QoS TID bits, while the AP verifies the standard AAD
+     * that includes the full QoS Control field (Ack Policy, etc.).  That
+     * mismatch makes the AP drop the frame even though it ACKs it at the
+     * PHY.  The working software-CCMP path uses plain Data frames, so strip
+     * QoS for all hardware-encrypted data frames; the firmware then computes
+     * the MIC over a QoS-free AAD that matches what the AP checks.
      * For software-encrypted frames the MIC is already computed over the
-     * original QoS header, so stripping it here would corrupt the AAD and
-     * make the AP drop the frame. */
-    bool     strip_qos    = multicast && qos && hw_encrypt;
-    uint16_t air_hdr_len  = hdrlen - (strip_qos ? 2U : 0U);
+     * original QoS header, so stripping it here would corrupt the AAD. */
+    bool     strip_qos    = hw_encrypt && qos;
+    uint16_t air_hdr_len  = strip_qos ? (hdrlen - 2) : hdrlen;
 
     uint16_t mpdu_len = tx_len - (hdrlen - air_hdr_len);
     uint8_t  hdr_pad  = (uint8_t)((-air_hdr_len) & 3U);
@@ -4260,15 +4314,12 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
              * so the firmware forwards the MPDU as-is.  This matches Linux
              * mt76x02_mac_write_txwi() when no hw_key is assigned. */
             wcid = 0xff;
-        } else if (multicast) {
-            /* Broadcast/multicast frames transmitted by a STA are encrypted
-             * with the GTK, not the pairwise key.  The GTK lives in the group
-             * WCID (254) programmed during M3.  Linux mt76x02 routes these
-             * frames through the VIF WCID so the firmware picks up the GTK
-             * and the correct key index for the CCMP header. */
-            wcid = MT_VIF_WCID(0);
         } else {
-            /* Unicast data to the AP uses the pairwise key in WCID 1. */
+            /* All data frames sent by a STA in an infrastructure BSS (unicast
+             * or broadcast/multicast DA) are protected with the PTK, key id 0.
+             * The GTK installed in the group WCID (254) is only used by the AP
+             * for AP->STA group RX; using it for STA->AP TX makes the AP drop
+             * the frame because it expects the PTK. */
             wcid = 1;
         }
     } else {
@@ -4281,15 +4332,19 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     }
     __mt76_put_le16(txwi + 0, 0);       /* flags */
     __mt76_put_le16(txwi + 2, rate);
-    /* ack_ctl: request ACK for unicast frames only.  Broadcast/multicast
-     * frames must not expect an ACK; otherwise the firmware keeps retrying
-     * and never reports TX done.  Do NOT use NSEQ: on this chip/driver combo
-     * the hardware leaves the sequence number at 0 for every frame, causing
-     * the AP to treat M2/M4 as duplicates.  We assign a software-managed seq. */
-    txwi[4] = multicast ? 0 : MT_TXWI_ACK_CTL_REQ;
+    /* ack_ctl: request ACK for unicast frames only.  Use host-managed
+     * sequence numbers for all data frames; the firmware's NSEQ=1 path
+     * resets the sequence counter on the first post-handshake data frame,
+     * producing duplicate-seq=0 frames that the AP decrypts but drops.
+     * EAPOL/keepalive already use host seq for the same reason. */
+    uint8_t ack_ctl = 0;
+    if (!multicast) {
+        ack_ctl |= MT_TXWI_ACK_CTL_REQ;
+    }
+    txwi[4] = ack_ctl;
     txwi[5] = wcid;                     /* wcid: 1=AP unicast, 254=bcast/mcast, ff=mgmt */
     __mt76_put_le16(txwi + 6, mpdu_len);/* len_ctl = real MPDU length */
-    txwi[16] = (uint8_t)(wifi->mlme_aid & 0xFFU);   /* AID low byte */
+    txwi[16] = 0;                       /* AID: Linux mt76x02 leaves this 0 */
     /* txstream: Linux mt76x02 uses the number of TX chains (chainmask low
      * nibble) and selects the stream encoding by PHY type:
      *   - E4+ and HT/VHT frames: 0x13
@@ -4313,20 +4368,21 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     }
     txwi[18] = 0;                       /* ctl2 (TX power adjustment) */
     /* pktid: non-zero pktid makes the hardware push a TX status entry
-     * for this frame; without it MT_TX_STAT_FIFO stays empty. */
-    txwi[19] = is_data ? 1 : 0;         /* pktid */
+     * for this frame.  The status FIFO read is currently disabled, so use
+     * pktid=0 for hardware-encrypted data frames to avoid the firmware
+     * possibly stalling on a repeated pktid.  EAPOL/mgmt keep pktid=1. */
+    txwi[19] = (hw_encrypt ? 0 : (is_data ? 1 : 0));
 
     uint8_t *dst = buf + 4 + txwi_len;
+    if (tx_len < hdrlen) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    memcpy(dst, tx_frame, air_hdr_len);
     if (hw_encrypt) {
-        if (tx_len < hdrlen) {
-            return VSF_ERR_INVALID_PARAMETER;
-        }
-        memcpy(dst, tx_frame, air_hdr_len);
-        /* Firmware-managed CCMP: mark the frame Protected and let the chip
-         * insert the IV/EIV from the WCID_IV registers. */
-        dst[1] |= 0x40U;                            /* Protected */
-    } else {
-        memcpy(dst, tx_frame, air_hdr_len);
+        /* Mark the frame Protected so the firmware knows to apply CCMP
+         * encryption using the WCID key/IV registers.  The MPDU payload is
+         * still plaintext at this point; the chip inserts the IV/EIV and MIC. */
+        dst[1] |= 0x40U;
     }
     if (strip_qos) {
         /* Convert QoS Data -> plain Data by clearing the subtype bits. */
@@ -4369,13 +4425,13 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
         __mt76_put_le16(dst + 2, 0x002CU);
     }
 
-    if (mpdu_len >= 24) {
+    if ((mpdu_len >= 24) && ((txwi[4] & MT_TXWI_ACK_CTL_NSEQ) == 0)) {
         __mt76_tx_seq++;
         __mt76_put_le16(dst + 22, (uint16_t)(__mt76_tx_seq << 4));
     }
     memset(buf + total - pad, 0, pad);
 
-    vsf_wifi_chip_mt76_trace_debug(
+    vsf_wifi_chip_mt76_trace_info(
         "mt76: tx frame fc=0x%02X%02X len=%u total=%u hdr_pad=%u wcid=%u rate=0x%04X hw_enc=%u"
         VSF_TRACE_CFG_LINEEND,
         fc1, fc0, (unsigned)mpdu_len, (unsigned)total, hdr_pad,

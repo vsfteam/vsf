@@ -232,5 +232,17 @@ struct vsf_wifi_t {
     vsf_wifi_radio_t               raw_radio;
 };
 
+#if VSF_WIFI_USE_WPA == ENABLED
+/* CCMP-encrypt a plaintext data MPDU using a caller-supplied 48-bit PN
+ * counter (little-endian, pn[0] = LSB).  If `pn` is NULL the function falls
+ * back to wifi->wpa_tx_pn.  Returns the encrypted MPDU length, or 0 on
+ * failure.  Used by chip drivers that need to software-encrypt specific
+ * frames (e.g. MT76 broadcast/multicast) while leaving unicast traffic to
+ * the hardware crypto backend. */
+extern uint16_t vsf_wifi_ccmp_encap_with_pn(vsf_wifi_t *wifi,
+        const uint8_t *frame, uint16_t len, uint8_t *out, uint16_t cap,
+        uint8_t pn[6]);
+#endif
+
 #endif // VSF_USE_WIFI
 #endif // __VSF_WIFI_PRIV_H__
