@@ -65,6 +65,7 @@ struct vsf_wifi_t {
 
     uint8_t  channel;
     bool     is_ready;
+    bool     bss_wmm;           /* current BSS supports WMM/QoS (set on assoc) */
     bool     disconnecting;     /* set in fini() to gate stale callbacks */
     uint8_t  mac[6];            /* populated by chip-driver EEPROM stage; */
                                 /* zero until firmware_load chain finishes */

@@ -137,6 +137,7 @@ typedef struct vsf_wifi_scan_result_t {
     int8_t   rssi;
     uint16_t capability;
     uint8_t  flags;
+    uint8_t  wmm;           /* 1 if the BSS advertises a WMM/WME IE          */
     /* Security parsed from the RSN IE (tag 48).  auth_mode == WIFI_AUTH_OPEN
      * means no RSN IE was present (open network / WEP).  Only WPA2-PSK is
      * recognised; pairwise/group are WIFI_CIPHER_xxx. */

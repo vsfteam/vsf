@@ -1472,6 +1472,7 @@ static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
     wifi->mlme_state = WIFI_MLME_IDLE;
     wifi->mlme_retry = 0;
     wifi->mlme_aid   = 0;
+    wifi->bss_wmm    = false;
 #if VSF_WIFI_USE_WPA == ENABLED
     wifi->wpa_ptk_valid = false;
 #endif
@@ -1615,6 +1616,11 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                             VSF_TRACE_CFG_LINEEND,
                             (unsigned)wifi->bss_max_idle_period);
                     break;
+                } else if ((tag == 221) && (len >= 7) &&
+                           (ie[2] == 0x00) && (ie[3] == 0x50) &&
+                           (ie[4] == 0xF2) && (ie[5] == 0x02)) {
+                    /* WMM IE in assoc-resp confirms the BSS is QoS capable. */
+                    wifi->bss_wmm = true;
                 }
                 ie += 2 + len;
                 remaining -= 2 + len;
@@ -1806,6 +1812,9 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
     wifi->mlme_aid      = 0;
     wifi->mlme_retry    = __VSF_WIFI_MLME_MAX_RETRY;
     wifi->mlme_state    = WIFI_MLME_AUTH;
+    /* Default to QoS Data until scan/assoc-resp prove otherwise.  Most modern
+     * APs support WMM; the fallback to plain Data is handled per-BSS below. */
+    wifi->bss_wmm       = true;
 
     /* drv->connect locks channel + BSSID + RX filter; its completion kicks
      * off the OPEN-system handshake (auth-req) in the bus EDA. */

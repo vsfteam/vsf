@@ -122,47 +122,46 @@ static uint16_t __wifi_dot11_to_eth(const uint8_t *frame, uint16_t len,
     return (uint16_t)(__WIFI_NETDRV_ETH_HDR_SIZE + payload_len);
 }
 
-/* Ethernet II -> 802.11 QoS Data (ToDS, to AP).  Returns the 802.11 frame
- * length written into `dot11` (capacity `dot11_cap`), or 0 on failure.
+/* Ethernet II -> 802.11 Data (ToDS, to AP).  Returns the 802.11 frame length
+ * written into `dot11` (capacity `dot11_cap`), or 0 on failure.
  *
- * VSF always advertises WMM/QoS in the association request, so the BSS is
- * treated as a QoS BSS.  In a QoS BSS, uplink data frames must use the QoS
- * Data subtype (0x88) with a 2-byte QoS Control field; plain Data frames are
- * not guaranteed to be accepted or routed to the correct AC by the AP.
+ * If `qos` is true the frame is built as QoS Data (subtype 0x88) with a 2-byte
+ * QoS Control field; otherwise it is built as plain Data (subtype 0x08).  The
+ * MT76 chip driver separately converts unprotected QoS Data EAPOL-Key frames
+ * to plain Data to work around a firmware Duration-field quirk, but that does
+ * not apply to normal post-handshake data frames.
  *
- * Note: this helper is generic and not chip-specific.  The MT76 chip driver
- * separately converts unprotected QoS Data EAPOL-Key frames to plain Data
- * to work around a firmware Duration-field quirk, but that does not apply
- * to normal post-handshake data frames. */
+ * Note: this helper is generic and not chip-specific. */
 static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
         const uint8_t *eth, uint16_t eth_len,
-        uint8_t *dot11, uint16_t dot11_cap)
+        uint8_t *dot11, uint16_t dot11_cap, bool qos)
 {
     if (eth_len < __WIFI_NETDRV_ETH_HDR_SIZE) {
         return 0;
     }
 
     uint16_t payload_len = (uint16_t)(eth_len - __WIFI_NETDRV_ETH_HDR_SIZE);
-    uint16_t total = (uint16_t)(26 + __WIFI_NETDRV_SNAP_SIZE + payload_len);
+    uint8_t  hdr_len     = qos ? 26 : 24;
+    uint16_t total       = (uint16_t)(hdr_len + __WIFI_NETDRV_SNAP_SIZE + payload_len);
     if (total > dot11_cap) {
         return 0;
     }
 
-    memset(dot11, 0, 26);
-    dot11[0] = 0x88;                                /* QoS Data             */
+    memset(dot11, 0, hdr_len);
+    dot11[0] = qos ? 0x88 : 0x08;                   /* QoS Data / Data      */
     dot11[1] = 0x01;                                /* ToDS                 */
     memcpy(&dot11[4],  bssid,    6);                /* addr1 = BSSID (RA)   */
     memcpy(&dot11[10], &eth[6],  6);                /* addr2 = SA  (TA)     */
     memcpy(&dot11[16], &eth[0],  6);                /* addr3 = DA           */
-    /* dot11[24..25] = QoS Control (TID 0) */
+    /* dot11[24..25] = QoS Control (TID 0), present only when qos == true */
 
-    uint8_t *llc = &dot11[26];
+    uint8_t *llc = &dot11[hdr_len];
     llc[0] = 0xAA; llc[1] = 0xAA; llc[2] = 0x03;
     llc[3] = 0x00; llc[4] = 0x00; llc[5] = 0x00;
     llc[6] = eth[12];                               /* ethertype hi         */
     llc[7] = eth[13];                               /* ethertype lo         */
 
-    memcpy(&dot11[26 + __WIFI_NETDRV_SNAP_SIZE],
+    memcpy(&dot11[hdr_len + __WIFI_NETDRV_SNAP_SIZE],
            &eth[__WIFI_NETDRV_ETH_HDR_SIZE], payload_len);
 
     return total;
@@ -315,8 +314,9 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
         }
     }
 
+    bool use_qos = wifi_netdrv->wifi->bss_wmm;
     uint16_t dot11_len = __wifi_eth_to_dot11(wifi_netdrv->bssid, eth, eth_len,
-            wifi_netdrv->tx_frame, sizeof(wifi_netdrv->tx_frame));
+            wifi_netdrv->tx_frame, sizeof(wifi_netdrv->tx_frame), use_qos);
     if (dot11_len > 0) {
         vsf_wifi_tx(wifi_netdrv->wifi, wifi_netdrv->tx_frame, dot11_len);
     }

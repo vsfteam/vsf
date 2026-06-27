@@ -3952,20 +3952,30 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                                 result.channel = ie[2];
                             } else if (tag == 48) {
                                 __mt76_parse_rsn(ie + 2, l, &result);
+                            } else if (tag == 221 && l >= 7 &&
+                                       ie[2] == 0x00 && ie[3] == 0x50 &&
+                                       ie[4] == 0xF2 && ie[5] == 0x02) {
+                                /* WMM Information/Parameter Element (OUI 00:50:F2,
+                                 * OUI type 2).  Both subtypes mean the BSS is QoS. */
+                                result.wmm = 1;
                             }
                             ie += 2 + l;
                         }
 
                         vsf_wifi_chip_mt76_trace_info(
                             "mt76: scan bssid=%02X:%02X:%02X:%02X:%02X:%02X "
-                            "ssid=%.*s ch=%u rssi=%d caps=0x%04X"
+                            "ssid=%.*s ch=%u rssi=%d caps=0x%04X wmm=%u"
                             VSF_TRACE_CFG_LINEEND,
                             bssid[0], bssid[1], bssid[2], bssid[3],
                             bssid[4], bssid[5],
                             result.ssid_len, result.ssid,
-                            result.channel, result.rssi, result.capability);
+                            result.channel, result.rssi, result.capability,
+                            (unsigned)result.wmm);
 
                         vsf_wifi_on_scan_result(wifi, &result);
+                        if (!memcmp(result.bssid, wifi->mlme_bssid, 6)) {
+                            wifi->bss_wmm = result.wmm != 0;
+                        }
                     } else {
                         vsf_wifi_chip_mt76_trace_info(
                             "mt76: scan body too short body_len=%u"
