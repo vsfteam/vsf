@@ -175,6 +175,15 @@
 #define MT_TX_STAT_FIFO_WCID_S              8
 #define MT_TX_STAT_FIFO_RATE_M              0xFFFF0000
 #define MT_TX_STAT_FIFO_RATE_S              16
+
+#define MT_TX_STAT_FIFO_EXT                 0x1798
+#define MT_TX_STAT_FIFO_EXT_RETRY_M         0x000000FF
+#define MT_TX_STAT_FIFO_EXT_RETRY_S         0
+#define MT_TX_STAT_FIFO_EXT_PKTID_M         0x0000FF00
+#define MT_TX_STAT_FIFO_EXT_PKTID_S         8
+
+#define MT76_PACKET_ID_HAS_RATE             0x80
+#define MT76_PKTID_RATE_M                   0x1F
 #define MT76_HT_FBK_TO_LEGACY               0x1384
 #define MT76_TX_PROT_CFG6                   0x13e0
 #define MT76_TX_PROT_CFG7                   0x13e4
@@ -216,8 +225,8 @@
 #define MT76_WCID_DROP(_n)                  (MT76_WCID_DROP_BASE + ((_n) >> 5) * 4)
 #define MT76_WCID_DROP_MASK(_n)             (1U << ((_n) % 32))
 
-#define MT76_WCID_TX_INFO_BASE              0xc000
-#define MT76_WCID_TX_INFO(_n)               (MT76_WCID_TX_INFO_BASE + ((_n) * 4))
+#define MT76_WCID_TX_INFO_BASE              0x1c00
+#define MT76_WCID_TX_INFO(_n)               (MT76_WCID_TX_INFO_BASE + ((_n) * 8))
 
 #define MT76_WCID_KEY_BASE                  0x8000
 #define MT76_WCID_KEY(_n)                   (MT76_WCID_KEY_BASE + (_n) * 32)
@@ -3554,11 +3563,16 @@ vsf_err_t __mt76_set_auth_mode(vsf_wifi_t *wifi,
     return VSF_ERR_NONE;
 }
 
+static void __mt76_rate_init(vsf_wifi_t *wifi);
+
 static void __mt76_connect_script_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     vsf_wifi_done_t done = priv->connect_done;
     priv->connect_done = NULL;
+    if (err == VSF_ERR_NONE) {
+        __mt76_rate_init(wifi);
+    }
     if (done != NULL) done(wifi, err);
 }
 
@@ -3781,9 +3795,34 @@ static void __mt76_parse_rsn(const uint8_t *body, uint8_t len,
     }
 }
 
+/* Extract the BSSID from a received 802.11 frame based on the FromDS/ToDS
+ * flags.  Returns NULL for WDS/invalid combinations where the BSSID is
+ * ambiguous.  Used to drop cross-BSS data frames before they reach the
+ * netdrv, since we do not have mac80211's upper-layer BSSID filtering. */
+static const uint8_t *__mt76_get_bssid(const uint8_t *dot11)
+{
+    uint8_t fc1 = dot11[1];
+    bool to_ds   = (fc1 & 0x01) != 0;
+    bool from_ds = (fc1 & 0x02) != 0;
+
+    if (!to_ds && from_ds) {
+        /* AP -> STA: addr2 = BSSID */
+        return dot11 + 10;
+    } else if (to_ds && !from_ds) {
+        /* STA -> AP: addr1 = BSSID */
+        return dot11 + 4;
+    } else if (!to_ds && !from_ds) {
+        /* IBSS / mesh: addr3 = BSSID */
+        return dot11 + 16;
+    }
+    /* WDS (ToDS=1, FromDS=1): BSSID ambiguous */
+    return NULL;
+}
+
 void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     uint16_t pos = 0;
+    static const uint8_t zero_bssid[6] = {0};
 
     while (pos + MT_DMA_HDR_LEN <= len) {
         uint16_t dma_len = (uint16_t)frame[pos] |
@@ -3837,11 +3876,17 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                 }
             }
 
-            /* If the hardware decrypted the frame (MT_RXINFO_DECRYPT), the CCMP
-             * header has already been stripped and the remaining length is
-             * reduced by PN_LEN*4 bytes.  Tell the upper layer the frame is
-             * plaintext by clearing the Protected bit so software CCMP decap
-             * is skipped. */
+            /* If the hardware decrypted the frame (MT_RXINFO_DECRYPT), the
+             * firmware verified the MIC and left the CCMP header in the buffer.
+             * Remove the CCMP header from the payload and the MIC from the tail
+             * so the upper layer sees a normal plaintext 802.11 data frame
+             * (LLC/SNAP directly after the MAC header).  Then clear Protected so
+             * software CCMP decap is skipped.
+             *
+             * CCMP overhead = 8-byte header + 8-byte MIC; PN_LEN*4 is the header
+             * length.  frame_len currently has the header already subtracted, so
+             * shifting the payload left by that amount and subtracting it once
+             * more yields the clean plaintext length. */
             vsf_wifi_chip_mt76_trace_debug(
                 "mt76: rxinfo=0x%08X ctl=0x%08X wcid=%u key_idx=%u bss_idx=%u"
                 VSF_TRACE_CFG_LINEEND,
@@ -3851,11 +3896,23 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                 (unsigned)((ctl >> 10) & 0x07U));
             if (rxinfo & MT_RXINFO_DECRYPT) {
                 uint8_t pn_len = (uint8_t)((rxinfo & MT_RXINFO_PN_LEN) >> 19);
-                if (pn_len != 0) {
-                    uint16_t strip = (uint16_t)(pn_len * 4);
-                    if (frame_len >= strip) {
-                        frame_len -= strip;
+                uint16_t strip = (uint16_t)(pn_len * 4);
+                uint16_t air_hdr_len = 24;
+                if ((dot11[0] & 0x0C) == 0x08) {
+                    uint8_t subtype = (dot11[0] >> 4) & 0x0F;
+                    if (subtype & 0x08) {
+                        air_hdr_len += 2;
                     }
+                }
+                if ((dot11[1] & 0x03) == 0x03) {
+                    air_hdr_len += 6;
+                }
+                if ((strip != 0)
+                        && (frame_len >= air_hdr_len + strip + strip)) {
+                    memmove(dot11 + air_hdr_len,
+                            dot11 + air_hdr_len + strip,
+                            frame_len - air_hdr_len - strip);
+                    frame_len -= strip;
                 }
                 dot11[1] &= ~0x40U;
             }
@@ -3929,7 +3986,25 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                 if (!wifi->scanning &&
                     ((wifi->mlme_state == WIFI_MLME_4WAY) ||
                      (wifi->mlme_state == WIFI_MLME_RUN))) {
-                    vsf_wifi_data_rx(wifi, dot11, frame_len);
+                    /* Drop cross-BSS data frames.  The hardware RX filter
+                     * accepts beacons/probes from any BSS for scanning; data
+                     * frames, however, must match our BSSID once associated.
+                     * This prevents neighbor-AP broadcast/ multicast frames
+                     * from being decrypted with the wrong GTK and generating
+                     * garbage ethertypes. */
+                    const uint8_t *bssid = __mt76_get_bssid(dot11);
+                    if ((bssid != NULL) &&
+                        (memcmp(bssid, zero_bssid, 6) != 0) &&
+                        (memcmp(bssid, wifi->mlme_bssid, 6) != 0)) {
+                        vsf_wifi_chip_mt76_trace_debug(
+                            "mt76: drop data frame from other BSS "
+                            "bssid=%02X:%02X:%02X:%02X:%02X:%02X"
+                            VSF_TRACE_CFG_LINEEND,
+                            bssid[0], bssid[1], bssid[2],
+                            bssid[3], bssid[4], bssid[5]);
+                    } else {
+                        vsf_wifi_data_rx(wifi, dot11, frame_len);
+                    }
                 }
             }
         }
@@ -3940,40 +4015,206 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 }
 
 /*============================================================================
- * TX status FIFO polling (debug): after each data frame read MT_TX_STAT_FIFO
- * once to see whether the AP ACKed it.  This is a one-shot delayed read so it
- * does not block the caller.
+ * Minimal rate control for MT76x02 STA mode.
+ *
+ * We keep a small table of 2.4 GHz 20 MHz rates (CCK / OFDM / HT-MCS) and
+ * adapt the WCID 1 TX info after each unicast TX status.  The algorithm is
+ * intentionally simple: step up after a few consecutive ACKs, step down
+ * immediately on a failed frame.
  *===========================================================================*/
-#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
-static void __mt76_txstat_read_done(vsf_wifi_t *wifi, vsf_err_t err)
+
+#define MT76_RATE_UP_THRESHOLD      3
+
+/* Rate values are in TXWI "rate" field format:
+ *   bits [5:0]  = rate index
+ *   bits [15:13]= PHY type (CCK=0, OFDM=1, HT=2)
+ */
+static const uint16_t __mt76_rate_table[] = {
+    /* CCK */
+    0x0000, /*  1 Mbps */
+    0x0001, /*  2 Mbps */
+    0x0002, /*  5.5 Mbps */
+    0x0003, /* 11 Mbps */
+    /* OFDM */
+    0x2000, /*  6 Mbps */
+    0x2001, /*  9 Mbps */
+    0x2002, /* 12 Mbps */
+    0x2003, /* 18 Mbps */
+    0x2004, /* 24 Mbps */
+    0x2005, /* 36 Mbps */
+    0x2006, /* 48 Mbps */
+    0x2007, /* 54 Mbps */
+    /* HT 20 MHz long GI */
+    0x4000, /* MCS 0  (6.5 Mbps) */
+    0x4001, /* MCS 1  (13 Mbps) */
+    0x4002, /* MCS 2  (19.5 Mbps) */
+    0x4003, /* MCS 3  (26 Mbps) */
+    0x4004, /* MCS 4  (39 Mbps) */
+    0x4005, /* MCS 5  (52 Mbps) */
+    0x4006, /* MCS 6  (58.5 Mbps) */
+    0x4007, /* MCS 7  (65 Mbps) */
+    0x4008, /* MCS 8  (13 Mbps, 2SS) */
+    0x4009, /* MCS 9  (26 Mbps, 2SS) */
+    0x400A, /* MCS 10 (39 Mbps, 2SS) */
+    0x400B, /* MCS 11 (52 Mbps, 2SS) */
+    0x400C, /* MCS 12 (78 Mbps, 2SS) */
+    0x400D, /* MCS 13 (104 Mbps, 2SS) */
+    0x400E, /* MCS 14 (117 Mbps, 2SS) */
+    0x400F, /* MCS 15 (130 Mbps, 2SS) */
+};
+
+#define MT76_RATE_TABLE_MIN         0   /* CCK 1 Mbps */
+#define MT76_RATE_TABLE_MAX         (dimof(__mt76_rate_table) - 1)
+#define MT76_RATE_TABLE_INIT        0   /* CCK 1 Mbps */
+
+static uint8_t __mt76_rate_to_nss(uint16_t rateval)
+{
+    uint8_t phy = (uint8_t)((rateval & MT_RXWI_RATE_PHY_MASK) >> 13);
+    if (phy == MT_PHY_TYPE_HT) {
+        uint8_t idx = (uint8_t)(rateval & MT_RXWI_RATE_INDEX_MASK);
+        return 1 + (idx >> 3);
+    }
+    return 1;
+}
+
+static void __mt76_wcid_set_rate(vsf_wifi_t *wifi, uint8_t wcid,
+                                 uint16_t rateval)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
-    if (err != VSF_ERR_NONE) {
-        vsf_wifi_chip_mt76_trace_info(
-            "mt76: txstat read failed err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    uint32_t tx_info = MT_WCID_TX_INFO_SET
+                     | ((uint32_t)__mt76_rate_to_nss(rateval) << MT_WCID_TX_INFO_NSS_SHIFT)
+                     | (uint32_t)rateval;
+
+    priv->tx_rate_val = rateval;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: rate set wcid=%u idx=%u val=0x%04X tx_info=0x%08X"
+        VSF_TRACE_CFG_LINEEND,
+        (unsigned)wcid, (unsigned)priv->tx_rate_idx,
+        (unsigned)rateval, (unsigned)tx_info);
+    __mt76_cfg_write(wifi, MT76_WCID_TX_INFO(wcid), tx_info, NULL);
+}
+
+static void __mt76_rate_init(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    priv->tx_rate_idx = MT76_RATE_TABLE_INIT;
+    priv->tx_rate_success_cnt = 0;
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: rate init" VSF_TRACE_CFG_LINEEND);
+    __mt76_wcid_set_rate(wifi, 1, __mt76_rate_table[priv->tx_rate_idx]);
+}
+
+static void __mt76_rate_update(vsf_wifi_t *wifi, bool success,
+                               bool ack_req, uint8_t wcid,
+                               uint8_t pktid, uint16_t rate)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    /* Only adapt on unicast data frames whose pktid encodes the rate we
+     * requested.  Stale connect-handshake entries (pktid without HAS_RATE)
+     * and non-unicast frames (ack_req=0) must not affect the rate table.
+     * Note: software-CCMP unicast data uses TXWI wcid=0xff, so the rate
+     * adaptation must not require wcid==1. */
+    if (!ack_req || !(pktid & MT76_PACKET_ID_HAS_RATE)) {
         return;
     }
+
+    /* Reconstruct the rate from the status the same way Linux does and
+     * ignore status entries that do not correspond to our current rate. */
+    uint16_t recon = (rate & ~MT76_PKTID_RATE_M) | (pktid & MT76_PKTID_RATE_M);
+    if (recon != priv->tx_rate_val) {
+        return;
+    }
+
+    if (success) {
+        priv->tx_rate_success_cnt++;
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: rate update success cnt=%u idx=%u"
+            VSF_TRACE_CFG_LINEEND,
+            (unsigned)priv->tx_rate_success_cnt, (unsigned)priv->tx_rate_idx);
+        if (priv->tx_rate_success_cnt >= MT76_RATE_UP_THRESHOLD) {
+            if (priv->tx_rate_idx < MT76_RATE_TABLE_MAX) {
+                priv->tx_rate_idx++;
+                __mt76_wcid_set_rate(wifi, 1,
+                                     __mt76_rate_table[priv->tx_rate_idx]);
+            }
+            priv->tx_rate_success_cnt = 0;
+        }
+    } else {
+        priv->tx_rate_success_cnt = 0;
+        if (priv->tx_rate_idx > MT76_RATE_TABLE_MIN) {
+            priv->tx_rate_idx--;
+            __mt76_wcid_set_rate(wifi, 1,
+                                 __mt76_rate_table[priv->tx_rate_idx]);
+        }
+    }
+}
+
+/*============================================================================
+ * TX status FIFO polling: after each data frame read MT_TX_STAT_FIFO_EXT then
+ * MT_TX_STAT_FIFO to obtain the pktid and reconstruct the actual TX rate.
+ * This is a one-shot delayed read so it does not block the caller.
+ *===========================================================================*/
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+static void __mt76_txstat_process(vsf_wifi_t *wifi)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     uint32_t v = priv->txstat_val;
+    uint32_t ext = priv->txstat_ext_val;
+
     if (!(v & MT_TX_STAT_FIFO_VALID)) {
         vsf_wifi_chip_mt76_trace_info(
             "mt76: txstat FIFO empty" VSF_TRACE_CFG_LINEEND);
         return;
     }
+
+    bool success = !!(v & MT_TX_STAT_FIFO_SUCCESS);
+    bool ack_req = !!(v & MT_TX_STAT_FIFO_ACKREQ);
+    uint8_t wcid = (uint8_t)((v & MT_TX_STAT_FIFO_WCID_M) >> MT_TX_STAT_FIFO_WCID_S);
+    uint16_t rate = (uint16_t)((v & MT_TX_STAT_FIFO_RATE_M) >> MT_TX_STAT_FIFO_RATE_S);
+    uint8_t pktid = (uint8_t)((ext & MT_TX_STAT_FIFO_EXT_PKTID_M) >> MT_TX_STAT_FIFO_EXT_PKTID_S);
+    uint8_t retry = (uint8_t)((ext & MT_TX_STAT_FIFO_EXT_RETRY_M) >> MT_TX_STAT_FIFO_EXT_RETRY_S);
+
+    if (pktid & MT76_PACKET_ID_HAS_RATE) {
+        rate = (rate & ~MT76_PKTID_RATE_M) | (pktid & MT76_PKTID_RATE_M);
+    }
+
     vsf_wifi_chip_mt76_trace_info(
-        "mt76: txstat success=%u ack_req=%u wcid=%u rate=0x%04X raw=0x%08X"
+        "mt76: txstat success=%u ack_req=%u wcid=%u rate=0x%04X pktid=0x%02X retry=%u"
         VSF_TRACE_CFG_LINEEND,
-        !!(v & MT_TX_STAT_FIFO_SUCCESS),
-        !!(v & MT_TX_STAT_FIFO_ACKREQ),
-        (unsigned)((v & MT_TX_STAT_FIFO_WCID_M) >> MT_TX_STAT_FIFO_WCID_S),
-        (unsigned)((v & MT_TX_STAT_FIFO_RATE_M) >> MT_TX_STAT_FIFO_RATE_S),
-        (unsigned)v);
+        (unsigned)success, (unsigned)ack_req, (unsigned)wcid,
+        (unsigned)rate, (unsigned)pktid, (unsigned)retry);
+
+    __mt76_rate_update(wifi, success, ack_req, wcid, pktid, rate);
+}
+
+static void __mt76_txstat_fifo_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: txstat FIFO read failed err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+        return;
+    }
+    __mt76_txstat_process(wifi);
+}
+
+static void __mt76_txstat_ext_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_chip_mt76_trace_info(
+            "mt76: txstat EXT read failed err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+        return;
+    }
+    __mt76_cfg_read(priv->wifi, MT_TX_STAT_FIFO, &priv->txstat_val,
+                    __mt76_txstat_fifo_done);
 }
 
 static void __mt76_txstat_timer(vsf_callback_timer_t *timer)
 {
     mt76_wifi_priv_t *priv = vsf_container_of(timer, mt76_wifi_priv_t, txstat_timer);
-    __mt76_cfg_read(priv->wifi, MT_TX_STAT_FIFO, &priv->txstat_val,
-                    __mt76_txstat_read_done);
+    __mt76_cfg_read(priv->wifi, MT_TX_STAT_FIFO_EXT, &priv->txstat_ext_val,
+                    __mt76_txstat_ext_done);
 }
 
 static void __mt76_txstat_poll(vsf_wifi_t *wifi)
@@ -4107,7 +4348,7 @@ static vsf_err_t __mt76_crypto_install_key(vsf_wifi_t *wifi,
     priv->crypto_done = done;
     vsf_wifi_chip_mt76_trace_info(
         "mt76: install_key pairwise=%d key_idx=%u wcid=%u n=%u"
-        VSF_TRACE_CFG_LINEEND,
+            VSF_TRACE_CFG_LINEEND,
         (int)pairwise, (unsigned)key_idx, (unsigned)wcid, (unsigned)n);
 
     vsf_err_t err = vsf_wifi_reg_run_script(wifi, ops, n,
@@ -4325,11 +4566,12 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     } else {
         wcid = 0xff;
     }
-    /* Post-handshake unicast data frames are sent at OFDM 6 Mbps.  Broadcast
-     * /multicast data and EAPOL-Key frames use CCK 1 Mbps for robust delivery. */
+    /* Post-handshake unicast data frames use the rate-control selected rate.
+     * Broadcast/multicast data and EAPOL-Key frames use CCK 1 Mbps. */
     if (is_data && !is_eapol && !multicast) {
-        rate = 0x2000U;                     /* OFDM 6 Mbps */
+        rate = priv->tx_rate_val;
     }
+
     __mt76_put_le16(txwi + 0, 0);       /* flags */
     __mt76_put_le16(txwi + 2, rate);
     /* ack_ctl: request ACK for unicast frames only.  Use host-managed
@@ -4367,11 +4609,20 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
         }
     }
     txwi[18] = 0;                       /* ctl2 (TX power adjustment) */
-    /* pktid: non-zero pktid makes the hardware push a TX status entry
-     * for this frame.  The status FIFO read is currently disabled, so use
-     * pktid=0 for hardware-encrypted data frames to avoid the firmware
-     * possibly stalling on a repeated pktid.  EAPOL/mgmt keep pktid=1. */
-    txwi[19] = (hw_encrypt ? 0 : (is_data ? 1 : 0));
+    /* pktid: controls whether the hardware pushes a TX status entry and
+     * what it carries.  Unicast data frames encode the lower bits of the
+     * TXWI rate so the status FIFO reports the actual transmitted rate;
+     * EAPOL-Key frames use pktid=1 to get an ACK status entry; broadcast/
+     * multicast and management frames leave pktid=0. */
+    uint8_t pktid = 0;
+    if (is_data && !multicast) {
+        if (!is_eapol) {
+            pktid = MT76_PACKET_ID_HAS_RATE | (rate & MT76_PKTID_RATE_M);
+        } else {
+            pktid = 1;
+        }
+    }
+    txwi[19] = pktid;
 
     uint8_t *dst = buf + 4 + txwi_len;
     if (tx_len < hdrlen) {
@@ -4432,17 +4683,15 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     memset(buf + total - pad, 0, pad);
 
     vsf_wifi_chip_mt76_trace_info(
-        "mt76: tx frame fc=0x%02X%02X len=%u total=%u hdr_pad=%u wcid=%u rate=0x%04X hw_enc=%u"
+        "mt76: tx frame fc=0x%02X%02X len=%u total=%u hdr_pad=%u wcid=%u rate=0x%04X pktid=0x%02X hw_enc=%u"
         VSF_TRACE_CFG_LINEEND,
         fc1, fc0, (unsigned)mpdu_len, (unsigned)total, hdr_pad,
-        (unsigned)wcid, (unsigned)rate, (unsigned)hw_encrypt);
+        (unsigned)wcid, (unsigned)rate, (unsigned)pktid, (unsigned)hw_encrypt);
 
     vsf_err_t err = __mt76_tx_frame(wifi, buf, total, MT76_TX_QUEUE_MGMT, NULL);
     if ((err == VSF_ERR_NONE) && (type == 0x08)) {
-        /* Temporarily disabled: txstat polling uses EP0 reg_read and collides
-         * with other cfg_read calls after link-up, triggering an assertion.
-         * Re-enable once EP0 accesses are properly serialized. */
-        // __mt76_txstat_poll(wifi);
+        /* Poll TX status FIFO once after each data frame to verify ACK/rate. */
+        __mt76_txstat_poll(wifi);
     }
     return err;
 }

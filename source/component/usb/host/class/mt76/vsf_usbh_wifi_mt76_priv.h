@@ -63,6 +63,35 @@ typedef enum {
     MT76_EP0_FCE_HI,
 } vk_usbh_wifi_mt76_ep0_state_t;
 
+typedef enum {
+    MT76_EP0_REQ_READ,
+    MT76_EP0_REQ_WRITE,
+    MT76_EP0_REQ_FCE_WRITE,
+    MT76_EP0_REQ_DEV_CMD,
+    MT76_EP0_REQ_DEV_CLASS_CMD,
+} vk_usbh_wifi_mt76_ep0_req_type_t;
+
+#define MT76_EP0_CLASS_DATA_SIZE    64
+#define MT76_EP0_QUEUE_SIZE         8
+
+typedef struct vk_usbh_wifi_mt76_ep0_req_t {
+    vk_usbh_wifi_mt76_ep0_req_type_t type;
+    struct usb_ctrlrequest_t    req;
+    uint32_t                    fce_addr;
+    uint32_t                    fce_val;
+    void                        *buf;       /* caller buffer for IN/OUT data */
+    uint8_t                     class_data[MT76_EP0_CLASS_DATA_SIZE];
+    uint16_t                    class_len;
+    vsf_wifi_done_t             done;
+} vk_usbh_wifi_mt76_ep0_req_t;
+
+typedef struct vk_usbh_wifi_mt76_ep0_queue_t {
+    vk_usbh_wifi_mt76_ep0_req_t reqs[MT76_EP0_QUEUE_SIZE];
+    uint8_t                     head;
+    uint8_t                     tail;
+    uint8_t                     count;
+} vk_usbh_wifi_mt76_ep0_queue_t;
+
 typedef struct vk_usbh_wifi_mt76_ep_t {
     uint8_t                     addr;
     struct usb_endpoint_desc_t *desc;
@@ -91,10 +120,15 @@ typedef struct vk_usbh_wifi_mt76_t {
     /* chip driver private data follows wifi */
     mt76_wifi_priv_t            mt76_priv;
 
-    /* ep0 control-transfer state */
+    /* ep0 control-transfer state.  All EP0 requests go through ep0_queue;
+     * only one request is in flight at a time, and the dispatcher starts the
+     * next one after the current completes.  This removes the old requirement
+     * that callers wait for ep0_state == IDLE before submitting. */
     vk_usbh_wifi_mt76_ep0_state_t ep0_state;
     vsf_wifi_done_t             ep0_done;
-    bool                        ep0_pending;
+    bool                        ep0_busy;
+    bool                        ep0_crit_pend;  /* waiting for ep0.crit */
+    vk_usbh_wifi_mt76_ep0_queue_t ep0_queue;
     struct usb_ctrlrequest_t    ep0_req;
     void                        *ep0_buf;   /* caller buffer for IN/OUT data */
     uint32_t                    ep0_fce_addr;

@@ -225,7 +225,14 @@ typedef struct mt76_wifi_priv {
     /* one-shot TX status poll for debugging handshake ACK failures */
     vsf_callback_timer_t    txstat_timer;
     uint32_t                txstat_val;
+    uint32_t                txstat_ext_val;
 #endif
+
+    /* Rate control state: index into __mt76_rate_table, consecutive ACK
+     * counter, and the rate value last programmed into WCID 1 TX info. */
+    uint8_t                 tx_rate_idx;
+    uint8_t                 tx_rate_success_cnt;
+    uint16_t                tx_rate_val;
 
     /* buffers */
     uint8_t                 rx_buf[MT76_RX_URB_SIZE];

@@ -124,11 +124,16 @@ static uint16_t __wifi_dot11_to_eth(const uint8_t *frame, uint16_t len,
 
 /* Ethernet II -> 802.11 QoS Data (ToDS, to AP).  Returns the 802.11 frame
  * length written into `dot11` (capacity `dot11_cap`), or 0 on failure.
- * Linux/mac80211 sends normal data as QoS Data; using the same subtype lets
- * the AP classify the frame onto the correct AC and avoids drops caused by
- * plain Data frames after a QoS association.  The MT76 MAC previously corrupted
- * the Duration of *unprotected* QoS Data EAPOL frames, but protected QoS Data
- * keeps the CCMP header intact, so this path is safe for post-handshake data. */
+ *
+ * VSF always advertises WMM/QoS in the association request, so the BSS is
+ * treated as a QoS BSS.  In a QoS BSS, uplink data frames must use the QoS
+ * Data subtype (0x88) with a 2-byte QoS Control field; plain Data frames are
+ * not guaranteed to be accepted or routed to the correct AC by the AP.
+ *
+ * Note: this helper is generic and not chip-specific.  The MT76 chip driver
+ * separately converts unprotected QoS Data EAPOL-Key frames to plain Data
+ * to work around a firmware Duration-field quirk, but that does not apply
+ * to normal post-handshake data frames. */
 static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
         const uint8_t *eth, uint16_t eth_len,
         uint8_t *dot11, uint16_t dot11_cap)
@@ -149,10 +154,7 @@ static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
     memcpy(&dot11[4],  bssid,    6);                /* addr1 = BSSID (RA)   */
     memcpy(&dot11[10], &eth[6],  6);                /* addr2 = SA  (TA)     */
     memcpy(&dot11[16], &eth[0],  6);                /* addr3 = DA           */
-    /* QoS Control: AC_BE (TID 0).  Group-addressed frames must set the
-     * Ack Policy to "No Ack" (bits 5:6 = 01); otherwise the AP is asked to
-     * ACK a broadcast/multicast and typically drops the frame. */
-    dot11[24] = (eth[0] & 0x01) ? 0x20 : 0x00;      /* QoS Control          */
+    /* dot11[24..25] = QoS Control (TID 0) */
 
     uint8_t *llc = &dot11[26];
     llc[0] = 0xAA; llc[1] = 0xAA; llc[2] = 0x03;
