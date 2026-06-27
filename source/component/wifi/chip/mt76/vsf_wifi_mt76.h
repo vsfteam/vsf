@@ -234,6 +234,10 @@ typedef struct mt76_wifi_priv {
     uint8_t                 tx_rate_success_cnt;
     uint16_t                tx_rate_val;
 
+    /* Last received RSSI (from rxwi[12], i.e. rssi[0]).  -128 means "not
+     * received yet"; updated for every successfully parsed MPDU. */
+    int8_t                  last_rssi;
+
     /* buffers */
     uint8_t                 rx_buf[MT76_RX_URB_SIZE];
     uint8_t                 tx_buf[MT76_TX_URB_SIZE];

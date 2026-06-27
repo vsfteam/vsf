@@ -800,11 +800,14 @@ static vsf_err_t __mt76_mcu_msg_send(vsf_wifi_t *wifi, uint8_t cmd,
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 
-    uint8_t seq = ++priv->mcu_seq;
-    if (seq == 0) {
-        seq = ++priv->mcu_seq;
+    /* MCU command sequence number is 4-bit (firmware echoes it in the
+     * CMD_RESP endpoint).  Cycle 1..15 and never use 0, matching Linux
+     * mt76x02u behaviour. */
+    uint8_t seq = priv->mcu_seq + 1;
+    if (seq > 15) {
+        seq = 1;
     }
-    seq &= 0x0F;
+    priv->mcu_seq = seq;
 
     if (wait_resp) {
         priv->mcu_wait_resp = true;
@@ -2490,6 +2493,7 @@ vsf_err_t __mt76_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     priv->pending_done = done;
     priv->state        = MT76_STATE_INIT_READ_ASIC;
+    priv->last_rssi    = (int8_t)-128;
     /* Install RX handlers early so that MCU command responses received
      * during the init sequence (e.g. LOAD_CR) are routed to the chip
      * driver instead of being dropped. */
@@ -3734,9 +3738,27 @@ vsf_err_t __mt76_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 
 vsf_err_t __mt76_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)
 {
-    (void)info;
-    /* TODO: read RSSI/rate */
-    return VSF_ERR_NOT_SUPPORT;
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    memset(info, 0, sizeof(*info));
+    memcpy(info->bssid, wifi->mlme_bssid, 6);
+    info->channel = wifi->mlme_channel;
+    if (wifi->mlme_state == WIFI_MLME_RUN) {
+        info->flags |= WIFI_LINK_FLAG_CONNECTED;
+#if VSF_WIFI_USE_WPA == ENABLED
+        if (wifi->wpa_ptk_valid) {
+            info->flags |= WIFI_LINK_FLAG_AUTHORIZED;
+        }
+#endif
+    }
+    /* TX rate is the value last programmed by the rate-control loop.
+     * RX rate is not directly available in STA mode without parsing every
+     * incoming frame's RXWI; mirror TX rate as a conservative estimate. */
+    info->tx_rate = priv->tx_rate_val;
+    info->rx_rate = priv->tx_rate_val;
+    info->rssi    = priv->last_rssi;
+
+    return VSF_ERR_NONE;
 }
 
 /* Map RSN cipher suite type (IEEE 802.11-2012 Table 8-101) to VSF cipher. */
@@ -3821,6 +3843,7 @@ static const uint8_t *__mt76_get_bssid(const uint8_t *dot11)
 
 void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     uint16_t pos = 0;
     static const uint8_t zero_bssid[6] = {0};
 
@@ -3916,6 +3939,10 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                 }
                 dot11[1] &= ~0x40U;
             }
+
+            /* Record the RSSI of the most recently received MPDU.  The RXWI
+             * places rssi[0] at byte 12 for both management and data frames. */
+            priv->last_rssi = (int8_t)rxwi[12];
 
             uint8_t type = dot11[0] & 0x0C;
             if (type == 0x00) {                       /* management type */
