@@ -204,11 +204,16 @@ typedef struct mt76_wifi_priv {
     /* set_channel context */
     uint8_t                 set_channel_channel;
     uint8_t                 set_channel_scan;
+    uint8_t                 set_channel_bw;        /* WIFI_BW_xxx hint      */
     uint8_t                 set_channel_bw_index;
+    uint8_t                 set_channel_ch_group;
+    bool                    set_channel_is_5g;
     uint8_t                 set_channel_state;    /* top-level state */
     uint8_t                 set_channel_substate; /* mac_stop sub-state */
+    uint8_t                 set_channel_bbp_substate; /* BBP bw sub-state  */
     uint32_t                set_channel_saved_rts;
     vsf_wifi_done_t         set_channel_done;     /* original caller callback */
+    uint8_t                 last_channel;         /* last tuned channel */
 
     /* connect context */
     vsf_wifi_done_t         connect_done;

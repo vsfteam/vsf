@@ -53,6 +53,9 @@ static void __vsf_wifi_mlme_send_auth (vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason);
 static void __vsf_wifi_mlme_finish    (vsf_wifi_t *wifi, uint8_t reason);
+static void __vsf_wifi_retry_key_install(vsf_wifi_t *wifi);
+static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err);
+static void __vsf_wifi_handshake_gtk_done(vsf_wifi_t *wifi, vsf_err_t err);
 
 /* Active scan: probe each channel during its dwell window so that silent /
  * hidden APs answer with a probe-response.  Set to DISABLED for pure passive
@@ -313,6 +316,9 @@ static void __vsf_wifi_script_finish(vsf_wifi_t *wifi, vsf_err_t err)
     if (done != NULL) {
         done(wifi, err);
     }
+    /* If the 4-way handshake is waiting for the script bus to become free,
+     * let it retry now that the previous script has completed. */
+    __vsf_wifi_retry_key_install(wifi);
 }
 
 static void __vsf_wifi_script_step(vsf_wifi_t *wifi, vsf_err_t err)
@@ -1349,22 +1355,33 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         i += wifi->mlme_ssid_len;
     }
 
-    /* Supported Rates IE: 1/2/5.5/11/9/18/36/54 Mbps. */
-    static const uint8_t __supp_rates_ie[] = {
-        0x01, 0x08,
-        0x82, 0x84, 0x8B, 0x96,
-        0x12, 0x24, 0x48, 0x6C,
-    };
-    memcpy(&frame[i], __supp_rates_ie, sizeof(__supp_rates_ie));
-    i += sizeof(__supp_rates_ie);
+    /* Supported Rates IE.  5 GHz does not support CCK, so use only OFDM
+     * rates; 2.4 GHz mirrors the Windows Ralink capture. */
+    if (wifi->mlme_channel > 14) {
+        static const uint8_t __supp_rates_5g_ie[] = {
+            0x01, 0x08,
+            0x0C, 0x12, 0x18, 0x24,
+            0x30, 0x48, 0x60, 0x6C,
+        };
+        memcpy(&frame[i], __supp_rates_5g_ie, sizeof(__supp_rates_5g_ie));
+        i += sizeof(__supp_rates_5g_ie);
+    } else {
+        static const uint8_t __supp_rates_ie[] = {
+            0x01, 0x08,
+            0x82, 0x84, 0x8B, 0x96,
+            0x12, 0x24, 0x48, 0x6C,
+        };
+        memcpy(&frame[i], __supp_rates_ie, sizeof(__supp_rates_ie));
+        i += sizeof(__supp_rates_ie);
 
-    /* Extended Supported Rates IE: 6/12/24/48 Mbps. */
-    static const uint8_t __ext_rates_ie[] = {
-        0x32, 0x04,
-        0x0C, 0x18, 0x30, 0x60,
-    };
-    memcpy(&frame[i], __ext_rates_ie, sizeof(__ext_rates_ie));
-    i += sizeof(__ext_rates_ie);
+        /* Extended Supported Rates IE: 6/12/24/48 Mbps. */
+        static const uint8_t __ext_rates_ie[] = {
+            0x32, 0x04,
+            0x0C, 0x18, 0x30, 0x60,
+        };
+        memcpy(&frame[i], __ext_rates_ie, sizeof(__ext_rates_ie));
+        i += sizeof(__ext_rates_ie);
+    }
 
     /* HT Capabilities IE (tag 45) - exact Windows values. */
     static const uint8_t __ht_cap_ie[] = {
@@ -1473,6 +1490,8 @@ static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
     wifi->mlme_retry = 0;
     wifi->mlme_aid   = 0;
     wifi->bss_wmm    = false;
+    wifi->key_install.ptk_pending = false;
+    wifi->key_install.gtk_pending = false;
 #if VSF_WIFI_USE_WPA == ENABLED
     wifi->wpa_ptk_valid = false;
 #endif
@@ -1713,6 +1732,14 @@ void vsf_wifi_set_channel(vsf_wifi_t *wifi, uint8_t channel)
     }
 }
 
+void vsf_wifi_set_channel_bw(vsf_wifi_t *wifi, uint8_t bw)
+{
+    if (bw > WIFI_BW_80MHZ) {
+        bw = WIFI_BW_20MHZ;
+    }
+    wifi->connect_bw = bw;
+}
+
 vsf_err_t vsf_wifi_set_mac(vsf_wifi_t *wifi, const uint8_t mac[6])
 {
     if (!wifi->is_ready || !wifi->drv->set_mac_addr) return VSF_ERR_NOT_READY;
@@ -1933,6 +1960,41 @@ static void __vsf_wifi_handshake_link_up(vsf_wifi_t *wifi)
     }
 }
 
+/* Retry a hardware key install that was deferred because the script dispatcher
+ * was busy.  Called after a script finishes so the handshake can proceed once
+ * the bus is free. */
+static void __vsf_wifi_retry_key_install(vsf_wifi_t *wifi)
+{
+    if (wifi->mlme_state != WIFI_MLME_KEY_INSTALL) {
+        return;
+    }
+
+    if (wifi->key_install.ptk_pending) {
+        wifi->key_install.ptk_pending = false;
+        if ((wifi->drv->crypto_ops != NULL) &&
+                (wifi->drv->crypto_ops->install_key != NULL)) {
+            wifi->wpa_hw_crypto = true;
+            vsf_err_t err = wifi->drv->crypto_ops->install_key(wifi, 0, true,
+                    wifi->wpa_ptk + 32, VSF_WIFI_TK_LEN, wifi->mlme_bssid,
+                    __vsf_wifi_handshake_ptk_done);
+            if (err != VSF_ERR_NONE) {
+                __vsf_wifi_handshake_ptk_done(wifi, err);
+            }
+        }
+    } else if (wifi->key_install.gtk_pending) {
+        wifi->key_install.gtk_pending = false;
+        if ((wifi->drv->crypto_ops != NULL) &&
+                (wifi->drv->crypto_ops->install_key != NULL)) {
+            vsf_err_t err = wifi->drv->crypto_ops->install_key(wifi,
+                    wifi->wpa_gtk_keyidx, false, wifi->wpa_gtk,
+                    wifi->wpa_gtk_len, NULL, __vsf_wifi_handshake_gtk_done);
+            if (err != VSF_ERR_NONE) {
+                __vsf_wifi_handshake_gtk_done(wifi, err);
+            }
+        }
+    }
+}
+
 static void __vsf_wifi_handshake_gtk_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (!__vsf_wifi_handshake_is_pending(wifi)) {
@@ -1940,6 +2002,10 @@ static void __vsf_wifi_handshake_gtk_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 
     if (err != VSF_ERR_NONE) {
+        if (err == VSF_ERR_NOT_AVAILABLE) {
+            wifi->key_install.gtk_pending = true;
+            return;
+        }
         vsf_wifi_trace_info(
                 "wifi: hardware GTK install failed (err=%d), falling back to software CCMP"
                 VSF_TRACE_CFG_LINEEND, (int)err);
@@ -1956,6 +2022,10 @@ static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 
     if (err != VSF_ERR_NONE) {
+        if (err == VSF_ERR_NOT_AVAILABLE) {
+            wifi->key_install.ptk_pending = true;
+            return;
+        }
         vsf_wifi_trace_info(
                 "wifi: hardware PTK install failed (err=%d), falling back to software CCMP"
                 VSF_TRACE_CFG_LINEEND, (int)err);

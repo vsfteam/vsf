@@ -95,7 +95,18 @@ struct vsf_wifi_t {
     uint8_t  mlme_ssid[33];     /* target SSID (for assoc-req SSID IE)    */
     uint8_t  mlme_ssid_len;
     uint8_t  mlme_channel;      /* target channel                         */
+    uint8_t  connect_bw;        /* WIFI_BW_xxx for next connect/set_channel*/
     uint8_t  mlme_retry;        /* retransmits left for current step      */
+
+    /* Deferred hardware key install.  When the chip crypto backend reports
+     * VSF_ERR_NOT_AVAILABLE because a previous register script is still in
+     * flight, the handshake is retried automatically once that script
+     * completes.  This avoids a race between the async connect script and the
+     * 4-way handshake on register-based chips such as RT5572. */
+    struct {
+        bool ptk_pending;
+        bool gtk_pending;
+    } key_install;
     uint16_t mlme_aid;          /* association id from assoc-resp         */
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_t mlme_timer;

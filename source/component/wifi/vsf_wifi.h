@@ -144,6 +144,8 @@ typedef struct vsf_wifi_scan_result_t {
     uint8_t  auth_mode;
     uint8_t  pairwise_cipher;
     uint8_t  group_cipher;
+    uint8_t  ht40_width;    /* 0 = 20 MHz, 1 = 40 MHz (from HT Operation IE)   */
+    uint8_t  ht40_plus;     /* 1 = secondary channel above, 0 = below/none     */
 } vsf_wifi_scan_result_t;
 
 typedef struct vsf_wifi_link_info_t {
@@ -448,6 +450,15 @@ vsf_err_t    vsf_wifi_scan         (vsf_wifi_t *wifi,
                                     const uint8_t *channels,
                                     uint8_t num_channels, uint16_t dwell_ms);
 vsf_err_t    vsf_wifi_scan_stop    (vsf_wifi_t *wifi);
+
+/* Channel bandwidth hints used by set_channel / connect.  Not all chip
+ * drivers support 40/80 MHz; unsupported values fall back to 20 MHz. */
+#define WIFI_BW_20MHZ           0
+#define WIFI_BW_40MHZ_PLUS      1   /* primary lower, extension above      */
+#define WIFI_BW_40MHZ_MINUS     2   /* primary upper, extension below      */
+#define WIFI_BW_80MHZ           3
+
+void         vsf_wifi_set_channel_bw(vsf_wifi_t *wifi, uint8_t bw);
 
 vsf_err_t    vsf_wifi_connect      (vsf_wifi_t *wifi,
                                     const uint8_t bssid[6],

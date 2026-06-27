@@ -166,6 +166,35 @@
 #define MT76_GF40_PROT_CFG                  0x1378
 #define MT76_EXP_ACK_TIME                   0x1380
 
+/* Band / bandwidth configuration registers ( Linux mt76x02 ) */
+#define MT76_TX_BAND_CFG                    0x132c
+#define MT76_TX_BAND_CFG_UPPER_40M          (1U << 0)
+#define MT76_TX_BAND_CFG_5G                 (1U << 1)
+#define MT76_TX_BAND_CFG_2G                 (1U << 2)
+
+#define MT76_EXT_CCA_CFG                    0x141c
+#define MT76_EXT_CCA_CFG_CCA0_M             0x00000003
+#define MT76_EXT_CCA_CFG_CCA1_M             0x0000000c
+#define MT76_EXT_CCA_CFG_CCA2_M             0x00000030
+#define MT76_EXT_CCA_CFG_CCA3_M             0x000000c0
+#define MT76_EXT_CCA_CFG_CCA_MASK_M         0x00000f00
+
+/* BBP indirect register bases */
+#define MT76_BBP_CORE_BASE                  0x2000
+#define MT76_BBP_AGC_BASE                   0x2300
+#define MT76_BBP_TXBE_BASE                  0x2700
+#define MT76_BBP(_type, _n)                 (MT76_BBP_##_type##_BASE + ((_n) << 2))
+#define MT76_BBP_CORE_R1_BW_M               (3U << 3)   /* bits 4:3 */
+#define MT76_BBP_CORE_R1_BW_20              (0U << 3)
+#define MT76_BBP_CORE_R1_BW_40              (2U << 3)
+#define MT76_BBP_CORE_R1_BW_80              (3U << 3)
+#define MT76_BBP_AGC_R0_BW_M                (7U << 12)  /* bits 14:12 */
+#define MT76_BBP_AGC_R0_BW_20               (1U << 12)
+#define MT76_BBP_AGC_R0_BW_40               (3U << 12)
+#define MT76_BBP_AGC_R0_BW_80               (7U << 12)
+#define MT76_BBP_AGC_R0_CTRL_CHAN_M         (3U << 8)   /* bits 9:8 */
+#define MT76_BBP_TXBE_R0_CTRL_CHAN_M        (3U << 0)   /* bits 1:0 */
+
 #define MT_TX_STAT_FIFO                     0x1718
 #define MT_TX_STAT_FIFO_VALID               (1U << 0)
 #define MT_TX_STAT_FIFO_SUCCESS             (1U << 5)
@@ -286,7 +315,6 @@ enum mt76x02_cipher_type {
 #define MT76_COEXCFG0_COEX_EN               (1U << 0)
 #define MT76_TX_ALC_CFG_4                   0x077c
 #define MT76_TX_ALC_CFG_4_MPDU_2ND_TC       (1U << 31)
-#define MT76_EXT_CCA_CFG                    0x1260
 #define MT76_AUTO_RSP_CFG                   0x110c
 #define MT76_WMM_AIFSN                      0x0214
 #define MT76_WMM_CWMIN                      0x0218
@@ -3348,6 +3376,63 @@ static vsf_err_t __mt76_mac_stop(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     return VSF_ERR_NONE;
 }
 
+/* ext_cca_chan[ch_group_index] for 20/40/80 MHz, matching Linux mt76x2u. */
+static const uint32_t __mt76_ext_cca_chan[4] = {
+    0x000001e4, /* CCA0=0 CCA1=1 CCA2=2 CCA3=3 MASK=BIT(0) */
+    0x000002e1, /* CCA0=1 CCA1=0 CCA2=2 CCA3=3 MASK=BIT(1) */
+    0x0000042e, /* CCA0=2 CCA1=3 CCA2=1 CCA3=0 MASK=BIT(2) */
+    0x0000081b, /* CCA0=3 CCA1=2 CCA2=1 CCA3=0 MASK=BIT(3) */
+};
+
+typedef struct mt76_channel_cfg_t {
+    uint8_t channel;        /* value sent in SWITCH_CHANNEL_OP idx        */
+    uint8_t bw;             /* 0=20, 1=40, 2=80                           */
+    uint8_t bw_index;       /* low bits of ext_chan (0..3)                */
+    uint8_t ch_group;       /* ch_group_index for ext_cca / ctrl_chan     */
+    bool    is_5g;          /* channel > 14                                 */
+} mt76_channel_cfg_t;
+
+/* Compute the firmware channel parameters for a given IEEE channel and
+ * bandwidth.  For 40/80 MHz the firmware expects the center channel index
+ * (Linux mt76x2u behaviour), not the primary channel number. */
+static void __mt76_channel_cfg(uint8_t channel, uint8_t bw,
+                               mt76_channel_cfg_t *cfg)
+{
+    cfg->is_5g   = channel > 14;
+    cfg->bw      = 0;
+    cfg->bw_index= 0;
+    cfg->ch_group= 0;
+    cfg->channel = channel;
+
+    switch (bw) {
+    case WIFI_BW_40MHZ_PLUS:
+        cfg->bw       = 1;
+        cfg->bw_index = 1;          /* primary lower, extension above      */
+        cfg->ch_group = 0;
+        cfg->channel  = channel + 2;/* center channel                      */
+        break;
+    case WIFI_BW_40MHZ_MINUS:
+        cfg->bw       = 1;
+        cfg->bw_index = 3;          /* primary upper, extension below      */
+        cfg->ch_group = 1;
+        cfg->channel  = channel - 2;/* center channel                      */
+        break;
+    case WIFI_BW_80MHZ:
+        if (cfg->is_5g) {
+            uint8_t group_start;
+            /* 5G 80 MHz groups are 36-48, 52-64, 100-112, 116-128, ... */
+            group_start = (uint8_t)((((channel - 36) / 16) * 16) + 36);
+            cfg->ch_group = (uint8_t)((channel - group_start) / 4);
+            cfg->bw_index = cfg->ch_group;
+            cfg->bw       = 2;
+            cfg->channel  = group_start + 6; /* center channel             */
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 static void __mt76_set_channel_start_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
@@ -3380,14 +3465,14 @@ static void __mt76_set_channel_first_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 
     uint8_t payload[8];
-    payload[0] = priv->set_channel_channel; /* idx */
+    payload[0] = priv->set_channel_channel; /* idx (center for 40/80) */
     payload[1] = priv->set_channel_scan;    /* scan */
-    payload[2] = 0;                         /* bw: 20 MHz */
+    payload[2] = priv->set_channel_bw;      /* 0=20, 1=40, 2=80           */
     payload[3] = 0;                         /* pad */
     /* chainmask: MT7612U is 2T2R, use 0x0202 */
     payload[4] = 0x02;
     payload[5] = 0x02;
-    /* ext_chan: 0xe0 + bw_index for 20 MHz primary channel */
+    /* ext_chan: 0xe0 + bw_index for the target bandwidth */
     payload[6] = 0xe0 + priv->set_channel_bw_index;
     payload[7] = 0;
 
@@ -3410,9 +3495,9 @@ static void __mt76_set_channel_filter_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 
     uint8_t payload[8];
-    payload[0] = priv->set_channel_channel; /* idx */
+    payload[0] = priv->set_channel_channel; /* idx (center for 40/80) */
     payload[1] = priv->set_channel_scan;    /* scan */
-    payload[2] = 0;                         /* bw: 20 MHz */
+    payload[2] = priv->set_channel_bw;      /* 0=20, 1=40, 2=80           */
     payload[3] = 0;                         /* pad */
     /* chainmask: MT7612U is 2T2R, use 0x0202 */
     payload[4] = 0x02;
@@ -3431,6 +3516,103 @@ static void __mt76_set_channel_filter_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
+/* Program BBP bandwidth and ctrl-channel fields to match the target channel
+ * width.  This mirrors Linux mt76x02_phy_set_bw(); the firmware
+ * SWITCH_CHANNEL_OP does not update these fields on its own. */
+static void __mt76_set_channel_bw_step(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    uint32_t core_bw, agc_bw;
+    uint8_t ctrl = priv->set_channel_ch_group;
+    switch (priv->set_channel_bw) {
+    case 2:     /* 80 MHz */
+        core_bw = MT76_BBP_CORE_R1_BW_80;
+        agc_bw  = MT76_BBP_AGC_R0_BW_80;
+        break;
+    case 1:     /* 40 MHz */
+        core_bw = MT76_BBP_CORE_R1_BW_40;
+        agc_bw  = MT76_BBP_AGC_R0_BW_40;
+        break;
+    default:    /* 20 MHz */
+        core_bw = MT76_BBP_CORE_R1_BW_20;
+        agc_bw  = MT76_BBP_AGC_R0_BW_20;
+        break;
+    }
+
+    vsf_err_t step_err;
+    switch (priv->set_channel_bbp_substate) {
+    case 0:
+        step_err = __mt76_cfg_read(wifi, MT76_BBP(CORE, 1), &priv->fw_idx,
+                                   __mt76_set_channel_bw_step);
+        priv->set_channel_bbp_substate = 1;
+        break;
+    case 1: {
+        uint32_t val = (priv->fw_idx & ~MT76_BBP_CORE_R1_BW_M) | core_bw;
+        step_err = __mt76_cfg_write(wifi, MT76_BBP(CORE, 1), val,
+                                    __mt76_set_channel_bw_step);
+        priv->set_channel_bbp_substate = 2;
+        break;
+    }
+    case 2:
+        step_err = __mt76_cfg_read(wifi, MT76_BBP(AGC, 0), &priv->fw_idx,
+                                   __mt76_set_channel_bw_step);
+        priv->set_channel_bbp_substate = 3;
+        break;
+    case 3: {
+        uint32_t val = (priv->fw_idx & ~MT76_BBP_AGC_R0_BW_M) | agc_bw;
+        val = (val & ~MT76_BBP_AGC_R0_CTRL_CHAN_M) |
+              ((uint32_t)ctrl << 8);
+        step_err = __mt76_cfg_write(wifi, MT76_BBP(AGC, 0), val,
+                                    __mt76_set_channel_bw_step);
+        priv->set_channel_bbp_substate = 4;
+        break;
+    }
+    case 4:
+        step_err = __mt76_cfg_read(wifi, MT76_BBP(TXBE, 0), &priv->fw_idx,
+                                   __mt76_set_channel_bw_step);
+        priv->set_channel_bbp_substate = 5;
+        break;
+    case 5: {
+        uint32_t val = (priv->fw_idx & ~MT76_BBP_TXBE_R0_CTRL_CHAN_M) | ctrl;
+        step_err = __mt76_cfg_write(wifi, MT76_BBP(TXBE, 0), val,
+                                    __mt76_set_channel_filter_done);
+        /* filter_done will continue with SWITCH_CHANNEL_OP. */
+        break;
+    }
+    default:
+        step_err = VSF_ERR_FAIL;
+        break;
+    }
+
+    if (step_err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, step_err);
+    }
+}
+
+static void __mt76_set_channel_band_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    if (err != VSF_ERR_NONE) {
+        vsf_wifi_done_t done = priv->set_channel_done;
+        priv->set_channel_done = NULL;
+        if (done != NULL) done(wifi, err);
+        return;
+    }
+
+    priv->set_channel_bbp_substate = 0;
+    __mt76_set_channel_bw_step(wifi, VSF_ERR_NONE);
+}
+
 static void __mt76_set_channel_stop_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
@@ -3441,14 +3623,28 @@ static void __mt76_set_channel_stop_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
 
-    /* Scan mode: clear OTHER_BSS so beacons/probe-responses from any BSS
-     * are received. */
-    uint32_t filter = priv->rxfilter & ~MT_RX_FILTR_CFG_OTHER_BSS;
+    vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
+
+    /* Program band select and extension-CCA for the target channel/bw.
+     * BBP bandwidth/ctrl-chan programming is handled in the next step
+     * (__mt76_set_channel_bw_step) to match Linux mt76x02_phy_set_bw(). */
+    uint32_t band_cfg = priv->set_channel_is_5g
+                      ? MT76_TX_BAND_CFG_5G
+                      : MT76_TX_BAND_CFG_2G;
+    if (priv->set_channel_ch_group & 1) {
+        band_cfg |= MT76_TX_BAND_CFG_UPPER_40M;
+    }
+    ops[0].reg = MT76_TX_BAND_CFG;
+    ops[0].val = band_cfg;
+    ops[1].reg = MT76_EXT_CCA_CFG;
+    ops[1].val = __mt76_ext_cca_chan[priv->set_channel_ch_group];
+
     vsf_wifi_chip_mt76_trace_debug(
-        "mt76: scan rx_filter=0x%08X" VSF_TRACE_CFG_LINEEND,
-        (unsigned)filter);
-    vsf_err_t step_err = __mt76_cfg_write(wifi, MT_RX_FILTR_CFG, filter,
-                                          __mt76_set_channel_filter_done);
+        "mt76: band_cfg=0x%04X ext_cca=0x%04X" VSF_TRACE_CFG_LINEEND,
+        (unsigned)band_cfg, (unsigned)ops[1].val);
+
+    vsf_err_t step_err = vsf_wifi_reg_run_script(wifi, ops, 2,
+                                                 __mt76_set_channel_band_done);
     if (step_err != VSF_ERR_NONE) {
         vsf_wifi_done_t done = priv->set_channel_done;
         priv->set_channel_done = NULL;
@@ -3460,15 +3656,24 @@ static vsf_err_t __mt76_set_channel_ex(vsf_wifi_t *wifi, uint8_t channel,
                                        bool scan, vsf_wifi_done_t done)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    mt76_channel_cfg_t cfg;
 
-    priv->set_channel_channel  = channel;
+    __mt76_channel_cfg(channel, wifi->connect_bw, &cfg);
+
+    priv->set_channel_channel  = cfg.channel;
     priv->set_channel_scan     = scan ? 1 : 0;
-    priv->set_channel_bw_index = 0;     /* 20 MHz */
+    priv->set_channel_bw       = cfg.bw;
+    priv->set_channel_bw_index = cfg.bw_index;
+    priv->set_channel_ch_group = cfg.ch_group;
+    priv->set_channel_is_5g    = cfg.is_5g;
     priv->set_channel_done     = done;
+    priv->last_channel         = channel;
 
     vsf_wifi_chip_mt76_trace_debug(
-        "mt76: set_channel=%u scan=%d" VSF_TRACE_CFG_LINEEND,
-        (unsigned)channel, (int)scan);
+        "mt76: set_channel=%u scan=%d bw=%u bw_index=%u group=%u is_5g=%d"
+        VSF_TRACE_CFG_LINEEND,
+        (unsigned)cfg.channel, (int)scan, (unsigned)cfg.bw,
+        (unsigned)cfg.bw_index, (unsigned)cfg.ch_group, (int)cfg.is_5g);
 
     return __mt76_mac_stop(wifi, __mt76_set_channel_stop_done);
 }
@@ -3568,6 +3773,7 @@ vsf_err_t __mt76_set_auth_mode(vsf_wifi_t *wifi,
 }
 
 static void __mt76_rate_init(vsf_wifi_t *wifi);
+static uint16_t __mt76_rate_for_channel(uint8_t channel);
 
 static void __mt76_connect_script_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
@@ -3632,11 +3838,12 @@ static void __mt76_connect_channel_done(vsf_wifi_t *wifi, vsf_err_t err)
     /* WCID TX info: tell the hardware the default rate/nss/power for this
      * station.  Without the SET flag the chip may fall back to unknown
      * parameters and silently fail to transmit data frames (EAPOL M2/M4).
-     * Use CCK 1 Mbps / nss=1 / txpwr_adj=0 as the conservative default. */
+     * 2.4G: CCK 1 Mbps; 5G: OFDM 6 Mbps (CCK is not valid on 5 GHz). */
+    uint16_t init_rate = __mt76_rate_for_channel(wifi->mlme_channel);
     ops[6].reg = MT76_WCID_TX_INFO(1);
     ops[6].val = MT_WCID_TX_INFO_SET
                | (1U << MT_WCID_TX_INFO_NSS_SHIFT)
-               | 0x0000U;               /* CCK 1 Mbps */
+               | init_rate;
 
     /* Beacon interval 100 TU << 4, timer enable, STA TSF sync, TBTT enable. */
     ops[7].reg = MT76_BEACON_TIME_CFG;
@@ -3675,7 +3882,7 @@ static void __mt76_connect_channel_done(vsf_wifi_t *wifi, vsf_err_t err)
     ops[18].reg = MT76_WCID_TX_INFO(MT_VIF_WCID(0));
     ops[18].val = MT_WCID_TX_INFO_SET
                 | (1U << MT_WCID_TX_INFO_NSS_SHIFT)
-                | 0x0000U;               /* CCK 1 Mbps */
+                | init_rate;
 
     vsf_wifi_chip_mt76_trace_info(
         "mt76: program wcid=1 bssid=%02X:%02X:%02X:%02X:%02X:%02X bssidx=0 tx_info=0x%08X"
@@ -3979,6 +4186,14 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                                 result.channel = ie[2];
                             } else if (tag == 48) {
                                 __mt76_parse_rsn(ie + 2, l, &result);
+                            } else if (tag == 61 && l >= 2) {
+                                /* HT Operation IE: primary channel (body[0]),
+                                 * HT info (body[1]).  Bit 0 = 40 MHz capable;
+                                 * bits [3:2] secondary channel offset
+                                 * (1=above, 3=below). */
+                                result.ht40_width = (ie[2 + 1] & 0x01) ? 1 : 0;
+                                uint8_t sco = (uint8_t)((ie[2 + 1] >> 2) & 0x03);
+                                result.ht40_plus = (sco == 1) ? 1 : 0;
                             } else if (tag == 221 && l >= 7 &&
                                        ie[2] == 0x00 && ie[3] == 0x50 &&
                                        ie[4] == 0xF2 && ie[5] == 0x02) {
@@ -3991,13 +4206,15 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 
                         vsf_wifi_chip_mt76_trace_info(
                             "mt76: scan bssid=%02X:%02X:%02X:%02X:%02X:%02X "
-                            "ssid=%.*s ch=%u rssi=%d caps=0x%04X wmm=%u"
+                            "ssid=%.*s ch=%u rssi=%d caps=0x%04X wmm=%u ht40=%u%s"
                             VSF_TRACE_CFG_LINEEND,
                             bssid[0], bssid[1], bssid[2], bssid[3],
                             bssid[4], bssid[5],
                             result.ssid_len, result.ssid,
                             result.channel, result.rssi, result.capability,
-                            (unsigned)result.wmm);
+                            (unsigned)result.wmm,
+                            (unsigned)result.ht40_width,
+                            result.ht40_plus ? "+" : (result.ht40_width ? "-" : ""));
 
                         vsf_wifi_on_scan_result(wifi, &result);
                         if (!memcmp(result.bssid, wifi->mlme_bssid, 6)) {
@@ -4054,7 +4271,7 @@ void __mt76_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 /*============================================================================
  * Minimal rate control for MT76x02 STA mode.
  *
- * We keep a small table of 2.4 GHz 20 MHz rates (CCK / OFDM / HT-MCS) and
+ * We keep a small table of CCK / OFDM / HT-MCS rates and
  * adapt the WCID 1 TX info after each unicast TX status.  The algorithm is
  * intentionally simple: step up after a few consecutive ACKs, step down
  * immediately on a failed frame.
@@ -4103,6 +4320,13 @@ static const uint16_t __mt76_rate_table[] = {
 #define MT76_RATE_TABLE_MIN         0   /* CCK 1 Mbps */
 #define MT76_RATE_TABLE_MAX         (dimof(__mt76_rate_table) - 1)
 #define MT76_RATE_TABLE_INIT        0   /* CCK 1 Mbps */
+#define MT76_RATE_TABLE_INIT_5G     4   /* OFDM 6 Mbps */
+
+static uint16_t __mt76_rate_for_channel(uint8_t channel)
+{
+    return (channel > 14) ? __mt76_rate_table[MT76_RATE_TABLE_INIT_5G]
+                          : __mt76_rate_table[MT76_RATE_TABLE_INIT];
+}
 
 static uint8_t __mt76_rate_to_nss(uint16_t rateval)
 {
@@ -4134,10 +4358,14 @@ static void __mt76_wcid_set_rate(vsf_wifi_t *wifi, uint8_t wcid,
 static void __mt76_rate_init(vsf_wifi_t *wifi)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
-    priv->tx_rate_idx = MT76_RATE_TABLE_INIT;
+    priv->tx_rate_idx = (wifi->mlme_channel > 14)
+                      ? MT76_RATE_TABLE_INIT_5G
+                      : MT76_RATE_TABLE_INIT;
     priv->tx_rate_success_cnt = 0;
     vsf_wifi_chip_mt76_trace_info(
-        "mt76: rate init" VSF_TRACE_CFG_LINEEND);
+        "mt76: rate init band=%s idx=%u" VSF_TRACE_CFG_LINEEND,
+        (wifi->mlme_channel > 14) ? "5g" : "2g",
+        (unsigned)priv->tx_rate_idx);
     __mt76_wcid_set_rate(wifi, 1, __mt76_rate_table[priv->tx_rate_idx]);
 }
 
@@ -4573,12 +4801,13 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 
     uint8_t *txwi = buf + 4;
     memset(txwi, 0, txwi_len);
-    /* Management frames (auth/assoc/probe) and post-handshake data are sent at
-     * CCK 1 Mbps.  OFDM 6 Mbps was tried earlier, but this AP/STA combination
-     * ACKs the frames while the upper layer appears to drop them; falling back
-     * to the same CCK rate that works for EAPOL isolates whether the issue is
-     * the rate/MCS selection. */
-    uint16_t rate = 0;                          /* CCK 1 Mbps for EAPOL/mgmt */
+    /* Management frames (auth/assoc/probe) and EAPOL frames are sent at a
+     * conservative basic rate.  2.4G uses CCK 1 Mbps because some APs ACK
+     * OFDM management frames but then drop them; 5G cannot use CCK, so use
+     * OFDM 6 Mbps as the basic rate.  Fall back to the last tuned channel
+     * when the MLME has not recorded a target channel yet. */
+    uint8_t tx_channel = wifi->mlme_channel ? wifi->mlme_channel : priv->last_channel;
+    uint16_t rate = (tx_channel > 14) ? 0x2000U : 0x0000U;
     /* Linux mt76x02: WCID 1 is used for unicast ACK routing; WCID 254 is the
      * group/multicast WCID for this BSS.  For hardware-encrypted data frames
      * the firmware uses the key stored in the selected WCID. */
