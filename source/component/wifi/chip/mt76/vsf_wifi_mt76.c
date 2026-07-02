@@ -181,7 +181,9 @@
 /* BBP indirect register bases */
 #define MT76_BBP_CORE_BASE                  0x2000
 #define MT76_BBP_AGC_BASE                   0x2300
+#define MT76_BBP_TXO_BASE                   0x2600
 #define MT76_BBP_TXBE_BASE                  0x2700
+#define MT76_BBP_RXO_BASE                   0x2900
 #define MT76_BBP(_type, _n)                 (MT76_BBP_##_type##_BASE + ((_n) << 2))
 #define MT76_BBP_CORE_R1_BW_M               (3U << 3)   /* bits 4:3 */
 #define MT76_BBP_CORE_R1_BW_20              (0U << 3)
@@ -328,8 +330,14 @@ enum mt76x02_cipher_type {
 #define MT76_BBP_CORE_BASE                  0x2000
 #define MT76_BBP_IBI_BASE                   0x2100
 #define MT76_BBP_AGC_BASE                   0x2300
+#define MT76_BBP_TXO_BASE                   0x2600
 #define MT76_BBP_TXBE_BASE                  0x2700
+#define MT76_BBP_RXO_BASE                   0x2900
 #define MT76_BBP(_type, _n)                 (MT76_BBP_##_type##_BASE + ((_n) << 2))
+
+#define MT76_BBP_TXO_4_TX_CMM_BW            (1U << 25)
+#define MT76_BBP_RXO_13_RX_CMM_PD_EN        (1U << 8)
+#define MT76_BBP_RXO_13_LDPC_RX_EN          (1U << 10)
 
 #define MT76_XO_CTRL5                       0x0114
 #define MT76_XO_CTRL5_C2_VAL_MASK           0x7f00
@@ -390,6 +398,15 @@ enum mt76x02_cipher_type {
 #define MT76_EE_XTAL_TRIM_2                 0x09e
 #define MT76_EE_NIC_CONF_2                  0x042
 
+/* EEPROM RX path gain / RSSI offset fields (MT76x2) */
+#define MT76_EE_LNA_GAIN                    0x044
+#define MT76_EE_RSSI_OFFSET_2G_0            0x046
+#define MT76_EE_RSSI_OFFSET_2G_1            0x048
+#define MT76_EE_LNA_GAIN_5GHZ_1             0x049
+#define MT76_EE_RSSI_OFFSET_5G_0            0x04a
+#define MT76_EE_RSSI_OFFSET_5G_1            0x04c
+#define MT76_EE_LNA_GAIN_5GHZ_2             0x04d
+
 /* EEPROM TX power / calibration fields (MT76x2) */
 #define MT76_EE_TX_POWER_DELTA_BW40         0x050
 #define MT76_EE_TX_POWER_DELTA_BW80         0x052
@@ -411,6 +428,7 @@ enum mt76x02_cipher_type {
 #define MT76_EE_2G_TARGET_POWER             0x0d0
 #define MT76_EE_5G_TARGET_POWER             0x0d2
 #define MT76_EE_RF_2G_TSSI_OFF_TXPOWER      0x0f6
+#define MT76_EE_RF_2G_RX_HIGH_GAIN          0x0f8
 #define MT76_EE_RF_5G_GRP0_1_RX_HIGH_GAIN   0x0fa
 #define MT76_EE_RF_5G_GRP2_3_RX_HIGH_GAIN   0x0fc
 #define MT76_EE_RF_5G_GRP4_5_RX_HIGH_GAIN   0x0fe
@@ -422,6 +440,8 @@ enum mt76x02_cipher_type {
 #define MT76_EE_NIC_CONF_0_PA_INT_5G        (1U << 9)
 #define MT76_EE_NIC_CONF_1_TEMP_TX_ALC      (1U << 1)
 #define MT76_EE_NIC_CONF_1_TX_ALC_EN        (1U << 13)
+#define MT76_EE_NIC_CONF_1_LNA_EXT_2G       (1U << 2)
+#define MT76_EE_NIC_CONF_1_LNA_EXT_5G       (1U << 3)
 #define MT76_EE_TX_POWER_EXT_PA_5G_EN       (1U << 15)
 
 static uint16_t __mt76_eeprom_get_u16(mt76_wifi_priv_t *priv, uint16_t offset)
@@ -658,6 +678,126 @@ static bool __mt76_ext_pa_enabled(vsf_wifi_t *wifi, uint8_t channel)
         return (conf0 & MT76_EE_NIC_CONF_0_PA_INT_5G) == 0;
     }
     return (conf0 & MT76_EE_NIC_CONF_0_PA_INT_2G) == 0;
+}
+
+/* Map a 5G channel to its RX high-gain EEPROM group, mirroring Linux
+ * mt76x2_get_cal_channel_group(). */
+static uint8_t __mt76_5g_rx_gain_group(uint8_t channel)
+{
+    if (channel >= 184 && channel <= 196) return 0; /* MT_CH_5G_JAPAN    */
+    if (channel <= 48)                    return 1; /* MT_CH_5G_UNII_1   */
+    if (channel <= 64)                    return 2; /* MT_CH_5G_UNII_2   */
+    if (channel <= 114)                   return 3; /* MT_CH_5G_UNII_2E_1*/
+    if (channel <= 144)                   return 4; /* MT_CH_5G_UNII_2E_2*/
+    return 5;                                         /* MT_CH_5G_UNII_3   */
+}
+
+static uint8_t __mt76_get_5g_rx_high_gain(mt76_wifi_priv_t *priv, uint8_t channel)
+{
+    uint8_t group = __mt76_5g_rx_gain_group(channel);
+    uint16_t val;
+
+    switch (group) {
+    case 0:
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_5G_GRP0_1_RX_HIGH_GAIN);
+        return (uint8_t)(val & 0xff);
+    case 1:
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_5G_GRP0_1_RX_HIGH_GAIN);
+        return (uint8_t)(val >> 8);
+    case 2:
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_5G_GRP2_3_RX_HIGH_GAIN);
+        return (uint8_t)(val & 0xff);
+    case 3:
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_5G_GRP2_3_RX_HIGH_GAIN);
+        return (uint8_t)(val >> 8);
+    case 4:
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_5G_GRP4_5_RX_HIGH_GAIN);
+        return (uint8_t)(val & 0xff);
+    default:
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_5G_GRP4_5_RX_HIGH_GAIN);
+        return (uint8_t)(val >> 8);
+    }
+}
+
+/* Read RX path gain from EEPROM and populate priv->rx_mcu_gain / rx_lna_gain,
+ * matching Linux mt76x2_read_rx_gain().  This must be called before
+ * CMD_INIT_GAIN_OP on each channel switch. */
+static void __mt76_read_rx_gain(vsf_wifi_t *wifi, uint8_t channel)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    bool is_5g = channel > 14;
+    uint16_t val;
+    int8_t lna_2g;
+    int8_t lna_5g[3];
+    uint8_t lna;
+    uint8_t high_gain;
+
+    if (is_5g) {
+        high_gain = __mt76_get_5g_rx_high_gain(priv, channel);
+    } else {
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RF_2G_RX_HIGH_GAIN);
+        high_gain = (uint8_t)(val >> 8);
+    }
+
+    /* high_gain is two 4-bit signed nibbles: [chain1][chain0]. */
+    if (!__mt76_field_valid(high_gain)) {
+        priv->rx_high_gain[0] = 0;
+        priv->rx_high_gain[1] = 0;
+    } else {
+        priv->rx_high_gain[0] = (int8_t)__mt76_sign_extend(high_gain & 0x0f, 4);
+        priv->rx_high_gain[1] = (int8_t)__mt76_sign_extend((high_gain >> 4) & 0x0f, 4);
+    }
+
+    val = __mt76_eeprom_get_u16(priv, MT76_EE_LNA_GAIN);
+    lna_2g = (int8_t)(val & 0xff);
+    lna_5g[0] = (int8_t)(val >> 8);
+
+    val = __mt76_eeprom_get_u16(priv, MT76_EE_RSSI_OFFSET_2G_1);
+    lna_5g[1] = (int8_t)(val >> 8);
+
+    val = __mt76_eeprom_get_u16(priv, MT76_EE_RSSI_OFFSET_5G_1);
+    lna_5g[2] = (int8_t)(val >> 8);
+
+    if (!__mt76_field_valid((uint8_t)lna_5g[1])) lna_5g[1] = lna_5g[0];
+    if (!__mt76_field_valid((uint8_t)lna_5g[2])) lna_5g[2] = lna_5g[0];
+
+    if (is_5g) {
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RSSI_OFFSET_5G_0);
+    } else {
+        val = __mt76_eeprom_get_u16(priv, MT76_EE_RSSI_OFFSET_2G_0);
+    }
+    priv->rx_rssi_offset[0] = (int8_t)__mt76_sign_extend_optional(val & 0xff, 7);
+    priv->rx_rssi_offset[1] = (int8_t)__mt76_sign_extend_optional((val >> 8) & 0xff, 7);
+
+    priv->rx_mcu_gain = ((uint8_t)lna_2g & 0xff)
+                      | (((uint8_t)lna_5g[0] & 0xff) << 8)
+                      | (((uint8_t)lna_5g[1] & 0xff) << 16)
+                      | (((uint8_t)lna_5g[2] & 0xff) << 24);
+
+    val = __mt76_eeprom_get_u16(priv, MT76_EE_NIC_CONF_1);
+    if (val & MT76_EE_NIC_CONF_1_LNA_EXT_2G) lna_2g = 0;
+    if (val & MT76_EE_NIC_CONF_1_LNA_EXT_5G) {
+        lna_5g[0] = 0; lna_5g[1] = 0; lna_5g[2] = 0;
+    }
+
+    if (!is_5g) {
+        lna = (uint8_t)lna_2g;
+    } else if (channel <= 64) {
+        lna = (uint8_t)lna_5g[0];
+    } else if (channel <= 128) {
+        lna = (uint8_t)lna_5g[1];
+    } else {
+        lna = (uint8_t)lna_5g[2];
+    }
+    priv->rx_lna_gain = (lna != 0xff) ? (int8_t)__mt76_sign_extend(lna, 8) : 0;
+    priv->rx_gain_read = true;
+
+    vsf_wifi_chip_mt76_trace_info(
+        "mt76: read_rx_gain ch=%u mcu_gain=0x%08X lna_gain=%d hg=[%d,%d]"
+        VSF_TRACE_CFG_LINEEND,
+        (unsigned)channel, (unsigned)priv->rx_mcu_gain,
+        (int)priv->rx_lna_gain,
+        (int)priv->rx_high_gain[0], (int)priv->rx_high_gain[1]);
 }
 
 static void __mt76_add_rate_power_offset(mt76_rate_power_t *r, int8_t offset)
@@ -897,7 +1037,14 @@ static vsf_err_t __mt76_apply_tx_power(vsf_wifi_t *wifi, uint8_t channel,
     return err;
 }
 
+#define MT76_CMD_INIT_GAIN_OP               3
 #define MT76_CMD_SWITCH_CHANNEL_OP          30
+#define MT76_CMD_CALIBRATION_OP             31
+
+/* MCU calibration types for CMD_CALIBRATION_OP (MT76x2) */
+#define MT76_MCU_CAL_R                      1
+#define MT76_MCU_CAL_RXDCOC                 2
+#define MT76_MCU_CAL_RC                     3
 
 /* RX filter register */
 #define MT_RX_FILTR_CFG                     0x1400
@@ -3976,6 +4123,8 @@ static void __mt76_channel_cfg(uint8_t channel, uint8_t bw,
     }
 }
 
+static void __mt76_set_channel_post_step(vsf_wifi_t *wifi, vsf_err_t err);
+
 static void __mt76_set_channel_start_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
@@ -3986,15 +4135,168 @@ static void __mt76_set_channel_start_done(vsf_wifi_t *wifi, vsf_err_t err)
     if (done != NULL) done(wifi, err);
 }
 
+static void __mt76_set_channel_post_step(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+
+    if (err != VSF_ERR_NONE) {
+        __mt76_set_channel_start_done(wifi, err);
+        return;
+    }
+
+    vsf_err_t step_err = VSF_ERR_NONE;
+    uint8_t payload[8];
+    vsf_wifi_reg_op_t *ops = wifi->scratch_ops;
+
+    switch (priv->set_channel_post_substate) {
+    case 0:
+        /* Enable LDPC Rx (chip rev E3+); Linux sets BIT(10) of RXO(13). */
+        priv->set_channel_post_substate = 1;
+        step_err = __mt76_cfg_read(wifi, MT76_BBP(RXO, 13), &priv->fw_idx,
+                                   __mt76_set_channel_post_step);
+        break;
+    case 1: {
+        uint32_t val = priv->fw_idx | MT76_BBP_RXO_13_LDPC_RX_EN;
+        priv->set_channel_post_substate = 2;
+        step_err = __mt76_cfg_write(wifi, MT76_BBP(RXO, 13), val,
+                                    __mt76_set_channel_post_step);
+        break;
+    }
+    case 2:
+        /* One-time R calibration (used by RF LC tuning); Linux runs once. */
+        if (!priv->init_cal_done) {
+            __mt76_put_le32(&payload[0], MT76_MCU_CAL_R);
+            __mt76_put_le32(&payload[4], 0);
+            priv->set_channel_post_substate = 3;
+            step_err = __mt76_mcu_msg_send(wifi,
+                MT76_CMD_CALIBRATION_OP, payload, sizeof(payload), true,
+                __mt76_set_channel_post_step);
+        } else {
+            priv->set_channel_post_substate = 3;
+            __mt76_set_channel_post_step(wifi, VSF_ERR_NONE);
+        }
+        break;
+    case 3:
+        /* RX DC offset calibration: must run after each channel switch, even
+         * during scan.  Linux mt76x2u calls mt76x02_mcu_calibrate(MCU_CAL_RXDCOC)
+         * in mt76x2u_phy_set_channel() unconditionally. */
+        __mt76_put_le32(&payload[0], MT76_MCU_CAL_RXDCOC);
+        __mt76_put_le32(&payload[4], priv->last_channel);
+        priv->set_channel_post_substate = 4;
+        step_err = __mt76_mcu_msg_send(wifi,
+            MT76_CMD_CALIBRATION_OP, payload, sizeof(payload), true,
+            __mt76_set_channel_post_step);
+        break;
+    case 4:
+        /* One-time RC (Rx LPF) calibration. */
+        if (!priv->init_cal_done) {
+            __mt76_put_le32(&payload[0], MT76_MCU_CAL_RC);
+            __mt76_put_le32(&payload[4], 0);
+            priv->set_channel_post_substate = 5;
+            step_err = __mt76_mcu_msg_send(wifi,
+                MT76_CMD_CALIBRATION_OP, payload, sizeof(payload), true,
+                __mt76_set_channel_post_step);
+        } else {
+            priv->set_channel_post_substate = 5;
+            __mt76_set_channel_post_step(wifi, VSF_ERR_NONE);
+        }
+        break;
+    case 5:
+        /* AGC tuning and TXOP configuration; Linux writes these after every
+         * channel switch, before the optional channel calibration block. */
+        ops[0].reg = MT76_BBP(AGC, 61); ops[0].val = 0xff64a4e2;
+        ops[1].reg = MT76_BBP(AGC, 7);  ops[1].val = 0x08081010;
+        ops[2].reg = MT76_BBP(AGC, 11); ops[2].val = 0x00000404;
+        ops[3].reg = MT76_BBP(AGC, 2);  ops[3].val = 0x00007070;
+        ops[4].reg = MT76_TXOP_CTRL_CFG; ops[4].val = 0x04101b3f;
+        priv->set_channel_post_substate = 6;
+        step_err = vsf_wifi_reg_run_script(wifi, ops, 5,
+                                           __mt76_set_channel_post_step);
+        break;
+    case 6:
+        /* TX common-mode bandwidth and RX common-mode PD enable. */
+        priv->set_channel_post_substate = 7;
+        step_err = __mt76_cfg_read(wifi, MT76_BBP(TXO, 4), &priv->fw_idx,
+                                   __mt76_set_channel_post_step);
+        break;
+    case 7: {
+        uint32_t val = priv->fw_idx | MT76_BBP_TXO_4_TX_CMM_BW;
+        priv->set_channel_post_substate = 8;
+        step_err = __mt76_cfg_write(wifi, MT76_BBP(TXO, 4), val,
+                                    __mt76_set_channel_post_step);
+        break;
+    }
+    case 8:
+        priv->set_channel_post_substate = 9;
+        step_err = __mt76_cfg_read(wifi, MT76_BBP(RXO, 13), &priv->fw_idx,
+                                   __mt76_set_channel_post_step);
+        break;
+    case 9: {
+        uint32_t val = priv->fw_idx | MT76_BBP_RXO_13_RX_CMM_PD_EN;
+        priv->init_cal_done = true;
+        priv->set_channel_post_substate = 10;
+        step_err = __mt76_cfg_write(wifi, MT76_BBP(RXO, 13), val,
+                                    __mt76_set_channel_post_step);
+        break;
+    }
+    case 10:
+        __mt76_mac_start(wifi, __mt76_set_channel_start_done);
+        break;
+    default:
+        step_err = VSF_ERR_FAIL;
+        break;
+    }
+
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_set_channel_start_done(wifi, step_err);
+    }
+}
+
+static void __mt76_set_channel_init_gain_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
+    vsf_wifi_chip_mt76_trace_debug(
+        "mt76: set_channel_init_gain_done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    if (err != VSF_ERR_NONE) {
+        __mt76_set_channel_start_done(wifi, err);
+        return;
+    }
+
+    /* Continue with the post-switch register/calibration sequence. */
+    priv->set_channel_post_substate = 0;
+    __mt76_set_channel_post_step(wifi, VSF_ERR_NONE);
+    (void)priv;
+}
+
 static void __mt76_set_channel_second_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    mt76_wifi_priv_t *priv = __mt76_priv(wifi);
     vsf_wifi_chip_mt76_trace_debug(
         "mt76: set_channel_second_done err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
     if (err != VSF_ERR_NONE) {
         __mt76_set_channel_start_done(wifi, err);
         return;
     }
-    __mt76_mac_start(wifi, __mt76_set_channel_start_done);
+
+    /* After SWITCH_CHANNEL_OP completes, program the RX path initial gain
+     * from EEPROM.  Linux mt76x2u does this in mt76x2u_phy_set_channel()
+     * immediately after mt76x2_mcu_set_channel(); without it the LNA is not
+     * calibrated to the band and weak APs are dropped by the PHY. */
+    __mt76_read_rx_gain(wifi, priv->last_channel);
+
+    uint8_t payload[8];
+    payload[0] = priv->last_channel;
+    payload[1] = 0;
+    payload[2] = 0;
+    payload[3] = 0x80;          /* force = BIT(31) of little-endian channel */
+    __mt76_put_le32(&payload[4], priv->rx_mcu_gain);
+
+    vsf_err_t step_err = __mt76_mcu_msg_send(wifi,
+        MT76_CMD_INIT_GAIN_OP, payload, sizeof(payload), true,
+        __mt76_set_channel_init_gain_done);
+    if (step_err != VSF_ERR_NONE) {
+        __mt76_set_channel_start_done(wifi, step_err);
+    }
 }
 
 static void __mt76_set_channel_first_done(vsf_wifi_t *wifi, vsf_err_t err)
@@ -4209,8 +4511,10 @@ static vsf_err_t __mt76_set_channel_ex(vsf_wifi_t *wifi, uint8_t channel,
     priv->set_channel_bw_index = cfg.bw_index;
     priv->set_channel_ch_group = cfg.ch_group;
     priv->set_channel_is_5g    = cfg.is_5g;
-    priv->set_channel_done     = done;
-    priv->last_channel         = channel;
+    priv->set_channel_bbp_substate    = 0;
+    priv->set_channel_post_substate   = 0;
+    priv->set_channel_done            = done;
+    priv->last_channel                = channel;
 
     vsf_wifi_chip_mt76_trace_debug(
         "mt76: set_channel=%u scan=%d bw=%u bw_index=%u group=%u is_5g=%d"

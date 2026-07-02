@@ -147,6 +147,17 @@ typedef struct mt76_wifi_priv {
     /* Cached RX filter value; updated after MAC reset and during scan. */
     uint32_t                rxfilter;
 
+    /* RX path gain state, read from EEPROM and programmed via CMD_INIT_GAIN_OP
+     * after every channel switch (mirrors Linux mt76x2_read_rx_gain). */
+    uint32_t                rx_mcu_gain;
+    int8_t                  rx_lna_gain;
+    int8_t                  rx_high_gain[2];
+    int8_t                  rx_rssi_offset[2];
+    bool                    rx_gain_read;
+
+    /* One-time RF calibration flags, matching Linux mt76x2u init. */
+    bool                    init_cal_done;
+
     uint8_t                 mcu_seq;
     uint8_t                 state;
 
@@ -211,6 +222,7 @@ typedef struct mt76_wifi_priv {
     uint8_t                 set_channel_state;    /* top-level state */
     uint8_t                 set_channel_substate; /* mac_stop sub-state */
     uint8_t                 set_channel_bbp_substate; /* BBP bw sub-state  */
+    uint8_t                 set_channel_post_substate; /* post-switch cal/regs */
     uint32_t                set_channel_saved_rts;
     vsf_wifi_done_t         set_channel_done;     /* original caller callback */
     uint8_t                 last_channel;         /* last tuned channel */
