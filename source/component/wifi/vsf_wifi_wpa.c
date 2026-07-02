@@ -66,8 +66,11 @@
  * MIC + secure set, no key data. */
 #define KI_G2   (KI_VERSION_AES | KI_MIC | KI_SECURE)
 
-/* Re-arm the handshake timer after each step we answer. */
-#define __WPA_STEP_TIMEOUT_MS   1000
+/* Re-arm the handshake timer after each step we answer.
+ * 5 GHz links sometimes need more than 1 s for the AP to respond after M2,
+ * especially when the 802.11 MAC layer retransmits M2 several times.
+ * Use a generous timeout so late-but-valid M3/G1 frames are not dropped. */
+#define __WPA_STEP_TIMEOUT_MS   2500
 
 /* Working buffer cap for a TX EAPOL frame / an RX MIC recompute / key-data
  * unwrap.  An EAPOL handshake frame is well under this. */
@@ -281,13 +284,11 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
     }
 
     /* M2: SNonce + our RSN IE in key data, MIC under the fresh KCK.
-     * Send M2 EXACTLY ONCE.  The Windows native driver USB capture
-     * (ref/rt5572_win_usb.log L23730) shows M2 sent a single time, with the
-     * AP's M3 arriving immediately after (L23736).  Wi-Fi is half-duplex:
-     * back-to-back M2 retransmits keep us transmitting while the AP is trying
-     * to send M3, so we miss M3 and the handshake stalls (exactly the symptom
-     * seen on iPhone/ChinaNet).  M1 retransmits from the AP (handled via the
-     * is_retransmit path above) provide the retry mechanism if M2 is lost. */
+     * Send M2 once normally; if this is an M1 retransmit (AP did not receive
+     * our first M2) the is_retransmit path above will be taken and we re-send
+     * the same M2.  For the first M2, wait for either the AP's M3 or another
+     * M1 retransmit.  Sending M2 back-to-back without waiting can keep us
+     * transmitting while the AP is sending M3, causing us to miss M3. */
 #if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
     vsf_wifi_trace_info("wifi: SNonce before M2 send: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X ..." VSF_TRACE_CFG_LINEEND,
             wifi->wpa_snonce[0], wifi->wpa_snonce[1], wifi->wpa_snonce[2], wifi->wpa_snonce[3],

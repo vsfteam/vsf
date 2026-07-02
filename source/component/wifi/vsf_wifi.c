@@ -804,8 +804,11 @@ static void __ccmp_aad_nonce(const uint8_t *dot11, uint16_t hdr_len, bool qos,
     aad[n++] = dot11[22] & 0x0F;                /* SC: keep frag#, drop seq# */
     aad[n++] = 0;
     if (qos) {
-        prio     = dot11[24] & 0x0F;            /* QoS Control TID */
-        aad[n++] = prio;
+        prio     = dot11[24] & 0x0F;            /* QoS Control TID (nonce only uses TID) */
+        /* AAD includes full QoS Control except A-MSDU-present (bit 7), which
+         * must be masked to 0 (IEEE 802.11-2016 12.5.3.3.2).  Preserve Ack
+         * Policy and EOSP bits so the MIC matches what the AP computes. */
+        aad[n++] = dot11[24] & 0x7F;
         aad[n++] = 0;
     }
     *aad_len = n;
@@ -1286,6 +1289,19 @@ void vsf_wifi_on_scan_hop_evt(vsf_wifi_t *wifi) { (void)wifi; }
 
 #define __VSF_WIFI_MLME_MAX_RETRY       3
 #define __VSF_WIFI_MLME_TIMEOUT_MS      400
+
+/* 5 GHz links at the edge of range need a longer per-attempt timeout and more
+ * auth/assoc attempts because the hardware may need the full retry budget. */
+static uint8_t __vsf_wifi_mlme_max_retry(vsf_wifi_t *wifi)
+{
+    return (wifi->mlme_channel > 14) ? 7 : __VSF_WIFI_MLME_MAX_RETRY;
+}
+
+static uint16_t __vsf_wifi_mlme_timeout_ms(vsf_wifi_t *wifi)
+{
+    return (wifi->mlme_channel > 14) ? 800 : __VSF_WIFI_MLME_TIMEOUT_MS;
+}
+
 #if VSF_WIFI_USE_WPA == ENABLED
 /* Whole-handshake budget: the AP retransmits M1/M3 on its own schedule, so a
  * single generous timeout covers all four messages; expiry aborts the link. */
@@ -1330,7 +1346,7 @@ static void __vsf_wifi_mlme_send_auth(vsf_wifi_t *wifi)
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
-    vsf_callback_timer_add_ms(&wifi->mlme_timer, __VSF_WIFI_MLME_TIMEOUT_MS);
+    vsf_callback_timer_add_ms(&wifi->mlme_timer, __vsf_wifi_mlme_timeout_ms(wifi));
 #endif
 }
 
@@ -1393,6 +1409,38 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
     };
     memcpy(&frame[i], __ht_cap_ie, sizeof(__ht_cap_ie));
     i += sizeof(__ht_cap_ie);
+
+    /* 5 GHz: MT7612U is an 802.11ac (VHT) chip.  Over-the-air comparison
+     * against the native Linux mt76 driver on the same AP showed the AP
+     * silently drops an assoc-req that lacks VHT Capabilities (auth is
+     * ACKed/answered, but assoc-req gets no assoc-resp).  Add VHT
+     * Capabilities + RM Enabled + Supported Operating Classes, copied from
+     * the Linux mt76 5 GHz assoc-req (same chip family).  See
+     * ref/mt76/MT7612U_progress.md (2026-07-01). */
+    if (wifi->mlme_channel > 14) {
+        static const uint8_t __vht_cap_ie[] = {
+            0xBF, 0x0C,
+            0xB0, 0x01, 0x80, 0x31,
+            0xFA, 0xFF, 0x00, 0x00, 0xFA, 0xFF, 0x00, 0x00,
+        };
+        memcpy(&frame[i], __vht_cap_ie, sizeof(__vht_cap_ie));
+        i += sizeof(__vht_cap_ie);
+
+        static const uint8_t __rm_enabled_ie[] = {
+            0x46, 0x05,
+            0x70, 0x00, 0x00, 0x00, 0x00,
+        };
+        memcpy(&frame[i], __rm_enabled_ie, sizeof(__rm_enabled_ie));
+        i += sizeof(__rm_enabled_ie);
+
+        static const uint8_t __supp_opclass_ie[] = {
+            0x3B, 0x11,
+            0x81, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79,
+            0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82,
+        };
+        memcpy(&frame[i], __supp_opclass_ie, sizeof(__supp_opclass_ie));
+        i += sizeof(__supp_opclass_ie);
+    }
 
     /* Extended Capabilities IE (tag 127). */
     static const uint8_t __ext_cap_ie[] = {
@@ -1465,7 +1513,7 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
-    vsf_callback_timer_add_ms(&wifi->mlme_timer, __VSF_WIFI_MLME_TIMEOUT_MS);
+    vsf_callback_timer_add_ms(&wifi->mlme_timer, __vsf_wifi_mlme_timeout_ms(wifi));
 #endif
 }
 
@@ -1512,7 +1560,7 @@ static void __vsf_wifi_mlme_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
         __vsf_wifi_mlme_finish(wifi, WIFI_REASON_UNSPECIFIED);
         return;
     }
-    wifi->mlme_retry = __VSF_WIFI_MLME_MAX_RETRY;
+    wifi->mlme_retry = __vsf_wifi_mlme_max_retry(wifi);
     __vsf_wifi_mlme_send_auth(wifi);
 }
 
@@ -1601,7 +1649,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
 #endif
         vsf_wifi_trace_info("wifi: auth ok, sending assoc-req" VSF_TRACE_CFG_LINEEND);
         wifi->mlme_state = WIFI_MLME_ASSOC;
-        wifi->mlme_retry = __VSF_WIFI_MLME_MAX_RETRY;
+        wifi->mlme_retry = __vsf_wifi_mlme_max_retry(wifi);
         __vsf_wifi_mlme_send_assoc(wifi);
         break;
 
@@ -1837,7 +1885,7 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
     wifi->mlme_ssid_len = ssid_len;
     wifi->mlme_channel  = channel;
     wifi->mlme_aid      = 0;
-    wifi->mlme_retry    = __VSF_WIFI_MLME_MAX_RETRY;
+    wifi->mlme_retry    = __vsf_wifi_mlme_max_retry(wifi);
     wifi->mlme_state    = WIFI_MLME_AUTH;
     /* Default to QoS Data until scan/assoc-resp prove otherwise.  Most modern
      * APs support WMM; the fallback to plain Data is handled per-BSS below. */

@@ -153,7 +153,12 @@ static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
     memcpy(&dot11[4],  bssid,    6);                /* addr1 = BSSID (RA)   */
     memcpy(&dot11[10], &eth[6],  6);                /* addr2 = SA  (TA)     */
     memcpy(&dot11[16], &eth[0],  6);                /* addr3 = DA           */
-    /* dot11[24..25] = QoS Control (TID 0), present only when qos == true */
+    /* QoS Control: TID 0.  Broadcast/multicast must use Ack Policy = No Explicit
+     * Acknowledgment (bits 5-6 = 0b10) to match Linux mac80211 behavior for
+     * group-addressed QoS Data frames. */
+    if (qos && ((eth[0] & 0x01) != 0)) {
+        dot11[24] = 0x40;                           /* Ack Policy = No Explicit Ack */
+    }
 
     uint8_t *llc = &dot11[hdr_len];
     llc[0] = 0xAA; llc[1] = 0xAA; llc[2] = 0x03;
@@ -314,7 +319,11 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
         }
     }
 
-    bool use_qos = wifi_netdrv->wifi->bss_wmm;
+    bool use_qos = wifi_netdrv->wifi->bss_wmm && ((eth[0] & 0x01) == 0);
+    /* Broadcast/multicast data is sent as plain Data (non-QoS) even on WMM
+     * BSSes.  This avoids the Ack-Policy/EOSP/A-MSDU bits in QoS Control that
+     * several firmware implementations mishandle, and it produces a simpler
+     * CCMP AAD that is less error-prone for software-encrypted group traffic. */
     uint16_t dot11_len = __wifi_eth_to_dot11(wifi_netdrv->bssid, eth, eth_len,
             wifi_netdrv->tx_frame, sizeof(wifi_netdrv->tx_frame), use_qos);
     if (dot11_len > 0) {

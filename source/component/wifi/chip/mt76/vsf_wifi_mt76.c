@@ -968,6 +968,7 @@ static vsf_err_t __mt76_apply_tx_power(vsf_wifi_t *wifi, uint8_t channel,
 #define MT_PHY_TYPE_CCK                     0
 #define MT_PHY_TYPE_OFDM                    1
 #define MT_PHY_TYPE_HT                      2
+#define MT_PHY_TYPE_VHT                     4
 
 /* USB RX DMA header + RXWI layout */
 #define MT_DMA_HDR_LEN                      4
@@ -4951,7 +4952,7 @@ static const uint16_t __mt76_rate_table[] = {
 #define MT76_RATE_TABLE_MIN         0   /* CCK 1 Mbps */
 #define MT76_RATE_TABLE_MAX         (dimof(__mt76_rate_table) - 1)
 #define MT76_RATE_TABLE_INIT        0   /* CCK 1 Mbps */
-#define MT76_RATE_TABLE_INIT_5G     4   /* OFDM 6 Mbps */
+#define MT76_RATE_TABLE_INIT_5G     12  /* HT MCS0 (Linux mt76x02 starts here) */
 
 static uint16_t __mt76_rate_for_channel(uint8_t channel)
 {
@@ -5038,7 +5039,8 @@ static void __mt76_rate_update(vsf_wifi_t *wifi, bool success,
         }
     } else {
         priv->tx_rate_success_cnt = 0;
-        if (priv->tx_rate_idx > MT76_RATE_TABLE_MIN) {
+        uint8_t min_idx = (wifi->mlme_channel > 14) ? 4 : MT76_RATE_TABLE_MIN;
+        if (priv->tx_rate_idx > min_idx) {
             priv->tx_rate_idx--;
             __mt76_wcid_set_rate(wifi, 1,
                                  __mt76_rate_table[priv->tx_rate_idx]);
@@ -5274,12 +5276,10 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 
     mt76_wifi_priv_t *priv = __mt76_priv(wifi);
 
-    /* The MT76 MAC overwrites the Duration field of *unprotected* QoS Data
-     * frames to 0, which causes APs to discard unprotected frames (EAPOL-Key
-     * M2/M4) at higher layers even though they ACK them at the PHY.  Convert
-     * only unprotected QoS EAPOL-Key frames to plain Data so the Duration we
-     * write is preserved.  Post-handshake data frames are left as QoS Data to
-     * match the RT5572 reference and Linux mt76x02 behavior. */
+    /* Linux mt76x02 transmits 5G EAPOL-Key frames as QoS Data at VHT MCS0
+     * (with LDPC/STBC).  The older "strip QoS" workaround was needed on some
+     * 2.4G APs, but on the target 5G AP it causes M2/M4 to be missed/dropped.
+     * Keep QoS Data on 5G; only strip QoS on 2.4G where CCK 1 Mbps is used. */
     uint8_t  frame_buf[1536];
     const uint8_t *tx_frame = frame;
     uint16_t tx_len = len;
@@ -5302,7 +5302,8 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
                     && (frame[snap_off + 7] == 0x8E);
         }
     }
-    if (qos && !protected && is_eapol && len >= 26 && len <= sizeof(frame_buf)) {
+    if (qos && !protected && is_eapol && (wifi->mlme_channel <= 14) &&
+            len >= 26 && len <= sizeof(frame_buf)) {
         frame_buf[0] = (fc0 & 0x0F);            /* subtype 0: Data, keep Type */
         memcpy(frame_buf + 1, frame + 1, 23);   /* FC[1], Duration, addrs, Seq */
         memcpy(frame_buf + 24, frame + 26, len - 26); /* skip QoS Control */
@@ -5433,12 +5434,21 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     uint8_t *txwi = buf + 4;
     memset(txwi, 0, txwi_len);
     /* Management frames (auth/assoc/probe) and EAPOL frames are sent at a
-     * conservative basic rate.  2.4G uses CCK 1 Mbps because some APs ACK
-     * OFDM management frames but then drop them; 5G cannot use CCK, so use
-     * OFDM 6 Mbps as the basic rate.  Fall back to the last tuned channel
-     * when the MLME has not recorded a target channel yet. */
+     * conservative basic rate.  2.4G uses CCK 1 Mbps; 5G cannot use CCK.
+     * 5G auth/assoc still use HT MCS0, but EAPOL-Key frames follow Linux
+     * mt76x02 and use VHT MCS0 with LDPC/STBC for reliable ACKs. */
     uint8_t tx_channel = wifi->mlme_channel ? wifi->mlme_channel : priv->last_channel;
-    uint16_t rate = (tx_channel > 14) ? 0x2000U : 0x0000U;
+    uint16_t rate;
+    if (tx_channel > 14) {
+        rate = (MT_PHY_TYPE_HT << 13) | 0;    /* HT MCS0 */
+    } else {
+        rate = 0x0000U;                          /* CCK 1 Mbps */
+    }
+    if (is_eapol) {
+        rate = (tx_channel > 14)
+             ? ((MT_PHY_TYPE_VHT << 13) | MT_RXWI_RATE_LDPC | MT_RXWI_RATE_STBC)
+             : 0x0000U;
+    }
     /* Linux mt76x02: WCID 1 is used for unicast ACK routing; WCID 254 is the
      * group/multicast WCID for this BSS.  For hardware-encrypted data frames
      * the firmware uses the key stored in the selected WCID. */
@@ -5452,51 +5462,63 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
              * mt76x02_mac_write_txwi() when no hw_key is assigned. */
             wcid = 0xff;
         } else {
-            /* All data frames sent by a STA in an infrastructure BSS (unicast
-             * or broadcast/multicast DA) are protected with the PTK, key id 0.
-             * The GTK installed in the group WCID (254) is only used by the AP
-             * for AP->STA group RX; using it for STA->AP TX makes the AP drop
-             * the frame because it expects the PTK. */
+            /* Unicast data frames use the pairwise WCID (1) where the PTK is
+             * stored.  Broadcast/multicast data is software-encrypted above
+             * and uses WCID 0xff, so it never reaches this branch. */
             wcid = 1;
         }
     } else {
         wcid = 0xff;
     }
     /* Post-handshake unicast data frames use the rate-control selected rate.
-     * Broadcast/multicast data and EAPOL-Key frames use CCK 1 Mbps. */
+     * Broadcast/multicast data uses the basic rate chosen above; EAPOL-Key
+     * frames keep the rate selected above (CCK 1 Mbps on 2.4G, HT MCS0 on 5G). */
     if (is_data && !is_eapol && !multicast) {
         rate = priv->tx_rate_val;
     }
 
-    __mt76_put_le16(txwi + 0, 0);       /* flags */
+    /* flags: Linux mt76x02 sets AMPDU + MPDU density for 5G EAPOL-Key frames
+     * (and for all data frames once the BA session is ready).  Replicate this
+     * for the target 5G AP; density 5 matches the AP's ht_cap.ampdu_density. */
+    uint16_t txwi_flags = 0;
+    if (is_eapol && (tx_channel > 14)) {
+        txwi_flags |= MT_TXWI_FLAGS_AMPDU
+                   | (5U << 5);       /* MPDU density 5 (8 us) */
+    }
+    __mt76_put_le16(txwi + 0, txwi_flags);
     __mt76_put_le16(txwi + 2, rate);
     /* ack_ctl: request ACK for unicast frames only.  Use host-managed
      * sequence numbers for all data frames; the firmware's NSEQ=1 path
      * resets the sequence counter on the first post-handshake data frame,
      * producing duplicate-seq=0 frames that the AP decrypts but drops.
-     * EAPOL/keepalive already use host seq for the same reason. */
+     * EAPOL/keepalive already use host seq for the same reason.
+     * Match Linux mt76x02 by setting the BA window to maximum for 5G
+     * EAPOL-Key frames (this is what Linux populates in ack_ctl). */
     uint8_t ack_ctl = 0;
     if (!multicast) {
         ack_ctl |= MT_TXWI_ACK_CTL_REQ;
+        if (is_eapol && (tx_channel > 14)) {
+            ack_ctl |= MT_TXWI_ACK_CTL_BA_WINDOW_MASK;
+        }
     }
     txwi[4] = ack_ctl;
     txwi[5] = wcid;                     /* wcid: 1=AP unicast, 254=bcast/mcast, ff=mgmt */
     __mt76_put_le16(txwi + 6, mpdu_len);/* len_ctl = real MPDU length */
     txwi[16] = 0;                       /* AID: Linux mt76x02 leaves this 0 */
-    /* txstream: Linux mt76x02 uses the number of TX chains (chainmask low
-     * nibble) and selects the stream encoding by PHY type:
-     *   - E4+ and HT/VHT frames: 0x13
-     *   - E3+ and non-HT (CCK/OFDM) frames: 0x93
-     * MT7612U is 2T2R and rev 0x44 >= E4.  The wrong encoding for CCK/OFDM
-     * EAPOL frames causes the chip to report TX success while the frame is
-     * never radiated, so the 4-way handshake stalls. */
+    /* txstream: Linux mt76x02_mac_write_txwi() uses the number of TX chains
+     * (chainmask low nibble) and the ASIC revision to choose the stream
+     * encoding:
+     *   - E4+ (rev >= 0x33): 0x13 for ALL frames
+     *   - E3+ non-HT frames: 0x93
+     * MT7612U is 2T2R and rev 0x44 >= E4.  Using 0x93 for non-HT frames
+     * causes the chip to report TX success while the frame is never radiated
+     * or is rejected by the AP, breaking DHCP/ARP broadcasts. */
     {
         uint8_t nstreams = (uint8_t)(priv->chainmask & 0x0F);
         uint16_t rev = __mt76_rev(priv);
-        uint8_t phy = (uint8_t)((rate & MT_RXWI_RATE_PHY_MASK) >> 13);
         if (nstreams > 1) {
             if (rev >= 0x40) {
-                txwi[17] = (phy == MT_PHY_TYPE_HT) ? 0x13 : 0x93;
+                txwi[17] = 0x13;
             } else if (rev >= MT76_REV_E3) {
                 txwi[17] = 0x93;
             }
@@ -5508,12 +5530,12 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     /* pktid: controls whether the hardware pushes a TX status entry and
      * what it carries.  Unicast data frames encode the lower bits of the
      * TXWI rate so the status FIFO reports the actual transmitted rate;
-     * EAPOL-Key frames use pktid=1 to get an ACK status entry; broadcast/
-     * multicast and management frames leave pktid=0. */
+     * EAPOL-Key frames and unicast management frames use pktid=1 to get an
+     * ACK status entry; broadcast/multicast leave pktid=0. */
     uint8_t pktid = 0;
-    if (is_data && !multicast) {
-        if (!is_eapol) {
-            pktid = MT76_PACKET_ID_HAS_RATE | (rate & MT76_PKTID_RATE_M);
+    if (!multicast) {
+        if (is_data) {
+            pktid = is_eapol ? 1 : (MT76_PACKET_ID_HAS_RATE | (rate & MT76_PKTID_RATE_M));
         } else {
             pktid = 1;
         }
@@ -5550,13 +5572,10 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     (void)protected;
 
     /* EAPOL-Key frames (4-way handshake) must be sent at a rate the AP will
-     * ACK reliably.  MT76 at OFDM 6 Mbps results in no ACK and deauth reason 15.
-     * Use CCK 1 Mbps and the same Duration that the RT5572 reference driver
-     * uses for M2/M4 (0x002c); a larger value seems to be overwritten to 0 by
-     * the MT76 MAC when the frame is sent as QoS Data, so we converted the
-     * frame to plain Data above. */
+     * ACK reliably.  2.4G uses CCK 1 Mbps; 5G uses VHT MCS0 with LDPC/STBC
+     * to match Linux mt76x02 on the target AP.  Rewrite the TXWI rate here
+     * in case header rewrite changed the channel/rate selection above. */
     if (is_eapol) {
-        rate = 0;                                   /* CCK 1 Mbps */
         __mt76_put_le16(txwi + 2, rate);
     }
     /* MT76 does not auto-fill Duration for plain Data frames; a zero Duration
@@ -5567,9 +5586,16 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
      * For software-CCMP frames the MPDU is already encrypted when it reaches
      * us; overwriting Duration here would corrupt the MIC and make the AP
      * drop the frame silently.  Those frames already carry the duration chosen
-     * by the upper layer (0 for broadcasts, which is correct). */
-    if ((type == 0x08) && !protected && !multicast) {
-        __mt76_put_le16(dst + 2, 0x002CU);
+     * by the upper layer (0 for broadcasts, which is correct).
+     * 5 GHz unicast management frames (auth/assoc) also need a non-zero
+     * Duration; the Linux reference driver uses 0x002c and several 5G APs
+     * ignore our auth request when Duration is left at 0. */
+    if (!multicast && !protected) {
+        bool is_mgmt = (type == 0x00);
+        bool needs_duration = (type == 0x08) || (is_mgmt && (tx_channel > 14));
+        if (needs_duration) {
+            __mt76_put_le16(dst + 2, 0x002CU);
+        }
     }
 
     if ((mpdu_len >= 24) && ((txwi[4] & MT_TXWI_ACK_CTL_NSEQ) == 0)) {
