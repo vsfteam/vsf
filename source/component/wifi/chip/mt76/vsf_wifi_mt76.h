@@ -258,6 +258,11 @@ typedef struct mt76_wifi_priv {
      * received yet"; updated for every successfully parsed MPDU. */
     int8_t                  last_rssi;
 
+    /* Per-interface 802.11 TX sequence number.  Previously a file-level
+     * static, which would collide if multiple VIFs/interfaces share this
+     * driver.  The lower 4 bits are the fragment number and stay zero. */
+    uint16_t                tx_seq;
+
     /* buffers */
     uint8_t                 rx_buf[MT76_RX_URB_SIZE];
     uint8_t                 tx_buf[MT76_TX_URB_SIZE];

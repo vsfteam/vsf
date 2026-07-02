@@ -3198,6 +3198,7 @@ vsf_err_t __mt76_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     priv->pending_done = done;
     priv->state        = MT76_STATE_INIT_READ_ASIC;
     priv->last_rssi    = (int8_t)-128;
+    priv->tx_seq       = 0;
     /* Install RX handlers early so that MCU command responses received
      * during the init sequence (e.g. LOAD_CR) are routed to the chip
      * driver instead of being dropped. */
@@ -5568,12 +5569,6 @@ static const vsf_wifi_crypto_ops_t __mt76_crypto_ops = {
  * On USB this maps to the AC_BE bulk-out endpoint. */
 #define MT76_TX_QUEUE_MGMT                  1
 
-/* Software-managed 802.11 sequence number for MT76.  The chip's NSEQ bit
- * does not seem to increment the sequence number for our current WCID setup,
- * leaving every data frame with seq=0; the AP ACKs the radio frame but drops
- * it as a duplicate, causing the 4-way handshake to stall. */
-static uint16_t __mt76_tx_seq;
-
 vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 {
     if (len < 2) return VSF_ERR_INVALID_PARAMETER;
@@ -5903,8 +5898,8 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     }
 
     if ((mpdu_len >= 24) && ((txwi[4] & MT_TXWI_ACK_CTL_NSEQ) == 0)) {
-        __mt76_tx_seq++;
-        __mt76_put_le16(dst + 22, (uint16_t)(__mt76_tx_seq << 4));
+        priv->tx_seq++;
+        __mt76_put_le16(dst + 22, (uint16_t)(priv->tx_seq << 4));
     }
     memset(buf + total - pad, 0, pad);
 
