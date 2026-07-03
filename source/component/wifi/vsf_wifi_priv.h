@@ -24,6 +24,10 @@
 
 #if VSF_USE_WIFI == ENABLED
 
+#ifndef VSF_WIFI_CFG_CCMP_BUF_SIZE
+#   define VSF_WIFI_CFG_CCMP_BUF_SIZE      1600
+#endif
+
 /*============================ TYPES =========================================*/
 
 /*
@@ -146,6 +150,15 @@ struct vsf_wifi_t {
      * software CCMP encap/decap is bypassed (the chip does it in-line). */
     uint8_t  wpa_tx_pn[6];
     bool     wpa_hw_crypto;
+
+    /* Software CCMP working buffers.  Placed in the instance instead of local
+     * static arrays so the code remains re-entrant when multiple wifi instances
+     * exist or when an async path could overlap. */
+    uint32_t wpa_ccmp_tx_buf[(VSF_WIFI_CFG_CCMP_BUF_SIZE + 3) / 4];
+    uint32_t wpa_ccmp_rx_buf[(VSF_WIFI_CFG_CCMP_BUF_SIZE + 3) / 4];
+    uint32_t wpa_ccmp_verify_buf[(VSF_WIFI_CFG_CCMP_BUF_SIZE + 3) / 4];
+    uint8_t  wpa_ccmp_verify_cnt;
+    uint8_t  wpa_ccmp_fail_cnt;
 #endif
 
     /* ---- Script / blob dispatcher state ----

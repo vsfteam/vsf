@@ -778,10 +778,6 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
  * consumed: [802.11 hdr][CCMP hdr 8B][cipher == plaintext_len][MIC 8B].
  *==========================================================================*/
 
-#ifndef __VSF_WIFI_CCMP_BUF_SIZE
-#   define __VSF_WIFI_CCMP_BUF_SIZE     1600
-#endif
-
 /* Build the CCMP AAD and CCM nonce for a 3-address data MPDU, matching the
  * IEEE 802.11 masking rules (see hostap wlantest reference):
  *   FC : subtype bits (0x70 of byte0) masked; Retry/PwrMgt/MoreData (byte1
@@ -887,11 +883,9 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
 
     /* Self-verify: try to decrypt our own output and check roundtrip. */
     {
-        static uint32_t __verify_cnt = 0;
-        if (++__verify_cnt <= 5) {
-            static uint32_t __vbuf32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
-            uint8_t *vout = (uint8_t *)__vbuf32;
-            uint16_t vlen = __vsf_wifi_ccmp_decap(wifi, out, total, vout, (uint16_t)sizeof(__vbuf32));
+        if (++wifi->wpa_ccmp_verify_cnt <= 5) {
+            uint8_t *vout = (uint8_t *)wifi->wpa_ccmp_verify_buf;
+            uint16_t vlen = __vsf_wifi_ccmp_decap(wifi, out, total, vout, VSF_WIFI_CFG_CCMP_BUF_SIZE);
             if (vlen == 0) {
                 vsf_wifi_trace_error("wifi: CCMP TX self-verify FAILED (decrypt returned 0)"
                         VSF_TRACE_CFG_LINEEND);
@@ -1093,17 +1087,15 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             return;
         }
         {
-            static uint32_t __ccmp_rx32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
-            uint8_t *out = (uint8_t *)__ccmp_rx32;
+            uint8_t *out = (uint8_t *)wifi->wpa_ccmp_rx_buf;
             uint16_t plen = __vsf_wifi_ccmp_decap(wifi, dot11, len,
-                    out, (uint16_t)sizeof(__ccmp_rx32));
+                    out, VSF_WIFI_CFG_CCMP_BUF_SIZE);
             bool is_uc = !(dot11[4] & 0x01);
             if (plen == 0) {
-                static uint32_t __ccmp_fail_cnt = 0;
-                if (++__ccmp_fail_cnt <= 5) {
+                if (++wifi->wpa_ccmp_fail_cnt <= 5) {
                     vsf_wifi_trace_info("wifi: CCMP decap FAIL #%u len=%u"
                             VSF_TRACE_CFG_LINEEND,
-                            (unsigned)__ccmp_fail_cnt, (unsigned)len);
+                            (unsigned)wifi->wpa_ccmp_fail_cnt, (unsigned)len);
                 }
                 return;
             }
@@ -1952,10 +1944,9 @@ vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     if (wifi->wpa_ptk_valid && !wifi->wpa_hw_crypto &&
             (len >= 2) && (((frame[0] >> 2) & 0x03) == 2) &&
             ((frame[1] & 0x40) == 0)) {
-        static uint32_t __ccmp_tx32[(__VSF_WIFI_CCMP_BUF_SIZE + 3) / 4];
-        uint8_t *enc = (uint8_t *)__ccmp_tx32;
+        uint8_t *enc = (uint8_t *)wifi->wpa_ccmp_tx_buf;
         uint16_t total = __vsf_wifi_ccmp_encap(wifi, frame, len,
-                enc, (uint16_t)sizeof(__ccmp_tx32), wifi->wpa_tx_pn);
+                enc, VSF_WIFI_CFG_CCMP_BUF_SIZE, wifi->wpa_tx_pn);
         if (total == 0) return VSF_ERR_FAIL;
         return __vsf_wifi_tx_frame(wifi, enc, total);
     }
