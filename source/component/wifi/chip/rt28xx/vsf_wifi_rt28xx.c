@@ -742,15 +742,15 @@ static int __rt28xx_build_init(vsf_wifi_reg_op_t *ops)
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_GF40_PROT_CFG,        0x03E54084);
     /* AUTO_RSP_CFG (0x1404): match the Windows native driver's runtime value
      * 0x13 = AUTORESPONDER | BAC_ACK_POLICY | AR_PREAMBLE(short).  The Windows
-     * USB capture connecting to the SAME AP (ChinaNet-5Jhc) writes 0x13 every
-     * time (ref/rt5572_win_usb.log L2121/7876/8220/17615/18074), whereas the
-     * Linux rt2800 init writes 0x07 (AUTORESPONDER|BAC_ACK_POLICY|CTS_40_MMODE).
-     * Two differences vs our old 0x07: (1) drop bit2 CTS_40_MMODE -- ChinaNet is
-     * 20MHz on ch1 so 40MHz CTS duplicate mode should be off; (2) set bit4
-     * AR_PREAMBLE=1 so the hardware auto-ACK uses short preamble, which the AP
-     * expects.  A long-preamble auto-ACK the AP can't decode would explain the
-     * observed symptom: AP keeps retransmitting auth/assoc-resp and never
-     * advances to EAPOL M1 (handshake timeout). */
+     * USB capture writes 0x13 every time (ref/rt5572_win_usb.log
+     * L2121/7876/8220/17615/18074), whereas the Linux rt2800 init writes 0x07
+     * (AUTORESPONDER|BAC_ACK_POLICY|CTS_40_MMODE).  Two differences vs our old
+     * 0x07: (1) drop bit2 CTS_40_MMODE -- the target network is 20MHz on ch1 so
+     * 40MHz CTS duplicate mode should be off; (2) set bit4 AR_PREAMBLE=1 so the
+     * hardware auto-ACK uses short preamble, which the AP expects.  A
+     * long-preamble auto-ACK the AP can't decode would explain the observed
+     * symptom: AP keeps retransmitting auth/assoc-resp and never advances to
+     * EAPOL M1 (handshake timeout). */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_AUTO_RSP_CFG,        0x00000013);
     /* ---- TXOP_CTRL_CFG: match Windows capture 0x0000243F (reg 0x1340).
      * Previously disabled "for regression testing"; the Windows native driver
@@ -1687,7 +1687,7 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
             result.channel = ie[2];
         } else if (tag == 48) {                     /* RSN IE (WPA2) */
             __rt28xx_parse_rsn(ie + 2, l, &result);
-            if (result.ssid_len > 0 && !memcmp(result.ssid, "ChinaNet", 8) && l <= 32) {
+            {
                 char rsnbuf[80]; int rpos = 0;
                 for (uint8_t m = 0; m < l && rpos < (int)sizeof(rsnbuf) - 3; m++)
                     rpos += snprintf(&rsnbuf[rpos], sizeof(rsnbuf) - rpos, "%02X", ie[2 + m]);
@@ -1695,7 +1695,7 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
                         (unsigned)l, rsnbuf);
             }
         } else if (tag == 45) {                     /* HT Capabilities */
-            if (result.ssid_len > 0 && !memcmp(result.ssid, "ChinaNet", 8) && l <= 32) {
+            {
                 char htbuf[80]; int hpos = 0;
                 for (uint8_t m = 0; m < l && hpos < (int)sizeof(htbuf) - 3; m++)
                     hpos += snprintf(&htbuf[hpos], sizeof(htbuf) - hpos, "%02X", ie[2 + m]);

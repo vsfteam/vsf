@@ -1353,9 +1353,9 @@ static void __vsf_wifi_mlme_send_auth(vsf_wifi_t *wifi)
 /* Association-request (variable length: header + fixed fields + IEs). */
 static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
 {
-    /* Assoc-req body built from the Windows Ralink driver capture for the
-     * same AP (ChinaNet-5Jhc).  The exact IE order and capability bits are
-     * required for this AP to send EAPOL-Key M1 after association. */
+    /* Assoc-req body built from the Windows Ralink driver capture.
+     * The exact IE order and capability bits are required for the
+     * target AP to send EAPOL-Key M1 after association. */
     uint8_t  frame[256];
     uint16_t i = __vsf_wifi_mlme_hdr(wifi, frame, 0x00);  /* subtype 0x0 */
 
@@ -1399,10 +1399,12 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         i += sizeof(__ext_rates_ie);
     }
 
-    /* HT Capabilities IE (tag 45) - exact Windows values. */
+    /* HT Capabilities IE (tag 45) - aligned with Linux mt76x2u 5 GHz
+     * assoc-req.  First byte 0xff enables all caps that the Linux driver
+     * advertises; third byte 0x03 matches Linux. */
     static const uint8_t __ht_cap_ie[] = {
         0x2D, 0x1A,
-        0xAC, 0x01, 0x02,
+        0xFF, 0x01, 0x03,
         0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1434,18 +1436,20 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         i += sizeof(__rm_enabled_ie);
 
         static const uint8_t __supp_opclass_ie[] = {
-            0x3B, 0x11,
-            0x81, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79,
-            0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82,
+            0x3B, 0x15,
+            0x81, 0x51, 0x52, 0x53, 0x54, 0x73, 0x74, 0x75,
+            0x76, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D,
+            0x7E, 0x7F, 0x80, 0x81, 0x82,
         };
         memcpy(&frame[i], __supp_opclass_ie, sizeof(__supp_opclass_ie));
         i += sizeof(__supp_opclass_ie);
     }
 
-    /* Extended Capabilities IE (tag 127). */
+    /* Extended Capabilities IE (tag 127) - aligned with Linux mt76x2u. */
     static const uint8_t __ext_cap_ie[] = {
-        0x7F, 0x08,
-        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x7F, 0x0B,
+        0x00, 0x00, 0x0A, 0x02, 0x01, 0x40, 0x40, 0x40,
+        0x00, 0x01, 0x20,
     };
     memcpy(&frame[i], __ext_cap_ie, sizeof(__ext_cap_ie));
     i += sizeof(__ext_cap_ie);
@@ -1470,10 +1474,10 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
     memcpy(&frame[i], __wmm_ie, sizeof(__wmm_ie));
     i += sizeof(__wmm_ie);
 
-    /* Ralink proprietary IE 0x21 observed in the Windows capture. */
+    /* Ralink proprietary IE 0x21 observed in the Linux mt76 capture. */
     static const uint8_t __ralink_21_ie[] = {
         0x21, 0x02,
-        0x05, 0x13,
+        0x00, 0x14,
     };
     memcpy(&frame[i], __ralink_21_ie, sizeof(__ralink_21_ie));
     i += sizeof(__ralink_21_ie);
@@ -1484,7 +1488,7 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
      * handshake M2 can echo this IE unchanged. */
     if (wifi->wpa_auth.auth_mode == WIFI_AUTH_WPA2_PSK) {
         static const uint8_t __rsn_ie[] = {
-            0x30, 0x16,                 /* tag 48, length 22                 */
+            0x30, 0x14,                 /* tag 48, length 20                 */
             0x01, 0x00,                 /* RSN version 1                     */
             0x00, 0x0F, 0xAC, 0x04,     /* group cipher  = CCMP              */
             0x01, 0x00,                 /* pairwise count = 1                */
@@ -1492,7 +1496,6 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
             0x01, 0x00,                 /* AKM count     = 1                 */
             0x00, 0x0F, 0xAC, 0x02,     /* AKM           = PSK               */
             0x00, 0x00,                 /* RSN capabilities                  */
-            0x00, 0x00,                 /* PMKID count = 0                   */
         };
         memcpy(&frame[i], __rsn_ie, sizeof(__rsn_ie));
         i += sizeof(__rsn_ie);
