@@ -882,6 +882,7 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
     memcpy(cc + 8 + payload_len, mic, 8);
 
     /* Self-verify: try to decrypt our own output and check roundtrip. */
+#if VSF_WIFI_CFG_CCMP_TX_SELF_VERIFY == ENABLED
     {
         if (++wifi->wpa_ccmp_verify_cnt <= 5) {
             uint8_t *vout = (uint8_t *)wifi->wpa_ccmp_verify_buf;
@@ -917,6 +918,7 @@ static uint16_t __vsf_wifi_ccmp_encap(vsf_wifi_t *wifi,
             }
         }
     }
+#endif
 
     return total;
 }

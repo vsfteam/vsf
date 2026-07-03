@@ -105,6 +105,16 @@
 #endif
 
 /*
+ * CCMP TX self-verify: after software-encrypting a data frame, decrypt it again
+ * to confirm round-trip correctness.  Useful when bringing up a new chip driver
+ * or debugging software CCMP, but it costs one 1600-byte working buffer per
+ * wifi instance.  Keep DISABLED for normal operation.
+ */
+#ifndef VSF_WIFI_CFG_CCMP_TX_SELF_VERIFY
+#   define VSF_WIFI_CFG_CCMP_TX_SELF_VERIFY    DISABLED
+#endif
+
+/*
  * RT28xx (RT2870/RT3070/RT3572/RT5370/RT5572) hardware CCMP offloading.
  * When ENABLED the RT28xx chip driver registers crypto_ops and the wifi layer
  * skips software CCMP encap/decap.  When DISABLED the existing software CCMP

@@ -156,8 +156,10 @@ struct vsf_wifi_t {
      * exist or when an async path could overlap. */
     uint32_t wpa_ccmp_tx_buf[(VSF_WIFI_CFG_CCMP_BUF_SIZE + 3) / 4];
     uint32_t wpa_ccmp_rx_buf[(VSF_WIFI_CFG_CCMP_BUF_SIZE + 3) / 4];
+#if VSF_WIFI_CFG_CCMP_TX_SELF_VERIFY == ENABLED
     uint32_t wpa_ccmp_verify_buf[(VSF_WIFI_CFG_CCMP_BUF_SIZE + 3) / 4];
     uint8_t  wpa_ccmp_verify_cnt;
+#endif
     uint8_t  wpa_ccmp_fail_cnt;
 #endif
 
