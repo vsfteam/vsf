@@ -116,6 +116,10 @@
 #   error vsf_linux_fs need VSF_FS_CFG_VFS_FILE_HAS_OP
 #endif
 
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED
+#   error VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE is needed for vsf_eda_post_evt_msg
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

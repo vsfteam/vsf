@@ -212,6 +212,10 @@
 #   endif
 #endif
 
+#ifndef VSF_LINUX_USE_USB_HOST
+#   define VSF_LINUX_USE_USB_HOST               ENABLED
+#endif
+
 // do not check VSF_USE_APPLET
 #if VSF_LINUX_USE_APPLET == ENABLED
 #   ifndef VSF_LINUX_APPLET_USE_DLFCN

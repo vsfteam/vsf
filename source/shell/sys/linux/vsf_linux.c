@@ -1153,7 +1153,9 @@ vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op
 #else
         thread->entry = (vsf_thread_entry_t *)op->on_run;
 #endif
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
         thread->sighandler = __vsf_linux_sighandler;
+#endif
 
         // set stack
         thread->stack_size = stack_size;
@@ -3726,6 +3728,7 @@ int sched_get_priority_min(int policy)
 
 int sched_getparam(pid_t pid, struct sched_param *param)
 {
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
     if (NULL == process) { return -1; }
 
@@ -3735,10 +3738,15 @@ int sched_getparam(pid_t pid, struct sched_param *param)
 
     param->sched_priority = __vsf_eda_get_cur_priority(&thread->use_as__vsf_eda_t);
     return 0;
+#else
+    errno = ENOTSUP;
+    return -1;
+#endif
 }
 
 int sched_setparam(pid_t pid, const struct sched_param *param)
 {
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
     if (NULL == process) { return -1; }
 
@@ -3746,6 +3754,10 @@ int sched_setparam(pid_t pid, const struct sched_param *param)
         __vsf_eda_set_priority(&_->use_as__vsf_eda_t, param->sched_priority);
     }
     return 0;
+#else
+    errno = ENOTSUP;
+    return -1;
+#endif
 }
 
 int sched_getscheduler(pid_t pid)
