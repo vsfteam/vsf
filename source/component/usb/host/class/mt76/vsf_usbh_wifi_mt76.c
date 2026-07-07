@@ -195,7 +195,7 @@ static void *__vk_usbh_wifi_mt76_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 
     if (desc_ifs->bInterfaceNumber != 0) return NULL;
 
-    vsf_wifi_chip_mt76_trace_info(
+    vsf_wifi_chip_mt76_trace_debug(
         "mt76usb: probe if=%d" VSF_TRACE_CFG_LINEEND,
         desc_ifs->bInterfaceNumber);
 
@@ -315,13 +315,13 @@ static void *__vk_usbh_wifi_mt76_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info(&uwifi->eda, "usbh_wifi_mt76", NULL, 0);
 #endif
-    vsf_wifi_chip_mt76_trace_info(
+    vsf_wifi_chip_mt76_trace_debug(
         "mt76usb: probe ok, starting wifi" VSF_TRACE_CFG_LINEEND);
     vsf_wifi_on_new(&uwifi->wifi);
     return uwifi;
 
 free_all:
-    vsf_wifi_chip_mt76_trace_info(
+    vsf_wifi_chip_mt76_trace_debug(
         "mt76usb: probe failed" VSF_TRACE_CFG_LINEEND);
     if (uwifi->usbh != NULL) {
         __vk_usbh_wifi_mt76_free_all_urbs(uwifi);
@@ -707,7 +707,7 @@ static void __vk_usbh_wifi_mt76_ep0_dispatch(vk_usbh_wifi_mt76_t *uwifi)
 static void __vk_usbh_wifi_mt76_on_ready(vsf_wifi_t *wifi)
 {
     vk_usbh_wifi_mt76_t *uwifi = __vk_usbh_wifi_mt76_from_wifi(wifi);
-    vsf_wifi_chip_mt76_trace_info(
+    vsf_wifi_chip_mt76_trace_debug(
         "mt76usb: on_ready called" VSF_TRACE_CFG_LINEEND);
     if (!__vk_usbh_wifi_mt76_start_rx(uwifi)) {
         vk_usbh_remove_interface(uwifi->usbh, uwifi->dev, uwifi->ifs);
@@ -938,14 +938,14 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
 
     vk_usbh_pipe_t target_pipe = vk_usbh_get_pipe_from_ep_desc(uwifi->dev,
             uwifi->out_ep[queue_idx].desc);
-    vsf_trace_info("mt76usb: tx before switch iocb_ep=%d target_ep=%d" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_chip_mt76_trace_debug("mt76usb: tx before switch iocb_ep=%d target_ep=%d" VSF_TRACE_CFG_LINEEND,
             iocb->urb.urb_hcd->pipe.endpoint, target_pipe.endpoint);
     if (iocb->urb.urb_hcd->pipe.endpoint != target_pipe.endpoint) {
         /* A pre-allocated IOCB may be bound to the firmware endpoint; switch
          * the underlying HCD pipe to the target TX queue endpoint. */
         iocb->urb.urb_hcd->pipe = target_pipe;
     }
-    vsf_trace_info("mt76usb: tx after switch iocb_ep=%d" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_chip_mt76_trace_debug("mt76usb: tx after switch iocb_ep=%d" VSF_TRACE_CFG_LINEEND,
             iocb->urb.urb_hcd->pipe.endpoint);
     iocb->is_busy = true;
     iocb->ep_idx  = queue_idx;
@@ -953,7 +953,7 @@ static vsf_err_t __vk_usbh_wifi_mt76_tx_frame(vsf_wifi_t *wifi,
 
     vsf_err_t err = vk_usbh_submit_urb_ex(uwifi->usbh, &iocb->urb,
             0, &uwifi->eda);
-    vsf_trace_info("mt76usb: submit_urb err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
+    vsf_wifi_chip_mt76_trace_debug("mt76usb: submit_urb err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
     if (VSF_ERR_NONE != err) {
         iocb->is_busy = false;
         iocb->done    = NULL;
