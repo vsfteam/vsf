@@ -21,57 +21,8 @@
 
 #if VSF_USE_WIFI == ENABLED && VSF_WIFI_USE_MT76 == ENABLED
 
-#include "../../vsf_wifi_priv.h"
-
-/*============================ MACROS ========================================*/
-
-/* USB vendor request types used by MT76 */
-#define MT76_VEND_READ_CFG          0x01
-#define MT76_VEND_WRITE_CFG         0x02
-#define MT76_VEND_READ_EEPROM       0x03
-#define MT76_VEND_MULTI_READ        0x07
-#define MT76_VEND_MULTI_WRITE       0x06
-#define MT76_VEND_WRITE_FCE         0x05
-#define MT76_VEND_DEV_MODE          0x01
-
-/*============================ IMPLEMENTATION ================================*/
-
-vsf_err_t __mt76_usb_reg_read(vsf_wifi_t *wifi, uint32_t reg,
-                               uint32_t *out, vsf_wifi_done_t done)
-{
-    /* TODO: USB control transfer read */
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t __mt76_usb_reg_write(vsf_wifi_t *wifi, uint32_t reg,
-                                uint32_t val, vsf_wifi_done_t done)
-{
-    /* TODO: USB control transfer write */
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t __mt76_usb_bulk_out(vsf_wifi_t *wifi, const uint8_t *data,
-                               uint16_t len, uint8_t ep_idx,
-                               vsf_wifi_done_t done)
-{
-    /* TODO: USB bulk OUT */
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t __mt76_usb_bulk_in_submit(vsf_wifi_t *wifi, uint8_t *buf,
-                                     uint16_t len, uint8_t ep_idx)
-{
-    /* TODO: submit bulk IN URB */
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t __mt76_usb_vendor_req(vsf_wifi_t *wifi, uint8_t req,
-                                 uint8_t req_type, uint16_t value,
-                                 uint16_t index, void *buf, uint16_t len,
-                                 vsf_wifi_done_t done)
-{
-    /* TODO: generic vendor request */
-    return VSF_ERR_NOT_SUPPORT;
-}
+/* USB bus primitives (vendor requests, bulk in/out, probe/disconnect) live in
+ * vsf/source/component/usb/host/class/mt76/vsf_usbh_wifi_mt76.c.  This file is
+ * kept as a placeholder for any chip-layer USB helpers that may be added later. */
 
 #endif      /* VSF_USE_WIFI == ENABLED && VSF_WIFI_USE_MT76 == ENABLED */
