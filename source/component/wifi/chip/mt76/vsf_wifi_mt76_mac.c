@@ -1594,7 +1594,11 @@ static void __mt76_set_channel_post_step(vsf_wifi_t *wifi, vsf_err_t err)
         break;
     }
     case 10:
-        __mt76_mac_start(wifi, __mt76_set_channel_start_done);
+        if (priv->set_channel_scan) {
+            __mt76_set_channel_start_done(wifi, VSF_ERR_NONE);
+        } else {
+            __mt76_mac_start(wifi, __mt76_set_channel_start_done);
+        }
         break;
     default:
         step_err = VSF_ERR_FAIL;
@@ -1876,6 +1880,13 @@ static vsf_err_t __mt76_set_channel_ex(vsf_wifi_t *wifi, uint8_t channel,
         (unsigned)cfg.channel, (int)scan, (unsigned)cfg.bw,
         (unsigned)cfg.bw_index, (unsigned)cfg.ch_group, (int)cfg.is_5g);
 
+    /* Linux mt76x2u omits MAC stop/start for scan-only channel switches.
+     * Keeping TX/RX active during scan avoids a long poll-wait on MAC_STATUS
+     * and BBP(IBI,12) for every channel.  Connect/fini paths still stop MAC. */
+    if (scan) {
+        __mt76_set_channel_stop_done(wifi, VSF_ERR_NONE);
+        return VSF_ERR_NONE;
+    }
     return __mt76_mac_stop(wifi, __mt76_set_channel_stop_done);
 }
 
