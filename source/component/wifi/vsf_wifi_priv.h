@@ -195,6 +195,7 @@ struct vsf_wifi_t {
             uint16_t              reserved;
             uint32_t              last_val;    /* read landing zone */
             vsf_wifi_reg_match_fn_t   match;
+            void                  *match_ctx;
         } read_poll;
     } s;
 

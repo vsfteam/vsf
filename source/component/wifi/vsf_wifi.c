@@ -512,7 +512,8 @@ static void __vsf_wifi_read_poll_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
     if (wifi->s.read_poll.match != NULL
-            && wifi->s.read_poll.match(wifi->s.read_poll.last_val)) {
+            && wifi->s.read_poll.match(wifi->s.read_poll.match_ctx,
+                                       wifi->s.read_poll.last_val)) {
         vsf_wifi_trace_debug("wifi: read_poll reg=0x%08X matched val=0x%08X" VSF_TRACE_CFG_LINEEND,
                 (unsigned)wifi->s.read_poll.reg,
                 (unsigned)wifi->s.read_poll.last_val);
@@ -548,8 +549,8 @@ static void __vsf_wifi_read_poll_timer_cb(vsf_callback_timer_t *timer)
 #endif
 
 vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint32_t reg,
-        vsf_wifi_reg_match_fn_t match, uint16_t max_retry, uint16_t interval_ms,
-        vsf_wifi_done_t done)
+        vsf_wifi_reg_match_fn_t match, void *match_ctx, uint16_t max_retry,
+        uint16_t interval_ms, vsf_wifi_done_t done)
 {
     if (wifi->script_busy)              return VSF_ERR_NOT_AVAILABLE;
     if (NULL == match)                  return VSF_ERR_INVALID_PARAMETER;
@@ -562,6 +563,7 @@ vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint32_t reg,
     memset(&wifi->s, 0, sizeof(wifi->s));
     wifi->s.read_poll.reg          = reg;
     wifi->s.read_poll.match        = match;
+    wifi->s.read_poll.match_ctx    = match_ctx;
     wifi->s.read_poll.retry_left   = (uint16_t)(max_retry - 1);
     wifi->s.read_poll.interval_ms  = interval_ms;
     wifi->s.read_poll.last_val     = 0;

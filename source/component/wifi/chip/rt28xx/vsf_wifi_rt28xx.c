@@ -422,6 +422,67 @@
         RT28XX_RF_WRITE  | RT28XX_RF_BUSY | (((uint32_t)(r_) & 0x3F) << 8)     \
                          |  ((uint32_t)(v_) & 0xFF))
 
+#ifndef RT28XX_TX_BUF_SIZE
+#   define RT28XX_TX_BUF_SIZE   1600
+#endif
+
+typedef struct rt28xx_wifi_priv_t {
+    uint8_t             rf_shadow[64];
+    uint8_t             bbp_shadow[256];
+    uint8_t             freq_offset;
+    bool                iq_valid;
+    uint8_t             iq_gain_tx0;
+    uint8_t             iq_phase_tx0;
+    uint8_t             iq_gain_tx1;
+    uint8_t             iq_phase_tx1;
+    uint8_t             iq_rf_comp;
+    uint8_t             iq_rf_imbal;
+    vsf_wifi_reg_op_t   ops_buf[384];
+    uint32_t            asic_ver;
+    uint8_t             xtal40;
+    uint32_t            txfifo_val;
+    uint32_t            txfifo_ok;
+    uint32_t            txfifo_fail;
+    uint32_t            macdbg_val;
+    struct {
+        uint32_t        detect_val;
+        uint32_t        data3, data2, data1, data0;
+        uint32_t        freq_raw;
+        uint32_t        iq_raw3, iq_raw2, iq_raw0;
+    } efuse_ctx;
+    uint32_t            bbp_probe;
+    uint8_t             bbp_wait_tries;
+    uint32_t            rf_probe;
+    uint32_t            init_pbf;
+    vsf_wifi_done_t     init_done;
+    vsf_wifi_done_t     setch_done;
+    uint8_t             setch_channel;
+    uint32_t            rxsta1;
+    uint32_t            macctrl;
+    uint32_t            ldo;
+    uint32_t            chbusy;
+    uint32_t            chidle;
+    uint32_t            setch_bbpprobe;
+    uint32_t            shared_key_mode[4];
+    uint32_t            tx_buf32[(RT28XX_TX_BUF_SIZE + 3) / 4];
+} rt28xx_wifi_priv_t;
+
+static inline rt28xx_wifi_priv_t *__rt28xx_priv(vsf_wifi_t *wifi)
+{
+    return (rt28xx_wifi_priv_t *)wifi->chip_priv;
+}
+
+static rt28xx_wifi_priv_t *__rt28xx_priv_ensure(vsf_wifi_t *wifi)
+{
+    if (wifi->chip_priv == NULL) {
+        wifi->chip_priv = vsf_heap_malloc(sizeof(rt28xx_wifi_priv_t));
+        if (wifi->chip_priv != NULL) {
+            memset(wifi->chip_priv, 0, sizeof(rt28xx_wifi_priv_t));
+        }
+    }
+    return (rt28xx_wifi_priv_t *)wifi->chip_priv;
+}
+
 /*===================== SHADOW REGISTERS + EMIT HELPERS ======================*
  *
  * The RT5592 RF/BBP bring-up sequence is full of read-modify-write steps
@@ -433,59 +494,32 @@
  * the intended on-chip state.
  *==========================================================================*/
 
-static uint8_t __rt28xx_rf_shadow[64];
-static uint8_t __rt28xx_bbp_shadow[256];
-
-/* RF frequency offset (RFCSR17_CODE) decoded from EEPROM_FREQ during bring-up.
- * 0 = not yet read / not programmed, in which case the channel script leaves
- * RFCSR17 alone (matches the previous "freq offset defaulted to 0" behaviour).
- * Defined here so __rt28xx_emit_channel() (above the eFuse chain) can read it. */
-static uint8_t __rt28xx_freq_offset;
-
-/* TX IQ calibration values decoded from EEPROM (ref rt2800_iq_calibrate).
- * 2.4 GHz only for now (the AP under test is 2.4 GHz).  __rt28xx_iq_valid is
- * set once the eFuse IQ block has been read; until then emit_channel skips
- * the IQ writes and leaves the BBP IQ registers at their init defaults. */
-static bool    __rt28xx_iq_valid;
-static uint8_t __rt28xx_iq_gain_tx0;    /* byte 0x130, BBP158=0x2c */
-static uint8_t __rt28xx_iq_phase_tx0;   /* byte 0x131, BBP158=0x2d */
-static uint8_t __rt28xx_iq_gain_tx1;    /* byte 0x133, BBP158=0x4a */
-static uint8_t __rt28xx_iq_phase_tx1;   /* byte 0x134, BBP158=0x4b */
-static uint8_t __rt28xx_iq_rf_comp;     /* byte 0x13C, BBP158=0x04 (0xff->0) */
-static uint8_t __rt28xx_iq_rf_imbal;    /* byte 0x13D, BBP158=0x03 (0xff->0) */
-
-/* Scratch big enough for the whole init sequence (~270 ops incl. the 84-entry
- * GLRT table) and for a single channel switch (~75 ops).  init / set_channel /
- * connect never run concurrently (the executor is single-flight), so they can
- * share one static buffer. */
-static vsf_wifi_reg_op_t __rt28xx_ops_buf[384];
-
-static int __emit_rf(vsf_wifi_reg_op_t *ops, int n, uint8_t reg, uint8_t val)
+static int __emit_rf(rt28xx_wifi_priv_t *priv, int n, uint8_t reg, uint8_t val)
 {
-    __rt28xx_rf_shadow[reg] = val;
-    ops[n] = (vsf_wifi_reg_op_t)RT_OP_RF(reg, val);
+    priv->rf_shadow[reg] = val;
+    priv->ops_buf[n] = (vsf_wifi_reg_op_t)RT_OP_RF(reg, val);
     return n + 1;
 }
 
-static int __emit_rf_rmw(vsf_wifi_reg_op_t *ops, int n, uint8_t reg,
+static int __emit_rf_rmw(rt28xx_wifi_priv_t *priv, int n, uint8_t reg,
         uint8_t mask, uint8_t val)
 {
-    uint8_t v = (uint8_t)((__rt28xx_rf_shadow[reg] & ~mask) | (val & mask));
-    return __emit_rf(ops, n, reg, v);
+    uint8_t v = (uint8_t)((priv->rf_shadow[reg] & ~mask) | (val & mask));
+    return __emit_rf(priv, n, reg, v);
 }
 
-static int __emit_bbp(vsf_wifi_reg_op_t *ops, int n, uint8_t reg, uint8_t val)
+static int __emit_bbp(rt28xx_wifi_priv_t *priv, int n, uint8_t reg, uint8_t val)
 {
-    __rt28xx_bbp_shadow[reg] = val;
-    ops[n] = (vsf_wifi_reg_op_t)RT_OP_BBP(reg, val);
+    priv->bbp_shadow[reg] = val;
+    priv->ops_buf[n] = (vsf_wifi_reg_op_t)RT_OP_BBP(reg, val);
     return n + 1;
 }
 
-static int __emit_bbp_rmw(vsf_wifi_reg_op_t *ops, int n, uint8_t reg,
+static int __emit_bbp_rmw(rt28xx_wifi_priv_t *priv, int n, uint8_t reg,
         uint8_t mask, uint8_t val)
 {
-    uint8_t v = (uint8_t)((__rt28xx_bbp_shadow[reg] & ~mask) | (val & mask));
-    return __emit_bbp(ops, n, reg, v);
+    uint8_t v = (uint8_t)((priv->bbp_shadow[reg] & ~mask) | (val & mask));
+    return __emit_bbp(priv, n, reg, v);
 }
 
 /* GLRT (Generalized Likelihood Ratio Test) table, BBP indices 128..211,
@@ -510,92 +544,91 @@ static const uint8_t __rt28xx_glrt_5592[] = {
  *==========================================================================*/
 /* Captured from the MCU-ready poll (ASIC_VER_ID).  Low 16 bits = revision;
  * used to select the RT5592C+ vs pre-C BBP/RFCSR init tail. */
-static uint32_t __rt28xx_asic_ver;
-static inline bool __rt28xx_is_5592c(void)
+static inline bool __rt28xx_is_5592c(rt28xx_wifi_priv_t *priv)
 {
-    return (__rt28xx_asic_ver & 0xFFFFu) >= RT28XX_REV_RT5592C;
+    return (priv->asic_ver & 0xFFFFu) >= RT28XX_REV_RT5592C;
 }
 
-static int __rt28xx_build_bbp(vsf_wifi_reg_op_t *ops, int n)
+static int __rt28xx_build_bbp(rt28xx_wifi_priv_t *priv, int n)
 {
     int i;
 
     /* init_bbp_early */
-    n = __emit_bbp(ops, n, 65, 0x2C);
-    n = __emit_bbp(ops, n, 66, 0x38);
-    n = __emit_bbp(ops, n, 68, 0x0B);
-    n = __emit_bbp(ops, n, 69, 0x12);
-    n = __emit_bbp(ops, n, 70, 0x0A);
-    n = __emit_bbp(ops, n, 73, 0x10);
-    n = __emit_bbp(ops, n, 81, 0x37);
-    n = __emit_bbp(ops, n, 82, 0x62);
-    n = __emit_bbp(ops, n, 83, 0x6A);
-    n = __emit_bbp(ops, n, 84, 0x99);
-    n = __emit_bbp(ops, n, 86, 0x00);
-    n = __emit_bbp(ops, n, 91, 0x04);
-    n = __emit_bbp(ops, n, 92, 0x00);
-    n = __emit_bbp(ops, n, 103, 0x00);
-    n = __emit_bbp(ops, n, 105, 0x05);
-    n = __emit_bbp(ops, n, 106, 0x35);
+    n = __emit_bbp(priv, n, 65, 0x2C);
+    n = __emit_bbp(priv, n, 66, 0x38);
+    n = __emit_bbp(priv, n, 68, 0x0B);
+    n = __emit_bbp(priv, n, 69, 0x12);
+    n = __emit_bbp(priv, n, 70, 0x0A);
+    n = __emit_bbp(priv, n, 73, 0x10);
+    n = __emit_bbp(priv, n, 81, 0x37);
+    n = __emit_bbp(priv, n, 82, 0x62);
+    n = __emit_bbp(priv, n, 83, 0x6A);
+    n = __emit_bbp(priv, n, 84, 0x99);
+    n = __emit_bbp(priv, n, 86, 0x00);
+    n = __emit_bbp(priv, n, 91, 0x04);
+    n = __emit_bbp(priv, n, 92, 0x00);
+    n = __emit_bbp(priv, n, 103, 0x00);
+    n = __emit_bbp(priv, n, 105, 0x05);
+    n = __emit_bbp(priv, n, 106, 0x35);
 
     /* BBP105 MLD = (rx_chain == 2); single chain -> 0 (overwritten to 0x3C) */
-    n = __emit_bbp_rmw(ops, n, 105, BBP105_MLD, 0);
-    n = __emit_bbp_rmw(ops, n, 4, BBP4_MAC_IF_CTRL, BBP4_MAC_IF_CTRL);
+    n = __emit_bbp_rmw(priv, n, 105, BBP105_MLD, 0);
+    n = __emit_bbp_rmw(priv, n, 4, BBP4_MAC_IF_CTRL, BBP4_MAC_IF_CTRL);
 
-    n = __emit_bbp(ops, n, 20, 0x06);
-    n = __emit_bbp(ops, n, 31, 0x08);
-    n = __emit_bbp(ops, n, 65, 0x2C);
-    n = __emit_bbp(ops, n, 68, 0xDD);
-    n = __emit_bbp(ops, n, 69, 0x1A);
-    n = __emit_bbp(ops, n, 70, 0x05);
-    n = __emit_bbp(ops, n, 73, 0x13);
-    n = __emit_bbp(ops, n, 74, 0x0F);
-    n = __emit_bbp(ops, n, 75, 0x4F);
-    n = __emit_bbp(ops, n, 76, 0x28);
-    n = __emit_bbp(ops, n, 77, 0x59);
-    n = __emit_bbp(ops, n, 84, 0x9A);
-    n = __emit_bbp(ops, n, 86, 0x38);
-    n = __emit_bbp(ops, n, 88, 0x90);
-    n = __emit_bbp(ops, n, 91, 0x04);
-    n = __emit_bbp(ops, n, 92, 0x02);
-    n = __emit_bbp(ops, n, 95, 0x9A);
-    n = __emit_bbp(ops, n, 98, 0x12);
-    n = __emit_bbp(ops, n, 103, 0xC0);
-    n = __emit_bbp(ops, n, 104, 0x92);
-    n = __emit_bbp(ops, n, 105, 0x3C);
-    n = __emit_bbp(ops, n, 106, 0x35);
-    n = __emit_bbp(ops, n, 128, 0x12);
-    n = __emit_bbp(ops, n, 134, 0xD0);
-    n = __emit_bbp(ops, n, 135, 0xF6);
-    n = __emit_bbp(ops, n, 137, 0x0F);
+    n = __emit_bbp(priv, n, 20, 0x06);
+    n = __emit_bbp(priv, n, 31, 0x08);
+    n = __emit_bbp(priv, n, 65, 0x2C);
+    n = __emit_bbp(priv, n, 68, 0xDD);
+    n = __emit_bbp(priv, n, 69, 0x1A);
+    n = __emit_bbp(priv, n, 70, 0x05);
+    n = __emit_bbp(priv, n, 73, 0x13);
+    n = __emit_bbp(priv, n, 74, 0x0F);
+    n = __emit_bbp(priv, n, 75, 0x4F);
+    n = __emit_bbp(priv, n, 76, 0x28);
+    n = __emit_bbp(priv, n, 77, 0x59);
+    n = __emit_bbp(priv, n, 84, 0x9A);
+    n = __emit_bbp(priv, n, 86, 0x38);
+    n = __emit_bbp(priv, n, 88, 0x90);
+    n = __emit_bbp(priv, n, 91, 0x04);
+    n = __emit_bbp(priv, n, 92, 0x02);
+    n = __emit_bbp(priv, n, 95, 0x9A);
+    n = __emit_bbp(priv, n, 98, 0x12);
+    n = __emit_bbp(priv, n, 103, 0xC0);
+    n = __emit_bbp(priv, n, 104, 0x92);
+    n = __emit_bbp(priv, n, 105, 0x3C);
+    n = __emit_bbp(priv, n, 106, 0x35);
+    n = __emit_bbp(priv, n, 128, 0x12);
+    n = __emit_bbp(priv, n, 134, 0xD0);
+    n = __emit_bbp(priv, n, 135, 0xF6);
+    n = __emit_bbp(priv, n, 137, 0x0F);
 
     /* GLRT */
     for (i = 0; i < (int)dimof(__rt28xx_glrt_5592); i++) {
-        n = __emit_bbp(ops, n, 195, (uint8_t)(128 + i));
-        n = __emit_bbp(ops, n, 196, __rt28xx_glrt_5592[i]);
+        n = __emit_bbp(priv, n, 195, (uint8_t)(128 + i));
+        n = __emit_bbp(priv, n, 196, __rt28xx_glrt_5592[i]);
     }
 
-    n = __emit_bbp_rmw(ops, n, 4, BBP4_MAC_IF_CTRL, BBP4_MAC_IF_CTRL);
+    n = __emit_bbp_rmw(priv, n, 4, BBP4_MAC_IF_CTRL, BBP4_MAC_IF_CTRL);
     /* antenna 0 -> RX_DEFAULT_ANT = 1 */
-    n = __emit_bbp_rmw(ops, n, 152, BBP152_RX_DEFAULT_ANT, BBP152_RX_DEFAULT_ANT);
+    n = __emit_bbp_rmw(priv, n, 152, BBP152_RX_DEFAULT_ANT, BBP152_RX_DEFAULT_ANT);
     /* RT5592C+ only: set BBP254 bit7 (rt2800_init_bbp_5592:7028). */
-    if (__rt28xx_is_5592c()) {
-        n = __emit_bbp_rmw(ops, n, 254, BBP254_BIT7, BBP254_BIT7);
+    if (__rt28xx_is_5592c(priv)) {
+        n = __emit_bbp_rmw(priv, n, 254, BBP254_BIT7, BBP254_BIT7);
     }
     /* init_freq_calibration */
-    n = __emit_bbp(ops, n, 142, 0x01);
-    n = __emit_bbp(ops, n, 143, 0x39);
-    n = __emit_bbp(ops, n, 84, 0x19);
+    n = __emit_bbp(priv, n, 142, 0x01);
+    n = __emit_bbp(priv, n, 143, 0x39);
+    n = __emit_bbp(priv, n, 84, 0x19);
     /* RT5592C+ only: re-assert BBP103=0xC0 (rt2800_init_bbp_5592:7038). */
-    if (__rt28xx_is_5592c()) {
-        n = __emit_bbp(ops, n, 103, 0xC0);
+    if (__rt28xx_is_5592c(priv)) {
+        n = __emit_bbp(priv, n, 103, 0xC0);
     }
     /* ---- BBP1 / BBP3 : TX & RX antenna chain config (init_bbp_5592:7055-7060
      * + config_ant for 2T2R).  BBP1=0x50 matches the Windows native driver and
      * is required for CCK short-preamble EAPOL-Key M1 reception; 0x14 causes
      * the PHY to miss M1 and the 4-way handshake times out. ---- */
-    n = __emit_bbp(ops, n, 1, 0x50);
-    n = __emit_bbp(ops, n, 3, 0x08);   /* RX_ANTENNA=1 (both chains active)   */
+    n = __emit_bbp(priv, n, 1, 0x50);
+    n = __emit_bbp(priv, n, 3, 0x08);   /* RX_ANTENNA=1 (both chains active)   */
     return n;
 }
 
@@ -604,68 +637,69 @@ static int __rt28xx_build_bbp(vsf_wifi_reg_op_t *ops, int n)
  * normal_mode_setup_5xxx().  freq_cal_mode1() is skipped (USB MCU command,
  * frequency offset defaulted to 0).  Pre-RT5592C revision assumed.
  *==========================================================================*/
-static int __rt28xx_build_rfcsr(vsf_wifi_reg_op_t *ops, int n)
+static int __rt28xx_build_rfcsr(rt28xx_wifi_priv_t *priv, int n)
 {
     /* rf_init_calibration(30): pulse RFCSR30 bit7 (RF_CALIBRATION) */
-    n = __emit_rf_rmw(ops, n, 30, RFCSR30_RF_CALIBRATION, RFCSR30_RF_CALIBRATION);
-    n = __emit_rf_rmw(ops, n, 30, RFCSR30_RF_CALIBRATION, 0);
+    n = __emit_rf_rmw(priv, n, 30, RFCSR30_RF_CALIBRATION, RFCSR30_RF_CALIBRATION);
+    n = __emit_rf_rmw(priv, n, 30, RFCSR30_RF_CALIBRATION, 0);
 
-    n = __emit_rf(ops, n, 1, 0x3F);
-    n = __emit_rf(ops, n, 3, 0x08);
-    n = __emit_rf(ops, n, 5, 0x10);
-    n = __emit_rf(ops, n, 6, 0xE4);
-    n = __emit_rf(ops, n, 7, 0x00);
-    n = __emit_rf(ops, n, 14, 0x00);
-    n = __emit_rf(ops, n, 15, 0x00);
-    n = __emit_rf(ops, n, 16, 0x00);
-    n = __emit_rf(ops, n, 18, 0x03);
-    n = __emit_rf(ops, n, 19, 0x4D);
-    n = __emit_rf(ops, n, 20, 0x10);
-    n = __emit_rf(ops, n, 21, 0x8D);
-    n = __emit_rf(ops, n, 26, 0x82);
-    n = __emit_rf(ops, n, 28, 0x00);
-    n = __emit_rf(ops, n, 29, 0x10);
-    n = __emit_rf(ops, n, 33, 0xC0);
-    n = __emit_rf(ops, n, 34, 0x07);
-    n = __emit_rf(ops, n, 35, 0x12);
-    n = __emit_rf(ops, n, 47, 0x0C);
-    n = __emit_rf(ops, n, 53, 0x22);
-    n = __emit_rf(ops, n, 63, 0x07);
+    n = __emit_rf(priv, n, 1, 0x3F);
+    n = __emit_rf(priv, n, 3, 0x08);
+    n = __emit_rf(priv, n, 5, 0x10);
+    n = __emit_rf(priv, n, 6, 0xE4);
+    n = __emit_rf(priv, n, 7, 0x00);
+    n = __emit_rf(priv, n, 14, 0x00);
+    n = __emit_rf(priv, n, 15, 0x00);
+    n = __emit_rf(priv, n, 16, 0x00);
+    n = __emit_rf(priv, n, 18, 0x03);
+    n = __emit_rf(priv, n, 19, 0x4D);
+    n = __emit_rf(priv, n, 20, 0x10);
+    n = __emit_rf(priv, n, 21, 0x8D);
+    n = __emit_rf(priv, n, 26, 0x82);
+    n = __emit_rf(priv, n, 28, 0x00);
+    n = __emit_rf(priv, n, 29, 0x10);
+    n = __emit_rf(priv, n, 33, 0xC0);
+    n = __emit_rf(priv, n, 34, 0x07);
+    n = __emit_rf(priv, n, 35, 0x12);
+    n = __emit_rf(priv, n, 47, 0x0C);
+    n = __emit_rf(priv, n, 53, 0x22);
+    n = __emit_rf(priv, n, 63, 0x07);
 
-    n = __emit_rf(ops, n, 2, 0x80);
+    n = __emit_rf(priv, n, 2, 0x80);
 
     /* RT5592C+ only: "Enable DC filter" BBP103=0xC0 (init_rfcsr_5592:8494). */
-    if (__rt28xx_is_5592c()) {
-        n = __emit_bbp(ops, n, 103, 0xC0);
+    if (__rt28xx_is_5592c(priv)) {
+        n = __emit_bbp(priv, n, 103, 0xC0);
     }
 
     /* normal_mode_setup_5xxx(): for a 2T2R part (RXPATH==TXPATH==2) the
      * reference leaves BBP138 untouched -- both ADCs and DACs stay on.  Only a
      * single-chain EEPROM would clear RX_ADC1 / set TX_DAC1, which we must NOT
      * do here or chain-1 RX is killed. */
-    n = __emit_rf_rmw(ops, n, 38, RFCSR38_RX_LO1_EN, 0);
-    n = __emit_rf_rmw(ops, n, 39, RFCSR39_RX_LO2_EN, 0);
-    n = __emit_bbp_rmw(ops, n, 4, BBP4_MAC_IF_CTRL, BBP4_MAC_IF_CTRL);
-    n = __emit_rf_rmw(ops, n, 30, RFCSR30_RX_VCM, (uint8_t)(2 << 3));
+    n = __emit_rf_rmw(priv, n, 38, RFCSR38_RX_LO1_EN, 0);
+    n = __emit_rf_rmw(priv, n, 39, RFCSR39_RX_LO2_EN, 0);
+    n = __emit_bbp_rmw(priv, n, 4, BBP4_MAC_IF_CTRL, BBP4_MAC_IF_CTRL);
+    n = __emit_rf_rmw(priv, n, 30, RFCSR30_RX_VCM, (uint8_t)(2 << 3));
 
     /* pre-RT5592C only: RFCSR27=0x03 (init_rfcsr_5592:8499).  On RT5592C+ this
      * write is omitted -- programming it there mis-sets the RF and was a real
      * bug in the original (revision-blind) port. */
-    if (!__rt28xx_is_5592c()) {
-        n = __emit_rf(ops, n, 27, 0x03);
+    if (!__rt28xx_is_5592c(priv)) {
+        n = __emit_rf(priv, n, 27, 0x03);
     }
     return n;
 }
 
 /*============================== INIT BUILDER ================================*/
-static int __rt28xx_build_init(vsf_wifi_reg_op_t *ops)
+static int __rt28xx_build_init(rt28xx_wifi_priv_t *priv)
 {
+    vsf_wifi_reg_op_t *ops = priv->ops_buf;
     int n = 0;
 
     /* Chip powers up with RF/BBP registers cleared; mirror that so the rmw
      * helpers resolve correctly across this rebuild. */
-    memset(__rt28xx_rf_shadow,  0, sizeof(__rt28xx_rf_shadow));
-    memset(__rt28xx_bbp_shadow, 0, sizeof(__rt28xx_bbp_shadow));
+    memset(priv->rf_shadow,  0, sizeof(priv->rf_shadow));
+    memset(priv->bbp_shadow, 0, sizeof(priv->bbp_shadow));
 
     /* ---- MAC/BBP reset + BBP-ready poll are performed separately in
      * __rt28xx_init BEFORE this builder runs (mirrors rt2800_enable_radio:
@@ -825,8 +859,8 @@ static int __rt28xx_build_init(vsf_wifi_reg_op_t *ops)
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_MAILBOX_CSR, RT28XX_H2M_MAILBOX_OWNER);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_HOST_CMD_CSR,    RT28XX_MCU_BOOT_SIGNAL);
     /* ---- BBP + RF (RT5592) ---- */
-    n = __rt28xx_build_bbp(ops, n);
-    n = __rt28xx_build_rfcsr(ops, n);
+    n = __rt28xx_build_bbp(priv, n);
+    n = __rt28xx_build_rfcsr(priv, n);
     /* ---- enable radio (mirror rt2800_enable_radio:10841): MAC TX-only ->
      * WPDMA TX_DMA|RX_DMA|TX_WRITEBACK (0x30 burst | 0x01 | 0x04 | 0x40 =
      * 0x75) -> MAC TX|RX.  The natural ep0 round-trip latency covers the
@@ -855,7 +889,7 @@ static const vsf_wifi_reg_op_t __rt28xx_post_fw_script[] = {
 
 /*============================ CHANNEL TABLE =================================*
  * RF5592 frequency-synthesiser values {channel, N, K, mod, R}, selected by the
- * on-chip crystal (20 vs 40 MHz, see __rt28xx_xtal40).  Both 2.4 GHz (ch 1-14)
+ * on-chip crystal (20 vs 40 MHz, see priv->xtal40).  Both 2.4 GHz (ch 1-14)
  * and 5 GHz (ch 36-196) are populated.  Verbatim from rf_vals_5592_xtal20 /
  * rf_vals_5592_xtal40 (rt2800lib.c).  Channel numbers in the 5 GHz band are
  * not contiguous, so entries are looked up by channel rather than indexed.
@@ -918,15 +952,15 @@ static const rt28xx_rf_channel_t __rf_vals_5592_xtal40[] = {
 };
 
 /* Set from MAC_DEBUG_INDEX bit31 during bring-up (1 = 40 MHz crystal). */
-static uint8_t __rt28xx_xtal40;
 
 /* Look up the RF synth values for a channel in the active crystal table.
  * Returns NULL for channels not present in the table. */
-static const rt28xx_rf_channel_t *__rt28xx_find_rf(uint8_t channel)
+static const rt28xx_rf_channel_t *__rt28xx_find_rf(rt28xx_wifi_priv_t *priv,
+        uint8_t channel)
 {
     const rt28xx_rf_channel_t *tbl;
     uint32_t i, cnt;
-    if (__rt28xx_xtal40) {
+    if (priv->xtal40) {
         tbl = __rf_vals_5592_xtal40;
         cnt = dimof(__rf_vals_5592_xtal40);
     } else {
@@ -948,137 +982,138 @@ static const rt28xx_rf_channel_t *__rt28xx_find_rf(uint8_t channel)
  * TX power clamped to POWER_BOUND / POWER_BOUND_5G.  freq_cal_mode1 and
  * iq_calibrate are skipped (MCU command / EEPROM dependent).  BBP3 untouched
  * (HT40_MINUS already 0). */
-static int __rt28xx_emit_channel(vsf_wifi_reg_op_t *ops, int n, uint8_t channel)
+static int __rt28xx_emit_channel(rt28xx_wifi_priv_t *priv, int n, uint8_t channel)
 {
+    vsf_wifi_reg_op_t *ops = priv->ops_buf;
     const rt28xx_rf_channel_t *rf;
     uint8_t rfcsr9, power_bound;
     bool is_5g;
 
-    rf = __rt28xx_find_rf(channel);
+    rf = __rt28xx_find_rf(priv, channel);
     if (NULL == rf) {
         channel = 1;
-        rf = __rt28xx_find_rf(1);
+        rf = __rt28xx_find_rf(priv, 1);
     }
     is_5g = (channel > 14);
     power_bound = is_5g ? RT28XX_POWER_BOUND_5G : RT28XX_POWER_BOUND;
 
     /* N / K / mod / R -> RFCSR8/9/11 (common prefix) */
-    n = __emit_rf(ops, n, 8, (uint8_t)(rf->n & 0xFF));
+    n = __emit_rf(priv, n, 8, (uint8_t)(rf->n & 0xFF));
     rfcsr9 = (uint8_t)(rf->k & RFCSR9_K);
     if (rf->n & 0x100)               { rfcsr9 |= RFCSR9_N; }
     if (((rf->mod - 8) & 0x04) >> 2) { rfcsr9 |= RFCSR9_MOD; }
-    n = __emit_rf_rmw(ops, n, 9, RFCSR9_K | RFCSR9_N | RFCSR9_MOD, rfcsr9);
+    n = __emit_rf_rmw(priv, n, 9, RFCSR9_K | RFCSR9_N | RFCSR9_MOD, rfcsr9);
 
     if (!is_5g) {
         uint8_t rf2359;
         /* RFCSR11 R/MOD are immediately overwritten by 0x4A on 2.4 GHz */
-        n = __emit_rf(ops, n, 11, 0x4A);
+        n = __emit_rf(priv, n, 11, 0x4A);
 
         /* 2.4 GHz fixed RF block */
-        n = __emit_rf(ops, n, 10, 0x90);
-        n = __emit_rf(ops, n, 12, 0x52);
-        n = __emit_rf(ops, n, 13, 0x42);
-        n = __emit_rf(ops, n, 22, 0x40);
-        n = __emit_rf(ops, n, 24, 0x4A);
-        n = __emit_rf(ops, n, 25, 0x80);
-        n = __emit_rf(ops, n, 27, 0x42);
-        n = __emit_rf(ops, n, 36, 0x80);
-        n = __emit_rf(ops, n, 37, 0x08);
-        n = __emit_rf(ops, n, 38, 0x89);
-        n = __emit_rf(ops, n, 39, 0x1B);
-        n = __emit_rf(ops, n, 40, 0x0D);
-        n = __emit_rf(ops, n, 41, 0x9B);
-        n = __emit_rf(ops, n, 42, 0xD5);
-        n = __emit_rf(ops, n, 43, 0x72);
-        n = __emit_rf(ops, n, 44, 0x0E);
-        n = __emit_rf(ops, n, 45, 0xA2);
-        n = __emit_rf(ops, n, 46, 0x6B);
-        n = __emit_rf(ops, n, 48, 0x10);
-        n = __emit_rf(ops, n, 51, 0x3E);
-        n = __emit_rf(ops, n, 52, 0x48);
-        n = __emit_rf(ops, n, 54, 0x38);
-        n = __emit_rf(ops, n, 56, 0xA1);
-        n = __emit_rf(ops, n, 57, 0x00);
-        n = __emit_rf(ops, n, 58, 0x39);
-        n = __emit_rf(ops, n, 60, 0x45);
-        n = __emit_rf(ops, n, 61, 0x91);
-        n = __emit_rf(ops, n, 62, 0x39);
+        n = __emit_rf(priv, n, 10, 0x90);
+        n = __emit_rf(priv, n, 12, 0x52);
+        n = __emit_rf(priv, n, 13, 0x42);
+        n = __emit_rf(priv, n, 22, 0x40);
+        n = __emit_rf(priv, n, 24, 0x4A);
+        n = __emit_rf(priv, n, 25, 0x80);
+        n = __emit_rf(priv, n, 27, 0x42);
+        n = __emit_rf(priv, n, 36, 0x80);
+        n = __emit_rf(priv, n, 37, 0x08);
+        n = __emit_rf(priv, n, 38, 0x89);
+        n = __emit_rf(priv, n, 39, 0x1B);
+        n = __emit_rf(priv, n, 40, 0x0D);
+        n = __emit_rf(priv, n, 41, 0x9B);
+        n = __emit_rf(priv, n, 42, 0xD5);
+        n = __emit_rf(priv, n, 43, 0x72);
+        n = __emit_rf(priv, n, 44, 0x0E);
+        n = __emit_rf(priv, n, 45, 0xA2);
+        n = __emit_rf(priv, n, 46, 0x6B);
+        n = __emit_rf(priv, n, 48, 0x10);
+        n = __emit_rf(priv, n, 51, 0x3E);
+        n = __emit_rf(priv, n, 52, 0x48);
+        n = __emit_rf(priv, n, 54, 0x38);
+        n = __emit_rf(priv, n, 56, 0xA1);
+        n = __emit_rf(priv, n, 57, 0x00);
+        n = __emit_rf(priv, n, 58, 0x39);
+        n = __emit_rf(priv, n, 60, 0x45);
+        n = __emit_rf(priv, n, 61, 0x91);
+        n = __emit_rf(priv, n, 62, 0x39);
 
         rf2359 = (channel <= 10) ? 0x07 : 0x06;
-        n = __emit_rf(ops, n, 23, rf2359);
-        n = __emit_rf(ops, n, 59, rf2359);
-        n = __emit_rf(ops, n, 55, 0x43);   /* OFDM, non-EP */
+        n = __emit_rf(priv, n, 23, rf2359);
+        n = __emit_rf(priv, n, 59, rf2359);
+        n = __emit_rf(priv, n, 55, 0x43);   /* OFDM, non-EP */
     } else {
         /* 5 GHz: RFCSR11 overwritten by 0x40; common A-band RF block */
-        n = __emit_rf(ops, n, 10, 0x97);
-        n = __emit_rf(ops, n, 11, 0x40);
-        n = __emit_rf(ops, n, 25, 0xBF);
-        n = __emit_rf(ops, n, 27, 0x42);
-        n = __emit_rf(ops, n, 36, 0x00);
-        n = __emit_rf(ops, n, 37, 0x04);
-        n = __emit_rf(ops, n, 38, 0x85);
-        n = __emit_rf(ops, n, 40, 0x42);
-        n = __emit_rf(ops, n, 41, 0xBB);
-        n = __emit_rf(ops, n, 42, 0xD7);
-        n = __emit_rf(ops, n, 45, 0x41);
-        n = __emit_rf(ops, n, 48, 0x00);
-        n = __emit_rf(ops, n, 57, 0x77);
-        n = __emit_rf(ops, n, 60, 0x05);
-        n = __emit_rf(ops, n, 61, 0x01);
+        n = __emit_rf(priv, n, 10, 0x97);
+        n = __emit_rf(priv, n, 11, 0x40);
+        n = __emit_rf(priv, n, 25, 0xBF);
+        n = __emit_rf(priv, n, 27, 0x42);
+        n = __emit_rf(priv, n, 36, 0x00);
+        n = __emit_rf(priv, n, 37, 0x04);
+        n = __emit_rf(priv, n, 38, 0x85);
+        n = __emit_rf(priv, n, 40, 0x42);
+        n = __emit_rf(priv, n, 41, 0xBB);
+        n = __emit_rf(priv, n, 42, 0xD7);
+        n = __emit_rf(priv, n, 45, 0x41);
+        n = __emit_rf(priv, n, 48, 0x00);
+        n = __emit_rf(priv, n, 57, 0x77);
+        n = __emit_rf(priv, n, 60, 0x05);
+        n = __emit_rf(priv, n, 61, 0x01);
 
         if (channel >= 36 && channel <= 64) {
-            n = __emit_rf(ops, n, 12, 0x2E);
-            n = __emit_rf(ops, n, 13, 0x22);
-            n = __emit_rf(ops, n, 22, 0x60);
-            n = __emit_rf(ops, n, 23, 0x7F);
-            n = __emit_rf(ops, n, 24, (channel <= 50) ? 0x09 : 0x07);
-            n = __emit_rf(ops, n, 39, 0x1C);
-            n = __emit_rf(ops, n, 43, 0x5B);
-            n = __emit_rf(ops, n, 44, 0x40);
-            n = __emit_rf(ops, n, 46, 0x00);
-            n = __emit_rf(ops, n, 51, 0xFE);
-            n = __emit_rf(ops, n, 52, 0x0C);
-            n = __emit_rf(ops, n, 54, 0xF8);
+            n = __emit_rf(priv, n, 12, 0x2E);
+            n = __emit_rf(priv, n, 13, 0x22);
+            n = __emit_rf(priv, n, 22, 0x60);
+            n = __emit_rf(priv, n, 23, 0x7F);
+            n = __emit_rf(priv, n, 24, (channel <= 50) ? 0x09 : 0x07);
+            n = __emit_rf(priv, n, 39, 0x1C);
+            n = __emit_rf(priv, n, 43, 0x5B);
+            n = __emit_rf(priv, n, 44, 0x40);
+            n = __emit_rf(priv, n, 46, 0x00);
+            n = __emit_rf(priv, n, 51, 0xFE);
+            n = __emit_rf(priv, n, 52, 0x0C);
+            n = __emit_rf(priv, n, 54, 0xF8);
             if (channel <= 50) {
-                n = __emit_rf(ops, n, 55, 0x06);
-                n = __emit_rf(ops, n, 56, 0xD3);
+                n = __emit_rf(priv, n, 55, 0x06);
+                n = __emit_rf(priv, n, 56, 0xD3);
             } else {
-                n = __emit_rf(ops, n, 55, 0x04);
-                n = __emit_rf(ops, n, 56, 0xBB);
+                n = __emit_rf(priv, n, 55, 0x04);
+                n = __emit_rf(priv, n, 56, 0xBB);
             }
-            n = __emit_rf(ops, n, 58, 0x15);
-            n = __emit_rf(ops, n, 59, 0x7F);
-            n = __emit_rf(ops, n, 62, 0x15);
+            n = __emit_rf(priv, n, 58, 0x15);
+            n = __emit_rf(priv, n, 59, 0x7F);
+            n = __emit_rf(priv, n, 62, 0x15);
         } else if (channel >= 100 && channel <= 165) {
-            n = __emit_rf(ops, n, 12, 0x0E);
-            n = __emit_rf(ops, n, 13, 0x42);
-            n = __emit_rf(ops, n, 22, 0x40);
+            n = __emit_rf(priv, n, 12, 0x0E);
+            n = __emit_rf(priv, n, 13, 0x42);
+            n = __emit_rf(priv, n, 22, 0x40);
             if (channel <= 153) {
-                n = __emit_rf(ops, n, 23, 0x3C);
-                n = __emit_rf(ops, n, 24, 0x06);
+                n = __emit_rf(priv, n, 23, 0x3C);
+                n = __emit_rf(priv, n, 24, 0x06);
             } else {
-                n = __emit_rf(ops, n, 23, 0x38);
-                n = __emit_rf(ops, n, 24, 0x05);
+                n = __emit_rf(priv, n, 23, 0x38);
+                n = __emit_rf(priv, n, 24, 0x05);
             }
             if (channel <= 138) {
-                n = __emit_rf(ops, n, 39, 0x1A);
-                n = __emit_rf(ops, n, 43, 0x3B);
-                n = __emit_rf(ops, n, 44, 0x20);
-                n = __emit_rf(ops, n, 46, 0x18);
+                n = __emit_rf(priv, n, 39, 0x1A);
+                n = __emit_rf(priv, n, 43, 0x3B);
+                n = __emit_rf(priv, n, 44, 0x20);
+                n = __emit_rf(priv, n, 46, 0x18);
             } else {
-                n = __emit_rf(ops, n, 39, 0x18);
-                n = __emit_rf(ops, n, 43, 0x1B);
-                n = __emit_rf(ops, n, 44, 0x10);
-                n = __emit_rf(ops, n, 46, 0x08);
+                n = __emit_rf(priv, n, 39, 0x18);
+                n = __emit_rf(priv, n, 43, 0x1B);
+                n = __emit_rf(priv, n, 44, 0x10);
+                n = __emit_rf(priv, n, 46, 0x08);
             }
-            n = __emit_rf(ops, n, 51, (channel <= 124) ? 0xFC : 0xEC);
-            n = __emit_rf(ops, n, 52, 0x06);
-            n = __emit_rf(ops, n, 54, 0xEB);
-            n = __emit_rf(ops, n, 55, (channel <= 138) ? 0x01 : 0x00);
-            n = __emit_rf(ops, n, 56, (channel <= 128) ? 0xBB : 0xAB);
-            n = __emit_rf(ops, n, 58, (channel <= 116) ? 0x1D : 0x15);
-            n = __emit_rf(ops, n, 59, (channel <= 138) ? 0x3F : 0x7C);
-            n = __emit_rf(ops, n, 62, (channel <= 116) ? 0x1D : 0x15);
+            n = __emit_rf(priv, n, 51, (channel <= 124) ? 0xFC : 0xEC);
+            n = __emit_rf(priv, n, 52, 0x06);
+            n = __emit_rf(priv, n, 54, 0xEB);
+            n = __emit_rf(priv, n, 55, (channel <= 138) ? 0x01 : 0x00);
+            n = __emit_rf(priv, n, 56, (channel <= 128) ? 0xBB : 0xAB);
+            n = __emit_rf(priv, n, 58, (channel <= 116) ? 0x1D : 0x15);
+            n = __emit_rf(priv, n, 59, (channel <= 138) ? 0x3F : 0x7C);
+            n = __emit_rf(priv, n, 62, (channel <= 116) ? 0x1D : 0x15);
         }
     }
 
@@ -1091,47 +1126,47 @@ static int __rt28xx_emit_channel(vsf_wifi_reg_op_t *ops, int n, uint8_t channel)
      * (0x27) caused. */
     {
         uint8_t tx_power = is_5g ? power_bound : 0x1F;
-        n = __emit_rf_rmw(ops, n, 49, RFCSR49_TX, tx_power);
-        n = __emit_rf_rmw(ops, n, 50, RFCSR50_TX, tx_power);
+        n = __emit_rf_rmw(priv, n, 49, RFCSR49_TX, tx_power);
+        n = __emit_rf_rmw(priv, n, 50, RFCSR50_TX, tx_power);
     }
 
     /* RF block enable: 2T2R -> RF_BLOCK_EN|PLL_PD|TX0_PD|RX0_PD|TX1_PD|RX1_PD */
-    n = __emit_rf(ops, n, 1, 0x3F);
-    n = __emit_rf(ops, n, 6, 0xE4);
-    n = __emit_rf(ops, n, 30, 0x10);   /* not HT40 */
-    n = __emit_rf(ops, n, 31, 0x80);
-    n = __emit_rf(ops, n, 32, 0x80);
+    n = __emit_rf(priv, n, 1, 0x3F);
+    n = __emit_rf(priv, n, 6, 0xE4);
+    n = __emit_rf(priv, n, 30, 0x10);   /* not HT40 */
+    n = __emit_rf(priv, n, 31, 0x80);
+    n = __emit_rf(priv, n, 32, 0x80);
     /* freq_cal_mode1 (ref rt2800lib.c:2447): apply EEPROM frequency offset to
      * RFCSR17_CODE.  Skipped when freq_offset==0 (not read / not programmed),
      * preserving the chip default. */
-    if (__rt28xx_freq_offset != 0) {
-        n = __emit_rf_rmw(ops, n, 17, RT28XX_RFCSR17_CODE, __rt28xx_freq_offset);
+    if (priv->freq_offset != 0) {
+        n = __emit_rf_rmw(priv, n, 17, RT28XX_RFCSR17_CODE, priv->freq_offset);
     }
-    n = __emit_rf_rmw(ops, n, 3, RFCSR3_VCOCAL_EN, RFCSR3_VCOCAL_EN);
+    n = __emit_rf_rmw(priv, n, 3, RFCSR3_VCOCAL_EN, RFCSR3_VCOCAL_EN);
 
     /* BBP front-end (lna_gain = 0); BBP79/80/81/82 are band dependent */
-    n = __emit_bbp(ops, n, 62, 0x37);
-    n = __emit_bbp(ops, n, 63, 0x37);
-    n = __emit_bbp(ops, n, 64, 0x37);
-    n = __emit_bbp(ops, n, 79, is_5g ? 0x18 : 0x1C);
-    n = __emit_bbp(ops, n, 80, is_5g ? 0x08 : 0x0E);
-    n = __emit_bbp(ops, n, 81, is_5g ? 0x38 : 0x3A);
-    n = __emit_bbp(ops, n, 82, is_5g ? 0x92 : 0x62);
+    n = __emit_bbp(priv, n, 62, 0x37);
+    n = __emit_bbp(priv, n, 63, 0x37);
+    n = __emit_bbp(priv, n, 64, 0x37);
+    n = __emit_bbp(priv, n, 79, is_5g ? 0x18 : 0x1C);
+    n = __emit_bbp(priv, n, 80, is_5g ? 0x08 : 0x0E);
+    n = __emit_bbp(priv, n, 81, is_5g ? 0x38 : 0x3A);
+    n = __emit_bbp(priv, n, 82, is_5g ? 0x92 : 0x62);
     /* per-channel GLRT band config (band dependent) */
-    n = __emit_bbp(ops, n, 195, 128); n = __emit_bbp(ops, n, 196, is_5g ? 0xF0 : 0xE0);
-    n = __emit_bbp(ops, n, 195, 129); n = __emit_bbp(ops, n, 196, is_5g ? 0x1E : 0x1F);
-    n = __emit_bbp(ops, n, 195, 130); n = __emit_bbp(ops, n, 196, is_5g ? 0x28 : 0x38);
-    n = __emit_bbp(ops, n, 195, 131); n = __emit_bbp(ops, n, 196, is_5g ? 0x20 : 0x32);
-    n = __emit_bbp(ops, n, 195, 133); n = __emit_bbp(ops, n, 196, is_5g ? 0x7F : 0x28);
-    n = __emit_bbp(ops, n, 195, 124); n = __emit_bbp(ops, n, 196, is_5g ? 0x7F : 0x19);
+    n = __emit_bbp(priv, n, 195, 128); n = __emit_bbp(priv, n, 196, is_5g ? 0xF0 : 0xE0);
+    n = __emit_bbp(priv, n, 195, 129); n = __emit_bbp(priv, n, 196, is_5g ? 0x1E : 0x1F);
+    n = __emit_bbp(priv, n, 195, 130); n = __emit_bbp(priv, n, 196, is_5g ? 0x28 : 0x38);
+    n = __emit_bbp(priv, n, 195, 131); n = __emit_bbp(priv, n, 196, is_5g ? 0x20 : 0x32);
+    n = __emit_bbp(priv, n, 195, 133); n = __emit_bbp(priv, n, 196, is_5g ? 0x7F : 0x28);
+    n = __emit_bbp(priv, n, 195, 124); n = __emit_bbp(priv, n, 196, is_5g ? 0x7F : 0x19);
 
     /* rt2800_config_channel() common tail (RF5592, no external LNA) */
-    n = __emit_bbp(ops, n, 62, 0x37);
-    n = __emit_bbp(ops, n, 63, 0x37);
-    n = __emit_bbp(ops, n, 64, 0x37);
-    n = __emit_bbp(ops, n, 86, 0x00);
-    n = __emit_bbp(ops, n, 82, is_5g ? 0xF2 : 0x84);  /* overrides value above */
-    n = __emit_bbp(ops, n, 75, 0x50);
+    n = __emit_bbp(priv, n, 62, 0x37);
+    n = __emit_bbp(priv, n, 63, 0x37);
+    n = __emit_bbp(priv, n, 64, 0x37);
+    n = __emit_bbp(priv, n, 86, 0x00);
+    n = __emit_bbp(priv, n, 82, is_5g ? 0xF2 : 0x84);  /* overrides value above */
+    n = __emit_bbp(priv, n, 75, 0x50);
 
     /* Band + RX-path pin enables.  LNA_PE/RFTR/TRSW MUST be set or the
      * receiver hears nothing (the old RT30xx 0x00000D0F left them clear). */
@@ -1142,35 +1177,35 @@ static int __rt28xx_emit_channel(vsf_wifi_reg_op_t *ops, int n, uint8_t channel)
 
     /* RT5592 GLRT BW + AGC.  bbp_write_with_rx_chain() programs BBP66 once per
      * RX chain (chain 0 then chain 1) by toggling BBP27 RX_CHAIN_SEL. */
-    n = __emit_bbp(ops, n, 195, 141); n = __emit_bbp(ops, n, 196, 0x1A);
-    n = __emit_bbp_rmw(ops, n, 27, BBP27_RX_CHAIN_SEL, 0);
-    n = __emit_bbp(ops, n, 66, 0x1C);
-    n = __emit_bbp_rmw(ops, n, 27, BBP27_RX_CHAIN_SEL, BBP27_RX_CHAIN1);
-    n = __emit_bbp(ops, n, 66, 0x1C);
+    n = __emit_bbp(priv, n, 195, 141); n = __emit_bbp(priv, n, 196, 0x1A);
+    n = __emit_bbp_rmw(priv, n, 27, BBP27_RX_CHAIN_SEL, 0);
+    n = __emit_bbp(priv, n, 66, 0x1C);
+    n = __emit_bbp_rmw(priv, n, 27, BBP27_RX_CHAIN_SEL, BBP27_RX_CHAIN1);
+    n = __emit_bbp(priv, n, 66, 0x1C);
     /* config_channel() tail (rt2800lib.c:4526): BBP4 BANDWIDTH=0 for 20 MHz,
      * preserve MAC_IF_CTRL via read-modify-write.  This was missing -- without
      * it the BBP keeps whatever bandwidth the init left and the RX decoder may
      * never lock onto 20 MHz OFDM. */
-    n = __emit_bbp_rmw(ops, n, 4, BBP4_BANDWIDTH, 0);
+    n = __emit_bbp_rmw(priv, n, 4, BBP4_BANDWIDTH, 0);
     /* TX IQ calibration (ref rt2800lib.c:4026 rt2800_iq_calibrate, RT5592).
      * Programs the per-chain TX IQ gain/phase and the RF IQ compensation via
      * the BBP158(index)/BBP159(value) pair.  WITHOUT this the TX constellation
      * has an uncorrected IQ imbalance -> high EVM -> the AP fails to decode
      * most of our uplink MPDUs and never ACKs them (RX is unaffected because
      * it does not use the TX IQ path).  2.4 GHz indices only for now. */
-    if (__rt28xx_iq_valid && !is_5g) {
-        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x2c);
-        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_gain_tx0);
-        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x2d);
-        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_phase_tx0);
-        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x4a);
-        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_gain_tx1);
-        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x4b);
-        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_phase_tx1);
-        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x04);
-        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_rf_comp);
-        n = __emit_bbp(ops, n, RT28XX_BBP158_IQ_INDEX, 0x03);
-        n = __emit_bbp(ops, n, RT28XX_BBP159_IQ_VALUE, __rt28xx_iq_rf_imbal);
+    if (priv->iq_valid && !is_5g) {
+        n = __emit_bbp(priv, n, RT28XX_BBP158_IQ_INDEX, 0x2c);
+        n = __emit_bbp(priv, n, RT28XX_BBP159_IQ_VALUE, priv->iq_gain_tx0);
+        n = __emit_bbp(priv, n, RT28XX_BBP158_IQ_INDEX, 0x2d);
+        n = __emit_bbp(priv, n, RT28XX_BBP159_IQ_VALUE, priv->iq_phase_tx0);
+        n = __emit_bbp(priv, n, RT28XX_BBP158_IQ_INDEX, 0x4a);
+        n = __emit_bbp(priv, n, RT28XX_BBP159_IQ_VALUE, priv->iq_gain_tx1);
+        n = __emit_bbp(priv, n, RT28XX_BBP158_IQ_INDEX, 0x4b);
+        n = __emit_bbp(priv, n, RT28XX_BBP159_IQ_VALUE, priv->iq_phase_tx1);
+        n = __emit_bbp(priv, n, RT28XX_BBP158_IQ_INDEX, 0x04);
+        n = __emit_bbp(priv, n, RT28XX_BBP159_IQ_VALUE, priv->iq_rf_comp);
+        n = __emit_bbp(priv, n, RT28XX_BBP158_IQ_INDEX, 0x03);
+        n = __emit_bbp(priv, n, RT28XX_BBP159_IQ_VALUE, priv->iq_rf_imbal);
     }
     return n;
 }
@@ -1318,23 +1353,21 @@ static void __rt28xx_parse_rsn(const uint8_t *body, uint8_t len,
  * the whole FIFO here by re-issuing run_read from the completion callback
  * (script_busy is already cleared by the dispatcher finish) until VALID=0, and
  * accumulate real per-frame ACK stats so success is actually observable. */
-static uint32_t __rt28xx_txfifo_val;
-static uint32_t __rt28xx_txfifo_ok;
-static uint32_t __rt28xx_txfifo_fail;
 static void __rt28xx_txfifo_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         return;
     }
-    uint32_t v = __rt28xx_txfifo_val;
+    uint32_t v = priv->txfifo_val;
     if (0 == (v & 0x1u)) {  /* VALID=0 -> FIFO drained */
         return;
     }
     unsigned ack_ok = (unsigned)((v >> 5) & 0x1u);   /* TX_SUCCESS */
     if (ack_ok) {
-        __rt28xx_txfifo_ok++;
+        priv->txfifo_ok++;
     } else {
-        __rt28xx_txfifo_fail++;
+        priv->txfifo_fail++;
     }
     vsf_wifi_chip_rt28xx_trace_debug("wifi: TX_STA_FIFO ack_ok=%u ack_req=%u wcid=%u pid=%u mcs=%u"
             " raw=0x%08X (ok=%u fail=%u)" VSF_TRACE_CFG_LINEEND,
@@ -1344,14 +1377,15 @@ static void __rt28xx_txfifo_done(vsf_wifi_t *wifi, vsf_err_t err)
             (unsigned)((v >> 1) & 0xFu),    /* PID_TYPE        */
             (unsigned)((v >> 16) & 0x7Fu),  /* MCS             */
             (unsigned)v,
-            (unsigned)__rt28xx_txfifo_ok, (unsigned)__rt28xx_txfifo_fail);
+            (unsigned)priv->txfifo_ok, (unsigned)priv->txfifo_fail);
     /* Re-issue to pop the next entry; stop automatically when VALID=0. */
     vsf_wifi_reg_read(wifi, RT28XX_TX_STA_FIFO,
-            &__rt28xx_txfifo_val, __rt28xx_txfifo_done);
+            &priv->txfifo_val, __rt28xx_txfifo_done);
 }
 
 static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     /* RT5592 USB bulk-in may deliver multiple aggregated frames in a single
      * transfer even with RX_BULK_AGG_EN=0. Each frame has the layout:
      *   | RXINFO(4) | RXWI(24) | MPDU | pad | RXD(4) | [align]
@@ -1568,7 +1602,7 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
         static uint32_t __txfifo_gate = 0;
         if ((++__txfifo_gate & 0x1u) == 0) {
             vsf_wifi_reg_read(wifi, RT28XX_TX_STA_FIFO,
-                    &__rt28xx_txfifo_val, __rt28xx_txfifo_done);
+                    &priv->txfifo_val, __rt28xx_txfifo_done);
         }
     }
 
@@ -1752,10 +1786,11 @@ __advance_frame:
  * value indicates the firmware has begun executing.
  */
 /* Captured from the MCU-ready poll (ASIC_VER_ID); see __rt28xx_is_5592c. */
-static bool __rt28xx_mcu_ready_match(uint32_t val)
+static bool __rt28xx_mcu_ready_match(void *ctx, uint32_t val)
 {
+    rt28xx_wifi_priv_t *priv = (rt28xx_wifi_priv_t *)ctx;
     if ((val != 0u) && (val != 0xFFFFFFFFu)) {
-        __rt28xx_asic_ver = val;
+        priv->asic_ver = val;
         return true;
     }
     return false;
@@ -1767,8 +1802,9 @@ static bool __rt28xx_mcu_ready_match(uint32_t val)
  * is 0 until the firmware actually runs, so it is the only honest "firmware
  * alive" signal.  The framework logs the matched / timeout value, so this
  * doubles as the requested MCU-running diagnostic. */
-static bool __rt28xx_pbf_ready_match(uint32_t val)
+static bool __rt28xx_pbf_ready_match(void *ctx, uint32_t val)
 {
+    (void)ctx;
     return (val & RT28XX_PBF_SYS_CTRL_READY) != 0u;
 }
 
@@ -1800,16 +1836,16 @@ static void __rt28xx_eeprom_after_iq_data0 (vsf_wifi_t *wifi, vsf_err_t err);
 /* Crystal-select probe: MAC_DEBUG_INDEX bit31 chooses xtal20 vs xtal40 for
  * the RF5592 channel table.  Read once during bring-up (before any
  * set_channel / connect builds a channel script). */
-static uint32_t __rt28xx_macdbg_val;
 
 static void __rt28xx_xtal_select_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE == err) {
-        __rt28xx_xtal40 = (__rt28xx_macdbg_val & RT28XX_MAC_DEBUG_INDEX_XTAL) ? 1 : 0;
+        priv->xtal40 = (priv->macdbg_val & RT28XX_MAC_DEBUG_INDEX_XTAL) ? 1 : 0;
         vsf_wifi_chip_rt28xx_trace_info("rt28xx: MAC_DEBUG_INDEX=0x%08X xtal=%uMHz ASIC=0x%08X rev=0x%04X %s" VSF_TRACE_CFG_LINEEND,
-                (unsigned)__rt28xx_macdbg_val, __rt28xx_xtal40 ? 40u : 20u,
-                (unsigned)__rt28xx_asic_ver, (unsigned)(__rt28xx_asic_ver & 0xFFFF),
-                __rt28xx_is_5592c() ? "(RT5592C+)" : "(pre-RT5592C)");
+                (unsigned)priv->macdbg_val, priv->xtal40 ? 40u : 20u,
+                (unsigned)priv->asic_ver, (unsigned)(priv->asic_ver & 0xFFFF),
+                __rt28xx_is_5592c(priv) ? "(RT5592C+)" : "(pre-RT5592C)");
     } else {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: MAC_DEBUG_INDEX read err=%d, default 20MHz xtal" VSF_TRACE_CFG_LINEEND, (int)err);
     }
@@ -1818,6 +1854,7 @@ static void __rt28xx_xtal_select_done(vsf_wifi_t *wifi, vsf_err_t err)
 
 static void __rt28xx_mcu_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         __rt28xx_chain_finish(wifi, err);
         return;
@@ -1825,7 +1862,7 @@ static void __rt28xx_mcu_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
     /* Stage 4a: read MAC_DEBUG_INDEX to select the RF5592 crystal table,
      * then fall through to the eFuse MAC reader (stage 4b). */
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_MAC_DEBUG_INDEX,
-            &__rt28xx_macdbg_val, __rt28xx_xtal_select_done);
+            &priv->macdbg_val, __rt28xx_xtal_select_done);
     if (VSF_ERR_NONE != e) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: MAC_DEBUG_INDEX submit err=%d" VSF_TRACE_CFG_LINEEND, (int)e);
         __rt28xx_eeprom_read_start(wifi);
@@ -1835,31 +1872,23 @@ static void __rt28xx_mcu_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
 /*------------------------------------------------------------------------
  * eFuse row-0 reader.
  *
- * Race-free single-instance: backing context lives at file scope because
- * the wifi-layer dispatcher's single-flight rule guarantees there is at
- * most one EEPROM read in flight per process.  When the rt28xx driver
- * later supports multiple concurrent NICs this should move into a
- * per-instance struct (e.g. via vsf_container_of from a chip_priv field).
+ * Backing context now lives in the per-instance rt28xx_wifi_priv_t.
  *------------------------------------------------------------------------*/
-static struct {
-    uint32_t detect_val;
-    uint32_t data3, data2, data1, data0;
-    uint32_t freq_raw;          /* EFUSE_DATA1 of the freq block (words 28..29) */
-    uint32_t iq_raw3, iq_raw2, iq_raw0;  /* IQ block DATA3/DATA2/DATA0 */
-} __rt28xx_efuse_ctx;
 
-static bool __rt28xx_efuse_kick_clear(uint32_t val)
+static bool __rt28xx_efuse_kick_clear(void *ctx, uint32_t val)
 {
+    (void)ctx;
     return !(val & RT28XX_EFUSE_KICK);
 }
 
 static void __rt28xx_eeprom_read_start(vsf_wifi_t *wifi)
 {
-    memset(&__rt28xx_efuse_ctx, 0, sizeof(__rt28xx_efuse_ctx));
-    __rt28xx_freq_offset = 0;
-    __rt28xx_iq_valid = false;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    memset(&priv->efuse_ctx, 0, sizeof(priv->efuse_ctx));
+    priv->freq_offset = 0;
+    priv->iq_valid = false;
     vsf_err_t err = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_CTRL,
-            &__rt28xx_efuse_ctx.detect_val, __rt28xx_eeprom_after_detect);
+            &priv->efuse_ctx.detect_val, __rt28xx_eeprom_after_detect);
     if (VSF_ERR_NONE != err) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: efuse detect submit err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
         __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
@@ -1868,15 +1897,16 @@ static void __rt28xx_eeprom_read_start(vsf_wifi_t *wifi)
 
 static void __rt28xx_eeprom_after_detect(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: efuse detect read err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
         __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
         return;
     }
     vsf_wifi_chip_rt28xx_trace_info("rt28xx: EFUSE_CTRL=0x%08X (PRESENT=%d)" VSF_TRACE_CFG_LINEEND,
-            (unsigned)__rt28xx_efuse_ctx.detect_val,
-            (__rt28xx_efuse_ctx.detect_val & RT28XX_EFUSE_PRESENT) ? 1 : 0);
-    if (!(__rt28xx_efuse_ctx.detect_val & RT28XX_EFUSE_PRESENT)) {
+            (unsigned)priv->efuse_ctx.detect_val,
+            (priv->efuse_ctx.detect_val & RT28XX_EFUSE_PRESENT) ? 1 : 0);
+    if (!(priv->efuse_ctx.detect_val & RT28XX_EFUSE_PRESENT)) {
         /* Off-chip EEPROM path (vendor 0x09 / EEPROM bus access) is not
          * yet wired through the reg_bus layer; bail out gracefully. */
         vsf_wifi_chip_rt28xx_trace_info("rt28xx: external EEPROM mode (no eFuse), MAC read skipped" VSF_TRACE_CFG_LINEEND);
@@ -1896,9 +1926,10 @@ static void __rt28xx_eeprom_after_detect(vsf_wifi_t *wifi, vsf_err_t err)
 
 static void __rt28xx_eeprom_after_kick(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_EFUSE_CTRL,
-            __rt28xx_efuse_kick_clear, /* max_retry */ 100, /* interval_ms */ 1,
+            __rt28xx_efuse_kick_clear, priv, /* max_retry */ 100, /* interval_ms */ 1,
             __rt28xx_eeprom_after_kick_poll);
     if (VSF_ERR_NONE != e) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: efuse kick poll submit err=%d" VSF_TRACE_CFG_LINEEND, (int)e);
@@ -1908,42 +1939,47 @@ static void __rt28xx_eeprom_after_kick(vsf_wifi_t *wifi, vsf_err_t err)
 
 static void __rt28xx_eeprom_after_kick_poll(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: efuse kick busy timeout" VSF_TRACE_CFG_LINEEND);
         __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
         return;
     }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA3,
-            &__rt28xx_efuse_ctx.data3, __rt28xx_eeprom_after_data3);
+            &priv->efuse_ctx.data3, __rt28xx_eeprom_after_data3);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_data3(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA2,
-            &__rt28xx_efuse_ctx.data2, __rt28xx_eeprom_after_data2);
+            &priv->efuse_ctx.data2, __rt28xx_eeprom_after_data2);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_data2(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA1,
-            &__rt28xx_efuse_ctx.data1, __rt28xx_eeprom_after_data1);
+            &priv->efuse_ctx.data1, __rt28xx_eeprom_after_data1);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_data1(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA0,
-            &__rt28xx_efuse_ctx.data0, __rt28xx_eeprom_after_data0);
+            &priv->efuse_ctx.data0, __rt28xx_eeprom_after_data0);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_data0(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     /*
      * Decode row 0 layout (16 bytes):
@@ -1956,16 +1992,16 @@ static void __rt28xx_eeprom_after_data0(vsf_wifi_t *wifi, vsf_err_t err)
      * each register storing its bytes little-endian.
      */
     uint8_t mac[6];
-    mac[0] = (uint8_t)(__rt28xx_efuse_ctx.data2 >>  0);
-    mac[1] = (uint8_t)(__rt28xx_efuse_ctx.data2 >>  8);
-    mac[2] = (uint8_t)(__rt28xx_efuse_ctx.data2 >> 16);
-    mac[3] = (uint8_t)(__rt28xx_efuse_ctx.data2 >> 24);
-    mac[4] = (uint8_t)(__rt28xx_efuse_ctx.data1 >>  0);
-    mac[5] = (uint8_t)(__rt28xx_efuse_ctx.data1 >>  8);
+    mac[0] = (uint8_t)(priv->efuse_ctx.data2 >>  0);
+    mac[1] = (uint8_t)(priv->efuse_ctx.data2 >>  8);
+    mac[2] = (uint8_t)(priv->efuse_ctx.data2 >> 16);
+    mac[3] = (uint8_t)(priv->efuse_ctx.data2 >> 24);
+    mac[4] = (uint8_t)(priv->efuse_ctx.data1 >>  0);
+    mac[5] = (uint8_t)(priv->efuse_ctx.data1 >>  8);
     vsf_wifi_chip_rt28xx_trace_debug(
             "rt28xx: EEPROM row0 D3=0x%08X D2=0x%08X D1=0x%08X D0=0x%08X" VSF_TRACE_CFG_LINEEND,
-            (unsigned)__rt28xx_efuse_ctx.data3, (unsigned)__rt28xx_efuse_ctx.data2,
-            (unsigned)__rt28xx_efuse_ctx.data1, (unsigned)__rt28xx_efuse_ctx.data0);
+            (unsigned)priv->efuse_ctx.data3, (unsigned)priv->efuse_ctx.data2,
+            (unsigned)priv->efuse_ctx.data1, (unsigned)priv->efuse_ctx.data0);
     /* Reject obviously invalid MACs before publishing.  A unicast MAC has
      * the multicast bit (bit 0 of the first octet) cleared; eFuse parts
      * shipped blank often read back with that bit set or with all-zero /
@@ -2012,27 +2048,30 @@ static void __rt28xx_eeprom_after_data0(vsf_wifi_t *wifi, vsf_err_t err)
  * high 16 bits).  Decode RFCSR17_CODE and clamp to FREQ_OFFSET_BOUND. ---- */
 static void __rt28xx_eeprom_after_freq_kick(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_EFUSE_CTRL,
-            __rt28xx_efuse_kick_clear, /* max_retry */ 100, /* interval_ms */ 1,
+            __rt28xx_efuse_kick_clear, priv, /* max_retry */ 100, /* interval_ms */ 1,
             __rt28xx_eeprom_after_freq_poll);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_freq_poll(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA1,
-            &__rt28xx_efuse_ctx.freq_raw, __rt28xx_eeprom_after_freq_data);
+            &priv->efuse_ctx.freq_raw, __rt28xx_eeprom_after_freq_data);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_freq_data(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     /* Block 24: DATA1 holds words 28..29 (LE).  EEPROM_FREQ is word 29 ->
      * high 16 bits; EEPROM_FREQ_OFFSET is its low byte. */
-    uint16_t freq_word = (uint16_t)(__rt28xx_efuse_ctx.freq_raw >> 16);
+    uint16_t freq_word = (uint16_t)(priv->efuse_ctx.freq_raw >> 16);
     uint8_t off = (uint8_t)(freq_word & 0x00FFu);     /* EEPROM_FREQ_OFFSET */
     off &= RT28XX_RFCSR17_CODE;                         /* RFCSR17_CODE (0x7f) */
     if (off > RT28XX_FREQ_OFFSET_BOUND) { off = RT28XX_FREQ_OFFSET_BOUND; }
@@ -2043,9 +2082,9 @@ static void __rt28xx_eeprom_after_freq_data(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: EEPROM_FREQ blank (0x%04X), freq cal skipped" VSF_TRACE_CFG_LINEEND,
                 (unsigned)freq_word);
     } else {
-        __rt28xx_freq_offset = off;
+        priv->freq_offset = off;
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: EEPROM_FREQ raw=0x%08X word=0x%04X -> RFCSR17 freq_offset=0x%02X" VSF_TRACE_CFG_LINEEND,
-                (unsigned)__rt28xx_efuse_ctx.freq_raw, (unsigned)freq_word, (unsigned)off);
+                (unsigned)priv->efuse_ctx.freq_raw, (unsigned)freq_word, (unsigned)off);
     }
     /* Freq done; continue to read the TX IQ calibration block (byte 0x130 ->
      * word 0x98 / block 152) so emit_channel can program BBP158/159.  Any
@@ -2066,56 +2105,61 @@ static void __rt28xx_eeprom_after_freq_data(vsf_wifi_t *wifi, vsf_err_t err)
  * Decode the six 2.4 GHz IQ cal bytes (ref rt2800_iq_calibrate). ---- */
 static void __rt28xx_eeprom_after_iq_kick(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_EFUSE_CTRL,
-            __rt28xx_efuse_kick_clear, /* max_retry */ 100, /* interval_ms */ 1,
+            __rt28xx_efuse_kick_clear, priv, /* max_retry */ 100, /* interval_ms */ 1,
             __rt28xx_eeprom_after_iq_poll);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_iq_poll(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA3,
-            &__rt28xx_efuse_ctx.iq_raw3, __rt28xx_eeprom_after_iq_data3);
+            &priv->efuse_ctx.iq_raw3, __rt28xx_eeprom_after_iq_data3);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_iq_data3(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA2,
-            &__rt28xx_efuse_ctx.iq_raw2, __rt28xx_eeprom_after_iq_data2);
+            &priv->efuse_ctx.iq_raw2, __rt28xx_eeprom_after_iq_data2);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_iq_data2(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_EFUSE_DATA0,
-            &__rt28xx_efuse_ctx.iq_raw0, __rt28xx_eeprom_after_iq_data0);
+            &priv->efuse_ctx.iq_raw0, __rt28xx_eeprom_after_iq_data0);
     if (VSF_ERR_NONE != e) __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_eeprom_after_iq_data0(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_chain_finish(wifi, VSF_ERR_NONE); return; }
     /* Block 152 (word 0x98), LE byte layout:
      *   DATA3 = bytes 0x130 0x131 0x132 0x133
      *   DATA2 = bytes 0x134 0x135 0x136 0x137
      *   DATA0 = bytes 0x13C 0x13D 0x13E 0x13F */
-    uint32_t r3 = __rt28xx_efuse_ctx.iq_raw3;
-    uint32_t r2 = __rt28xx_efuse_ctx.iq_raw2;
-    uint32_t r0 = __rt28xx_efuse_ctx.iq_raw0;
-    __rt28xx_iq_gain_tx0  = (uint8_t)(r3 >>  0);   /* 0x130 */
-    __rt28xx_iq_phase_tx0 = (uint8_t)(r3 >>  8);   /* 0x131 */
-    __rt28xx_iq_gain_tx1  = (uint8_t)(r3 >> 24);   /* 0x133 */
-    __rt28xx_iq_phase_tx1 = (uint8_t)(r2 >>  0);   /* 0x134 */
+    uint32_t r3 = priv->efuse_ctx.iq_raw3;
+    uint32_t r2 = priv->efuse_ctx.iq_raw2;
+    uint32_t r0 = priv->efuse_ctx.iq_raw0;
+    priv->iq_gain_tx0  = (uint8_t)(r3 >>  0);   /* 0x130 */
+    priv->iq_phase_tx0 = (uint8_t)(r3 >>  8);   /* 0x131 */
+    priv->iq_gain_tx1  = (uint8_t)(r3 >> 24);   /* 0x133 */
+    priv->iq_phase_tx1 = (uint8_t)(r2 >>  0);   /* 0x134 */
     {
         uint8_t comp  = (uint8_t)(r0 >> 0);        /* 0x13C */
         uint8_t imbal = (uint8_t)(r0 >> 8);        /* 0x13D */
-        __rt28xx_iq_rf_comp  = (comp  != 0xFF) ? comp  : 0;
-        __rt28xx_iq_rf_imbal = (imbal != 0xFF) ? imbal : 0;
+        priv->iq_rf_comp  = (comp  != 0xFF) ? comp  : 0;
+        priv->iq_rf_imbal = (imbal != 0xFF) ? imbal : 0;
     }
     /* CRITICAL: only apply TX IQ calibration when the eFuse IQ block is actually
      * programmed.  This dongle's eFuse returns 0xFF for the whole block (D3=D2=
@@ -2128,15 +2172,15 @@ static void __rt28xx_eeprom_after_iq_data0(vsf_wifi_t *wifi, vsf_err_t err)
      * (never 0xFF for gain/phase).  When the gain/phase bytes are all 0xFF the
      * block is blank: leave iq_valid=false so emit_channel skips IQ entirely and
      * the chip keeps its (calibrated) default TX path. */
-    __rt28xx_iq_valid =
-            !((__rt28xx_iq_gain_tx0  == 0xFF) && (__rt28xx_iq_phase_tx0 == 0xFF)
-           && (__rt28xx_iq_gain_tx1  == 0xFF) && (__rt28xx_iq_phase_tx1 == 0xFF));
+    priv->iq_valid =
+            !((priv->iq_gain_tx0  == 0xFF) && (priv->iq_phase_tx0 == 0xFF)
+           && (priv->iq_gain_tx1  == 0xFF) && (priv->iq_phase_tx1 == 0xFF));
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: IQ cal D3=0x%08X D2=0x%08X D0=0x%08X -> g0=%02X p0=%02X g1=%02X p1=%02X comp=%02X imb=%02X valid=%u" VSF_TRACE_CFG_LINEEND,
             (unsigned)r3, (unsigned)r2, (unsigned)r0,
-            __rt28xx_iq_gain_tx0, __rt28xx_iq_phase_tx0,
-            __rt28xx_iq_gain_tx1, __rt28xx_iq_phase_tx1,
-            __rt28xx_iq_rf_comp, __rt28xx_iq_rf_imbal,
-            (unsigned)__rt28xx_iq_valid);
+            priv->iq_gain_tx0, priv->iq_phase_tx0,
+            priv->iq_gain_tx1, priv->iq_phase_tx1,
+            priv->iq_rf_comp, priv->iq_rf_imbal,
+            (unsigned)priv->iq_valid);
     __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
 }
 
@@ -2147,6 +2191,7 @@ static void __rt28xx_eeprom_after_iq_data0(vsf_wifi_t *wifi, vsf_err_t err)
  * sufficient and its absence is not treated as an MCU failure. */
 static void __rt28xx_pbf_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         /* MCU did not raise PBF_SYS_CTRL_READY in time.  Log it but keep the
          * bring-up going so the rest of the chain still yields diagnostics
@@ -2156,7 +2201,7 @@ static void __rt28xx_pbf_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_chip_rt28xx_trace_info("rt28xx: MCU firmware running (PBF_SYS_CTRL_READY=1)" VSF_TRACE_CFG_LINEEND);
     }
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_ASIC_VER_ID,
-            __rt28xx_mcu_ready_match,
+            __rt28xx_mcu_ready_match, priv,
             /* max_retry  */ 200,
             /* interval_ms*/ 1,
             __rt28xx_mcu_ready_done);
@@ -2167,6 +2212,7 @@ static void __rt28xx_pbf_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
 
 static void __rt28xx_post_fw_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         __rt28xx_chain_finish(wifi, err);
         return;
@@ -2176,7 +2222,7 @@ static void __rt28xx_post_fw_done(vsf_wifi_t *wifi, vsf_err_t err)
      * This replaces the previous ASIC_VER_ID poll, which only proved the
      * chip-ID register was readable -- not that the MCU was executing. */
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_PBF_SYS_CTRL,
-            __rt28xx_pbf_ready_match,
+            __rt28xx_pbf_ready_match, priv,
             /* max_retry  */ 200,
             /* interval_ms*/ 1,
             __rt28xx_pbf_ready_done);
@@ -2257,6 +2303,12 @@ static void __rt28xx_fw_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 
 static vsf_err_t __rt28xx_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv_ensure(wifi);
+    if (priv == NULL) {
+        if (done != NULL) done(wifi, VSF_ERR_NOT_ENOUGH_RESOURCES);
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+    }
+
     if (__rt2870_firmware_size == 0) {
         if (done != NULL) done(wifi, VSF_ERR_NONE);
         return VSF_ERR_NONE;
@@ -2298,113 +2350,116 @@ static vsf_err_t __rt28xx_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 #define RT28XX_BBP_READ_KICK \
         (RT28XX_BBP_READ_CONTROL | RT28XX_BBP_BUSY | RT28XX_BBP_RW_MODE)
 
-static vsf_wifi_done_t __rt28xx_init_done;
-static uint32_t        __rt28xx_bbp_probe;
-static uint8_t         __rt28xx_bbp_wait_tries;
-
 static void __rt28xx_bbp_probe_kick(vsf_wifi_t *wifi);
 static void __rt28xx_init_built_done(vsf_wifi_t *wifi, vsf_err_t err);
 
 /* Final stage: build and run the full BBP/RF init sequence. */
 static void __rt28xx_init_emit(vsf_wifi_t *wifi)
 {
-    int n = __rt28xx_build_init(__rt28xx_ops_buf);
-    vsf_err_t e = vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, (uint16_t)n,
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    int n = __rt28xx_build_init(priv);
+    vsf_err_t e = vsf_wifi_reg_run_script(wifi, priv->ops_buf, (uint16_t)n,
             __rt28xx_init_built_done);
-    if (VSF_ERR_NONE != e && __rt28xx_init_done != NULL) {
-        __rt28xx_init_done(wifi, e);
+    if (VSF_ERR_NONE != e && priv->init_done != NULL) {
+        priv->init_done(wifi, e);
     }
 }
 
 /* Diagnostic: read RFCSR1 back after init (build_init writes 0x3F) to prove
  * the RF indirect WRITE path actually lands data on the chip. */
-static uint32_t __rt28xx_rf_probe;
 
 /* Capture each poll sample; stop once the RF engine clears BUSY (bit17). */
-static bool __rt28xx_rf_busy_clear(uint32_t val)
+static bool __rt28xx_rf_busy_clear(void *ctx, uint32_t val)
 {
-    __rt28xx_rf_probe = val;
+    rt28xx_wifi_priv_t *priv = (rt28xx_wifi_priv_t *)ctx;
+    priv->rf_probe = val;
     return ((val >> 17) & 1u) == 0u;
 }
 
 static void __rt28xx_rf_verify_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: RF_CSR_CFG readback=0x%08X (RFCSR6 data=0x%02X, "
             "init wrote 0xE4, BUSY=%u, pollerr=%d)" VSF_TRACE_CFG_LINEEND,
-            (unsigned)__rt28xx_rf_probe, (unsigned)(__rt28xx_rf_probe & 0xFF),
-            (unsigned)((__rt28xx_rf_probe >> 17) & 1), (int)err);
-    if (__rt28xx_init_done != NULL) __rt28xx_init_done(wifi, VSF_ERR_NONE);
+            (unsigned)priv->rf_probe, (unsigned)(priv->rf_probe & 0xFF),
+            (unsigned)((priv->rf_probe >> 17) & 1), (int)err);
+    if (priv->init_done != NULL) priv->init_done(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_rf_verify_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
-        if (__rt28xx_init_done != NULL) __rt28xx_init_done(wifi, VSF_ERR_NONE);
+        if (priv->init_done != NULL) priv->init_done(wifi, VSF_ERR_NONE);
         return;
     }
-    __rt28xx_rf_probe = 0;
+    priv->rf_probe = 0;
     /* RF read latches DATA only after the serial engine clears BUSY; poll it
      * (mirrors rt2800_rfcsr_read's second WAIT_FOR_RFCSR). */
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_RF_CSR_CFG,
-            __rt28xx_rf_busy_clear, /* max_retry */ 50, /* interval_ms */ 1,
+            __rt28xx_rf_busy_clear, priv, /* max_retry */ 50, /* interval_ms */ 1,
             __rt28xx_rf_verify_done);
     if (VSF_ERR_NONE != e) {
-        if (__rt28xx_init_done != NULL) __rt28xx_init_done(wifi, VSF_ERR_NONE);
+        if (priv->init_done != NULL) priv->init_done(wifi, VSF_ERR_NONE);
     }
 }
 
 /* init script finished; kick an RF read of RFCSR1 (WRITE=0 => read). */
 static void __rt28xx_init_built_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
-        if (__rt28xx_init_done != NULL) __rt28xx_init_done(wifi, err);
+        if (priv->init_done != NULL) priv->init_done(wifi, err);
         return;
     }
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
             RT28XX_RF_BUSY | (6u << 8));
-    vsf_err_t e = vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 1,
+    vsf_err_t e = vsf_wifi_reg_run_script(wifi, priv->ops_buf, 1,
             __rt28xx_rf_verify_kick_done);
     if (VSF_ERR_NONE != e) {
-        if (__rt28xx_init_done != NULL) __rt28xx_init_done(wifi, VSF_ERR_NONE);
+        if (priv->init_done != NULL) priv->init_done(wifi, VSF_ERR_NONE);
     }
 }
 
 /* Got BBP0 readback: if awake (non 0x00/0xFF) proceed to init; else retry. */
 static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    uint8_t v = (uint8_t)(__rt28xx_bbp_probe & 0xFF);
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    uint8_t v = (uint8_t)(priv->bbp_probe & 0xFF);
     if (VSF_ERR_NONE == err && v != 0x00 && v != 0xFF) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: BBP0=0x%02X ready after %u tries" VSF_TRACE_CFG_LINEEND,
-                v, (unsigned)__rt28xx_bbp_wait_tries);
+                v, (unsigned)priv->bbp_wait_tries);
         __rt28xx_init_emit(wifi);
         return;
     }
-    if (__rt28xx_bbp_wait_tries < 50) {
-        __rt28xx_bbp_wait_tries++;
+    if (priv->bbp_wait_tries < 50) {
+        priv->bbp_wait_tries++;
         __rt28xx_bbp_probe_kick(wifi);
         return;
     }
     vsf_wifi_chip_rt28xx_trace_info("rt28xx: BBP not ready (BBP0=0x%02X after %u tries), "
-            "continuing" VSF_TRACE_CFG_LINEEND, v, (unsigned)__rt28xx_bbp_wait_tries);
+            "continuing" VSF_TRACE_CFG_LINEEND, v, (unsigned)priv->bbp_wait_tries);
     __rt28xx_init_emit(wifi);
 }
 
 /* Read-kick landed; read BBP_CSR_CFG back to capture BBP0's value. */
 static void __rt28xx_bbp_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) { __rt28xx_init_emit(wifi); return; }
-    __rt28xx_bbp_probe = 0;
+    priv->bbp_probe = 0;
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_BBP_CSR_CFG,
-            &__rt28xx_bbp_probe, __rt28xx_bbp_probe_done);
+            &priv->bbp_probe, __rt28xx_bbp_probe_done);
     if (VSF_ERR_NONE != e) { __rt28xx_init_emit(wifi); }
 }
 
 /* Issue an indirect read request for BBP register 0 (version/status). */
 static void __rt28xx_bbp_probe_kick(vsf_wifi_t *wifi)
 {
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_BBP_CSR_CFG,
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_BBP_CSR_CFG,
             RT28XX_BBP_READ_KICK | (0u << 8));
-    vsf_err_t e = vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 1,
+    vsf_err_t e = vsf_wifi_reg_run_script(wifi, priv->ops_buf, 1,
             __rt28xx_bbp_kick_done);
     if (VSF_ERR_NONE != e) { __rt28xx_init_emit(wifi); }
 }
@@ -2419,21 +2474,21 @@ static void __rt28xx_reset_done(vsf_wifi_t *wifi, vsf_err_t err)
 /* Holds the PBF_SYS_CTRL value read at the top of init so the bit13 clear is a
  * true read-modify-write (never a blind whole-register write -- a blind
  * PBF_SYS_CTRL=0 was the very bug that previously left the receiver deaf). */
-static uint32_t __rt28xx_init_pbf;
 
 /* Stage 3: USB_MODE_RESET issued -> deassert the MAC/BBP reset and clear the
  * H2M mailbox/agent, exactly as ref rt2800usb_init_registers writes
  * MAC_SYS_CTRL=0 after the vendor reset (rt2800usb.c:291). */
 static void __rt28xx_reset_clear(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
         __rt28xx_init_emit(wifi);
         return;
     }
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_SYS_CTRL, 0);
-    __rt28xx_ops_buf[1] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_BBP_AGENT, 0);
-    __rt28xx_ops_buf[2] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_MAILBOX_CSR, 0);
-    vsf_err_t e = vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 3,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_SYS_CTRL, 0);
+    priv->ops_buf[1] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_BBP_AGENT, 0);
+    priv->ops_buf[2] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_H2M_MAILBOX_CSR, 0);
+    vsf_err_t e = vsf_wifi_reg_run_script(wifi, priv->ops_buf, 3,
             __rt28xx_reset_done);
     if (VSF_ERR_NONE != e) { __rt28xx_init_emit(wifi); }
 }
@@ -2463,18 +2518,25 @@ static void __rt28xx_reset_vendor_kick(vsf_wifi_t *wifi, vsf_err_t err)
  * lines 280-286. */
 static void __rt28xx_init_pbf_read_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    uint32_t pbf = (VSF_ERR_NONE == err) ? __rt28xx_init_pbf : 0;
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_PBF_SYS_CTRL,
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    uint32_t pbf = (VSF_ERR_NONE == err) ? priv->init_pbf : 0;
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_PBF_SYS_CTRL,
             pbf & ~RT28XX_PBF_SYS_CTRL_RESET13);
-    __rt28xx_ops_buf[1] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_SYS_CTRL,
+    priv->ops_buf[1] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_SYS_CTRL,
             RT28XX_MAC_SRST | RT28XX_BBP_HRST);
-    vsf_err_t e = vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 2,
+    vsf_err_t e = vsf_wifi_reg_run_script(wifi, priv->ops_buf, 2,
             __rt28xx_reset_vendor_kick);
     if (VSF_ERR_NONE != e) { __rt28xx_init_emit(wifi); }
 }
 
 static vsf_err_t __rt28xx_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv_ensure(wifi);
+    if (priv == NULL) {
+        if (done != NULL) done(wifi, VSF_ERR_NOT_ENOUGH_RESOURCES);
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+    }
+
     /* Bring-up order mirrors rt2800_enable_radio -> rt2800usb_init_registers:
      *   1. read PBF_SYS_CTRL, clear bit13, assert MAC+BBP reset,
      *   2. ep0 USB_MODE_RESET vendor request (digital-core reset -- this also
@@ -2485,11 +2547,11 @@ static vsf_err_t __rt28xx_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
      *   4. poll BBP0 until the BBP processor is awake (non 0x00/0xFF),
      *   5. only then write the BBP/RF init sequence (build_init).
      * Steps 1-4 run as a small staged async chain; step 5 is build_init. */
-    __rt28xx_init_done      = done;
-    __rt28xx_bbp_wait_tries = 0;
-    __rt28xx_init_pbf       = 0;
+    priv->init_done      = done;
+    priv->bbp_wait_tries = 0;
+    priv->init_pbf       = 0;
     vsf_err_t e = vsf_wifi_reg_read(wifi, RT28XX_PBF_SYS_CTRL,
-            &__rt28xx_init_pbf, __rt28xx_init_pbf_read_done);
+            &priv->init_pbf, __rt28xx_init_pbf_read_done);
     if (VSF_ERR_NONE != e) {
         /* Cannot read PBF: fall back to a plain reset (bit13 left as-is). */
         __rt28xx_init_pbf_read_done(wifi, VSF_ERR_FAIL);
@@ -2502,15 +2564,6 @@ static void __rt28xx_fini(vsf_wifi_t *wifi)
     (void)wifi;
 }
 
-static vsf_wifi_done_t __rt28xx_setch_done;
-static uint8_t         __rt28xx_setch_channel;
-static uint32_t        __rt28xx_rxsta1;
-static uint32_t        __rt28xx_macctrl;
-static uint32_t        __rt28xx_ldo;
-static uint32_t        __rt28xx_chbusy;
-static uint32_t        __rt28xx_chidle;
-static uint32_t        __rt28xx_setch_bbpprobe;
-
 /* Diagnostic tail: read BBP66 back to prove the indirect BBP WRITE path is
  * effective (we wrote 0x1C in emit_channel).  RF writes are verified working
  * via RFCSR6=0xE4, but BBP0=0x77 is only a read of the version register --
@@ -2518,22 +2571,24 @@ static uint32_t        __rt28xx_setch_bbpprobe;
  * false_cca stays 0. */
 static void __rt28xx_setch_bbp_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: after ch cfg BBP66=0x%02X (wrote 0x1C, pollerr=%d)"
-            VSF_TRACE_CFG_LINEEND, (unsigned)(__rt28xx_setch_bbpprobe & 0xFF),
+            VSF_TRACE_CFG_LINEEND, (unsigned)(priv->setch_bbpprobe & 0xFF),
             (int)err);
-    if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+    if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
 }
 
 static void __rt28xx_setch_bbp_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
         return;
     }
-    __rt28xx_setch_bbpprobe = 0;
+    priv->setch_bbpprobe = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read(wifi, RT28XX_BBP_CSR_CFG,
-            &__rt28xx_setch_bbpprobe, __rt28xx_setch_bbp_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+            &priv->setch_bbpprobe, __rt28xx_setch_bbp_done)) {
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
@@ -2545,31 +2600,33 @@ static void __rt28xx_setch_bbp_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
  * nothing" symptom. */
 static void __rt28xx_setch_rf3_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: after ch cfg RFCSR3=0x%02X (VCOCAL_EN=%u -> %s, "
             "pollerr=%d)" VSF_TRACE_CFG_LINEEND,
-            (unsigned)(__rt28xx_rf_probe & 0xFF),
-            (unsigned)((__rt28xx_rf_probe >> 7) & 1),
-            ((__rt28xx_rf_probe >> 7) & 1) ? "NOT LOCKED" : "locked",
+            (unsigned)(priv->rf_probe & 0xFF),
+            (unsigned)((priv->rf_probe >> 7) & 1),
+            ((priv->rf_probe >> 7) & 1) ? "NOT LOCKED" : "locked",
             (int)err);
     /* Chain a BBP66 read to verify the BBP write path. */
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_BBP_CSR_CFG,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_BBP_CSR_CFG,
             RT28XX_BBP_READ_KICK | (66u << 8));
-    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 1,
+    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, priv->ops_buf, 1,
             __rt28xx_setch_bbp_kick_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
 static void __rt28xx_setch_rf3_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
         return;
     }
-    __rt28xx_rf_probe = 0;
+    priv->rf_probe = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read_poll(wifi, RT28XX_RF_CSR_CFG,
-            __rt28xx_rf_busy_clear, 50, 1, __rt28xx_setch_rf3_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+            __rt28xx_rf_busy_clear, priv, 50, 1, __rt28xx_setch_rf3_done)) {
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
@@ -2578,33 +2635,33 @@ static void __rt28xx_setch_rf3_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
  * write never reached the chip (channel-program path broken). */
 static void __rt28xx_setch_rf8_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    const rt28xx_rf_channel_t *rf = __rt28xx_xtal40
-            ? &__rf_vals_5592_xtal40[__rt28xx_setch_channel - 1]
-            : &__rf_vals_5592_xtal20[__rt28xx_setch_channel - 1];
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    const rt28xx_rf_channel_t *rf = __rt28xx_find_rf(priv, priv->setch_channel);
     (void)rf;
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: after ch cfg RFCSR8=0x%02X (want N&0xff=0x%02X, "
             "pollerr=%d)" VSF_TRACE_CFG_LINEEND,
-            (unsigned)(__rt28xx_rf_probe & 0xFF),
+            (unsigned)(priv->rf_probe & 0xFF),
             (unsigned)(rf->n & 0xFF), (int)err);
     /* Chain RFCSR3 read (VCO lock status). */
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
             RT28XX_RF_BUSY | (3u << 8));
-    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 1,
+    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, priv->ops_buf, 1,
             __rt28xx_setch_rf3_kick_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
 static void __rt28xx_setch_rf8_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
         return;
     }
-    __rt28xx_rf_probe = 0;
+    priv->rf_probe = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read_poll(wifi, RT28XX_RF_CSR_CFG,
-            __rt28xx_rf_busy_clear, 50, 1, __rt28xx_setch_rf8_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+            __rt28xx_rf_busy_clear, priv, 50, 1, __rt28xx_setch_rf8_done)) {
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
@@ -2613,44 +2670,47 @@ static void __rt28xx_setch_rf8_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
  * RX0/TX0 absent -- need to confirm the channel write of 0x0F sticks). */
 static void __rt28xx_setch_rf1_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: after ch cfg RFCSR1=0x%02X (want 0x0F, BUSY=%u, "
             "pollerr=%d)" VSF_TRACE_CFG_LINEEND,
-            (unsigned)(__rt28xx_rf_probe & 0xFF),
-            (unsigned)((__rt28xx_rf_probe >> 17) & 1), (int)err);
+            (unsigned)(priv->rf_probe & 0xFF),
+            (unsigned)((priv->rf_probe >> 17) & 1), (int)err);
     /* Chain an RFCSR8 (channel N) read, then RFCSR3 (VCO lock), then BBP66. */
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
             RT28XX_RF_BUSY | (8u << 8));
-    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 1,
+    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, priv->ops_buf, 1,
             __rt28xx_setch_rf8_kick_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
 static void __rt28xx_setch_rf1_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE != err) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
         return;
     }
-    __rt28xx_rf_probe = 0;
+    priv->rf_probe = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read_poll(wifi, RT28XX_RF_CSR_CFG,
-            __rt28xx_rf_busy_clear, 50, 1, __rt28xx_setch_rf1_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+            __rt28xx_rf_busy_clear, priv, 50, 1, __rt28xx_setch_rf1_done)) {
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
 static void __rt28xx_setch_chconf_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     /* Only probe on channel 1 to keep the scan log readable. */
-    if (__rt28xx_setch_channel != 1) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, err);
+    if (priv->setch_channel != 1) {
+        if (priv->setch_done != NULL) priv->setch_done(wifi, err);
         return;
     }
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RF_CSR_CFG,
             RT28XX_RF_BUSY | (1u << 8));
-    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, 1,
+    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, priv->ops_buf, 1,
             __rt28xx_setch_rf1_kick_done)) {
-        if (__rt28xx_setch_done != NULL) __rt28xx_setch_done(wifi, VSF_ERR_NONE);
+        if (priv->setch_done != NULL) priv->setch_done(wifi, VSF_ERR_NONE);
     }
 }
 
@@ -2662,30 +2722,31 @@ static void __rt28xx_setch_chconf_done(vsf_wifi_t *wifi, vsf_err_t err)
  * cause of a permanently-zero false_cca). */
 static void __rt28xx_setch_after_diag(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    uint16_t false_cca = (uint16_t)(__rt28xx_rxsta1 & 0xFFFF);
-    uint16_t plcp_err  = (uint16_t)(__rt28xx_rxsta1 >> 16);
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    uint16_t false_cca = (uint16_t)(priv->rxsta1 & 0xFFFF);
+    uint16_t plcp_err  = (uint16_t)(priv->rxsta1 >> 16);
     (void)false_cca; (void)plcp_err;
-    uint32_t ldo_new   = __rt28xx_ldo & ~RT28XX_LDO_CFG0_VLEVEL_MASK;
+    uint32_t ldo_new   = priv->ldo & ~RT28XX_LDO_CFG0_VLEVEL_MASK;
     int n;
-    if (__rt28xx_setch_channel > 14) {
+    if (priv->setch_channel > 14) {
         ldo_new |= RT28XX_LDO_CFG0_VLEVEL_5G;   /* 5 GHz LDO_CORE_VLEVEL=5 */
     }
     vsf_wifi_chip_rt28xx_trace_debug("rt28xx: RX_STA_CNT1=0x%08X false_cca=%u plcp_err=%u "
             "MAC_SYS_CTRL=0x%08X (TX_EN=%u RX_EN=%u) LDO_CFG0=0x%08X (VLEVEL=%u) "
             "CH_IDLE=%u CH_BUSY_STA=%u (ch->%u)"
-            VSF_TRACE_CFG_LINEEND, __rt28xx_rxsta1, false_cca, plcp_err,
-            __rt28xx_macctrl, (unsigned)((__rt28xx_macctrl >> 2) & 1),
-            (unsigned)((__rt28xx_macctrl >> 3) & 1), __rt28xx_ldo,
-            (unsigned)((__rt28xx_ldo >> 26) & 0x7), __rt28xx_chidle,
-            __rt28xx_chbusy, __rt28xx_setch_channel);
+            VSF_TRACE_CFG_LINEEND, priv->rxsta1, false_cca, plcp_err,
+            priv->macctrl, (unsigned)((priv->macctrl >> 2) & 1),
+            (unsigned)((priv->macctrl >> 3) & 1), priv->ldo,
+            (unsigned)((priv->ldo >> 26) & 0x7), priv->chidle,
+            priv->chbusy, priv->setch_channel);
     /* config_channel_rf55xx() first writes LDO_CFG0 with LDO_CORE_VLEVEL=0 for
      * 2.4 GHz / 5 for 5 GHz (read-modify-write, preserving DELAY/BGSEL/LDO25). */
-    __rt28xx_ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_LDO_CFG0, ldo_new);
-    n = __rt28xx_emit_channel(__rt28xx_ops_buf, 1, __rt28xx_setch_channel);
-    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, (uint16_t)n,
+    priv->ops_buf[0] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_LDO_CFG0, ldo_new);
+    n = __rt28xx_emit_channel(priv, 1, priv->setch_channel);
+    if (VSF_ERR_NONE != vsf_wifi_reg_run_script(wifi, priv->ops_buf, (uint16_t)n,
             __rt28xx_setch_chconf_done)) {
-        if (__rt28xx_setch_done != NULL) {
-            __rt28xx_setch_done(wifi, VSF_ERR_FAIL);
+        if (priv->setch_done != NULL) {
+            priv->setch_done(wifi, VSF_ERR_FAIL);
         }
     }
 }
@@ -2696,9 +2757,10 @@ static void __rt28xx_setch_after_diag(vsf_wifi_t *wifi, vsf_err_t err)
  * never runs at all (PHY clock / enable). */
 static void __rt28xx_setch_read_chbusy(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    __rt28xx_chbusy = 0;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    priv->chbusy = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read(wifi, RT28XX_CH_BUSY_STA,
-            &__rt28xx_chbusy, __rt28xx_setch_after_diag)) {
+            &priv->chbusy, __rt28xx_setch_after_diag)) {
         __rt28xx_setch_after_diag(wifi, err);
     }
 }
@@ -2706,9 +2768,10 @@ static void __rt28xx_setch_read_chbusy(vsf_wifi_t *wifi, vsf_err_t err)
 /* Chain: LDO_CFG0 captured -> read CH_IDLE_STA before CH_BUSY_STA. */
 static void __rt28xx_setch_read_chidle(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    __rt28xx_chidle = 0;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    priv->chidle = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read(wifi, RT28XX_CH_IDLE_STA,
-            &__rt28xx_chidle, __rt28xx_setch_read_chbusy)) {
+            &priv->chidle, __rt28xx_setch_read_chbusy)) {
         __rt28xx_setch_read_chbusy(wifi, err);
     }
 }
@@ -2716,9 +2779,10 @@ static void __rt28xx_setch_read_chidle(vsf_wifi_t *wifi, vsf_err_t err)
 /* Chain: MAC_SYS_CTRL captured -> now read LDO_CFG0 before logging/program. */
 static void __rt28xx_setch_read_ldo(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    __rt28xx_ldo = 0;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    priv->ldo = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read(wifi, RT28XX_LDO_CFG0,
-            &__rt28xx_ldo, __rt28xx_setch_read_chidle)) {
+            &priv->ldo, __rt28xx_setch_read_chidle)) {
         __rt28xx_setch_read_chidle(wifi, err);
     }
 }
@@ -2726,9 +2790,10 @@ static void __rt28xx_setch_read_ldo(vsf_wifi_t *wifi, vsf_err_t err)
 /* Chain: RX_STA_CNT1 captured -> now read MAC_SYS_CTRL before logging. */
 static void __rt28xx_setch_read_macctrl(vsf_wifi_t *wifi, vsf_err_t err)
 {
-    __rt28xx_macctrl = 0;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    priv->macctrl = 0;
     if (VSF_ERR_NONE != vsf_wifi_reg_read(wifi, RT28XX_MAC_SYS_CTRL,
-            &__rt28xx_macctrl, __rt28xx_setch_read_ldo)) {
+            &priv->macctrl, __rt28xx_setch_read_ldo)) {
         __rt28xx_setch_read_ldo(wifi, err);
     }
 }
@@ -2736,17 +2801,18 @@ static void __rt28xx_setch_read_macctrl(vsf_wifi_t *wifi, vsf_err_t err)
 static vsf_err_t __rt28xx_set_channel(vsf_wifi_t *wifi, uint8_t channel,
         vsf_wifi_done_t done)
 {
-    if (NULL == __rt28xx_find_rf(channel)) return VSF_ERR_INVALID_PARAMETER;
-    __rt28xx_setch_done    = done;
-    __rt28xx_setch_channel = channel;
-    __rt28xx_rxsta1        = 0;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    if (NULL == __rt28xx_find_rf(priv, channel)) return VSF_ERR_INVALID_PARAMETER;
+    priv->setch_done    = done;
+    priv->setch_channel = channel;
+    priv->rxsta1        = 0;
     /* Read prior dwell's RX_STA_CNT1 first, then MAC_SYS_CTRL (diagnostic),
      * then set channel. */
     if (VSF_ERR_NONE != vsf_wifi_reg_read(wifi, RT28XX_RX_STA_CNT1,
-            &__rt28xx_rxsta1, __rt28xx_setch_read_macctrl)) {
+            &priv->rxsta1, __rt28xx_setch_read_macctrl)) {
         /* readback unavailable: fall back to plain channel program */
-        int n = __rt28xx_emit_channel(__rt28xx_ops_buf, 0, channel);
-        return vsf_wifi_reg_run_script(wifi, __rt28xx_ops_buf, (uint16_t)n, done);
+        int n = __rt28xx_emit_channel(priv, 0, channel);
+        return vsf_wifi_reg_run_script(wifi, priv->ops_buf, (uint16_t)n, done);
     }
     return VSF_ERR_NONE;
 }
@@ -2829,10 +2895,8 @@ static int __rt28xx_emit_wcid(vsf_wifi_reg_op_t *ops, int n, const uint8_t mac[6
 
 #if VSF_WIFI_USE_WPA == ENABLED && VSF_WIFI_CFG_RT28XX_HW_CRYPTO == ENABLED
 
-/* Shadow of the four SHARED_KEY_MODE registers so we can update the cipher
- * bits for group keys without an extra register read.  Cleared to 0 in init. */
-static uint32_t __rt28xx_shared_key_mode[4];
-
+/* Shadow of the four SHARED_KEY_MODE registers now lives in rt28xx_wifi_priv_t.
+ * Cleared to 0 in init via the zeroed chip_priv allocation. */
 
 static void __rt28xx_emit_key32(vsf_wifi_reg_op_t *ops, int *n,
         uint16_t base, const uint8_t key[32])
@@ -2868,6 +2932,7 @@ static vsf_err_t __rt28xx_crypto_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
         bool pairwise, const uint8_t *key, uint8_t key_len,
         const uint8_t *mac, vsf_wifi_done_t done)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     (void)mac;
     if ((key == NULL) || (key_len != 16)) {
         return VSF_ERR_INVALID_PARAMETER;
@@ -2899,11 +2964,11 @@ static vsf_err_t __rt28xx_crypto_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
         /* Update shadow and write the SHARED_KEY_MODE register this slot lives in. */
         uint8_t mode_reg = hw_idx / 8;
         uint8_t mode_bit = (hw_idx % 8) * 3;
-        __rt28xx_shared_key_mode[mode_reg] &= ~(0x7u << mode_bit);
-        __rt28xx_shared_key_mode[mode_reg] |= (uint32_t)RT28XX_CIPHER_AES << mode_bit;
+        priv->shared_key_mode[mode_reg] &= ~(0x7u << mode_bit);
+        priv->shared_key_mode[mode_reg] |= (uint32_t)RT28XX_CIPHER_AES << mode_bit;
         ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(
                 RT28XX_SHARED_KEY_MODE_ENTRY(mode_reg),
-                __rt28xx_shared_key_mode[mode_reg]);
+                priv->shared_key_mode[mode_reg]);
 
         /* IVEIV for the shared key slot so hardware can insert/verify IV. */
         __rt28xx_emit_iveiv(ops, &n, gtk_idx, RT28XX_MAC_IVEIV_ENTRY(hw_idx));
@@ -2926,11 +2991,12 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
         const uint8_t bssid[6], const uint8_t *ssid, uint8_t ssid_len,
         uint8_t channel, vsf_wifi_done_t done)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     (void)ssid; (void)ssid_len;
-    if (NULL == __rt28xx_find_rf(channel)) return VSF_ERR_INVALID_PARAMETER;
+    if (NULL == __rt28xx_find_rf(priv, channel)) return VSF_ERR_INVALID_PARAMETER;
 
-    /* bssid(2) + wcid(3) + channel(~75) + edca/wmm(~20) -> shared static buffer. */
-    vsf_wifi_reg_op_t *ops = __rt28xx_ops_buf;
+    /* bssid(2) + wcid(3) + channel(~75) + edca/wmm(~20) -> per-instance ops buffer. */
+    vsf_wifi_reg_op_t *ops = priv->ops_buf;
     int n = 0;
     /* MAC_BSSID (0x1010/0x1014): the Windows Ralink driver stores our own
      * STA MAC here with BSS_ID_MASK=3 (ref/rt5572_win_usb.log L6547-6550,
@@ -2956,7 +3022,7 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
      * (ref/rt5572_win_usb.log L17978-L17979: 0x7000 = 0x2AA70000).
      * The group-key mode bits are updated by the WPA layer after M3. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(0x7000, 0x2AA70000u);
-    n = __rt28xx_emit_channel(ops, n, channel);
+    n = __rt28xx_emit_channel(priv, n, channel);
     /* --- EDCA / WMM: match Windows connect sequence (ref/rt5572_win_usb.log
      *     L23597-L23614).  These are the 802.11e/WMM access-category parameters
      *     that the AP expects from an associated STA.  Without them the chip uses
@@ -3019,6 +3085,7 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
 
 static vsf_err_t __rt28xx_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 {
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     static const uint8_t zero_bssid[6] = {0};
     vsf_wifi_reg_op_t *ops = vsf_wifi_reg_get_scratch_ops(wifi);
     int n = 0;
@@ -3028,7 +3095,7 @@ static vsf_err_t __rt28xx_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 #if VSF_WIFI_USE_WPA == ENABLED && VSF_WIFI_CFG_RT28XX_HW_CRYPTO == ENABLED
     /* Clear any programmed GTK cipher mode. */
     for (int i = 0; i < 4; i++) {
-        __rt28xx_shared_key_mode[i] = 0;
+        priv->shared_key_mode[i] = 0;
         ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_SHARED_KEY_MODE_ENTRY(i), 0);
     }
 #endif
@@ -3186,18 +3253,14 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
     return total;
 }
 
-#ifndef RT28XX_TX_BUF_SIZE
-#   define RT28XX_TX_BUF_SIZE   1600
-#endif
-
 /* drv->tx: build the on-wire TX descriptor and hand it to the register bus. */
 static vsf_err_t __rt28xx_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
 {
-    static uint32_t __tx_buf32[(RT28XX_TX_BUF_SIZE + 3) / 4];
-    uint8_t *tx_buf = (uint8_t *)__tx_buf32;
+    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
+    uint8_t *tx_buf = (uint8_t *)priv->tx_buf32;
 
     uint16_t total = __rt28xx_build_tx(wifi, tx_buf,
-            (uint16_t)sizeof(__tx_buf32), frame, len);
+            (uint16_t)sizeof(priv->tx_buf32), frame, len);
     if (0 == total) return VSF_ERR_FAIL;
 
     if (wifi->reg_bus == NULL || wifi->reg_bus->data_tx == NULL) {

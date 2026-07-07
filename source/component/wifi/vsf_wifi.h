@@ -127,7 +127,7 @@ typedef void (*vsf_wifi_done_t)(vsf_wifi_t *wifi, vsf_err_t err);
  * read from a register satisfies the wait condition.  Called from the bus
  * driver's EDA on every poll iteration; must be cheap and side-effect free.
  */
-typedef bool (*vsf_wifi_reg_match_fn_t)(uint32_t val);
+typedef bool (*vsf_wifi_reg_match_fn_t)(void *ctx, uint32_t val);
 
 typedef struct vsf_wifi_scan_result_t {
     uint8_t  bssid[6];
@@ -630,7 +630,7 @@ vsf_err_t vsf_wifi_reg_run_blob(vsf_wifi_t *wifi,
  * Same single-flight constraint as run_script / run_blob.
  */
 vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint32_t reg,
-                                 vsf_wifi_reg_match_fn_t match,
+                                 vsf_wifi_reg_match_fn_t match, void *match_ctx,
                                  uint16_t max_retry, uint16_t interval_ms,
                                  vsf_wifi_done_t done);
 
