@@ -8,5 +8,10 @@ vsf_add_sources(
     chip/rt28xx/vsf_wifi_rt28xx.c
     chip/rt28xx/vsf_wifi_rt2870_firmware.c
     chip/mt76/vsf_wifi_mt76.c
+    chip/mt76/vsf_wifi_mt76_eeprom.c
     chip/mt76/vsf_wifi_mt76_firmware.c
+    chip/mt76/vsf_wifi_mt76_mac.c
+    chip/mt76/vsf_wifi_mt76_mcu.c
+    chip/mt76/vsf_wifi_mt76_phy.c
+    chip/mt76/vsf_wifi_mt76_usb.c
 )
