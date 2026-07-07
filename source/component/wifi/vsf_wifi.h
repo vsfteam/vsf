@@ -642,6 +642,22 @@ vsf_err_t vsf_wifi_reg_read_poll(vsf_wifi_t *wifi, uint32_t reg,
 vsf_err_t vsf_wifi_reg_read(vsf_wifi_t *wifi, uint32_t reg, uint32_t *out,
                             vsf_wifi_done_t done);
 
+#if VSF_WIFI_USE_WPA == ENABLED
+/* CCMP software-encapsulate a plaintext 802.11 data frame `frame` (length
+ * `len`) into `out` (capacity `cap`).  The 8-byte CCMP header is inserted
+ * immediately after the 802.11 header; the Protected Frame bit is set.
+ * `pn` is the 48-bit packet number used for this MPDU (little-endian);
+ * pass NULL to use the per-wifi TX PN counter.
+ * Returns the encrypted MPDU length, or 0 on failure.
+ *
+ * This is a public helper for chip drivers that need to software-encrypt
+ * specific frames even when hardware crypto is enabled (e.g. MT76 multicast
+ * frames). */
+uint16_t vsf_wifi_ccmp_encap_with_pn(vsf_wifi_t *wifi,
+        const uint8_t *frame, uint16_t len, uint8_t *out, uint16_t cap,
+        uint8_t pn[6]);
+#endif
+
 /* Per-wifi scratch op buffer (shared by parameterised chip ops). */
 vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi);
 

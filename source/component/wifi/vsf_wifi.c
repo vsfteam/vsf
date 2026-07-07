@@ -53,9 +53,11 @@ static void __vsf_wifi_mlme_send_auth (vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason);
 static void __vsf_wifi_mlme_finish    (vsf_wifi_t *wifi, uint8_t reason);
+#if VSF_WIFI_USE_WPA == ENABLED
 static void __vsf_wifi_retry_key_install(vsf_wifi_t *wifi);
 static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err);
 static void __vsf_wifi_handshake_gtk_done(vsf_wifi_t *wifi, vsf_err_t err);
+#endif
 
 /* Active scan: probe each channel during its dwell window so that silent /
  * hidden APs answer with a probe-response.  Set to DISABLED for pure passive
@@ -316,9 +318,11 @@ static void __vsf_wifi_script_finish(vsf_wifi_t *wifi, vsf_err_t err)
     if (done != NULL) {
         done(wifi, err);
     }
+#if VSF_WIFI_USE_WPA == ENABLED
     /* If the 4-way handshake is waiting for the script bus to become free,
      * let it retry now that the previous script has completed. */
     __vsf_wifi_retry_key_install(wifi);
+#endif
 }
 
 static void __vsf_wifi_script_step(vsf_wifi_t *wifi, vsf_err_t err)

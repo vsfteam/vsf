@@ -5629,7 +5629,9 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
      * buffer before encrypting the payload from the input buffer.  Passing
      * the same buffer for input and output overwrites the first 8 bytes of
      * the plaintext payload with the CCMP header, so use frame_buf as a
-     * separate output buffer. */
+     * separate output buffer.
+     * Only relevant when WPA/CCMP is compiled in. */
+#if VSF_WIFI_USE_WPA == ENABLED
     if (is_data && multicast && !protected && wifi->wpa_hw_crypto) {
         if (tx_len > sizeof(frame_buf)) {
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
@@ -5652,6 +5654,7 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
             "mt76: multicast sw-CCMP encap tx_len=%u"
             VSF_TRACE_CFG_LINEEND, (unsigned)tx_len);
     }
+#endif
 
     /* Compute the 802.11 header length so we can insert the L2 pad that
      * MT76 hardware expects when the header is not a multiple of 4 bytes.
@@ -5672,7 +5675,11 @@ vsf_err_t __mt76_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
      * Null frame from a STA.  This matches the RT5572 reference path.
      * Broadcast/multicast data is software-encrypted above, so it must not be
      * routed through the hardware WCID key table. */
+#if VSF_WIFI_USE_WPA == ENABLED
     bool hw_encrypt = wifi->wpa_hw_crypto && is_data && !is_eapol && !is_null && !multicast;
+#else
+    bool hw_encrypt = false;
+#endif
     /* For hardware CCMP the firmware inserts the CCMP header/MIC from the
      * WCID_IV/key registers, so the host frame must be plaintext and WIV=0.
      * For software CCMP (and all non-data frames) WIV=1 keeps the firmware
