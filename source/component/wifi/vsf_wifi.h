@@ -269,7 +269,14 @@ struct vsf_wifi_reg_bus_t {
  * The wifi layer never calls reg_bus directly — it always goes through the
  * chip vtable.  Register-based chips use the helpers vsf_wifi_reg_run_script /
  * run_blob / reg_read / reg_read_poll; command-based chips ignore reg_bus.
+ *
+ * Two chip families are supported:
+ *   - SoftMAC: the wifi core owns auth/assoc/4-way and probes each channel.
+ *   - FullMAC: the firmware owns MLME; the core only forwards scan/connect and
+ *     receives link-up / scan-result callbacks from the chip driver.
  *==========================================================================*/
+
+#define VSF_WIFI_CHIP_FLAG_FULLMAC          (1 << 0)
 
 #if VSF_WIFI_USE_WPA == ENABLED
 /*
@@ -304,6 +311,9 @@ typedef struct vsf_wifi_crypto_ops_t {
 struct vsf_wifi_chip_drv_t {
     const char *name;
 
+    /* Chip capability flags (e.g. VSF_WIFI_CHIP_FLAG_FULLMAC). */
+    uint32_t flags;
+
     /* Optional firmware uploader (rt2870.bin etc.).  Invoked once before
      * init() during attach.  Pure ops can use vsf_wifi_reg_run_script; bulk
      * blob uploads call vsf_wifi_reg_run_blob.  Leave NULL when the chip needs
@@ -311,45 +321,65 @@ struct vsf_wifi_chip_drv_t {
     vsf_err_t (*firmware_load)(vsf_wifi_t *wifi, vsf_wifi_done_t done);
     vsf_err_t (*init)         (vsf_wifi_t *wifi, vsf_wifi_done_t done);
     void      (*fini)         (vsf_wifi_t *wifi);
-    vsf_err_t (*set_channel)  (vsf_wifi_t *wifi, uint8_t channel,
-                               vsf_wifi_done_t done);
-    vsf_err_t (*set_rx_filter)(vsf_wifi_t *wifi, uint32_t mask,
-                               vsf_wifi_done_t done);
-    vsf_err_t (*set_mac_addr) (vsf_wifi_t *wifi, const uint8_t mac[6],
-                               vsf_wifi_done_t done);
-    vsf_err_t (*set_bssid)    (vsf_wifi_t *wifi, const uint8_t bssid[6],
-                               vsf_wifi_done_t done);
-    vsf_err_t (*set_auth_mode)(vsf_wifi_t *wifi,
-                               const vsf_wifi_auth_cfg_t *cfg,
-                               vsf_wifi_done_t done);
-    vsf_err_t (*connect)      (vsf_wifi_t *wifi,
-                               const uint8_t bssid[6], const uint8_t *ssid,
-                               uint8_t ssid_len, uint8_t channel,
-                               vsf_wifi_done_t done);
-    vsf_err_t (*disconnect)   (vsf_wifi_t *wifi, vsf_wifi_done_t done);
-    vsf_err_t (*get_link_info)(vsf_wifi_t *wifi,
-                               vsf_wifi_link_info_t *info);  /* sync */
 
-    /* Optional RX-frame parser used during scan.  When non-NULL and the
-     * driver is currently scanning, the wifi layer routes incoming frames
-     * here instead of vsf_wifi_on_rx; the chip code extracts beacons /
-     * probe responses and emits vsf_wifi_on_scan_result(). */
-    void      (*parse_rx)     (vsf_wifi_t *wifi, uint8_t *frame, uint16_t len);
+    union {
+        /* SoftMAC hooks.  Used when VSF_WIFI_CHIP_FLAG_FULLMAC is NOT set.
+         * The wifi core owns the MLME state machine. */
+        struct {
+            vsf_err_t (*set_channel)  (vsf_wifi_t *wifi, uint8_t channel,
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*set_rx_filter)(vsf_wifi_t *wifi, uint32_t mask,
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*set_mac_addr) (vsf_wifi_t *wifi, const uint8_t mac[6],
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*set_bssid)    (vsf_wifi_t *wifi, const uint8_t bssid[6],
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*set_auth_mode)(vsf_wifi_t *wifi,
+                                       const vsf_wifi_auth_cfg_t *cfg,
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*connect)      (vsf_wifi_t *wifi,
+                                       const uint8_t bssid[6], const uint8_t *ssid,
+                                       uint8_t ssid_len, uint8_t channel,
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*disconnect)   (vsf_wifi_t *wifi, vsf_wifi_done_t done);
+            vsf_err_t (*get_link_info)(vsf_wifi_t *wifi,
+                                       vsf_wifi_link_info_t *info);  /* sync */
 
-    /* Optional TX-descriptor builder.  Wraps a raw 802.11 frame into the
-     * chip-specific on-wire TX layout (e.g. RT2800 TXINFO + TXWI + frame +
-     * pad) by writing into `dst` (capacity `dst_cap`).  Returns the total
-     * byte count to ship over the data bus, or 0 on failure (dst too small
-     * / unsupported).  Used by drv->tx; may also be left NULL if tx builds
-     * its descriptor internally. */
-    uint16_t  (*build_tx)     (vsf_wifi_t *wifi, uint8_t *dst, uint16_t dst_cap,
-                              const uint8_t *frame, uint16_t frame_len);
+            /* Optional RX-frame parser used during scan.  When non-NULL and
+             * the driver is currently scanning, the wifi layer routes incoming
+             * frames here instead of vsf_wifi_on_rx; the chip code extracts
+             * beacons / probe responses and emits vsf_wifi_on_scan_result(). */
+            void      (*parse_rx)     (vsf_wifi_t *wifi, uint8_t *frame, uint16_t len);
 
-    /* Frame transmit hook.  The wifi layer routes all outbound 802.11 frames
-     * (active-scan probe-request, auth, assoc, deauth and data frames from
-     * the netdrv) through this hook.  The chip driver builds the on-wire
-     * payload and ships it over the bus.  REQUIRED; NULL returns
-     * VSF_ERR_NOT_SUPPORT from vsf_wifi_tx. */
+            /* Optional TX-descriptor builder. */
+            uint16_t  (*build_tx)     (vsf_wifi_t *wifi, uint8_t *dst, uint16_t dst_cap,
+                                      const uint8_t *frame, uint16_t frame_len);
+        } softmac;
+
+        /* FullMAC hooks.  Used when VSF_WIFI_CHIP_FLAG_FULLMAC IS set.
+         * The firmware owns MLME; the core only translates user API calls into
+         * chip-specific commands and waits for callbacks. */
+        struct {
+            vsf_err_t (*scan)         (vsf_wifi_t *wifi,
+                                       const uint8_t *channels,
+                                       uint8_t num_channels, uint16_t dwell_ms,
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*connect)      (vsf_wifi_t *wifi,
+                                       const uint8_t bssid[6], const uint8_t *ssid,
+                                       uint8_t ssid_len, uint8_t channel,
+                                       vsf_wifi_done_t done);
+            vsf_err_t (*disconnect)   (vsf_wifi_t *wifi, vsf_wifi_done_t done);
+            vsf_err_t (*get_link_info)(vsf_wifi_t *wifi,
+                                       vsf_wifi_link_info_t *info);  /* sync */
+        } fullmac;
+    };
+
+    /* Frame transmit hook.  The wifi layer routes all outbound frames through
+     * this hook.  REQUIRED; NULL returns VSF_ERR_NOT_SUPPORT from vsf_wifi_tx.
+     *
+     * For SoftMAC chips `frame` is a raw 802.11 MPDU.
+     * For FullMAC chips the meaning is chip-specific (e.g. an Ethernet frame or
+     * a chip-specific descriptor + payload). */
     vsf_err_t (*tx)           (vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len);
 
 #if VSF_WIFI_USE_WPA == ENABLED
@@ -674,6 +704,10 @@ vsf_wifi_reg_op_t * vsf_wifi_reg_get_scratch_ops(vsf_wifi_t *wifi);
 
 #if VSF_WIFI_USE_MT76 == ENABLED
 #   include "./chip/mt76/vsf_wifi_mt76.h"
+#endif
+
+#if VSF_WIFI_USE_AIC8800D == ENABLED
+#   include "./chip/aic8800d/vsf_wifi_aic8800d.h"
 #endif
 
 /*============================ LOGGING HELPERS ===============================*

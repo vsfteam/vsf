@@ -83,9 +83,11 @@ static void __vsf_wifi_keepalive_cb(vsf_callback_timer_t *timer);
 #endif
 static void __vsf_wifi_scan_advance  (vsf_wifi_t *wifi);
 static void __vsf_wifi_scan_finish   (vsf_wifi_t *wifi);
+static void __vsf_wifi_fullmac_scan_done(vsf_wifi_t *wifi, vsf_err_t err);
 #if VSF_WIFI_CFG_SCAN_ACTIVE == ENABLED
 static void __vsf_wifi_send_probe_req (vsf_wifi_t *wifi);
 #endif
+static void __vsf_wifi_fullmac_connect_done(vsf_wifi_t *wifi, vsf_err_t err);
 
 #define __VSF_WIFI_SCAN_DEFAULT_DWELL_MS    120
 #endif
@@ -689,10 +691,18 @@ static void __vsf_wifi_on_init_done(vsf_wifi_t *wifi, vsf_err_t err)
         __vsf_wifi_attach_fail(wifi, err);
         return;
     }
+
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        /* FullMAC firmware owns the MAC address and RX filters internally.
+         * Skip the SoftMAC set_mac_addr / set_rx_filter sequence. */
+        __vsf_wifi_on_rxfilter_done(wifi, VSF_ERR_NONE);
+        return;
+    }
+
     /* Program the MAC address (populated from EEPROM / fallback during init)
      * into the chip's unicast-filter registers so hardware ACKs work. */
-    if (wifi->drv->set_mac_addr != NULL) {
-        err = wifi->drv->set_mac_addr(wifi, wifi->mac, __vsf_wifi_on_mac_set_done);
+    if (wifi->drv->softmac.set_mac_addr != NULL) {
+        err = wifi->drv->softmac.set_mac_addr(wifi, wifi->mac, __vsf_wifi_on_mac_set_done);
         if (VSF_ERR_NONE != err) {
             __vsf_wifi_attach_fail(wifi, err);
         }
@@ -707,11 +717,11 @@ static void __vsf_wifi_on_mac_set_done(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_trace_info("wifi: set_mac_addr failed (err=%d), continuing"
                 VSF_TRACE_CFG_LINEEND, (int)err);
     }
-    if (NULL == wifi->drv->set_rx_filter) {
+    if (NULL == wifi->drv->softmac.set_rx_filter) {
         __vsf_wifi_on_rxfilter_done(wifi, VSF_ERR_NONE);
         return;
     }
-    err = wifi->drv->set_rx_filter(wifi, 0, __vsf_wifi_on_rxfilter_done);
+    err = wifi->drv->softmac.set_rx_filter(wifi, 0, __vsf_wifi_on_rxfilter_done);
     if (VSF_ERR_NONE != err) {
         __vsf_wifi_attach_fail(wifi, err);
     }
@@ -763,6 +773,19 @@ void vsf_wifi_fini(vsf_wifi_t *wifi)
 void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     if (wifi->disconnecting) return;
+
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        /* FullMAC: the chip driver owns RX classification.  If it supplied a
+         * parser (e.g. for scan results or link events) call it; otherwise
+         * deliver the frame directly. */
+        if (wifi->drv->softmac.parse_rx != NULL) {
+            wifi->drv->softmac.parse_rx(wifi, frame, len);
+        } else {
+            __vsf_wifi_deliver_rx(wifi, frame, len);
+        }
+        return;
+    }
+
     /* During a scan the chip parser owns the frame so it can extract
      * beacons / probe responses; while an MLME handshake is in progress (or
      * the link is up) the parser also routes mgmt frames to vsf_wifi_mlme_rx
@@ -770,8 +793,8 @@ void vsf_wifi_on_rx_internal(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
      * frame to the application. */
     if ((wifi->scanning || (wifi->mlme_state != WIFI_MLME_IDLE)
                 || wifi->raw_radio_active)
-            && wifi->drv->parse_rx != NULL) {
-        wifi->drv->parse_rx(wifi, frame, len);
+            && wifi->drv->softmac.parse_rx != NULL) {
+        wifi->drv->softmac.parse_rx(wifi, frame, len);
     } else {
         __vsf_wifi_deliver_rx(wifi, frame, len);
     }
@@ -1032,6 +1055,15 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
     if (wifi->disconnecting) return;
     if (len < 24) return;
 
+    /* FullMAC: firmware has already performed the 4-way handshake and CCMP
+     * decryption.  The chip driver delivers either a decrypted 802.11 data
+     * frame or an Ethernet frame, but in any case the wifi core must NOT
+     * touch EAPOL / CCMP. */
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        __vsf_wifi_deliver_rx(wifi, (uint8_t *)dot11, len);
+        return;
+    }
+
     /* Filter by A1 (destination address): only accept unicast frames
      * addressed to our MAC or broadcast/multicast frames.  The RX filter on
      * some chips is semi-promiscuous and may deliver frames for other STAs. */
@@ -1161,9 +1193,16 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
     __vsf_wifi_deliver_rx(wifi, (uint8_t *)dot11, len);
 }
 
-/*============================ SCAN SCHEDULER ================================*/
+static void __vsf_wifi_fullmac_scan_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (wifi->disconnecting || !wifi->scanning) return;
+    if (VSF_ERR_NONE != err) {
+        vsf_wifi_trace_error("scan: fullmac failed err=%d" VSF_TRACE_CFG_LINEEND, err);
+    }
+    __vsf_wifi_scan_finish(wifi);
+}
 
-#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+/*============================ SCAN SCHEDULER ================================*/
 
 static void __vsf_wifi_scan_finish(vsf_wifi_t *wifi)
 {
@@ -1173,6 +1212,8 @@ static void __vsf_wifi_scan_finish(vsf_wifi_t *wifi)
     wifi->scan_num_channels = 0;
     vsf_wifi_on_scan_done(wifi);
 }
+
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 
 /* Called from kernel timer EDA — bounce back to the bus driver's EDA so the
  * actual hop runs in the same context as bus completions. */
@@ -1245,13 +1286,13 @@ static void __vsf_wifi_scan_advance(vsf_wifi_t *wifi)
         __vsf_wifi_scan_finish(wifi);
         return;
     }
-    if (NULL == wifi->drv->set_channel) {
+    if (NULL == wifi->drv->softmac.set_channel) {
         __vsf_wifi_scan_finish(wifi);
         return;
     }
     uint8_t ch = wifi->scan_channels[wifi->scan_channel_idx];
     wifi->channel = ch;
-    if (VSF_ERR_NONE != wifi->drv->set_channel(wifi, ch,
+    if (VSF_ERR_NONE != wifi->drv->softmac.set_channel(wifi, ch,
             __vsf_wifi_scan_hop_done)) {
         __vsf_wifi_scan_finish(wifi);
     }
@@ -1567,6 +1608,28 @@ static void __vsf_wifi_mlme_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
     __vsf_wifi_mlme_send_auth(wifi);
 }
 
+/* FullMAC drv->fullmac.connect completion.  The firmware has finished auth/
+ * assoc/4-way internally; move to RUN and notify the application. */
+static void __vsf_wifi_fullmac_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    if (wifi->disconnecting) return;
+    if (wifi->mlme_state != WIFI_MLME_AUTH) return;
+    if (VSF_ERR_NONE != err) {
+        vsf_wifi_trace_error("wifi: fullmac connect failed (err=%d)"
+                VSF_TRACE_CFG_LINEEND, (int)err);
+        __vsf_wifi_mlme_finish(wifi, WIFI_REASON_UNSPECIFIED);
+        return;
+    }
+    wifi->mlme_state = WIFI_MLME_RUN;
+    wifi->mlme_retry = 0;
+    vsf_wifi_link_info_t info;
+    memset(&info, 0, sizeof(info));
+    memcpy(info.bssid, wifi->mlme_bssid, 6);
+    info.channel = wifi->mlme_channel;
+    info.flags   = WIFI_LINK_FLAG_CONNECTED | WIFI_LINK_FLAG_AUTHORIZED;
+    __vsf_wifi_deliver_link_up(wifi, &info);
+}
+
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 /* mlme_timer expiry (kernel timer EDA) — bounce to the bus EDA so the
  * retransmit TX runs in the same context as bus completions. */
@@ -1775,11 +1838,13 @@ void vsf_wifi_set_channel(vsf_wifi_t *wifi, uint8_t channel)
     if (channel < 1)   channel = 1;
     if (channel > 196) channel = 196;   /* 2.4 GHz + 5 GHz; driver validates */
     wifi->channel = channel;
-    /* Scan owner has set_channel scheduled — bumping it from outside would
+    /* Scan owner has set_channel scheduled -- bumping it from outside would
      * corrupt scratch_ops mid-script. */
     if (wifi->scanning) return;
-    if (wifi->is_ready && wifi->drv->set_channel) {
-        wifi->drv->set_channel(wifi, channel, NULL);
+    if (wifi->is_ready
+            && !(wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC)
+            && wifi->drv->softmac.set_channel) {
+        wifi->drv->softmac.set_channel(wifi, channel, NULL);
     }
 }
 
@@ -1793,26 +1858,33 @@ void vsf_wifi_set_channel_bw(vsf_wifi_t *wifi, uint8_t bw)
 
 vsf_err_t vsf_wifi_set_mac(vsf_wifi_t *wifi, const uint8_t mac[6])
 {
-    if (!wifi->is_ready || !wifi->drv->set_mac_addr) return VSF_ERR_NOT_READY;
+    if (!wifi->is_ready) return VSF_ERR_NOT_READY;
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC)
+        return VSF_ERR_NOT_SUPPORT;
+    if (!wifi->drv->softmac.set_mac_addr) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
-    return wifi->drv->set_mac_addr(wifi, mac, NULL);
+    return wifi->drv->softmac.set_mac_addr(wifi, mac, NULL);
 }
 
 vsf_err_t vsf_wifi_set_bssid(vsf_wifi_t *wifi, const uint8_t bssid[6])
 {
-    if (!wifi->is_ready || !wifi->drv->set_bssid) return VSF_ERR_NOT_READY;
+    if (!wifi->is_ready) return VSF_ERR_NOT_READY;
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC)
+        return VSF_ERR_NOT_SUPPORT;
+    if (!wifi->drv->softmac.set_bssid) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
-    return wifi->drv->set_bssid(wifi, bssid, NULL);
+    return wifi->drv->softmac.set_bssid(wifi, bssid, NULL);
 }
 
 vsf_err_t vsf_wifi_set_auth_mode(vsf_wifi_t *wifi,
         const vsf_wifi_auth_cfg_t *cfg)
 {
-    if (!wifi->is_ready || !wifi->drv->set_auth_mode) return VSF_ERR_NOT_READY;
+    if (!wifi->is_ready) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
 #if VSF_WIFI_USE_WPA == ENABLED
     /* Remember the requested security so the MLME can build the assoc-req RSN
-     * IE and (for WPA2-PSK) run the 4-way handshake with the supplied PMK. */
+     * IE and (for WPA2-PSK) run the 4-way handshake with the supplied PMK.
+     * FullMAC drivers also use this configuration to build connect requests. */
     if (cfg != NULL) {
         wifi->wpa_auth = *cfg;
     } else {
@@ -1820,7 +1892,13 @@ vsf_err_t vsf_wifi_set_auth_mode(vsf_wifi_t *wifi,
     }
     wifi->wpa_rsn_ie_len = 0;
 #endif
-    return wifi->drv->set_auth_mode(wifi, cfg, NULL);
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        /* FullMAC firmware consumes the auth configuration inside connect().
+         * No separate set_auth_mode hook is required. */
+        return VSF_ERR_NONE;
+    }
+    if (!wifi->drv->softmac.set_auth_mode) return VSF_ERR_NOT_READY;
+    return wifi->drv->softmac.set_auth_mode(wifi, cfg, NULL);
 }
 
 vsf_err_t vsf_wifi_scan(vsf_wifi_t *wifi,
@@ -1829,7 +1907,6 @@ vsf_err_t vsf_wifi_scan(vsf_wifi_t *wifi,
     if (!wifi->is_ready) return VSF_ERR_NOT_READY;
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     if (wifi->scanning)                     return VSF_ERR_NOT_AVAILABLE;
-    if (NULL == wifi->drv->set_channel)     return VSF_ERR_NOT_SUPPORT;
     if (channels == NULL || num_channels == 0
             || num_channels > dimof(wifi->scan_channels))
         return VSF_ERR_INVALID_PARAMETER;
@@ -1842,7 +1919,23 @@ vsf_err_t vsf_wifi_scan(vsf_wifi_t *wifi,
     wifi->scanning          = true;
     wifi->channel           = channels[0];
 
-    vsf_err_t err = wifi->drv->set_channel(wifi, channels[0],
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        if (NULL == wifi->drv->fullmac.scan) {
+            wifi->scanning = false;
+            return VSF_ERR_NOT_SUPPORT;
+        }
+        vsf_err_t err = wifi->drv->fullmac.scan(wifi, channels, num_channels,
+                wifi->scan_dwell_ms, __vsf_wifi_fullmac_scan_done);
+        if (VSF_ERR_NONE != err) {
+            wifi->scanning = false;
+        }
+        return err;
+    }
+
+    if (NULL == wifi->drv->softmac.set_channel) {
+        return VSF_ERR_NOT_SUPPORT;
+    }
+    vsf_err_t err = wifi->drv->softmac.set_channel(wifi, channels[0],
             __vsf_wifi_scan_hop_done);
     if (VSF_ERR_NONE != err) {
         wifi->scanning = false;
@@ -1871,10 +1964,33 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
         const uint8_t bssid[6], const uint8_t *ssid, uint8_t ssid_len,
         uint8_t channel)
 {
-    if (!wifi->is_ready || !wifi->drv->connect) return VSF_ERR_NOT_READY;
+    if (!wifi->is_ready) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
-    if (wifi->mlme_state != WIFI_MLME_IDLE) return VSF_ERR_NOT_AVAILABLE;
     if ((bssid == NULL) || (channel == 0)) return VSF_ERR_INVALID_PARAMETER;
+
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        if (!wifi->drv->fullmac.connect) return VSF_ERR_NOT_READY;
+        if (wifi->mlme_state != WIFI_MLME_IDLE) return VSF_ERR_NOT_AVAILABLE;
+        memcpy(wifi->mlme_bssid, bssid, 6);
+        if (ssid_len > sizeof(wifi->mlme_ssid) - 1) {
+            ssid_len = sizeof(wifi->mlme_ssid) - 1;
+        }
+        if ((ssid != NULL) && (ssid_len > 0)) {
+            memcpy(wifi->mlme_ssid, ssid, ssid_len);
+        }
+        wifi->mlme_ssid_len = ssid_len;
+        wifi->mlme_channel  = channel;
+        wifi->mlme_state    = WIFI_MLME_AUTH;  /* reserve state until link up */
+        vsf_err_t err = wifi->drv->fullmac.connect(wifi, bssid, ssid, ssid_len,
+                channel, __vsf_wifi_fullmac_connect_done);
+        if (VSF_ERR_NONE != err) {
+            wifi->mlme_state = WIFI_MLME_IDLE;
+        }
+        return err;
+    }
+
+    if (!wifi->drv->softmac.connect) return VSF_ERR_NOT_READY;
+    if (wifi->mlme_state != WIFI_MLME_IDLE) return VSF_ERR_NOT_AVAILABLE;
 
     /* Stash the target so the MLME state machine can build auth / assoc
      * frames and so a retransmit has the same parameters. */
@@ -1896,7 +2012,7 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
 
     /* drv->connect locks channel + BSSID + RX filter; its completion kicks
      * off the OPEN-system handshake (auth-req) in the bus EDA. */
-    vsf_err_t err = wifi->drv->connect(wifi, bssid, ssid, ssid_len, channel,
+    vsf_err_t err = wifi->drv->softmac.connect(wifi, bssid, ssid, ssid_len, channel,
             __vsf_wifi_mlme_connect_done);
     if (VSF_ERR_NONE != err) {
         wifi->mlme_state = WIFI_MLME_IDLE;
@@ -1906,15 +2022,25 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
 
 vsf_err_t vsf_wifi_disconnect(vsf_wifi_t *wifi)
 {
-    if (!wifi->is_ready || !wifi->drv->disconnect) return VSF_ERR_NOT_READY;
+    if (!wifi->is_ready) return VSF_ERR_NOT_READY;
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
+
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        if (!wifi->drv->fullmac.disconnect) return VSF_ERR_NOT_READY;
+        if (wifi->mlme_state == WIFI_MLME_IDLE) return VSF_ERR_NONE;
+        vsf_err_t err = wifi->drv->fullmac.disconnect(wifi, NULL);
+        __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_DISCONNECT);
+        return err;
+    }
+
+    if (!wifi->drv->softmac.disconnect) return VSF_ERR_NOT_READY;
     if (wifi->mlme_state == WIFI_MLME_IDLE) return VSF_ERR_NONE;
 
     /* Best-effort deauth so the AP frees our association immediately. */
     __vsf_wifi_mlme_send_deauth(wifi, WIFI_REASON_AUTH_LEAVING);
 
     /* Tear down chip-side BSSID / RX filter; ignore its async completion. */
-    vsf_err_t err = wifi->drv->disconnect(wifi, NULL);
+    vsf_err_t err = wifi->drv->softmac.disconnect(wifi, NULL);
 
     /* Drop the link locally regardless of the deauth/disconnect outcome. */
     __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_DISCONNECT);
@@ -1923,13 +2049,17 @@ vsf_err_t vsf_wifi_disconnect(vsf_wifi_t *wifi)
 
 vsf_err_t vsf_wifi_get_link_info(vsf_wifi_t *wifi, vsf_wifi_link_info_t *info)
 {
-    if (!wifi->is_ready || !wifi->drv->get_link_info) return VSF_ERR_NOT_READY;
-    return wifi->drv->get_link_info(wifi, info);
+    if (!wifi->is_ready) return VSF_ERR_NOT_READY;
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        if (!wifi->drv->fullmac.get_link_info) return VSF_ERR_NOT_SUPPORT;
+        return wifi->drv->fullmac.get_link_info(wifi, info);
+    }
+    if (!wifi->drv->softmac.get_link_info) return VSF_ERR_NOT_READY;
+    return wifi->drv->softmac.get_link_info(wifi, info);
 }
 
-/* Core TX path shared by vsf_wifi_tx (user API) and the active-scan probe-
- * request.  Deliberately does NOT check wifi->scanning so the scan scheduler
- * can transmit mid-scan; callers that must respect scanning check it first. */
+/* Transmit a raw frame bypassing the scanning guard.  Used by MLME and by
+ * vsf_wifi_tx itself (which applies the scanning guard first). */
 static vsf_err_t __vsf_wifi_tx_frame(vsf_wifi_t *wifi,
         const uint8_t *frame, uint16_t len)
 {
