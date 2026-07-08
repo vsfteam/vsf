@@ -30,6 +30,25 @@
 #define AIC8800D_USB_DATA_TYPE      0x01
 #define AIC8800D_USB_DUMMY_LEN      4
 
+/* Default TX power table for AIC8800D80 (matches Linux txpwr_lvl_v3) */
+static const struct aic8800d_txpwr_lvl_conf_v3 __aic8800d_txpwr_lvl_v3_default = {
+    .enable = 1,
+    .pwrlvl_11b_11ag_2g4 = { 20, 20, 20, 20, 20, 20, 20, 20, 18, 18, 16, 16 },
+    .pwrlvl_11n_11ac_2g4 = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 16 },
+    .pwrlvl_11ax_2g4     = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 16, 15, 15 },
+    .pwrlvl_11a_5g       = { 0x80, 0x80, 0x80, 0x80, 20, 20, 20, 20, 18, 18, 16, 16 },
+    .pwrlvl_11n_11ac_5g  = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 15 },
+    .pwrlvl_11ax_5g      = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 15, 14, 14 },
+};
+
+/*============================ FORWARD DECLARATIONS ==========================*/
+
+static uint8_t __aic8800d_freq_to_channel(uint16_t freq);
+static void __aic8800d_parse_rsn(const uint8_t *body, uint8_t len,
+        vsf_wifi_scan_result_t *result);
+static void __aic8800d_scan_finish(vsf_wifi_t *wifi);
+static void __aic8800d_scan_finish_timer_cb(vsf_callback_timer_t *timer);
+
 /*============================ LOCAL FUNCTIONS ===============================*/
 
 aic8800d_priv_t *__aic8800d_priv(vsf_wifi_t *wifi)
@@ -205,9 +224,97 @@ static void __aic8800d_handle_e2a(vsf_wifi_t *wifi,
     case AIC8800D_SCANU_RESULT_IND: {
         struct aic8800d_scanu_result_ind *ind =
                 (struct aic8800d_scanu_result_ind *)msg->param;
-        vsf_wifi_aic8800d_trace_debug("aic8800d: scan_result len=%u rssi=%d"
-                VSF_TRACE_CFG_LINEEND, ind->length, ind->rssi);
-        /* TODO: parse beacon/probe response and call vsf_wifi_on_scan_result() */
+        const uint8_t *frame = (const uint8_t *)ind->payload;
+        uint16_t frame_len = ind->length;
+        uint16_t freq = ind->center_freq;
+
+        vsf_wifi_aic8800d_trace_debug("aic8800d: scan_result len=%u rssi=%d freq=%u"
+                VSF_TRACE_CFG_LINEEND, ind->length, ind->rssi, freq);
+
+        if (priv->scan_finish_pending) {
+            /* Results keep arriving after SCANU_START_CFM; extend the guard
+             * window so the upper layer sees all of them before scan_done. */
+            vsf_callback_timer_remove(&priv->scan_finish_timer);
+            vsf_callback_timer_add_ms(&priv->scan_finish_timer, 500);
+        }
+        priv->scan_results_received++;
+
+        if (frame_len < 36) break;          /* min mgmt header + fixed params */
+
+        uint8_t fc0 = frame[0];
+        uint8_t subtype = (fc0 >> 4) & 0x0F;
+        /* beacon(8) or probe response(5) */
+        if (subtype != 5 && subtype != 8) break;
+
+        const uint8_t *bssid = frame + 16;  /* address 3 */
+        const uint8_t *body  = frame + 24;  /* after sequence control */
+        uint16_t body_len = frame_len > 24 ? (frame_len - 24) : 0;
+        if (body_len < 12) break;
+
+        vsf_wifi_scan_result_t result;
+        memset(&result, 0, sizeof(result));
+        memcpy(result.bssid, bssid, 6);
+        result.capability = (uint16_t)body[10] | ((uint16_t)body[11] << 8);
+        result.channel    = __aic8800d_freq_to_channel(freq);
+        result.rssi       = ind->rssi;
+        result.flags      = (subtype == 5) ? 1u : 0u; /* bit0 = probe response */
+
+        const uint8_t *ie  = body + 12;
+        const uint8_t *end = body + body_len;
+        while (ie + 2 <= end) {
+            uint8_t tag = ie[0];
+            uint8_t l   = ie[1];
+            if (ie + 2 + l > end) break;
+            if (tag == 0 && l <= 32) {          /* SSID */
+                memcpy(result.ssid, ie + 2, l);
+                result.ssid_len = l;
+            } else if (tag == 3 && l == 1) {   /* DS Param Set */
+                result.channel = ie[2];
+            } else if (tag == 48) {             /* RSN IE (WPA2) */
+                __aic8800d_parse_rsn(ie + 2, l, &result);
+            } else if (tag == 61 && l >= 2) {  /* HT Operation IE */
+                result.ht40_width = (ie[2 + 1] & 0x01) ? 1 : 0;
+                uint8_t sco = (uint8_t)((ie[2 + 1] >> 2) & 0x03);
+                result.ht40_plus = (sco == 1) ? 1 : 0;
+            } else if (tag == 221 && l >= 7 &&
+                       ie[2] == 0x00 && ie[3] == 0x50 &&
+                       ie[4] == 0xF2 && ie[5] == 0x02) {
+                /* WMM Information/Parameter Element (OUI 00:50:F2, type 2) */
+                result.wmm = 1;
+            }
+            ie += 2 + l;
+        }
+
+        vsf_wifi_aic8800d_trace_info(
+                "aic8800d: scan bssid=%02X:%02X:%02X:%02X:%02X:%02X "
+                "ssid=%.*s ch=%u rssi=%d caps=0x%04X wmm=%u ht40=%u%s"
+                VSF_TRACE_CFG_LINEEND,
+                bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5],
+                result.ssid_len, result.ssid,
+                result.channel, result.rssi, result.capability,
+                (unsigned)result.wmm,
+                (unsigned)result.ht40_width,
+                result.ht40_plus ? "+" : (result.ht40_width ? "-" : ""));
+
+        vsf_wifi_on_scan_result(wifi, &result);
+        break;
+    }
+    case AIC8800D_SCANU_START_CFM: {
+        struct aic8800d_scanu_start_cfm *cfm =
+                (struct aic8800d_scanu_start_cfm *)msg->param;
+        vsf_wifi_aic8800d_trace_info("aic8800d: scanu_start_cfm vif=%u status=%u result_cnt=%u"
+                VSF_TRACE_CFG_LINEEND,
+                cfm->vif_idx, cfm->status, cfm->result_cnt);
+        if (priv->scan_active) {
+            /* 0x1001 (SCANU_START_CFM) reports scan completion with the expected
+             * result count. Start a short guard window so any trailing
+             * SCANU_RESULT_IND indications are processed before scan_done. */
+            priv->scan_results_expected = cfm->result_cnt;
+            priv->scan_results_received = 0;
+            priv->scan_finish_pending = true;
+            vsf_callback_timer_remove(&priv->scan_finish_timer);
+            vsf_callback_timer_add_ms(&priv->scan_finish_timer, 500);
+        }
         break;
     }
     default:
@@ -314,6 +421,9 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
     struct aic8800d_mm_start_cfm start_cfm;
     struct aic8800d_mm_set_stack_start_cfm stack_cfm;
     struct aic8800d_mm_set_filter_req filter_req;
+    struct aic8800d_mm_set_txpwr_lvl_req txpwr_req;
+    struct aic8800d_mm_set_rf_calib_req rf_calib_req;
+    struct aic8800d_mm_set_rf_calib_cfm rf_calib_cfm;
     struct aic8800d_mm_add_if_req add_if_req;
     struct aic8800d_mm_reset_req reset_req;
     struct aic8800d_mm_get_mac_addr_req mac_req;
@@ -336,6 +446,10 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_STACK_START_REQ"
                 VSF_TRACE_CFG_LINEEND);
         memset(&stack_req, 0, sizeof(stack_req));
+        stack_req.is_stack_start = 1;
+        stack_req.efuse_valid = 0;
+        stack_req.set_vendor_info = 0x20; /* CO_BIT(5) */
+        stack_req.fwtrace_redir = 0;
         priv->init_step++;
         __aic8800d_send_msg(wifi, AIC8800D_MM_SET_STACK_START_REQ,
                 &stack_req, sizeof(stack_req),
@@ -344,6 +458,53 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         break;
 
     case 1:
+        vsf_wifi_aic8800d_trace_info("aic8800d: stack_start_cfm 5g=%u vendor=0x%02X"
+                VSF_TRACE_CFG_LINEEND, stack_cfm.is_5g_support, stack_cfm.vendor_info);
+
+        vsf_wifi_aic8800d_trace_info("aic8800d: MM_GET_FW_VERSION_REQ"
+                VSF_TRACE_CFG_LINEEND);
+        {
+            struct aic8800d_mm_get_fw_version_req fw_req;
+            struct aic8800d_mm_get_fw_version_cfm fw_cfm;
+            memset(&fw_req, 0, sizeof(fw_req));
+            priv->init_step++;
+            __aic8800d_send_msg(wifi, AIC8800D_MM_GET_FW_VERSION_REQ,
+                    &fw_req, sizeof(fw_req),
+                    AIC8800D_MM_GET_FW_VERSION_CFM, &fw_cfm, sizeof(fw_cfm),
+                    __aic8800d_init_done_cb);
+        }
+        break;
+
+    case 2:
+        vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_TXPWR_IDX_LVL_REQ"
+                VSF_TRACE_CFG_LINEEND);
+        memset(&txpwr_req, 0, sizeof(txpwr_req));
+        txpwr_req.u.txpwr_lvl_v3 = __aic8800d_txpwr_lvl_v3_default;
+        priv->init_step++;
+        __aic8800d_send_msg(wifi, AIC8800D_MM_SET_TXPWR_IDX_LVL_REQ,
+                &txpwr_req, sizeof(txpwr_req),
+                AIC8800D_MM_SET_TXPWR_IDX_LVL_CFM, NULL, 0,
+                __aic8800d_init_done_cb);
+        break;
+
+    case 3:
+        vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_RF_CALIB_REQ"
+                VSF_TRACE_CFG_LINEEND);
+        memset(&rf_calib_req, 0, sizeof(rf_calib_req));
+        rf_calib_req.cal_cfg_24g = 0x0f8f;
+        rf_calib_req.cal_cfg_5g  = 0x0f0f;
+        rf_calib_req.param_alpha = 0x0c34c008;
+        rf_calib_req.bt_calib_en = 0;
+        rf_calib_req.bt_calib_param = 0x264203;
+        /* xtal_cap defaults to enable=0; leave xtal_cap fields zero */
+        priv->init_step++;
+        __aic8800d_send_msg(wifi, AIC8800D_MM_SET_RF_CALIB_REQ,
+                &rf_calib_req, sizeof(rf_calib_req),
+                AIC8800D_MM_SET_RF_CALIB_CFM, &rf_calib_cfm, sizeof(rf_calib_cfm),
+                __aic8800d_init_done_cb);
+        break;
+
+    case 4:
         vsf_wifi_aic8800d_trace_info("aic8800d: MM_GET_MAC_ADDR_REQ"
                 VSF_TRACE_CFG_LINEEND);
         memset(&mac_req, 0, sizeof(mac_req));
@@ -354,7 +515,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 2:
+    case 5:
         memcpy(priv->mac_addr, mac_cfm.mac_addr, 6);
         priv->mac_addr_valid = true;
         memcpy(wifi->mac, mac_cfm.mac_addr, 6);
@@ -373,7 +534,23 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 3:
+    case 6:
+        vsf_wifi_aic8800d_trace_info("aic8800d: MM_START_REQ"
+                VSF_TRACE_CFG_LINEEND);
+        {
+            struct aic8800d_mm_start_req start_req;
+            memset(&start_req, 0, sizeof(start_req));
+            start_req.uapsd_timeout = 300;
+            start_req.lp_clk_accuracy = 20;
+            priv->init_step++;
+            __aic8800d_send_msg(wifi, AIC8800D_MM_START_REQ,
+                    &start_req, sizeof(start_req),
+                    AIC8800D_MM_START_CFM, &start_cfm, sizeof(start_cfm),
+                    __aic8800d_init_done_cb);
+        }
+        break;
+
+    case 7:
         vsf_wifi_aic8800d_trace_info("aic8800d: MM_VERSION_REQ"
                 VSF_TRACE_CFG_LINEEND);
         memset(&version_req, 0, sizeof(version_req));
@@ -384,29 +561,86 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 4:
+    case 8:
         vsf_wifi_aic8800d_trace_info("aic8800d: FW version=0x%08X"
                 VSF_TRACE_CFG_LINEEND, version_cfm.version_lmac);
         vsf_wifi_aic8800d_trace_info("aic8800d: ME_CONFIG_REQ"
                 VSF_TRACE_CFG_LINEEND);
-        priv->init_step++;
-        __aic8800d_send_msg(wifi, AIC8800D_ME_CONFIG_REQ,
-                NULL, 0,
-                AIC8800D_ME_CONFIG_CFM, NULL, 0,
-                __aic8800d_init_done_cb);
+        {
+            struct aic8800d_me_config_req me_req;
+            memset(&me_req, 0, sizeof(me_req));
+
+            me_req.ht_supp  = true;
+            me_req.vht_supp = false;
+            me_req.he_supp  = false;
+            me_req.he_ul_on = false;
+            me_req.ps_on    = true;
+            me_req.dpsm     = false;
+            me_req.ant_div_on = true;
+            me_req.tx_lft   = 1000;
+            me_req.phy_bw_max = 1; /* PHY_CHNL_BW_40 for AIC8800D80 */
+
+            /* HT capability: matches Linux RWNX_HT_CAPABILITIES converted by
+             * rwnx_send_me_config_req(). */
+            me_req.ht_cap.ht_capa_info = 0x0001; /* LDPC coding */
+            me_req.ht_cap.a_mpdu_param = 0x12;   /* factor=64K, density=16 */
+            me_req.ht_cap.mcs_rate[0]  = 0xFF;   /* MCS 0-7 */
+            me_req.ht_cap.ht_extended_capa  = 0;
+            me_req.ht_cap.tx_beamforming_capa = 0;
+            me_req.ht_cap.asel_capa = 0;
+
+            priv->init_step++;
+            __aic8800d_send_msg(wifi, AIC8800D_ME_CONFIG_REQ,
+                    &me_req, sizeof(me_req),
+                    AIC8800D_ME_CONFIG_CFM, NULL, 0,
+                    __aic8800d_init_done_cb);
+        }
         break;
 
-    case 5:
+    case 9:
         vsf_wifi_aic8800d_trace_info("aic8800d: ME_CHAN_CONFIG_REQ"
                 VSF_TRACE_CFG_LINEEND);
-        priv->init_step++;
-        __aic8800d_send_msg(wifi, AIC8800D_ME_CHAN_CONFIG_REQ,
-                NULL, 0,
-                AIC8800D_ME_CHAN_CONFIG_CFM, NULL, 0,
-                __aic8800d_init_done_cb);
+        {
+            struct aic8800d_me_chan_config_req req;
+            memset(&req, 0, sizeof(req));
+
+            /* 2.4GHz channels 1-14 */
+            req.chan2G4_cnt = AIC8800D_MAC_DOMAINCHANNEL_24G_MAX;
+            for (int i = 0; i < AIC8800D_MAC_DOMAINCHANNEL_24G_MAX; i++) {
+                req.chan2G4[i].band = 0; /* PHY_BAND_2G4 */
+                if (i < 13) {
+                    req.chan2G4[i].freq = (aic_u16)(2412 + i * 5);
+                } else {
+                    req.chan2G4[i].freq = 2484; /* channel 14 */
+                }
+                req.chan2G4[i].tx_power = 20;
+            }
+
+            /* 5GHz common channels */
+            static const uint16_t __aic8800d_5g_freqs[] = {
+                5180, 5200, 5220, 5240, 5260, 5280, 5300, 5320,
+                5500, 5520, 5540, 5560, 5580, 5600, 5620, 5640,
+                5660, 5680, 5700, 5720, 5745, 5765, 5785, 5805,
+                5825, 5845, 5865, 5885,
+            };
+            req.chan5G_cnt = dimof(__aic8800d_5g_freqs);
+            if (req.chan5G_cnt > AIC8800D_MAC_DOMAINCHANNEL_5G_MAX)
+                req.chan5G_cnt = AIC8800D_MAC_DOMAINCHANNEL_5G_MAX;
+            for (int i = 0; i < req.chan5G_cnt; i++) {
+                req.chan5G[i].band = 1; /* PHY_BAND_5G */
+                req.chan5G[i].freq = __aic8800d_5g_freqs[i];
+                req.chan5G[i].tx_power = 20;
+            }
+
+            priv->init_step++;
+            __aic8800d_send_msg(wifi, AIC8800D_ME_CHAN_CONFIG_REQ,
+                    &req, sizeof(req),
+                    AIC8800D_ME_CHAN_CONFIG_CFM, NULL, 0,
+                    __aic8800d_init_done_cb);
+        }
         break;
 
-    case 6:
+    case 10:
         vsf_wifi_aic8800d_trace_info("aic8800d: MM_ADD_IF_REQ"
                 VSF_TRACE_CFG_LINEEND);
         memset(&add_if_req, 0, sizeof(add_if_req));
@@ -419,7 +653,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 7:
+    case 11:
         priv->vif_idx = add_if_cfm.inst_nbr;
         vsf_wifi_aic8800d_trace_info("aic8800d: vif_idx=%u status=%u"
                 VSF_TRACE_CFG_LINEEND, add_if_cfm.inst_nbr, add_if_cfm.status);
@@ -427,8 +661,8 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_FILTER_REQ"
                 VSF_TRACE_CFG_LINEEND);
         memset(&filter_req, 0, sizeof(filter_req));
-        filter_req.filter = 0xFFFFFFFF;
-        filter_req.active_filter = 0xFFFFFFFF;
+        /* Linux RWNX_DEFAULT_RX_FILTER */
+        filter_req.filter = 0x35078788;
         priv->init_step++;
         __aic8800d_send_msg(wifi, AIC8800D_MM_SET_FILTER_REQ,
                 &filter_req, sizeof(filter_req),
@@ -436,7 +670,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 8:
+    case 12:
         vsf_wifi_aic8800d_trace_info("aic8800d: init done" VSF_TRACE_CFG_LINEEND);
         if (priv->init_done != NULL) {
             vsf_wifi_done_t done = priv->init_done;
@@ -926,6 +1160,8 @@ static vsf_err_t __aic8800d_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 
     priv->init_step  = 0;
     priv->init_done = done;
+    priv->scan_finish_timer.on_timer = __aic8800d_scan_finish_timer_cb;
+    priv->scan_finish_pending = false;
     __aic8800d_init_step(wifi, VSF_ERR_NONE);
     return VSF_ERR_NONE;
 }
@@ -936,6 +1172,124 @@ static void __aic8800d_fini(vsf_wifi_t *wifi)
     if (priv != NULL) {
         vsf_heap_free(priv);
         wifi->chip_priv = NULL;
+    }
+}
+
+static uint8_t __aic8800d_freq_to_channel(uint16_t freq)
+{
+    if (freq == 2484) {
+        return 14;
+    } else if (freq >= 2412 && freq <= 2472) {
+        return (uint8_t)((freq - 2412) / 5 + 1);
+    } else if (freq >= 5000 && freq <= 5900) {
+        return (uint8_t)((freq - 5000) / 5);
+    }
+    return 0;
+}
+
+static uint8_t __aic8800d_rsn_cipher(uint8_t cipher)
+{
+    switch (cipher) {
+    case 1:  return WIFI_CIPHER_WEP40;
+    case 2:  return WIFI_CIPHER_TKIP;
+    case 4:  return WIFI_CIPHER_CCMP;
+    case 5:  return WIFI_CIPHER_WEP104;
+    default: return WIFI_CIPHER_NONE;
+    }
+}
+
+/* Parse an RSN IE body (after tag+len) and fill security fields.
+ * Only WPA2-PSK is recognised (AKM suite 00-0F-AC-02). */
+static void __aic8800d_parse_rsn(const uint8_t *body, uint8_t len,
+        vsf_wifi_scan_result_t *result)
+{
+    static const uint8_t oui[3] = { 0x00, 0x0F, 0xAC };
+    const uint8_t *p   = body;
+    const uint8_t *end = body + len;
+    uint16_t count, k;
+    bool     has_psk  = false;
+    uint8_t  pairwise = WIFI_CIPHER_NONE;
+    uint8_t  group    = WIFI_CIPHER_NONE;
+
+    if (len < 8) return;
+    p += 2;                             /* skip version */
+    if (!memcmp(p, oui, 3)) group = __aic8800d_rsn_cipher(p[3]);
+    p += 4;
+    if (p + 2 > end) return;
+    count = (uint16_t)(p[0] | ((uint16_t)p[1] << 8)); p += 2;
+    for (k = 0; k < count; k++) {
+        if (p + 4 > end) return;
+        if (!memcmp(p, oui, 3)) {
+            uint8_t c = __aic8800d_rsn_cipher(p[3]);
+            if (c == WIFI_CIPHER_CCMP)              pairwise = WIFI_CIPHER_CCMP;
+            else if (pairwise == WIFI_CIPHER_NONE)  pairwise = c;
+        }
+        p += 4;
+    }
+    if (p + 2 > end) return;
+    count = (uint16_t)(p[0] | ((uint16_t)p[1] << 8)); p += 2;
+    for (k = 0; k < count; k++) {
+        if (p + 4 > end) return;
+        if (!memcmp(p, oui, 3) && (p[3] == 2)) has_psk = true;
+        p += 4;
+    }
+
+    if (has_psk) {
+        result->auth_mode       = WIFI_AUTH_WPA2_PSK;
+        result->pairwise_cipher = (pairwise != WIFI_CIPHER_NONE)
+                                ? pairwise : WIFI_CIPHER_CCMP;
+        result->group_cipher    = group;
+    }
+}
+
+static void __aic8800d_scan_cfm_cb(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    aic8800d_priv_t *priv = __aic8800d_priv(wifi);
+
+    if (VSF_ERR_NONE != err) {
+        vsf_wifi_done_t done = NULL;
+        if (priv != NULL) {
+            done = priv->scan_done;
+            priv->scan_done = NULL;
+            priv->scan_active = false;
+            priv->scan_finish_pending = false;
+            vsf_callback_timer_remove(&priv->scan_finish_timer);
+        }
+        if (done != NULL) {
+            done(wifi, err);
+        }
+        return;
+    }
+    /* 0x1009 (SCANU_START_CFM_ADDITIONAL) is an early "scan started" confirm.
+     * The actual scan completion message with result count is 0x1001
+     * (SCANU_START_CFM), which is handled in handle_e2a. */
+    vsf_wifi_aic8800d_trace_info("aic8800d: scanu_start_cfm_additional (scan started)" VSF_TRACE_CFG_LINEEND);
+}
+
+static void __aic8800d_scan_finish_timer_cb(vsf_callback_timer_t *timer)
+{
+    aic8800d_priv_t *priv = vsf_container_of(timer, aic8800d_priv_t, scan_finish_timer);
+    vsf_wifi_t *wifi = priv->wifi;
+    if (priv->scan_finish_pending) {
+        priv->scan_finish_pending = false;
+        __aic8800d_scan_finish(wifi);
+    }
+}
+
+static void __aic8800d_scan_finish(vsf_wifi_t *wifi)
+{
+    aic8800d_priv_t *priv = __aic8800d_priv(wifi);
+    vsf_wifi_done_t done = NULL;
+
+    if (priv != NULL) {
+        priv->scan_finish_pending = false;
+        vsf_callback_timer_remove(&priv->scan_finish_timer);
+        done = priv->scan_done;
+        priv->scan_done = NULL;
+        priv->scan_active = false;
+    }
+    if (done != NULL) {
+        done(wifi, VSF_ERR_NONE);
     }
 }
 
@@ -952,11 +1306,15 @@ static vsf_err_t __aic8800d_scan(vsf_wifi_t *wifi,
         return VSF_ERR_INVALID_PARAMETER;
 
     memset(&req, 0, sizeof(req));
+    vsf_wifi_aic8800d_trace_debug("aic8800d: scan req vif=%u num_channels=%u" VSF_TRACE_CFG_LINEEND,
+            priv->vif_idx, num_channels);
     req.vif_idx  = priv->vif_idx;
     req.chan_cnt = num_channels;
-    req.ssid_cnt = 0;
-    req.duration = dwell_ms * 1000; /* us */
+    req.ssid_cnt = 0;                   /* wildcard active probe */
+    req.duration = 0;                   /* use firmware default dwell time */
     for (int i = 0; i < num_channels; i++) {
+        vsf_wifi_aic8800d_trace_debug("aic8800d: scan chan[%d]=%u" VSF_TRACE_CFG_LINEEND,
+                i, channels[i]);
         req.chan[i].band  = (channels[i] <= 14) ? 0 : 1; /* 0=2.4G, 1=5G */
         req.chan[i].flags = 0;
         freq = channels[i];
@@ -965,7 +1323,9 @@ static vsf_err_t __aic8800d_scan(vsf_wifi_t *wifi,
         } else {
             freq = 5000 + channels[i] * 5;
         }
-        req.chan[i].freq  = freq;
+        req.chan[i].freq      = freq;
+        req.chan[i].tx_power  = 20;
+        req.chan[i].__pad     = 0;
     }
 
     memset(&req.bssid, 0xFF, sizeof(req.bssid));
@@ -974,8 +1334,8 @@ static vsf_err_t __aic8800d_scan(vsf_wifi_t *wifi,
 
     return __aic8800d_send_msg(wifi, AIC8800D_SCANU_START_REQ,
             &req, sizeof(req),
-            AIC8800D_SCANU_START_CFM, NULL, 0,
-            NULL);
+            AIC8800D_SCANU_START_CFM_ADDTIONAL, NULL, 0,
+            __aic8800d_scan_cfm_cb);
 }
 
 static vsf_err_t __aic8800d_connect(vsf_wifi_t *wifi,
@@ -998,7 +1358,9 @@ static vsf_err_t __aic8800d_connect(vsf_wifi_t *wifi,
     req.chan.flags = 0;
     freq = (channel <= 14) ? (2412 + (channel - 1) * 5)
                             : (5000 + channel * 5);
-    req.chan.freq  = freq;
+    req.chan.freq      = freq;
+    req.chan.tx_power  = 20;
+    req.chan.__pad     = 0;
 
     req.flags = 0;
     req.ctrl_port_ethertype = 0x8E88; /* EAPOL in LE16 */

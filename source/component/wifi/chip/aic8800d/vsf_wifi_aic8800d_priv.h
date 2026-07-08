@@ -92,8 +92,20 @@ static const uint32_t __aic8800d_rf_cfg[AIC8800D_RF_CFG_COUNT][3] = {
 /* ... many MM messages omitted ... */
 #define AIC8800D_MM_GET_MAC_ADDR_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 115)
 #define AIC8800D_MM_GET_MAC_ADDR_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 116)
+#define AIC8800D_MM_GET_FW_VERSION_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 128)
+#define AIC8800D_MM_GET_FW_VERSION_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 129)
+
 #define AIC8800D_MM_SET_STACK_START_REQ (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 123)
 #define AIC8800D_MM_SET_STACK_START_CFM (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 124)
+
+#define AIC8800D_MM_SET_RF_CALIB_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 105)
+#define AIC8800D_MM_SET_RF_CALIB_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 106)
+#define AIC8800D_MM_SET_TXPWR_IDX_LVL_REQ (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 113)
+#define AIC8800D_MM_SET_TXPWR_IDX_LVL_CFM (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 114)
+#define AIC8800D_MM_SET_TXPWR_OFST_REQ  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 115)
+#define AIC8800D_MM_SET_TXPWR_OFST_CFM  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 116)
+#define AIC8800D_MM_SET_TXPWR_LVL_ADJ_REQ (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 131)
+#define AIC8800D_MM_SET_TXPWR_LVL_ADJ_CFM (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 132)
 
 #define AIC8800D_ME_CONFIG_REQ          (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_ME) + 0)
 #define AIC8800D_ME_CONFIG_CFM          (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_ME) + 1)
@@ -104,11 +116,12 @@ static const uint32_t __aic8800d_rf_cfg[AIC8800D_RF_CFG_COUNT][3] = {
 #define AIC8800D_ME_TRAFFIC_IND_REQ     (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_ME) + 12)
 #define AIC8800D_ME_TRAFFIC_IND_CFM     (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_ME) + 13)
 
-#define AIC8800D_SCANU_START_REQ        (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 0)
-#define AIC8800D_SCANU_START_CFM        (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 1)
-#define AIC8800D_SCANU_RESULT_IND       (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 4)
-#define AIC8800D_SCANU_CANCEL_REQ       (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 10)
-#define AIC8800D_SCANU_CANCEL_CFM       (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 11)
+#define AIC8800D_SCANU_START_REQ            (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 0)
+#define AIC8800D_SCANU_START_CFM            (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 1)
+#define AIC8800D_SCANU_RESULT_IND           (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 4)
+#define AIC8800D_SCANU_START_CFM_ADDTIONAL  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 9)
+#define AIC8800D_SCANU_CANCEL_REQ           (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 10)
+#define AIC8800D_SCANU_CANCEL_CFM           (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SCANU) + 11)
 
 #define AIC8800D_SM_CONNECT_REQ         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SM) + 0)
 #define AIC8800D_SM_CONNECT_CFM         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_SM) + 1)
@@ -157,6 +170,8 @@ struct aic8800d_mac_chan_def {
     aic_u16 freq;
     aic_u8  band;
     aic_u8  flags;
+    aic_s8  tx_power;
+    aic_u8  __pad;
 };
 
 struct aic8800d_lmac_msg {
@@ -178,7 +193,19 @@ struct aic8800d_ipc_e2a_msg {
 
 /* Request parameter structures */
 struct aic8800d_mm_set_stack_start_req {
-    aic_u32 start_type;
+    aic_u8 is_stack_start;
+    aic_u8 efuse_valid;
+    aic_u8 set_vendor_info;
+    aic_u8 fwtrace_redir;
+};
+
+struct aic8800d_mm_get_fw_version_req {
+    aic_u8 dummy;
+};
+
+struct aic8800d_mm_get_fw_version_cfm {
+    aic_u8 fw_version_len;
+    aic_u8 fw_version[63];
 };
 
 struct aic8800d_mm_reset_req {
@@ -201,9 +228,111 @@ struct aic8800d_mm_add_if_req {
 
 struct aic8800d_mm_set_filter_req {
     aic_u32 filter;
-    aic_u32 active_filter;
-    aic_u32 feat_ctl;
-    aic_u32 active_feat_ctl;
+};
+
+/* TX power level configurations (v1/v2/v3/v4 unions) */
+struct aic8800d_txpwr_lvl_conf {
+    aic_u8 enable;
+    aic_s8 dsss;
+    aic_s8 ofdmlowrate_2g4;
+    aic_s8 ofdm64qam_2g4;
+    aic_s8 ofdm256qam_2g4;
+    aic_s8 ofdm1024qam_2g4;
+    aic_s8 ofdmlowrate_5g;
+    aic_s8 ofdm64qam_5g;
+    aic_s8 ofdm256qam_5g;
+    aic_s8 ofdm1024qam_5g;
+};
+
+struct aic8800d_txpwr_lvl_conf_v2 {
+    aic_u8 enable;
+    aic_s8 pwrlvl_11b_11ag_2g4[12];
+    aic_s8 pwrlvl_11n_11ac_2g4[10];
+    aic_s8 pwrlvl_11ax_2g4[12];
+};
+
+struct aic8800d_txpwr_lvl_conf_v3 {
+    aic_u8 enable;
+    aic_s8 pwrlvl_11b_11ag_2g4[12];
+    aic_s8 pwrlvl_11n_11ac_2g4[10];
+    aic_s8 pwrlvl_11ax_2g4[12];
+    aic_s8 pwrlvl_11a_5g[12];
+    aic_s8 pwrlvl_11n_11ac_5g[10];
+    aic_s8 pwrlvl_11ax_5g[12];
+};
+
+struct aic8800d_txpwr_lvl_conf_v4 {
+    aic_u8 enable;
+    aic_s8 pwrlvl_11b_11ag_2g4[12];
+    aic_s8 pwrlvl_11n_11ac_2g4[10];
+    aic_s8 pwrlvl_11ax_2g4[12];
+    aic_s8 pwrlvl_11a_5g[12];
+    aic_s8 pwrlvl_11n_11ac_5g[10];
+    aic_s8 pwrlvl_11ax_5g[12];
+    aic_s8 pwrlvl_11a_6g[8];
+    aic_s8 pwrlvl_11n_11ac_6g[10];
+    aic_s8 pwrlvl_11ax_6g[12];
+};
+
+struct aic8800d_mm_set_txpwr_lvl_req {
+    union {
+        struct aic8800d_txpwr_lvl_conf      txpwr_lvl;
+        struct aic8800d_txpwr_lvl_conf_v2   txpwr_lvl_v2;
+        struct aic8800d_txpwr_lvl_conf_v3   txpwr_lvl_v3;
+        struct aic8800d_txpwr_lvl_conf_v4   txpwr_lvl_v4;
+    } u;
+};
+
+struct aic8800d_txpwr_lvl_adj_conf {
+    aic_u8 enable;
+    aic_s8 pwrlvl_adj_tbl_2g4[3];
+    aic_s8 pwrlvl_adj_tbl_5g[6];
+};
+
+struct aic8800d_mm_set_txpwr_lvl_adj_req {
+    struct aic8800d_txpwr_lvl_adj_conf txpwr_lvl_adj;
+};
+
+struct aic8800d_txpwr_ofst_conf {
+    aic_u8 enable;
+    aic_s8 chan_1_4;
+    aic_s8 chan_5_9;
+    aic_s8 chan_10_13;
+    aic_s8 chan_36_64;
+    aic_s8 chan_100_120;
+    aic_s8 chan_122_140;
+    aic_s8 chan_142_165;
+};
+
+struct aic8800d_txpwr_ofst2x_conf {
+    aic_u8 enable;
+    aic_s8 pwrofst2x_tbl_2g4[3][3];
+    aic_s8 pwrofst2x_tbl_5g[3][6];
+};
+
+struct aic8800d_mm_set_txpwr_ofst_req {
+    union {
+        struct aic8800d_txpwr_ofst_conf     txpwr_ofst;
+        struct aic8800d_txpwr_ofst2x_conf   txpwr_ofst2x;
+    } u;
+};
+
+struct aic8800d_mm_set_rf_calib_req {
+    aic_u32 cal_cfg_24g;
+    aic_u32 cal_cfg_5g;
+    aic_u32 param_alpha;
+    aic_u32 bt_calib_en;
+    aic_u32 bt_calib_param;
+    aic_u8  xtal_cap;
+    aic_u8  xtal_cap_fine;
+    aic_u8  __pad[2];
+};
+
+struct aic8800d_mm_set_rf_calib_cfm {
+    aic_u32 rxgain_24g_addr;
+    aic_u32 rxgain_5g_addr;
+    aic_u32 txgain_24g_addr;
+    aic_u32 txgain_5g_addr;
 };
 
 struct aic8800d_mm_set_channel_req {
@@ -252,17 +381,88 @@ struct aic8800d_mm_set_filter_cfm {
     aic_u32 dummy;
 };
 
+struct aic8800d_mm_start_req {
+    aic_u32 phy_cfg[16];
+    aic_u32 uapsd_timeout;
+    aic_u16 lp_clk_accuracy;
+};
+
 struct aic8800d_mm_start_cfm {
     aic_u32 dummy;
 };
 
 struct aic8800d_mm_set_stack_start_cfm {
-    aic_u32 status;
+    aic_u8 is_5g_support;
+    aic_u8 vendor_info;
+};
+
+/* ME */
+#define AIC8800D_MAC_DOMAINCHANNEL_24G_MAX  14
+#define AIC8800D_MAC_DOMAINCHANNEL_5G_MAX   28
+
+#define AIC8800D_MAC_MCS_MAX_LEN            16
+#define AIC8800D_MAC_HE_MAC_CAPA_LEN        6
+#define AIC8800D_MAC_HE_PHY_CAPA_LEN        11
+#define AIC8800D_MAC_HE_PPE_THRES_MAX_LEN   25
+
+struct aic8800d_mac_ht_capability {
+    aic_u16 ht_capa_info;
+    aic_u8  a_mpdu_param;
+    aic_u8  mcs_rate[AIC8800D_MAC_MCS_MAX_LEN];
+    aic_u16 ht_extended_capa;
+    aic_u32 tx_beamforming_capa;
+    aic_u8  asel_capa;
+};
+
+struct aic8800d_mac_vht_capability {
+    aic_u32 vht_capa_info;
+    aic_u16 rx_mcs_map;
+    aic_u16 rx_highest;
+    aic_u16 tx_mcs_map;
+    aic_u16 tx_highest;
+};
+
+struct aic8800d_mac_he_mcs_nss_supp {
+    aic_u16 rx_mcs_80;
+    aic_u16 tx_mcs_80;
+    aic_u16 rx_mcs_160;
+    aic_u16 tx_mcs_160;
+    aic_u16 rx_mcs_80p80;
+    aic_u16 tx_mcs_80p80;
+};
+
+struct aic8800d_mac_he_capability {
+    aic_u8  mac_cap_info[AIC8800D_MAC_HE_MAC_CAPA_LEN];
+    aic_u8  phy_cap_info[AIC8800D_MAC_HE_PHY_CAPA_LEN];
+    struct aic8800d_mac_he_mcs_nss_supp mcs_supp;
+    aic_u8  ppe_thres[AIC8800D_MAC_HE_PPE_THRES_MAX_LEN];
+};
+
+struct aic8800d_me_config_req {
+    struct aic8800d_mac_ht_capability  ht_cap;
+    struct aic8800d_mac_vht_capability vht_cap;
+    struct aic8800d_mac_he_capability  he_cap;
+    aic_u16 tx_lft;
+    aic_u8  phy_bw_max;
+    aic_bool ht_supp;
+    aic_bool vht_supp;
+    aic_bool he_supp;
+    aic_bool he_ul_on;
+    aic_bool ps_on;
+    aic_bool ant_div_on;
+    aic_bool dpsm;
+};
+
+struct aic8800d_me_chan_config_req {
+    struct aic8800d_mac_chan_def chan2G4[AIC8800D_MAC_DOMAINCHANNEL_24G_MAX];
+    struct aic8800d_mac_chan_def chan5G[AIC8800D_MAC_DOMAINCHANNEL_5G_MAX];
+    aic_u8  chan2G4_cnt;
+    aic_u8  chan5G_cnt;
 };
 
 /* SCANU */
-#define AIC8800D_SCAN_CHANNEL_MAX   40
-#define AIC8800D_SCAN_SSID_MAX      1
+#define AIC8800D_SCAN_CHANNEL_MAX   42
+#define AIC8800D_SCAN_SSID_MAX      3
 
 struct aic8800d_scanu_start_req {
     struct aic8800d_mac_chan_def chan[AIC8800D_SCAN_CHANNEL_MAX];
@@ -273,8 +473,14 @@ struct aic8800d_scanu_start_req {
     aic_u8  vif_idx;
     aic_u8  chan_cnt;
     aic_u8  ssid_cnt;
-    aic_u8  no_cck;
+    aic_u16 no_cck;
     aic_u32 duration;
+};
+
+struct aic8800d_scanu_start_cfm {
+    aic_u8 vif_idx;
+    aic_u8 status;
+    aic_u8 result_cnt;
 };
 
 struct aic8800d_scanu_result_ind {
@@ -476,6 +682,10 @@ typedef struct aic8800d_priv_t {
     /* Scan state */
     vsf_wifi_done_t     scan_done;
     bool                scan_active;
+    bool                scan_finish_pending;
+    uint8_t             scan_results_expected;
+    uint8_t             scan_results_received;
+    vsf_callback_timer_t scan_finish_timer;
 
     /* Connect state */
     vsf_wifi_done_t     connect_done;
