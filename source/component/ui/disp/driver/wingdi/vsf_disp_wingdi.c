@@ -568,6 +568,7 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
     VSF_UI_ASSERT(disp_wingdi != NULL);
     uint8_t bytesize_pixel = vsf_disp_get_pixel_bytesize(disp_wingdi);
     uint32_t bytesize_line_area = area->size.x * bytesize_pixel;
+    bool mono_handled = false;
 
     uint32_t wingdi_bytesize_line = disp_wingdi->param.width * 4;
     uint32_t wingdi_byteoffset = ((disp_wingdi->param.height - 1 - area->pos.y) * disp_wingdi->param.width + area->pos.x) * 4;
@@ -605,12 +606,31 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
                 ((uint32_t *)ptr)[j] = ((uint32_t *)disp_buff)[j];
             }
             break;
+        case VSF_DISP_COLOR_MONO: {
+                // 1bpp page-bitmap: each byte is one column of 8 vertical pixels
+                uint8_t *src = (uint8_t *)disp_buff;
+                uint16_t pitch = area->size.x;
+                for (uint16_t py = 0; py < area->size.y; py++) {
+                    uint32_t *dst_line = (uint32_t *)((uint8_t *)ptr - py * wingdi_bytesize_line);
+                    uint16_t page = py >> 3;
+                    uint8_t bit = py & 7;
+                    for (uint16_t px = 0; px < area->size.x; px++) {
+                        uint8_t on = (src[page * pitch + px] >> bit) & 1;
+                        dst_line[px] = on ? 0xFFFFFF : 0x000000;
+                    }
+                }
+                mono_handled = true;
+            }
+            break;
         default:
             // TODO: add support to other color formats
             VSF_UI_ASSERT(false);
             break;
         }
 
+        if (mono_handled) {
+            break;
+        }
         ptr = (void *)((uint8_t *)ptr - wingdi_bytesize_line);
         disp_buff = (void *)((uint8_t *)disp_buff + bytesize_line_area);
     }
