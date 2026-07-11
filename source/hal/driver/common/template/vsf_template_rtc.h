@@ -182,8 +182,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             rtc, enable,     VSF_MCONNECT(__prefix_name, _t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             rtc, disable,    VSF_MCONNECT(__prefix_name, _t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _t) *rtc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t seconds, vsf_rtc_time_t milliseconds) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, ctrl,       VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_ctrl_t ctrl, void* param)
@@ -557,31 +557,31 @@ extern vsf_err_t vsf_rtc_get_configuration(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cf
  * \~english
  * @brief Get RTC date and time
  * @param[in] rtc_ptr Pointer to structure @ref vsf_rtc_t
- * @param[out] rtc_tm Date and time (year, month, day, hour, minute, second, etc.)
+ * @param[out] rtc_tm_ptr Date and time (year, month, day, hour, minute, second, etc.)
  * @return vsf_err_t VSF_ERR_NONE if operation successful, otherwise returns error code
  *
  * \~chinese
  * @brief 获取 RTC 日期和时间
  * @param[in] rtc_ptr 指向结构体 @ref vsf_rtc_t 的指针
- * @param[out] rtc_tm 日期和时间（年、月、日、时、分、秒等）
+ * @param[out] rtc_tm_ptr 日期和时间（年、月、日、时、分、秒等）
  * @return vsf_err_t 如果操作成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm);
+extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm_ptr);
 
 /**
  * \~english
  * @brief Set RTC date and time
  * @param[in] rtc_ptr Pointer to structure @ref vsf_rtc_t
- * @param[in] rtc_tm Date and time (year, month, day, hour, minute, second, etc.)
+ * @param[in] rtc_tm_ptr Date and time (year, month, day, hour, minute, second, etc.)
  * @return vsf_err_t VSF_ERR_NONE if operation successful, otherwise returns error code
  *
  * \~chinese
  * @brief 设置 RTC 日期和时间
  * @param[in] rtc_ptr 指向结构体 @ref vsf_rtc_t 的指针
- * @param[in] rtc_tm 日期和时间（年、月、日、时、分、秒等）
+ * @param[in] rtc_tm_ptr 日期和时间（年、月、日、时、分、秒等）
  * @return vsf_err_t 如果操作成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm);
+extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm_ptr);
 
 /**
  * \~english

@@ -221,8 +221,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_irq_mask_t,   adc, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *cfgs_ptr, uint32_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg_ptr, void *buffer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__prefix_name, _t) *adc_ptr, void *buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, ctrl,                 VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_ctrl_t ctrl, void* param)
 
@@ -927,7 +927,7 @@ extern vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr);
  \~english
  @brief ADC request sampling once
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
- @param[in] channel_cfg: a pointer to convert channel configuration
+ @param[in] channel_cfg_ptr: a pointer to convert channel configuration
  @param[out] buffer_ptr: pointer to the buffer that receives the conversion result
  @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
 
@@ -943,7 +943,7 @@ extern vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr);
  \~chinese
  @brief ADC 请求采样一次
  @param[in] adc_ptr: 指向结构体 @ref vsf_adc_t 的指针
- @param[in] channel_cfg: 转换通道配置的指针
+ @param[in] channel_cfg_ptr: 转换通道配置的指针
  @param[out] buffer_ptr: 用于接收转换结果的缓冲区指针
  @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
 
@@ -954,27 +954,27 @@ extern vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr);
  @note buffer_ptr 在完成回调被调用之前必须保持有效，其内容在完成前是未定义的。
  */
 extern vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
-                                              vsf_adc_channel_cfg_t *channel_cfg,
+                                              vsf_adc_channel_cfg_t *channel_cfg_ptr,
                                               void *buffer_ptr);
 
 /**
  \~english
  @brief ADC channel configuration
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
- @param[in] cfgs_ptr: convert channel configuration array
- @param[in] cnt: the length of convert channel configuration array
+ @param[in] channel_cfgs_ptr: convert channel configuration array
+ @param[in] count: the length of convert channel configuration array
  @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
  *
  * \~chinese
  * @brief ADC 通道配置
  * @param[in] adc_ptr: 指向结构体 @ref vsf_adc_t 的指针
- * @param[in] cfgs_ptr: 转换通道配置数组
- * @param[in] cnt: 转换通道配置数组的长度
+ * @param[in] channel_cfgs_ptr: 转换通道配置数组
+ * @param[in] count: 转换通道配置数组的长度
  * @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
  */
 extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
-                                        vsf_adc_channel_cfg_t *cfgs_ptr,
-                                        uint32_t cnt);
+                                        vsf_adc_channel_cfg_t *channel_cfgs_ptr,
+                                        uint32_t count);
 
 /**
  \~english

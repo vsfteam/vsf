@@ -504,7 +504,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_capability_t, sdio, capability,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_bus_width,        VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint8_t bus_width)               \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_req_t *req) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_req_t *req_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, ctrl,                 VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
@@ -1100,7 +1100,7 @@ extern vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
  \~english
  @brief Start a new request for sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
- @param[in] req: pointer to structure @ref vsf_sdio_req_t. For a data transfer, req->buffer
+ @param[in] req_ptr: pointer to structure @ref vsf_sdio_req_t. For a data transfer, req_ptr->buffer
             points to the data buffer (source for write, destination filled asynchronously
             by the driver for read).
  @return vsf_err_t: VSF_ERR_NONE if the request was successfully started, or a negative error code
@@ -1111,13 +1111,13 @@ extern vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
  @note Completion is signaled through the ISR callback registered in cfg.isr (see
        vsf_sdio_init): SDIO_IRQ_MASK_HOST_RESP_DONE when the command response is received
        and SDIO_IRQ_MASK_HOST_DATA_DONE when the data transfer finishes.
- @note req (and req->buffer, if any) must remain valid until completion is signaled; for a
-       read, req->buffer content is undefined before completion.
+ @note req_ptr (and req_ptr->buffer, if any) must remain valid until completion is signaled; for a
+       read, req_ptr->buffer content is undefined before completion.
 
  \~chinese
  @brief 启动 sdio 请求
  @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
- @param[in] req: sdio 请求结构指针，参考 @ref vsf_sdio_req_t。对于数据传输，req->buffer 指向数据
+ @param[in] req_ptr: sdio 请求结构指针，参考 @ref vsf_sdio_req_t。对于数据传输，req_ptr->buffer 指向数据
             缓冲区（写时作为源数据，读时由驱动异步填充）。
  @return vsf_err_t: 如果请求成功启动返回 VSF_ERR_NONE，否则返回负数
 
@@ -1125,10 +1125,10 @@ extern vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
        并不代表命令/数据传输已经完成。
  @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_sdio_init）通知：收到命令响应时为
        SDIO_IRQ_MASK_HOST_RESP_DONE，数据传输结束时为 SDIO_IRQ_MASK_HOST_DATA_DONE。
- @note req（及其 req->buffer，若有）在完成通知之前必须保持有效；读操作时 req->buffer 的内容
+ @note req_ptr（及其 req_ptr->buffer，若有）在完成通知之前必须保持有效；读操作时 req_ptr->buffer 的内容
        在完成前是未定义的。
  */
-extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req);
+extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req_ptr);
 
 /**
  \~english

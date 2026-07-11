@@ -203,8 +203,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_irq_mask_t,   dac, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *channel_cfg, uint_fast16_t value) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfgs_ptr, uint_fast8_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *channel_cfg_ptr, uint_fast16_t value) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *channel_cfgs_ptr, uint_fast8_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, ctrl,                 VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_ctrl_t ctrl, void* param)
 
@@ -547,7 +547,7 @@ extern vsf_dac_capability_t vsf_dac_capability(vsf_dac_t *dac_ptr);
  \~english
  @brief DAC request convert once
  @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
- @param[in] channel_cfg: a pointer to convert channel configuration
+ @param[in] channel_cfg_ptr: a pointer to convert channel configuration
  @param[in] value: the value to be converted (passed by value, output to the DAC)
  @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
 
@@ -560,7 +560,7 @@ extern vsf_dac_capability_t vsf_dac_capability(vsf_dac_t *dac_ptr);
  \~chinese
  @brief DAC 请求转换一次
  @param[in] dac_ptr: 指向结构体 @ref vsf_dac_t 的指针
- @param[in] channel_cfg: 转换通道配置的指针
+ @param[in] channel_cfg_ptr: 转换通道配置的指针
  @param[in] value: 待转换的值（按值传递，输出到 DAC）
  @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
 
@@ -569,27 +569,27 @@ extern vsf_dac_capability_t vsf_dac_capability(vsf_dac_t *dac_ptr);
  @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_dac_init）经 VSF_DAC_IRQ_MASK_CPL 中断通知。
  */
 extern vsf_err_t vsf_dac_channel_request_once(vsf_dac_t *dac_ptr,
-                                              vsf_dac_channel_cfg_t *channel_cfg,
+                                              vsf_dac_channel_cfg_t *channel_cfg_ptr,
                                               uint_fast16_t value);
 
 /**
  \~english
  @brief DAC channel configuration
  @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
- @param[in] cfgs_ptr: convert channel configuration array
- @param[in] cnt: the length of convert channel configuration array
+ @param[in] channel_cfgs_ptr: convert channel configuration array
+ @param[in] count: the length of convert channel configuration array
  @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
 
  \~chinese
  @brief DAC 通道配置
  @param[in] dac_ptr: 指向结构体 @ref vsf_dac_t 的指针
- @param[in] cfgs_ptr: 转换通道配置数组
- @param[in] cnt: 转换通道配置数组的长度
+ @param[in] channel_cfgs_ptr: 转换通道配置数组
+ @param[in] count: 转换通道配置数组的长度
  @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
  */
 extern vsf_err_t vsf_dac_channel_config(vsf_dac_t *dac_ptr,
-                                        vsf_dac_channel_cfg_t *cfgs_ptr,
-                                        uint_fast8_t cnt);
+                                        vsf_dac_channel_cfg_t *channel_cfgs_ptr,
+                                        uint_fast8_t count);
 
 /**
  \~english

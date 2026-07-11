@@ -335,8 +335,8 @@ extern "C" {
     /* exti_irq APIs: may return VSF_ERR_NOT_SUPPORT when the hardware GPIO driver
      * does not implement EXTI via GPIO. Users should fall back to the dedicated EXTI
      * interface (vsf_template_exti.h) when GPIO-based EXTI is unavailable. */     \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr)                               \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, exti_irq_clear,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
@@ -1431,31 +1431,31 @@ extern vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
  \~english
  @brief Configure external interrupt of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] cfg_ptr: a pointer to structure @ref vsf_gpio_exti_irq_cfg_t
+ @param[in] irq_cfg_ptr: a pointer to structure @ref vsf_gpio_exti_irq_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
 
  \~chinese
  @brief 配置 gpio 实例的外部中断
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
- @param[in] cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针
+ @param[in] irq_cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针
  @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  */
-extern vsf_err_t vsf_gpio_exti_irq_config(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_gpio_exti_irq_config(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
 
 /**
  \~english
  @brief Get the current external interrupt configuration of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[out] cfg_ptr: a pointer to structure @ref vsf_gpio_exti_irq_cfg_t to store the current configuration
+ @param[out] irq_cfg_ptr: a pointer to structure @ref vsf_gpio_exti_irq_cfg_t to store the current configuration
  @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
 
  \~chinese
  @brief 获取 gpio 实例的当前外部中断配置
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
- @param[out] cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针，用于存储当前配置
+ @param[out] irq_cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针，用于存储当前配置
  @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  */
-extern vsf_err_t vsf_gpio_exti_irq_get_configuration(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_gpio_exti_irq_get_configuration(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
 
 /**
  \~english

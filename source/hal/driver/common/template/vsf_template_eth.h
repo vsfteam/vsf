@@ -329,8 +329,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_irq_mask_t,   eth, irq_clear,              VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_buf_desc_t *buf_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_buf_desc_t *buf_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *sg_ptr, uint32_t sg_count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_sg_buf_desc_t *sg_ptr, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *sg_buf_ptr, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_sg_buf_desc_t *sg_buf_ptr, uint32_t sg_count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, ctrl,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_ctrl_t ctrl, void *param) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_status_t,     eth, status,                 VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_capability_t, eth, capability,             VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
@@ -986,7 +986,7 @@ extern vsf_err_t vsf_eth_send_request(vsf_eth_t *eth_ptr, vsf_eth_send_buf_desc_
  * \~english
  * @brief Send a scatter-gather buffer over ETH instance.
  * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
- * @param[in] sg_ptr: pointer to the scatter-gather buffer array to be sent
+ * @param[in] sg_buf_ptr: pointer to the scatter-gather buffer array to be sent
  * @param[in] sg_count: number of scatter-gather buffer elements in the array
  * @return vsf_err_t: VSF_ERR_NONE if the send request was successfully submitted, or a negative error code
  * @note This is an asynchronous API. It only submits the send request and returns immediately;
@@ -998,14 +998,14 @@ extern vsf_err_t vsf_eth_send_request(vsf_eth_t *eth_ptr, vsf_eth_send_buf_desc_
  * \~chinese
  * @brief 通过 ETH 实例发送一个分散聚集的缓冲区
  * @param[in] eth_ptr: 指向结构体 @ref vsf_eth_t 的指针
- * @param[in] sg_ptr: 指向要发送的分散聚集的缓冲区数组的指针
+ * @param[in] sg_buf_ptr: 指向要发送的分散聚集的缓冲区数组的指针
  * @param[in] sg_count: 分散聚集的缓冲区数组中的元素数量
  * @return vsf_err_t: 如果发送请求成功提交返回 VSF_ERR_NONE，失败返回负数
  * @note 这是一个异步 API。它仅提交发送请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
  *      并不代表帧已经发送完成。完成通过在 cfg.isr 中注册的回调经 VSF_ETH_IRQ_MASK_SG_TX_COMPLETE 中断通知。
  * @note 在接收到发送完成中断之前，缓冲区应该保持有效
  */
-extern vsf_err_t vsf_eth_send_sg_request(vsf_eth_t *eth_ptr, vsf_eth_send_sg_buf_desc_t *sg_ptr, uint32_t sg_count);
+extern vsf_err_t vsf_eth_send_sg_request(vsf_eth_t *eth_ptr, vsf_eth_send_sg_buf_desc_t *sg_buf_ptr, uint32_t sg_count);
 
 
 /**
@@ -1040,7 +1040,7 @@ extern vsf_err_t vsf_eth_recv_request(vsf_eth_t *eth_ptr, vsf_eth_recv_buf_desc_
  * \~english
  * @brief Receive data using scatter-gather buffers from ETH instance.
  * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
- * @param[out] sg_ptr: pointer to the scatter-gather buffer array to store received data
+ * @param[out] sg_buf_ptr: pointer to the scatter-gather buffer array to store received data
  * @param[in] sg_count: number of scatter-gather buffer elements in the array
  * @return vsf_err_t: VSF_ERR_NONE if data was received successfully, or a negative error code
  * @note This is an asynchronous receive API. Incoming frames are signaled through the ISR
@@ -1051,14 +1051,14 @@ extern vsf_err_t vsf_eth_recv_request(vsf_eth_t *eth_ptr, vsf_eth_recv_buf_desc_
  * \~chinese
  * @brief 从 ETH 实例使用分散聚集缓冲区接收数据
  * @param[in] eth_ptr: 指向结构体 @ref vsf_eth_t 的指针
- * @param[out] sg_ptr: 指向用于存储接收数据的分散聚集缓冲区数组的指针
+ * @param[out] sg_buf_ptr: 指向用于存储接收数据的分散聚集缓冲区数组的指针
  * @param[in] sg_count: 分散聚集缓缓冲区数组中的元素数量
  * @return vsf_err_t: 如果数据成功接收返回 VSF_ERR_NONE，失败返回负数
  * @note 这是一个异步接收 API。到达的帧通过在 cfg.isr 中注册的回调经 VSF_ETH_IRQ_MASK_SG_RX_AVAILABLE
  *      中断通知；通常在收到该通知后调用本 API 取出数据。
  * @note 必须预先分配具有足够大小的缓冲区以存储接收到的数据
  */
-extern vsf_err_t vsf_eth_recv_sg_request(vsf_eth_t *eth_ptr, vsf_eth_recv_sg_buf_desc_t *sg_ptr, uint32_t sg_count);
+extern vsf_err_t vsf_eth_recv_sg_request(vsf_eth_t *eth_ptr, vsf_eth_recv_sg_buf_desc_t *sg_buf_ptr, uint32_t sg_count);
 
 /**
  * \~english
