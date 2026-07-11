@@ -1396,8 +1396,13 @@ extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
  * @param[in] out_buffer_ptr: Pointer to data to transmit (NULL for receive-only)
  * @param[out] in_buffer_ptr: Pointer to buffer for received data (NULL for transmit-only)
  * @param[in] count: Number of data units to transfer (can be 0 for QSPI operations with only command/address phases)
- * @return vsf_err_t: VSF_ERR_NONE if transfer started successfully, or error code
- * @note This is an asynchronous operation, register for completion interrupts to be notified
+ * @return vsf_err_t: VSF_ERR_NONE if the transfer was successfully started, or error code
+ * @note This is an asynchronous API. A VSF_ERR_NONE return only means the transfer was
+ *       started, NOT that it has completed. Completion is signaled through the ISR callback
+ *       registered in cfg.isr (see vsf_spi_init) via VSF_SPI_IRQ_MASK_TX_CPL /
+ *       VSF_SPI_IRQ_MASK_RX_CPL.
+ * @note out_buffer_ptr and in_buffer_ptr must remain valid until completion is signaled;
+ *       in_buffer_ptr content is undefined before completion.
  * @note Data unit size is determined by the configured data size in SPI mode (@ref vsf_spi_mode_t)
  * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes per data unit
  * @note If both out_buffer_ptr and in_buffer_ptr are not NULL, data is exchanged in full-duplex mode
@@ -1415,7 +1420,11 @@ extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
  * @param[out] in_buffer_ptr: 指向用于接收数据的缓冲区指针（仅发送时为 NULL）
  * @param[in] count: 要传输的数据单元数量（对于仅有命令/地址阶段的 QSPI 操作可以为 0）
  * @return vsf_err_t: 如果传输成功启动则返回 VSF_ERR_NONE，否则返回错误码
- * @note 这是一个异步操作，注册完成中断以获得通知
+ * @note 这是一个异步 API。返回 VSF_ERR_NONE 只表示传输已经启动，并不代表传输已经完成。
+ *       完成通过在 cfg.isr 中注册的回调（参见 vsf_spi_init）经 VSF_SPI_IRQ_MASK_TX_CPL /
+ *       VSF_SPI_IRQ_MASK_RX_CPL 中断通知。
+ * @note out_buffer_ptr 和 in_buffer_ptr 在完成通知之前必须保持有效；in_buffer_ptr 的内容
+ *       在完成前是未定义的。
  * @note 数据单元大小由 SPI 模式中配置的数据大小决定（@ref vsf_spi_mode_t）
  * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节每个数据单元
  * @note 如果 out_buffer_ptr 和 in_buffer_ptr 都不为 NULL，则以全双工模式交换数据

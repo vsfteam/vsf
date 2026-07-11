@@ -1093,7 +1093,18 @@ extern vsf_err_t vsf_timer_channel_stop(vsf_timer_t *timer_ptr, uint8_t channel)
             @ref vsf_timer_channel_request_t is array of input capture value.
             For VSF_TIMER_CHANNEL_MODE_ENCODER mode, channel_a_buffer and channel_b_buffer in structure
             @ref vsf_timer_channel_request_t is array of encoder value for channel A and channel B.
- @return vsf_err_t: VSF_ERR_NONE if the TIMER channel start was successfully, or a negative error code
+            The buffers in request_ptr are inputs for BASE/PWM/OUTPUT_COMPARE modes and are filled
+            asynchronously by the driver (outputs) for INPUT_CAPTURE/ENCODER modes.
+ @return vsf_err_t: VSF_ERR_NONE if the channel request was successfully started, or a negative error code
+
+ @note This is an asynchronous, continuous request. It only starts the request and returns
+       immediately; a VSF_ERR_NONE return means the request was accepted, NOT that a
+       transfer round has completed. The request keeps running (each buffer element is
+       consumed/produced on every overflow) until vsf_timer_channel_request_stop is called.
+ @note Progress is signaled through the ISR callback registered in cfg.isr via
+       VSF_TIMER_IRQ_MASK_CHANNEL_REQUEST_COMPLETE and
+       VSF_TIMER_IRQ_MASK_CHANNEL_REQUEST_HALF_COMPLETE.
+ @note request_ptr and its buffers must remain valid until the request is stopped.
 
  \~chinese
  @brief 开始一个 TIMER 通道的请求 (通常基于 DMA)
@@ -1105,7 +1116,16 @@ extern vsf_err_t vsf_timer_channel_stop(vsf_timer_t *timer_ptr, uint8_t channel)
             对于 VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE 模式, @ref vsf_timer_channel_request_t 中的 pulse_buffer 是每次溢出后要设置的脉冲值数组。
             对于 VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE 模式, @ref vsf_timer_channel_request_t 中的 input_capture_buffer 是输入捕获值数组。
             对于 VSF_TIMER_CHANNEL_MODE_ENCODER 模式, @ref vsf_timer_channel_request_t 中的 channel_a_buffer 和 channel_b_buffer 是通道 A 和通道 B 的编码器值数组。
- @return vsf_err_t: 如果 TIMER 通道开始成功返回 VSF_ERR_NONE, 否则返回负数。
+            request_ptr 中的缓冲区在 BASE/PWM/OUTPUT_COMPARE 模式下为输入，在 INPUT_CAPTURE/ENCODER
+            模式下由驱动异步填充（为输出）。
+ @return vsf_err_t: 如果通道请求成功启动返回 VSF_ERR_NONE, 否则返回负数。
+
+ @note 这是一个异步、持续型请求。它仅启动请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表一轮传输已经完成。请求会持续运行（每次溢出消耗/产生一个缓冲区元素），
+       直到调用 vsf_timer_channel_request_stop 为止。
+ @note 进度通过在 cfg.isr 中注册的回调经 VSF_TIMER_IRQ_MASK_CHANNEL_REQUEST_COMPLETE 和
+       VSF_TIMER_IRQ_MASK_CHANNEL_REQUEST_HALF_COMPLETE 中断通知。
+ @note request_ptr 及其缓冲区在请求被停止之前必须保持有效。
  */
 extern vsf_err_t vsf_timer_channel_request_start(vsf_timer_t *timer_ptr, uint8_t channel, vsf_timer_channel_request_t *request_ptr);
 
@@ -1115,12 +1135,16 @@ extern vsf_err_t vsf_timer_channel_request_start(vsf_timer_t *timer_ptr, uint8_t
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
  @param[in] channel: timer channel
  @return vsf_err_t: VSF_ERR_NONE if the TIMER channel stop was successfully, or a negative error code
+ @note Stops a continuous request previously started by vsf_timer_channel_request_start.
+       After it returns, the request_ptr buffer passed to the start call may be safely released.
 
  \~chinese
  @brief 停止一个 TIMER 通道的请求
  @param[in] timer_ptr: 指向结构体 @ref vsf_timer_t 的指针
  @param[in] channel: TIMER 通道
  @return vsf_err_t: 如果 TIMER 通道停止成功返回 VSF_ERR_NONE, 否则返回负数。
+ @note 用于停止先前由 vsf_timer_channel_request_start 启动的持续型请求。返回后，传给 start
+       调用的 request_ptr 缓冲区即可安全释放。
  */
 extern vsf_err_t vsf_timer_channel_request_stop(vsf_timer_t *timer_ptr, uint8_t channel);
 

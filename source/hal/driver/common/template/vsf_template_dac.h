@@ -548,15 +548,25 @@ extern vsf_dac_capability_t vsf_dac_capability(vsf_dac_t *dac_ptr);
  @brief DAC request convert once
  @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
  @param[in] channel_cfg: a pointer to convert channel configuration
- @param[in] value: value to be converted
- @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
+ @param[in] value: the value to be converted (passed by value, output to the DAC)
+ @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
+
+ @note This is an asynchronous API. It only submits the conversion request and returns
+       immediately; a VSF_ERR_NONE return means the request was accepted, NOT that the
+       conversion has completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_dac_init) via the VSF_DAC_IRQ_MASK_CPL interrupt.
 
  \~chinese
  @brief DAC 请求转换一次
  @param[in] dac_ptr: 指向结构体 @ref vsf_dac_t 的指针
  @param[in] channel_cfg: 转换通道配置的指针
- @param[in] value: 待转换的值
- @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
+ @param[in] value: 待转换的值（按值传递，输出到 DAC）
+ @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 这是一个异步 API。它仅提交转换请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表转换已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_dac_init）经 VSF_DAC_IRQ_MASK_CPL 中断通知。
  */
 extern vsf_err_t vsf_dac_channel_request_once(vsf_dac_t *dac_ptr,
                                               vsf_dac_channel_cfg_t *channel_cfg,
@@ -585,16 +595,31 @@ extern vsf_err_t vsf_dac_channel_config(vsf_dac_t *dac_ptr,
  \~english
  @brief DAC channel request
  @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
- @param[out] buffer_ptr: convert channel data array
- @param[in] count: the length of convert channel configuration data array
- @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
+ @param[in] buffer_ptr: array of channel data to be output to the DAC
+ @param[in] count: the length of the convert channel data array
+ @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
+
+ @note This is an asynchronous API. It only submits the request and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the conversions
+       have completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_dac_init) via the VSF_DAC_IRQ_MASK_CPL interrupt.
+ @note buffer_ptr must remain valid until the completion callback is invoked (the data
+       may be fetched by DMA during the transfer) and must not be modified or reused
+       before completion.
 
  \~chinese
  @brief DAC 通道请求
  @param[in] dac_ptr: 指向结构体 @ref vsf_dac_t 的指针
- @param[out] buffer_ptr: 转换通道数据数组
- @param[in] count: 转换通道配置数据数组的长度
- @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
+ @param[in] buffer_ptr: 要输出到 DAC 的通道数据数组
+ @param[in] count: 转换通道数据数组的长度
+ @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 这是一个异步 API。它仅提交请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表转换已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_dac_init）经 VSF_DAC_IRQ_MASK_CPL 中断通知。
+ @note buffer_ptr 在完成回调被调用之前必须保持有效（传输期间数据可能由 DMA 读取），
+       且在完成前不可修改或复用。
  */
 extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
                                          void *buffer_ptr,

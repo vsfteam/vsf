@@ -962,7 +962,11 @@ extern vsf_eth_capability_t vsf_eth_capability(vsf_eth_t *eth_ptr);
  * @brief Send a buffer over ETH instance.
  * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
  * @param[in] buf_ptr: pointer to the buffer to be sent, refer to @ref vsf_eth_send_buf_desc_t
- * @return vsf_err_t: VSF_ERR_NONE if buffer was sent successfully, or a negative error code
+ * @return vsf_err_t: VSF_ERR_NONE if the send request was successfully submitted, or a negative error code
+ * @note This is an asynchronous API. It only submits the send request and returns immediately;
+ *      a VSF_ERR_NONE return means the request was accepted, NOT that the frame has been
+ *      transmitted. Completion is signaled through the ISR callback registered in cfg.isr
+ *      via VSF_ETH_IRQ_MASK_TX_COMPLETE.
  * @note If the capability is_send_buf_releasable_immediately is false,
  *      the buffer should remain valid until the transmission complete interrupt is received
  *
@@ -970,7 +974,9 @@ extern vsf_eth_capability_t vsf_eth_capability(vsf_eth_t *eth_ptr);
  * @brief 通过 ETH 实例发送一个缓冲区
  * @param[in] eth_ptr: 指向结构体 @ref vsf_eth_t 的指针
  * @param[in] buf_ptr: 指向要发送的缓冲区的指针，参考 @ref vsf_eth_send_buf_desc_t
- * @return vsf_err_t: 如果缓冲区成功发送返回 VSF_ERR_NONE，失败返回负数
+ * @return vsf_err_t: 如果发送请求成功提交返回 VSF_ERR_NONE，失败返回负数
+ * @note 这是一个异步 API。它仅提交发送请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+ *      并不代表帧已经发送完成。完成通过在 cfg.isr 中注册的回调经 VSF_ETH_IRQ_MASK_TX_COMPLETE 中断通知。
  * @note 如果 capability 的 is_send_buf_releasable_immediately 为 false， 在接收到发送完整中断之前，缓冲区应该保持有效
  * @note 如果 buf_ptr 的 payload 为 NULL，len 不为零，驱动如果可以支持对应大小的 buf，就返回 VSF_ERR_NONE，否则返回 VSF_ERR_INVALID_PARAMETER
  */
@@ -982,7 +988,11 @@ extern vsf_err_t vsf_eth_send_request(vsf_eth_t *eth_ptr, vsf_eth_send_buf_desc_
  * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
  * @param[in] sg_ptr: pointer to the scatter-gather buffer array to be sent
  * @param[in] sg_count: number of scatter-gather buffer elements in the array
- * @return vsf_err_t: VSF_ERR_NONE if buffer was sent successfully, or a negative error code
+ * @return vsf_err_t: VSF_ERR_NONE if the send request was successfully submitted, or a negative error code
+ * @note This is an asynchronous API. It only submits the send request and returns immediately;
+ *      a VSF_ERR_NONE return means the request was accepted, NOT that the frame has been
+ *      transmitted. Completion is signaled through the ISR callback registered in cfg.isr
+ *      via VSF_ETH_IRQ_MASK_SG_TX_COMPLETE.
  * @note The buffers should remain valid until the transmission complete interrupt is received
  *
  * \~chinese
@@ -990,7 +1000,9 @@ extern vsf_err_t vsf_eth_send_request(vsf_eth_t *eth_ptr, vsf_eth_send_buf_desc_
  * @param[in] eth_ptr: 指向结构体 @ref vsf_eth_t 的指针
  * @param[in] sg_ptr: 指向要发送的分散聚集的缓冲区数组的指针
  * @param[in] sg_count: 分散聚集的缓冲区数组中的元素数量
- * @return vsf_err_t: 如果缓冲区成功发送返回 VSF_ERR_NONE，失败返回负数
+ * @return vsf_err_t: 如果发送请求成功提交返回 VSF_ERR_NONE，失败返回负数
+ * @note 这是一个异步 API。它仅提交发送请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+ *      并不代表帧已经发送完成。完成通过在 cfg.isr 中注册的回调经 VSF_ETH_IRQ_MASK_SG_TX_COMPLETE 中断通知。
  * @note 在接收到发送完成中断之前，缓冲区应该保持有效
  */
 extern vsf_err_t vsf_eth_send_sg_request(vsf_eth_t *eth_ptr, vsf_eth_send_sg_buf_desc_t *sg_ptr, uint32_t sg_count);
@@ -1001,14 +1013,21 @@ extern vsf_err_t vsf_eth_send_sg_request(vsf_eth_t *eth_ptr, vsf_eth_send_sg_buf
  * @brief Receive a buffer from ETH instance.
  * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
  * @param[out] buf_ptr: pointer to the buffer to store received data, refer to @ref vsf_eth_recv_buf_desc_t
- * @return vsf_err_t: VSF_ERR_NONE if buffer was received successfully, or a negative error code
+ * @return vsf_err_t: VSF_ERR_NONE if data was received successfully, or a negative error code
+ * @note This is an asynchronous receive API. Incoming frames are signaled through the ISR
+ *      callback registered in cfg.isr via VSF_ETH_IRQ_MASK_RX_AVAILABLE; this API is
+ *      typically called after that notification (or when status.is_rx_available is 1) to
+ *      fetch the data, and returns VSF_ERR_NOT_READY if none is available.
  * @note The buffer must be pre-allocated with sufficient size to hold received data
  *
  * \~chinese
  * @brief 从 ETH 实例接收一个缓冲区
  * @param[in] eth_ptr: 指向结构体 @ref vsf_eth_t 的指针
  * @param[out] buf_ptr: 指向用于存储接收数据的缓冲区的指针，参考 @ref vsf_eth_recv_buf_desc_t
- * @return vsf_err_t: 如果缓冲区成功接收返回 VSF_ERR_NONE，失败返回负数
+ * @return vsf_err_t: 如果数据成功接收返回 VSF_ERR_NONE，失败返回负数
+ * @note 这是一个异步接收 API。到达的帧通过在 cfg.isr 中注册的回调经 VSF_ETH_IRQ_MASK_RX_AVAILABLE
+ *      中断通知；通常在收到该通知后（或 status.is_rx_available 为 1 时）调用本 API 取出数据，
+ *      若无可用数据则返回 VSF_ERR_NOT_READY。
  * @note 必须预先分配具有足够大小的缓冲区以存储接收到的数据
  * @note 如果 buf_ptr 的 payload 为 NULL，驱动将修改 len 返回可以读取的数据的长度
  * @note 如果 status 的 is_rx_available 为 1，而且 buf_ptr 的 payload 不为 NULL，
@@ -1024,6 +1043,9 @@ extern vsf_err_t vsf_eth_recv_request(vsf_eth_t *eth_ptr, vsf_eth_recv_buf_desc_
  * @param[out] sg_ptr: pointer to the scatter-gather buffer array to store received data
  * @param[in] sg_count: number of scatter-gather buffer elements in the array
  * @return vsf_err_t: VSF_ERR_NONE if data was received successfully, or a negative error code
+ * @note This is an asynchronous receive API. Incoming frames are signaled through the ISR
+ *      callback registered in cfg.isr via VSF_ETH_IRQ_MASK_SG_RX_AVAILABLE; this API is
+ *      typically called after that notification to fetch the data.
  * @note The buffers must be pre-allocated with sufficient size to hold received data
  *
  * \~chinese
@@ -1032,6 +1054,8 @@ extern vsf_err_t vsf_eth_recv_request(vsf_eth_t *eth_ptr, vsf_eth_recv_buf_desc_
  * @param[out] sg_ptr: 指向用于存储接收数据的分散聚集缓冲区数组的指针
  * @param[in] sg_count: 分散聚集缓缓冲区数组中的元素数量
  * @return vsf_err_t: 如果数据成功接收返回 VSF_ERR_NONE，失败返回负数
+ * @note 这是一个异步接收 API。到达的帧通过在 cfg.isr 中注册的回调经 VSF_ETH_IRQ_MASK_SG_RX_AVAILABLE
+ *      中断通知；通常在收到该通知后调用本 API 取出数据。
  * @note 必须预先分配具有足够大小的缓冲区以存储接收到的数据
  */
 extern vsf_err_t vsf_eth_recv_sg_request(vsf_eth_t *eth_ptr, vsf_eth_recv_sg_buf_desc_t *sg_ptr, uint32_t sg_count);

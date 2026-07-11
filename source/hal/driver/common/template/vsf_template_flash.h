@@ -594,13 +594,23 @@ extern vsf_flash_irq_mask_t vsf_flash_irq_clear(vsf_flash_t *flash_ptr, vsf_flas
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
  @param[in] offset_of_bytes: The address of the sector to be erased,
             needs to be an integer multiple of the smallest erasable sector size
- @return vsf_err_t: VSF_ERR_NONE if FLASH starts to perform the erase, otherwise returns error code
+ @return vsf_err_t: VSF_ERR_NONE if the erase request was successfully submitted, otherwise returns error code
+
+ @note This is an asynchronous API. It only starts the erase and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the erase has
+       completed. Do not access the sector until completion is signaled.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_ERASE interrupt.
 
  \~chinese
  @brief FLASH 擦除一块扇区
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
  @param[in] offset_of_bytes: 被擦除扇区的地址，需要是最小可擦除扇区的整数倍
- @return  如果 FLASH 开始执行擦除返回 VSF_ERR_NONE，否则返回错误码
+ @return  如果擦除请求成功提交返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 这是一个异步 API。它仅启动擦除后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表擦除已经完成。在完成通知之前不要访问该扇区。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_ERASE 中断通知。
  */
 extern vsf_err_t vsf_flash_erase_one_sector(vsf_flash_t *flash_ptr,
                                             vsf_flash_size_t offset_of_bytes);
@@ -613,14 +623,24 @@ extern vsf_err_t vsf_flash_erase_one_sector(vsf_flash_t *flash_ptr,
             needs to be an integer multiple of the smallest erasable sector size
  @param[in] size_of_bytes: Size in bytes to erase, needs to be an integer multiple of the
             smallest erasable sector size
- @return vsf_err_t: VSF_ERR_NONE if flash starts to perform the erase, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if the erase request was successfully submitted, or a negative error code
+
+ @note This is an asynchronous API. It only starts the erase and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the erase has
+       completed. Do not access the range until completion is signaled.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_ERASE interrupt.
 
  \~chinese
  @brief flash 擦除连续区域
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
  @param[in] offset_of_bytes: 被擦除扇区的地址，需要是最小可擦除扇区大小的整数倍
  @param[in] size_of_bytes: 被擦除区域的大小，需要是最小可擦除扇区大小的整数倍
- @return  如果 flash 开始执行擦除返回 VSF_ERR_NONE，否则返回负数
+ @return  如果擦除请求成功提交返回 VSF_ERR_NONE，否则返回负数
+
+ @note 这是一个异步 API。它仅启动擦除后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表擦除已经完成。在完成通知之前不要访问该区域。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_ERASE 中断通知。
  */
 extern vsf_err_t vsf_flash_erase_multi_sector(vsf_flash_t *flash_ptr,
                                               vsf_flash_size_t offset_of_bytes,
@@ -630,12 +650,22 @@ extern vsf_err_t vsf_flash_erase_multi_sector(vsf_flash_t *flash_ptr,
  \~english
  @brief Flash chip erase
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
- @return vsf_err_t: VSF_ERR_NONE if flash starts to perform the chip erase, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if the chip-erase request was successfully submitted, or a negative error code
+
+ @note This is an asynchronous API. It only starts the erase and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the erase has
+       completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_ERASE interrupt.
 
  \~chinese
  @brief flash 整片擦除
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
- @return  如果 flash 开始执行整片擦除返回 VSF_ERR_NONE，否则返回负数
+ @return  如果整片擦除请求成功提交返回 VSF_ERR_NONE，否则返回负数
+
+ @note 这是一个异步 API。它仅启动擦除后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表擦除已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_ERASE 中断通知。
  */
 extern vsf_err_t vsf_flash_erase_all(vsf_flash_t *flash_ptr);
 
@@ -646,17 +676,29 @@ extern vsf_err_t vsf_flash_erase_all(vsf_flash_t *flash_ptr);
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
  @param[in] offset_of_bytes: Address of the sector to be written,
                 some flash requires an integer multiple of the smallest writable sector size
- @param[in] buffer: a pointer to data
- @param[in] size_of_bytes: a pointer to data
- @return vsf_err_t: VSF_ERR_NONE if flash starts to perform the write, or a negative error code
+ @param[in] buffer: pointer to the source data to be written to flash
+ @param[in] size_of_bytes: size in bytes to write
+ @return vsf_err_t: VSF_ERR_NONE if the write request was successfully submitted, or a negative error code
+
+ @note This is an asynchronous API. It only starts the write and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the write has
+       completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_WRITE interrupt.
+ @note buffer must remain valid and unmodified until completion is signaled.
 
  \~chinese
  @brief flash 写一个扇区
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
  @param[in] offset_of_bytes: 被写入扇区的地址, 部分 flash 需要是最小可写入扇区大小的整数倍
- @param[in] buffer: 数据的指针
- @param[in] size_of_bytes: 被写入扇区的长度，部分 flash 需要是最小可写入扇区大小的整数倍
- @return  如果 flash 开始执行写入返回 VSF_ERR_NONE，否则返回负数
+ @param[in] buffer: 指向要写入 flash 的源数据的指针
+ @param[in] size_of_bytes: 要写入的字节数
+ @return  如果写入请求成功提交返回 VSF_ERR_NONE，否则返回负数
+
+ @note 这是一个异步 API。它仅启动写入后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表写入已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_WRITE 中断通知。
+ @note buffer 在完成通知之前必须保持有效且不被修改。
  */
 extern vsf_err_t vsf_flash_write_one_sector(vsf_flash_t *flash_ptr,
                                             vsf_flash_size_t offset_of_bytes,
@@ -669,17 +711,29 @@ extern vsf_err_t vsf_flash_write_one_sector(vsf_flash_t *flash_ptr,
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
  @param[in] offset_of_bytes: Address of the sector to be written,
                 some flash requires an integer multiple of the smallest writable sector size
- @param[in] buffer: a pointer to data
+ @param[in] buffer: pointer to the source data to be written to flash
  @param[in] size_of_bytes: size of data to write
- @return vsf_err_t: VSF_ERR_NONE if flash starts to perform the write, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if the write request was successfully submitted, or a negative error code
+
+ @note This is an asynchronous API. It only starts the write and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the write has
+       completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_WRITE interrupt.
+ @note buffer must remain valid and unmodified until completion is signaled.
 
  \~chinese
  @brief flash 写多个扇区
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
  @param[in] offset_of_bytes: 被写入扇区的地址, 部分 flash 需要是最小可擦除扇区大小的整数倍
- @param[in] buffer: 数据的指针
+ @param[in] buffer: 指向要写入 flash 的源数据的指针
  @param[in] size_of_bytes: 被写入扇区的长度，部分 flash 需要是最小可擦除扇区大小的整数倍
- @return  如果 flash 开始执行写入返回 VSF_ERR_NONE，否则返回负数
+ @return  如果写入请求成功提交返回 VSF_ERR_NONE，否则返回负数
+
+ @note 这是一个异步 API。它仅启动写入后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表写入已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_WRITE 中断通知。
+ @note buffer 在完成通知之前必须保持有效且不被修改。
  */
 extern vsf_err_t vsf_flash_write_multi_sector(vsf_flash_t *flash_ptr,
                                               vsf_flash_size_t offset_of_bytes,
@@ -690,19 +744,33 @@ extern vsf_err_t vsf_flash_write_multi_sector(vsf_flash_t *flash_ptr,
  \~english
  @brief flash read one sector
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
- @param[in] offset_of_bytes: Address of the sector to be written,
-                some flash requires an integer multiple of the smallest writable sector size
- @param[in] buffer: a pointer to data
- @param[in] size_of_bytes: a pointer to data
- @return vsf_err_t: VSF_ERR_NONE if flash starts to perform the chip erase, or a negative error code
+ @param[in] offset_of_bytes: Address of the sector to be read,
+                some flash requires an integer multiple of the smallest readable sector size
+ @param[out] buffer: pointer to the buffer that receives the data read from flash
+ @param[in] size_of_bytes: size in bytes to read
+ @return vsf_err_t: VSF_ERR_NONE if the read request was successfully submitted, or a negative error code
+
+ @note This is an asynchronous API. It only starts the read and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the read has
+       completed. Do not read buffer until completion is signaled.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_READ interrupt. The data is written
+       into buffer asynchronously by the driver.
+ @note buffer must remain valid until completion is signaled.
 
  \~chinese
  @brief flash 读一个扇区
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
  @param[in] offset_of_bytes: 被读入扇区的地址, 部分 flash 需要是最小可读入扇区大小的整数倍
- @param[in] buffer: 数据的指针
- @param[in] size_of_bytes: 被读入扇区的长度，部分 flash 需要是最小可读入扇区大小的整数倍
- @return  如果 flash 开始执行读入返回 VSF_ERR_NONE , 否则返回负数。
+ @param[out] buffer: 用于接收从 flash 读出数据的缓冲区指针
+ @param[in] size_of_bytes: 要读取的字节数
+ @return  如果读取请求成功提交返回 VSF_ERR_NONE , 否则返回负数。
+
+ @note 这是一个异步 API。它仅启动读取后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表读取已经完成。在完成通知之前不要读取 buffer。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_READ 中断通知。
+       数据由驱动异步写入 buffer。
+ @note buffer 在完成通知之前必须保持有效。
  */
 extern vsf_err_t vsf_flash_read_one_sector(vsf_flash_t *flash_ptr,
                                            vsf_flash_size_t offset_of_bytes,
@@ -713,19 +781,33 @@ extern vsf_err_t vsf_flash_read_one_sector(vsf_flash_t *flash_ptr,
  \~english
  @brief flash read multi sector
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
- @param[in] offset_of_bytes: Address of the sector to be written,
-                some flash requires an integer multiple of the smallest writable sector size
- @param[in] buffer: a pointer to data
- @param[in] size_of_bytes: a pointer to data
- @return vsf_err_t: VSF_ERR_NONE if flash starts to perform the chip erase, or a negative error code
+ @param[in] offset_of_bytes: Address of the sector to be read,
+                some flash requires an integer multiple of the smallest readable sector size
+ @param[out] buffer: pointer to the buffer that receives the data read from flash
+ @param[in] size_of_bytes: size in bytes to read
+ @return vsf_err_t: VSF_ERR_NONE if the read request was successfully submitted, or a negative error code
+
+ @note This is an asynchronous API. It only starts the read and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the read has
+       completed. Do not read buffer until completion is signaled.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_flash_init) via the VSF_FLASH_IRQ_MASK_READ interrupt. The data is written
+       into buffer asynchronously by the driver.
+ @note buffer must remain valid until completion is signaled.
 
  \~chinese
  @brief flash 读多个扇区
  @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
- @param[in] offset_of_bytes: 被读入扇区的地址, 部分 flash 需要是最小可擦除扇区大小的整数倍
- @param[in] buffer: 数据的指针
- @param[in] size_of_bytes: 被读入扇区的长度，部分 flash 需要是最小可擦除扇区大小的整数倍
- @return  如果 flash 开始执行读入返回 VSF_ERR_NONE , 否则返回负数。
+ @param[in] offset_of_bytes: 被读入扇区的地址, 部分 flash 需要是最小可读入扇区大小的整数倍
+ @param[out] buffer: 用于接收从 flash 读出数据的缓冲区指针
+ @param[in] size_of_bytes: 要读取的字节数
+ @return  如果读取请求成功提交返回 VSF_ERR_NONE , 否则返回负数。
+
+ @note 这是一个异步 API。它仅启动读取后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表读取已经完成。在完成通知之前不要读取 buffer。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_flash_init）经 VSF_FLASH_IRQ_MASK_READ 中断通知。
+       数据由驱动异步写入 buffer。
+ @note buffer 在完成通知之前必须保持有效。
  */
 extern vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr,
                                              vsf_flash_size_t offset_of_bytes,

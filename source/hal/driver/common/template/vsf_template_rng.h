@@ -250,20 +250,33 @@ extern vsf_rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr);
  \~english
  @brief RNG generate request
  @param[in] rng_ptr: a pointer to structure @ref vsf_rng_t
- @param[in] buffer: RNG data buffer
- @param[in] num: the length of RNG data buffer
- @param[in] param: callback parameter
- @param[in] on_ready_cb: callback function
- @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
+ @param[out] buffer: buffer that receives the generated random data
+ @param[in] num: the length of RNG data buffer (in words)
+ @param[in] param: callback parameter passed back to on_ready_cb
+ @param[in] on_ready_cb: completion callback function
+ @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
+
+ @note This is an asynchronous API. It only submits the request and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the random data is
+       ready.
+ @note Completion is signaled by invoking on_ready_cb. The random data is written into
+       buffer asynchronously; its content is undefined until on_ready_cb is called.
+ @note buffer must remain valid until on_ready_cb is invoked.
 
  \~chinese
  @brief RNG 生成请求
  @param[in] rng_ptr: 指向结构体 @ref vsf_rng_t 的指针
- @param[in] buffer: RNG 数据缓冲区
- @param[in] num: RNG 数据缓冲区长度
- @param[in] param: 回调函数参数
+ @param[out] buffer: 用于接收生成的随机数据的缓冲区
+ @param[in] num: RNG 数据缓冲区长度（以字为单位）
+ @param[in] param: 传回给 on_ready_cb 的回调函数参数
  @param[in] on_ready_cb: 完成回调函数
- @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
+ @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 这是一个异步 API。它仅提交请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表随机数据已经就绪。
+ @note 完成通过调用 on_ready_cb 通知。随机数据被异步写入 buffer；在 on_ready_cb 被调用之前，
+       其内容是未定义的。
+ @note buffer 在 on_ready_cb 被调用之前必须保持有效。
  */
 extern vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng_ptr, uint32_t *buffer, uint32_t num,
                                           void *param, vsf_rng_on_ready_callback_t * on_ready_cb);

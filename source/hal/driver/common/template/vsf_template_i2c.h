@@ -1275,8 +1275,18 @@ extern uint_fast16_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t *i2c_ptr,
  * @param[in] address: address of I2C transfer (address does not include read/write bit)
  * @param[in] cmd: I2C command
  * @param[in] count: number of data to transfer
- * @param[in,out] buffer_ptr: I2C transfer buffer
- * @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
+ * @param[in,out] buffer_ptr: I2C transfer buffer; used as source for a write and filled
+ *              asynchronously by the driver for a read
+ * @return vsf_err_t: VSF_ERR_NONE if the transfer was successfully started, or a negative error code
+ *
+ * @note This is an asynchronous API. It only starts the transfer and returns immediately;
+ *       a VSF_ERR_NONE return means the request was accepted, NOT that the transfer has
+ *       completed.
+ * @note Completion is signaled through the ISR callback registered in cfg.isr (see
+ *       vsf_i2c_init) via VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE, or a master error mask
+ *       such as VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK / VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT.
+ *       buffer_ptr must remain valid until completion is signaled. For the interrupt events
+ *       see @ref vsf_i2c_irq_mask_t.
  *
  * \~chinese
  * @brief I2C 主机请求一次传输
@@ -1284,8 +1294,15 @@ extern uint_fast16_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t *i2c_ptr,
  * @param[in] address: I2C 传输的地址（地址不包含读写位）
  * @param[in] cmd: I2C 命令
  * @param[in] count: 要传输的数据数量
- * @param[in,out] buffer_ptr: I2C 传输缓冲区
- * @return vsf_err_t: 成功返回 VSF_ERR_NONE，否则返回负数
+ * @param[in,out] buffer_ptr: I2C 传输缓冲区；写时作为源数据、读时由驱动异步填充
+ * @return vsf_err_t: 如果传输成功启动返回 VSF_ERR_NONE，否则返回负数
+ *
+ * @note 这是一个异步 API。它仅启动传输后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+ *       并不代表传输已经完成。
+ * @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_i2c_init）经
+ *       VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE，或主机错误掩码如
+ *       VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK / VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT 通知。
+ *       buffer_ptr 在完成通知之前必须保持有效。具体的中断事件请参考 @ref vsf_i2c_irq_mask_t。
  */
 extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                         uint16_t address,
@@ -1299,16 +1316,30 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
  * @param[in,out] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  * @param[in] transmit_or_receive: true for transmit, false for receive
  * @param[in] count: number of data to transfer
- * @param[in,out] buffer_ptr: I2C transfer buffer
- * @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
+ * @param[in,out] buffer_ptr: I2C transfer buffer; used as source when transmitting and
+ *              filled asynchronously by the driver when receiving
+ * @return vsf_err_t: VSF_ERR_NONE if the request was successfully started, or a negative error code
+ *
+ * @note This is an asynchronous API. It only starts the transfer and returns immediately;
+ *       a VSF_ERR_NONE return means the request was accepted, NOT that the transfer has
+ *       completed.
+ * @note Completion is signaled through the ISR callback registered in cfg.isr (see
+ *       vsf_i2c_init) via VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE. buffer_ptr must remain
+ *       valid until completion is signaled. For the interrupt events see @ref vsf_i2c_irq_mask_t.
  *
  * \~chinese
  * @brief I2C 从机请求一次传输
  * @param[in,out] i2c_ptr: 结构体 @ref vsf_i2c_t 的指针
  * @param[in] transmit_or_receive: true 表示发送，false 表示接收
  * @param[in] count: 要传输的数据数量
- * @param[in,out] buffer_ptr: I2C 传输缓冲区
- * @return vsf_err_t: 成功返回 VSF_ERR_NONE，否则返回负数
+ * @param[in,out] buffer_ptr: I2C 传输缓冲区；发送时作为源数据、接收时由驱动异步填充
+ * @return vsf_err_t: 如果请求成功启动返回 VSF_ERR_NONE，否则返回负数
+ *
+ * @note 这是一个异步 API。它仅启动传输后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+ *       并不代表传输已经完成。
+ * @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_i2c_init）经
+ *       VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE 通知。buffer_ptr 在完成通知之前必须保持有效。
+ *       具体的中断事件请参考 @ref vsf_i2c_irq_mask_t。
  */
 extern vsf_err_t vsf_i2c_slave_request(vsf_i2c_t *i2c_ptr,
                                        bool transmit_or_receive,
@@ -1320,13 +1351,16 @@ extern vsf_err_t vsf_i2c_slave_request(vsf_i2c_t *i2c_ptr,
  * @brief get the counter of transfers for current request by the I2C master
  * @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  * @return uint_fast16_t: number of data transferred
- * @note This API can be used between slave NAK and the next transmission
+ * @note Used together with the asynchronous vsf_i2c_master_request to query how many bytes
+ *       have been transferred so far. It is typically queried in the completion/error ISR
+ *       callback, and can also be used between a slave NAK and the next transmission.
  *
  * \~chinese
  * @brief 获取 I2C 主机当前请求已经传输的数据数量
  * @param[in] i2c_ptr: 结构体 @ref vsf_i2c_t 的指针
  * @return uint_fast16_t: 已传输的数据数量
- * @note 此 API 可在从机 NAK 之后到下一次传输之前使用
+ * @note 配合异步的 vsf_i2c_master_request 使用，用于查询当前已传输的字节数。通常在完成/错误的
+ *       ISR 回调中查询，也可在从机 NAK 之后到下一次传输之前使用。
  */
 extern uint_fast16_t vsf_i2c_master_get_transferred_count(vsf_i2c_t *i2c_ptr);
 

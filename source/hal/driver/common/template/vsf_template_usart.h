@@ -1368,18 +1368,26 @@ extern uint_fast32_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer
  * \~english
  * @brief Request a DMA receive operation through the USART
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- * @param[in] buffer_ptr: Pointer to the receive buffer
+ * @param[out] buffer_ptr: pointer to the buffer that receives data, filled asynchronously by the driver
  * @param[in] count: Number of bytes to receive
  * @return vsf_err_t: VSF_ERR_NONE if the receive request was successfully started, otherwise returns error code
- * @note This is an asynchronous operation
+ * @note This is an asynchronous API. A VSF_ERR_NONE return only means the request was
+ *       accepted, NOT that the data has been received. Completion is signaled through the
+ *       ISR callback registered in cfg.isr (see vsf_usart_init) via VSF_USART_IRQ_MASK_RX_CPL.
+ * @note buffer_ptr must remain valid until completion is signaled, and its content is
+ *       undefined before completion. Use vsf_usart_get_rx_count() after RX_CPL (or after
+ *       vsf_usart_cancel_rx) to obtain the number of bytes actually received.
  *
  * \~chinese
  * @brief 请求通过 USART 进行 DMA 接收操作
  * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
- * @param[in] buffer_ptr: 接收缓冲区指针
+ * @param[out] buffer_ptr: 接收缓冲区指针，由驱动异步填充
  * @param[in] count: 要接收的字节数
  * @return vsf_err_t: 如果接收请求成功启动则返回 VSF_ERR_NONE，否则返回错误码
- * @note 这是一个异步操作
+ * @note 这是一个异步 API。返回 VSF_ERR_NONE 只表示请求已被接受，并不代表数据已经接收完成。
+ *       完成通过在 cfg.isr 中注册的回调（参见 vsf_usart_init）经 VSF_USART_IRQ_MASK_RX_CPL 中断通知。
+ * @note buffer_ptr 在完成通知之前必须保持有效，其内容在完成前是未定义的。可在 RX_CPL 之后
+ *       （或调用 vsf_usart_cancel_rx 之后）使用 vsf_usart_get_rx_count() 获取实际接收的字节数。
  */
 extern vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
 
@@ -1387,18 +1395,28 @@ extern vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, 
  * \~english
  * @brief Request a DMA transmit operation through the USART
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- * @param[in] buffer_ptr: Pointer to the transmit buffer
+ * @param[in] buffer_ptr: pointer to the transmit source buffer
  * @param[in] count: Number of bytes to transmit
  * @return vsf_err_t: VSF_ERR_NONE if the transmit request was successfully started, otherwise returns error code
- * @note This is an asynchronous operation
+ * @note This is an asynchronous API. A VSF_ERR_NONE return only means the request was
+ *       accepted, NOT that the data has been transmitted. Completion is signaled through
+ *       the ISR callback registered in cfg.isr (see vsf_usart_init) via VSF_USART_IRQ_MASK_TX_CPL.
+ * @note buffer_ptr must remain valid and unmodified until completion is signaled.
+ * @note VSF_USART_IRQ_MASK_TX_CPL only means all data has been pushed into the TX FIFO,
+ *       NOT that the last bit has left the wire. Poll status (txfe / is_busy) if you must
+ *       ensure the hardware is fully idle.
  *
  * \~chinese
  * @brief 请求通过 USART 进行 DMA 发送操作
  * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
- * @param[in] buffer_ptr: 发送缓冲区指针
+ * @param[in] buffer_ptr: 发送源缓冲区指针
  * @param[in] count: 要发送的字节数
  * @return vsf_err_t: 如果发送请求成功启动则返回 VSF_ERR_NONE，否则返回错误码
- * @note 这是一个异步操作
+ * @note 这是一个异步 API。返回 VSF_ERR_NONE 只表示请求已被接受，并不代表数据已经发送完成。
+ *       完成通过在 cfg.isr 中注册的回调（参见 vsf_usart_init）经 VSF_USART_IRQ_MASK_TX_CPL 中断通知。
+ * @note buffer_ptr 在完成通知之前必须保持有效且不被修改。
+ * @note VSF_USART_IRQ_MASK_TX_CPL 仅表示所有数据已被推入 TX FIFO，并不代表最后一个 bit 已从
+ *       线缆发出。若必须确认硬件完全空闲，请轮询 status（txfe / is_busy）。
  */
 extern vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
 
@@ -1407,11 +1425,16 @@ extern vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, 
  * @brief Cancel an ongoing USART receive operation
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  * @return vsf_err_t: VSF_ERR_NONE if the receive operation was successfully cancelled, otherwise returns error code
+ * @note Aborts a transfer previously started by vsf_usart_request_rx. After cancellation
+ *       the receive buffer may be safely released; use vsf_usart_get_rx_count() to obtain
+ *       the number of bytes received before the cancel.
  *
  * \~chinese
  * @brief 取消正在进行的 USART 接收操作
  * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
  * @return vsf_err_t: 如果成功取消接收操作则返回 VSF_ERR_NONE，否则返回错误码
+ * @note 用于中止先前由 vsf_usart_request_rx 启动的传输。取消后接收缓冲区即可安全释放；
+ *       可使用 vsf_usart_get_rx_count() 获取取消前已接收的字节数。
  */
 extern vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr);
 
@@ -1420,11 +1443,16 @@ extern vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr);
  * @brief Cancel an ongoing USART transmit operation
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  * @return vsf_err_t: VSF_ERR_NONE if the transmit operation was successfully cancelled, otherwise returns error code
+ * @note Aborts a transfer previously started by vsf_usart_request_tx. After cancellation
+ *       the transmit buffer may be safely released; use vsf_usart_get_tx_count() to obtain
+ *       the number of bytes transmitted before the cancel.
  *
  * \~chinese
  * @brief 取消正在进行的 USART 发送操作
  * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
  * @return vsf_err_t: 如果成功取消发送操作则返回 VSF_ERR_NONE，否则返回错误码
+ * @note 用于中止先前由 vsf_usart_request_tx 启动的传输。取消后发送缓冲区即可安全释放；
+ *       可使用 vsf_usart_get_tx_count() 获取取消前已发送的字节数。
  */
 extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
 

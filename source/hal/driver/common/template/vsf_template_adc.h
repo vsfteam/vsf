@@ -928,15 +928,30 @@ extern vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr);
  @brief ADC request sampling once
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
  @param[in] channel_cfg: a pointer to convert channel configuration
- @param[in] buffer_ptr: value to be converted
- @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
+ @param[out] buffer_ptr: pointer to the buffer that receives the conversion result
+ @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
+
+ @note This is an asynchronous API. It only submits the sampling request and returns
+       immediately; a VSF_ERR_NONE return means the request was accepted, NOT that the
+       conversion has completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_adc_init) via the VSF_ADC_IRQ_MASK_CPL interrupt. The conversion result is
+       written into buffer_ptr asynchronously by the driver.
+ @note buffer_ptr must remain valid until the completion callback is invoked, and its
+       content is undefined before completion.
 
  \~chinese
  @brief ADC 请求采样一次
  @param[in] adc_ptr: 指向结构体 @ref vsf_adc_t 的指针
  @param[in] channel_cfg: 转换通道配置的指针
- @param[in] buffer_ptr: 待转换的值的缓冲区
- @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
+ @param[out] buffer_ptr: 用于接收转换结果的缓冲区指针
+ @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 这是一个异步 API。它仅提交采样请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表转换已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_adc_init）经 VSF_ADC_IRQ_MASK_CPL 中断通知。
+       转换结果由驱动异步写入 buffer_ptr。
+ @note buffer_ptr 在完成回调被调用之前必须保持有效，其内容在完成前是未定义的。
  */
 extern vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
                                               vsf_adc_channel_cfg_t *channel_cfg,
@@ -965,16 +980,31 @@ extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
  \~english
  @brief ADC channel request
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
- @param[out] buffer_ptr: convert channel data array
- @param[in] count: the length of convert channel configuration data array
- @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
+ @param[out] buffer_ptr: array that receives the converted channel data
+ @param[in] count: the length of the convert channel data array
+ @return vsf_err_t: VSF_ERR_NONE if the request was successfully submitted, otherwise returns error code
+
+ @note This is an asynchronous API. It only submits the request and returns immediately;
+       a VSF_ERR_NONE return means the request was accepted, NOT that the conversions
+       have completed.
+ @note Completion is signaled through the ISR callback registered in cfg.isr (see
+       vsf_adc_init) via the VSF_ADC_IRQ_MASK_CPL interrupt. The converted data is
+       written into buffer_ptr asynchronously by the driver.
+ @note buffer_ptr must remain valid until the completion callback is invoked, and its
+       content is undefined before completion.
 
  \~chinese
  @brief ADC 通道请求
  @param[in] adc_ptr: 指向结构体 @ref vsf_adc_t 的指针
- @param[out] buffer_ptr: 转换通道数据数组
- @param[in] count: 转换通道配置数据数组的长度
- @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
+ @param[out] buffer_ptr: 用于接收转换通道数据的数组
+ @param[in] count: 转换通道数据数组的长度
+ @return vsf_err_t: 如果请求成功提交返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 这是一个异步 API。它仅提交请求后立即返回；返回 VSF_ERR_NONE 只表示请求已被接受，
+       并不代表转换已经完成。
+ @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_adc_init）经 VSF_ADC_IRQ_MASK_CPL 中断通知。
+       转换数据由驱动异步写入 buffer_ptr。
+ @note buffer_ptr 在完成回调被调用之前必须保持有效，其内容在完成前是未定义的。
  */
 extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
                                          void *buffer_ptr,
