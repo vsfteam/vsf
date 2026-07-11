@@ -40,6 +40,14 @@
 #   define VSF_TEST_ADC_ONESHOT_SAMPLE_CYCLES           0
 #endif
 
+#ifndef VSF_TEST_ADC_ONESHOT_PRIO
+#   define VSF_TEST_ADC_ONESHOT_PRIO                    vsf_arch_prio_1
+#endif
+
+#ifndef VSF_TEST_ADC_ONESHOT_TIMEOUT_MS
+#   define VSF_TEST_ADC_ONESHOT_TIMEOUT_MS             500
+#endif
+
 
 #ifndef VSF_TEST_ADC_CLOCK_HZ
 #   define VSF_TEST_ADC_CLOCK_HZ               48000000
