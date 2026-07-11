@@ -319,7 +319,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_get_configuration,          VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_addr_t src_address, vsf_dma_addr_t dst_address, uint32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *scatter_gather_cfg, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *sg_desc_ptr, uint32_t sg_count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_start,                   VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count,      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
@@ -1163,14 +1163,14 @@ extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, uint8_t channel);
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @param[in] channel: channel number
  @param[in] isr: DMA interrupt handler
- @param[in] cfg_ptr: a pointer to DMA channel scatter-gather configuration
+ @param[in] sg_desc_ptr: a pointer to DMA channel scatter-gather configuration
  @param[in] sg_count: number of scatter-gather configurations
  @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
- @note The scatter_gather_cfg array should be initialized using the VSF_DMA_CHANNEL_SG_ARRAY macro
+ @note The sg_desc_ptr array should be initialized using the VSF_DMA_CHANNEL_SG_ARRAY macro
        for better compatibility.
- @note The scatter_gather_cfg must point to DMA-accessible memory region.
- @note The caller must ensure scatter_gather_cfg remains valid until the DMA transfer completes.
- @note The contents of scatter_gather_cfg may be modified by the driver to match the actual
+ @note The sg_desc_ptr must point to DMA-accessible memory region.
+ @note The caller must ensure sg_desc_ptr remains valid until the DMA transfer completes.
+ @note The contents of sg_desc_ptr may be modified by the driver to match the actual
        hardware descriptor format required by the DMA controller.
  @note The driver will handle linked list construction internally, including:
        - Setting up the 'next' pointer for each descriptor
@@ -1186,13 +1186,13 @@ extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, uint8_t channel);
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in] channel: 通道序号
  @param[in] isr: DMA 中断处理函数
- @param[in] cfg_ptr: 指向 DMA 通道 scatter-gather 配置的指针
+ @param[in] sg_desc_ptr: 指向 DMA 通道 scatter-gather 配置的指针
  @param[in] sg_count: scatter-gather 配置的数量
  @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
- @note scatter_gather_cfg 指向的结构体应该使用宏 VSF_DMA_CHANNEL_SG_ARRAY 来初始化，以保证更好的兼容性。
- @note scatter_gather_cfg 指向的结构体需要是可以被 DMA 直接访问的内存区域。
- @note scatter_gather_cfg 指向的结构体需要调用者确保在 DMA 传输完成之前不会被释放。
- @note scatter_gather_cfg 指向的结构体的内容可能在配置后被修改成 DMA 实际需要的 Scatter-Gather 描述符结构。
+ @note sg_desc_ptr 指向的结构体应该使用宏 VSF_DMA_CHANNEL_SG_ARRAY 来初始化，以保证更好的兼容性。
+ @note sg_desc_ptr 指向的结构体需要是可以被 DMA 直接访问的内存区域。
+ @note sg_desc_ptr 指向的结构体需要调用者确保在 DMA 传输完成之前不会被释放。
+ @note sg_desc_ptr 指向的结构体的内容可能在配置后被修改成 DMA 实际需要的 Scatter-Gather 描述符结构。
  @note 驱动会在内部处理链表的构建，包括：
        - 为每个描述符设置 'next' 指针
        - 使用 NULL 或硬件特定的结束标记终止链表

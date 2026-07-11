@@ -203,9 +203,9 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_irq_mask_t,   dac, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfg, uint_fast16_t value) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *channel_cfg, uint_fast16_t value) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfgs_ptr, uint_fast8_t cnt) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *values_ptr, uint_fast32_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, ctrl,                 VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/

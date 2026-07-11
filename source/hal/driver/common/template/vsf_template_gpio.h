@@ -335,8 +335,8 @@ extern "C" {
     /* exti_irq APIs: may return VSF_ERR_NOT_SUPPORT when the hardware GPIO driver
      * does not implement EXTI via GPIO. Users should fall back to the dedicated EXTI
      * interface (vsf_template_exti.h) when GPIO-based EXTI is unavailable. */     \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr)                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, exti_irq_clear,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \

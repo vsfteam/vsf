@@ -283,7 +283,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_capability_t, spi, capability,            VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cs_active,             VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast8_t index) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cs_inactive,           VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast8_t index) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fifo_transfer,         VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fifo_transfer,         VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,      VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,       VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast32_t * sent_count, uint_fast32_t *received_count) \

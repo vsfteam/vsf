@@ -329,8 +329,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_irq_mask_t,   eth, irq_clear,              VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_buf_desc_t *buf_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_buf_desc_t *buf_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *sg_ptr, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_sg_buf_desc_t *sg_ptr, uint32_t sg_count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, ctrl,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_ctrl_t ctrl, void *param) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_status_t,     eth, status,                 VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_capability_t, eth, capability,             VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
