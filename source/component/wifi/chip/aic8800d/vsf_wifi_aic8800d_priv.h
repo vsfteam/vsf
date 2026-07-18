@@ -37,13 +37,26 @@ extern "C" {
 
 #define AIC8800D_CMD_TIMEOUT_MS     5000
 #define AIC8800D_CMD_BUF_SIZE       1536
-#define AIC8800D_MAX_CMD_PARAM      256
+#define AIC8800D_MAX_CMD_PARAM      1024
 #define AIC8800D_MAX_PENDING_CMDS   4
 
 /* Default RF config for AIC8800D80 U02 (pll trx, matches Linux rf_tbl_masked) */
 #define AIC8800D_RF_CFG_COUNT       1
 static const uint32_t __aic8800d_rf_cfg[AIC8800D_RF_CFG_COUNT][3] = {
     {0x40344058, 0x00800000, 0x00000000},   /* pll trx */
+};
+
+/* System config tables for AIC8800D80 (matches Linux syscfg_tbl / syscfg_tbl_masked) */
+#define AIC8800D_SYSCFG_COUNT       3
+static const uint32_t __aic8800d_syscfg[AIC8800D_SYSCFG_COUNT][2] = {
+    {0x40500014, 0x00000101},
+    {0x40500018, 0x0000010D},
+    {0x40500004, 0x00000010},
+};
+
+#define AIC8800D_SYSCFG_MASKED_COUNT    1
+static const uint32_t __aic8800d_syscfg_masked[AIC8800D_SYSCFG_MASKED_COUNT][3] = {
+    {0x40506024, 0x000000FF, 0x000000DF},
 };
 
 /* Firmware binary is embedded as a C array in vsf_wifi_aic8800d_firmware_data.c.
@@ -221,8 +234,8 @@ struct aic8800d_mm_version_req {
 };
 
 struct aic8800d_mm_add_if_req {
+    aic_u8  type;                   /* MM_STA / MM_AP / ... (must be first, matches Linux) */
     struct aic8800d_mac_addr addr;
-    aic_u8  type;
     aic_u8  p2p;
 };
 
@@ -483,6 +496,13 @@ struct aic8800d_scanu_start_cfm {
     aic_u8 result_cnt;
 };
 
+struct aic8800d_scanu_cancel_req {
+};
+
+struct aic8800d_scanu_cancel_cfm {
+    aic_u8 status;
+};
+
 struct aic8800d_scanu_result_ind {
     aic_u16 length;
     aic_u16 framectrl;
@@ -497,10 +517,26 @@ struct aic8800d_scanu_result_ind {
 /* SM */
 #define AIC8800D_SM_ASSOC_IE_LEN    256
 
+/* mac_connection_flags from Linux lmac_mac.h */
+#define AIC8800D_CONNECTION_FLAG_CONTROL_PORT_HOST  (1u << 0)
+#define AIC8800D_CONNECTION_FLAG_CONTROL_PORT_NO_ENC (1u << 1)
+#define AIC8800D_CONNECTION_FLAG_DISABLE_HT         (1u << 2)
+#define AIC8800D_CONNECTION_FLAG_WPA_WPA2_IN_USE    (1u << 3)
+#define AIC8800D_CONNECTION_FLAG_MFP_IN_USE         (1u << 4)
+#define AIC8800D_CONNECTION_FLAG_REASSOCIATION      (1u << 5)
+
+/* TX/RX data descriptor sizes */
+#define AIC8800D_TXDESC_API_SIZE    20  /* sizeof(struct hostdesc) */
+#define AIC8800D_RX_HWHDR_LEN       60  /* RX_HWHRD_LEN in Linux driver */
+#define AIC8800D_USB_TX_HEADER_LEN  8   /* USB bulk TX aggregation header */
+#define AIC8800D_USB_RX_ALIGNMENT   4
+
 struct aic8800d_sm_connect_req {
     struct aic8800d_mac_ssid     ssid;
+    aic_u8  __pad_after_ssid;
     struct aic8800d_mac_addr     bssid;
     struct aic8800d_mac_chan_def chan;
+    aic_u8  __pad_after_chan[2];
     aic_u32 flags;
     aic_u16 ctrl_port_ethertype;
     aic_u16 ie_len;
@@ -516,6 +552,10 @@ struct aic8800d_sm_connect_cfm {
     aic_u8 status;
 };
 
+/* SM_CONNECT_IND carries assoc IEs in a SM_ASSOC_IE_LEN(800)-byte buffer,
+ * larger than the 256-byte ie_buf of SM_CONNECT_REQ (Linux lmac_msg.h). */
+#define AIC8800D_SM_ASSOC_IND_IE_LEN    800
+
 struct aic8800d_sm_connect_ind {
     aic_u16 status_code;
     struct aic8800d_mac_addr bssid;
@@ -527,7 +567,7 @@ struct aic8800d_sm_connect_ind {
     aic_u8  acm;
     aic_u16 assoc_req_ie_len;
     aic_u16 assoc_rsp_ie_len;
-    aic_u32 assoc_ie_buf[AIC8800D_SM_ASSOC_IE_LEN / 4];
+    aic_u32 assoc_ie_buf[AIC8800D_SM_ASSOC_IND_IE_LEN / 4];
     aic_u16 aid;
     aic_u8  band;
     aic_u16 center_freq;
@@ -545,6 +585,42 @@ struct aic8800d_sm_disconnect_req {
 struct aic8800d_sm_disconnect_ind {
     aic_u16 reason_code;
     aic_u8  vif_idx;
+};
+
+struct aic8800d_hostdesc {
+    aic_u16 packet_len;
+    aic_u16 flags_ext;
+    struct aic8800d_mac_addr eth_dest_addr;
+    struct aic8800d_mac_addr eth_src_addr;
+    aic_u16 ethertype;
+    aic_u8  ac;
+    aic_u8  tid;
+    aic_u8  vif_idx;
+    aic_u8  staid;
+    aic_u16 flags;
+};
+
+struct aic8800d_txdesc_api {
+    struct aic8800d_hostdesc host;
+};
+
+/* USB bulk TX aggregation header (8 bytes) */
+struct aic8800d_usb_tx_header {
+    aic_u8 len_lsb;
+    aic_u8 len_msb;     /* bits 0..3 */
+    aic_u8 len2_lsb;
+    aic_u8 len2_msb;
+    aic_u8 len3_lsb;
+    aic_u8 len3_msb;
+    aic_u8 type;        /* AIC8800D_USB_TYPE_DATA */
+    aic_u8 reserved;
+};
+
+struct aic8800d_hw_rxhdr {
+    /* hw_rxhdr is 60 bytes; we only need the fields used for routing.
+     * The full layout includes hwvect (36 bytes), phy_info (8 bytes),
+     * flags (4 bytes), pattern (4 bytes). Keep opaque for now. */
+    aic_u8  raw[AIC8800D_RX_HWHDR_LEN];
 };
 
 /* DBG */
@@ -569,9 +645,24 @@ static const uint32_t __aic8800d_patch_tbl[AIC8800D_PATCH_TBL_COUNT][2] = {
     {0x0170, 0x0001000A},   /* rx aggr counter */
 };
 
+/* Boot-time upload addresses (from fw_patch_table INF record:
+ * addr_adid=0x00201940, addr_patch=0x001E0000; the hardcoded defaults in
+ * Linux aic_compat_8800d80.h are overridden by aicbt_patch_info_unpack()) */
+#define AIC8800D_ADID_ADDR              0x00201940
+#define AIC8800D_PATCH_ADDR             0x001E0000
+
 /* Firmware binary (auto-generated from fmacfw_8800d80_u02.bin) */
 extern const uint8_t __aic8800d_firmware_data[];
 extern const uint32_t __aic8800d_firmware_size;
+/* ADID (chip trim/calibration data), auto-generated from fw_adid_8800d80_u02.bin */
+extern const uint8_t __aic8800d_adid_data[];
+extern const uint32_t __aic8800d_adid_size;
+/* Boot patch code, auto-generated from fw_patch_8800d80_u02.bin */
+extern const uint8_t __aic8800d_patch_data[];
+extern const uint32_t __aic8800d_patch_size;
+/* Boot patch table, auto-generated from fw_patch_table_8800d80_u02.bin */
+extern const uint8_t __aic8800d_patch_table_data[];
+extern const uint32_t __aic8800d_patch_table_size;
 
 struct aic8800d_dbg_mem_read_req {
     aic_u32 mem_addr;
@@ -663,9 +754,16 @@ typedef struct aic8800d_priv_t {
     uint8_t            *fw_buf;
     uint32_t            fw_size;
     uint32_t            fw_offset;
+    uint32_t            fw_addr;
+    uint8_t             fw_img_idx;
     vsf_wifi_done_t     fw_done;
     struct aic8800d_dbg_mem_read_cfm sysconfig_rd_cfm;
     uint8_t             chip_mcu_id;
+
+    /* Boot patch table (fw_patch_table_8800d80_u02.bin) write state */
+    uint16_t            patch_tbl_idx;
+    uint16_t            patch_tbl_count;
+    uint32_t            patch_tbl_pairs[96][2];
 
     /* Patch config state */
     uint8_t             patch_step;
@@ -676,6 +774,10 @@ typedef struct aic8800d_priv_t {
     uint32_t            patch_buff_base;
     uint8_t             patch_write_idx;
 
+    /* System config state */
+    uint8_t             syscfg_idx;
+    uint8_t             syscfg_masked_idx;
+
     /* RF config state */
     uint8_t             rf_cfg_idx;
 
@@ -683,13 +785,27 @@ typedef struct aic8800d_priv_t {
     vsf_wifi_done_t     scan_done;
     bool                scan_active;
     bool                scan_finish_pending;
+    uint8_t             scan_finish_retries;
     uint8_t             scan_results_expected;
     uint8_t             scan_results_received;
     vsf_callback_timer_t scan_finish_timer;
+#define AIC8800D_SCAN_RSN_CAP_CACHE_SIZE    8
+    struct {
+        uint8_t  bssid[6];
+        uint16_t rsn_cap;
+    } scan_rsn_cap_cache[AIC8800D_SCAN_RSN_CAP_CACHE_SIZE];
+    uint8_t             scan_rsn_cap_cache_num;
 
     /* Connect state */
+    struct aic8800d_sm_connect_req connect_req;
     vsf_wifi_done_t     connect_done;
     bool                connect_active;
+    uint16_t            ap_rsn_cap;
+
+    /* Link state (cached from SM_CONNECT_IND) */
+    uint8_t             ap_idx;
+    uint8_t             sta_idx;
+    bool                qos;
 } aic8800d_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

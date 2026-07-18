@@ -73,6 +73,8 @@
 
 typedef struct vk_usbh_wifi_aic8800d_iocb_t {
     vk_usbh_urb_t       urb;
+    struct vk_usbh_wifi_aic8800d_t *aic;
+    vsf_callback_timer_t rx_retry_timer;
     uint8_t             is_rx        : 1;
     uint8_t             is_supported : 1;
     uint8_t             is_busy      : 1;
@@ -111,6 +113,7 @@ static void * __vk_usbh_wifi_aic8800d_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 static void __vk_usbh_wifi_aic8800d_disconnect(vk_usbh_t *usbh,
         vk_usbh_dev_t *dev, void *param);
 static void __vk_usbh_wifi_aic8800d_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
+static void __vk_usbh_wifi_aic8800d_rx_retry_cb(vsf_callback_timer_t *timer);
 static void __vk_usbh_wifi_aic8800d_on_eda_terminate(vsf_eda_t *eda);
 static void __vk_usbh_wifi_aic8800d_attach_fail(vsf_wifi_t *wifi, vsf_err_t err);
 static void __vk_usbh_wifi_aic8800d_on_ready(vsf_wifi_t *wifi);
@@ -238,6 +241,19 @@ static const vsf_wifi_aic8800d_bus_ops_t __vk_usbh_wifi_aic8800d_bus_ops_templat
     .send       = __vk_usbh_wifi_aic8800d_send,
     .can_send   = __vk_usbh_wifi_aic8800d_can_send,
 };
+
+static void __vk_usbh_wifi_aic8800d_rx_retry_cb(vsf_callback_timer_t *timer)
+{
+    vk_usbh_wifi_aic8800d_iocb_t *iocb = vsf_container_of(timer,
+            vk_usbh_wifi_aic8800d_iocb_t, rx_retry_timer);
+    vk_usbh_wifi_aic8800d_t *aic = iocb->aic;
+    if (aic != NULL && !aic->wifi.disconnecting) {
+        vsf_err_t err = vk_usbh_submit_urb(aic->usbh, &iocb->urb);
+        if (VSF_ERR_NONE != err) {
+            vk_usbh_remove_interface(aic->usbh, aic->dev, aic->ifs);
+        }
+    }
+}
 
 static void __vk_usbh_wifi_aic8800d_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -387,6 +403,14 @@ static void * __vk_usbh_wifi_aic8800d_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     aic->usbh = usbh;
     aic->dev  = dev;
     aic->ifs  = ifs;
+
+    for (int j = 0; j < VSF_USBH_WIFI_AIC8800D_CFG_RX_NUM; j++) {
+        aic->rx_icb[j].aic = aic;
+        aic->rx_icb[j].rx_retry_timer.on_timer = __vk_usbh_wifi_aic8800d_rx_retry_cb;
+    }
+    for (int j = 0; j < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; j++) {
+        aic->tx_ocb[j].aic = aic;
+    }
 
     /* Initialise per-instance bus ops from the template and decide whether
      * this is a boot-loader device (needs firmware upload) or a runtime

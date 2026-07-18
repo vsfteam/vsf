@@ -144,6 +144,7 @@ typedef struct vsf_wifi_scan_result_t {
     uint8_t  auth_mode;
     uint8_t  pairwise_cipher;
     uint8_t  group_cipher;
+    uint16_t rsn_cap;       /* RSN capabilities from AP RSN IE               */
     uint8_t  ht40_width;    /* 0 = 20 MHz, 1 = 40 MHz (from HT Operation IE)   */
     uint8_t  ht40_plus;     /* 1 = secondary channel above, 0 = below/none     */
 } vsf_wifi_scan_result_t;
