@@ -43,6 +43,15 @@ extern "C" {
 #   error "libusb_hcd ONLY support win/linux/macos"
 #endif
 
+/* Detach a device when one of its URBs fails fatally (LIBUSB_ERROR_IO on the
+ * 1.0 backend; -1/-4/-5 on the libusb-win32 0.1 backend).  In polling mode
+ * (no hotplug) this is the ONLY way a gone device is noticed: without it the
+ * device slot stays occupied forever and a re-enumerating device (e.g. one
+ * rebooting after a firmware download) is never re-detected. */
+#ifndef VSF_LIBUSB_HCD_CFG_REMOVE_ON_ERROR
+#   define VSF_LIBUSB_HCD_CFG_REMOVE_ON_ERROR     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

@@ -1074,7 +1074,15 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
             }
 
 #if VSF_LIBUSB_HCD_CFG_REMOVE_ON_ERROR == ENABLED
+#   ifdef LIBUSB_API_VERSION
             if (urb->status == LIBUSB_ERROR_IO) {
+#   else
+            /* libusb-win32 0.1 backend: the wrapper above returns raw 0.1
+             * negative codes.  -116 (-ETIMEDOUT) just means an idle endpoint
+             * on a HEALTHY device and must NOT detach; -1/-4/-5 mean the
+             * device is actually gone. */
+            if ((urb->status == -1) || (urb->status == -4) || (urb->status == -5)) {
+#   endif
                 // device removed
 #   if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
                 __vsf_arch_irq_start(irq_thread);
