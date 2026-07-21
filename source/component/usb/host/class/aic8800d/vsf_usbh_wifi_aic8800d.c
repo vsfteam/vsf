@@ -49,6 +49,26 @@
 #   define VSF_USBH_WIFI_AIC8800D_CFG_TX_BUFSIZE  2048
 #endif
 
+/* Bus-level logging.  The RX URB completion path is extremely hot: the AIC
+ * firmware emits ZLP keepalives on the bulk IN endpoint at ~1kHz, so per-URB
+ * traces are debug-level, gated by VSF_WIFI_CFG_BUS_AIC8800D_LOG_LEVEL
+ * (vsf_wifi_cfg.h falls it back to VSF_WIFI_CFG_LOG_LEVEL). */
+#if VSF_WIFI_CFG_BUS_AIC8800D_LOG_LEVEL >= 1
+#   define __usbh_aic8800d_trace_error(...)   vsf_trace_error(__VA_ARGS__)
+#else
+#   define __usbh_aic8800d_trace_error(...)   ((void)0)
+#endif
+#if VSF_WIFI_CFG_BUS_AIC8800D_LOG_LEVEL >= 2
+#   define __usbh_aic8800d_trace_info(...)    vsf_trace_info(__VA_ARGS__)
+#else
+#   define __usbh_aic8800d_trace_info(...)    ((void)0)
+#endif
+#if VSF_WIFI_CFG_BUS_AIC8800D_LOG_LEVEL >= 4
+#   define __usbh_aic8800d_trace_debug(...)   vsf_trace_info(__VA_ARGS__)
+#else
+#   define __usbh_aic8800d_trace_debug(...)   ((void)0)
+#endif
+
 #define AIC8800D_USB_VID    0xA69C
 #define AIC8800D_V2_VID     0x368B
 #define AIC8800D_TP_VID     0x2357
@@ -91,18 +111,21 @@ typedef struct vk_usbh_wifi_aic8800d_t {
     vsf_wifi_aic8800d_bus_ops_t bus_ops;
 
     uint8_t              ep_in;
-    uint8_t              ep_out;
+    uint8_t              ep_out_cmd;    /* command OUT endpoint (ep 0x02) */
+    uint8_t              ep_out_data;   /* data OUT endpoint (ep 0x01) */
     uint16_t             ep_in_mps;
-    uint16_t             ep_out_mps;
+    uint16_t             ep_out_cmd_mps;
+    uint16_t             ep_out_data_mps;
 
     /* Bulk RX/TX iocb pool */
     union {
         struct {
             vk_usbh_wifi_aic8800d_iocb_t rx_icb[VSF_USBH_WIFI_AIC8800D_CFG_RX_NUM];
-            vk_usbh_wifi_aic8800d_iocb_t tx_ocb[VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM];
+            vk_usbh_wifi_aic8800d_iocb_t tx_cmd_ocb[VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM];
+            vk_usbh_wifi_aic8800d_iocb_t tx_data_ocb[VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM];
         };
         vk_usbh_wifi_aic8800d_iocb_t iocb[VSF_USBH_WIFI_AIC8800D_CFG_RX_NUM
-                                       + VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM];
+                                       + 2 * VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM];
     };
 } vk_usbh_wifi_aic8800d_t;
 
@@ -197,14 +220,32 @@ static vsf_err_t __vk_usbh_wifi_aic8800d_send(vsf_wifi_t *wifi,
 
     if (len > VSF_USBH_WIFI_AIC8800D_CFG_TX_BUFSIZE) return VSF_ERR_NOT_SUPPORT;
 
+    /* LMAC commands carry the 0x11 command type at offset 2; data frames use
+     * the data type (0x01).  Route commands to ep 0x02 and data to ep 0x01,
+     * matching the firmware's expectations. */
+    bool is_cmd = (len >= 8) && (data[2] == 0x11) && (data[3] == 0x00);
+
+    /* Preferred pool by message type (cmd -> ep 0x02, data -> ep 0x01), but
+     * fall back to the other pool: the boot-ROM device exposes only a single
+     * bulk OUT (ep 0x01) used for the firmware-download commands, while the
+     * runtime device has both. */
+    vk_usbh_wifi_aic8800d_iocb_t *pools[2] = {
+        is_cmd ? aic->tx_cmd_ocb : aic->tx_data_ocb,
+        is_cmd ? aic->tx_data_ocb : aic->tx_cmd_ocb,
+    };
     vk_usbh_wifi_aic8800d_iocb_t *ocb = NULL;
-    for (int i = 0; i < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; i++) {
-        if (aic->tx_ocb[i].is_supported && !aic->tx_ocb[i].is_busy) {
-            ocb = &aic->tx_ocb[i];
-            break;
+    for (int pass = 0; pass < 2 && ocb == NULL; pass++) {
+        for (int i = 0; i < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; i++) {
+            if (pools[pass][i].is_supported && !pools[pass][i].is_busy) {
+                ocb = &pools[pass][i];
+                break;
+            }
         }
     }
-    if (NULL == ocb) return VSF_ERR_NOT_AVAILABLE;
+    if (NULL == ocb) {
+        vsf_wifi_aic8800d_trace_error("aic8800d_usb: send no free ocb (cmd=%d)" VSF_TRACE_CFG_LINEEND, is_cmd);
+        return VSF_ERR_NOT_AVAILABLE;
+    }
 
     uint8_t *buf = vk_usbh_urb_peek_buffer(&ocb->urb);
     if (NULL == buf) {
@@ -226,9 +267,13 @@ static bool __vk_usbh_wifi_aic8800d_can_send(vsf_wifi_t *wifi)
 {
     vk_usbh_wifi_aic8800d_t *aic = vsf_container_of(wifi, vk_usbh_wifi_aic8800d_t, wifi);
     if (!wifi->is_ready) return false;
+    /* send() falls back to the other pool when the preferred one is full, so
+     * a free slot in either pool means TX is possible. */
     for (int i = 0; i < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; i++) {
-        vk_usbh_wifi_aic8800d_iocb_t *ocb = &aic->tx_ocb[i];
-        if (ocb->is_supported && !ocb->is_busy) return true;
+        if ((aic->tx_cmd_ocb[i].is_supported && !aic->tx_cmd_ocb[i].is_busy)
+                || (aic->tx_data_ocb[i].is_supported && !aic->tx_data_ocb[i].is_busy)) {
+            return true;
+        }
     }
     return false;
 }
@@ -259,21 +304,21 @@ static void __vk_usbh_wifi_aic8800d_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_wifi_aic8800d_t *aic = __this_aic(eda);
 
-    vsf_trace_info("aic8800d_usb: evthandler evt=%d disconnecting=%d INIT=%d"
+    __usbh_aic8800d_trace_debug("aic8800d_usb: evthandler evt=%d disconnecting=%d INIT=%d"
             VSF_TRACE_CFG_LINEEND, (int)evt, (int)aic->wifi.disconnecting, (int)VSF_EVT_INIT);
 
     if (aic->wifi.disconnecting) return;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_trace_info("aic8800d_usb: VSF_EVT_INIT matched, calling wifi_start"
+        __usbh_aic8800d_trace_info("aic8800d_usb: VSF_EVT_INIT matched, calling wifi_start"
                 VSF_TRACE_CFG_LINEEND);
         if (!__vk_usbh_wifi_aic8800d_start_rx(aic)) {
             vk_usbh_remove_interface(aic->usbh, aic->dev, aic->ifs);
             return;
         }
         vsf_wifi_start(&aic->wifi);
-        vsf_trace_info("aic8800d_usb: wifi_start returned" VSF_TRACE_CFG_LINEEND);
+        __usbh_aic8800d_trace_info("aic8800d_usb: wifi_start returned" VSF_TRACE_CFG_LINEEND);
         return;
 
     case VSF_WIFI_EVT_SCAN_HOP:
@@ -299,7 +344,7 @@ static void __vk_usbh_wifi_aic8800d_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             int st = vk_usbh_urb_get_status(&iocb->urb);
             uint32_t len = (URB_OK == st)
                     ? vk_usbh_urb_get_actual_length(&iocb->urb) : 0;
-            vsf_trace_info("aic8800d_usb: rx done st=%d len=%u" VSF_TRACE_CFG_LINEEND,
+            __usbh_aic8800d_trace_debug("aic8800d_usb: rx done st=%d len=%u" VSF_TRACE_CFG_LINEEND,
                     st, (unsigned)len);
             if (URB_OK == st && len > 0) {
                 uint8_t *frame = vk_usbh_urb_peek_buffer(&iocb->urb);
@@ -311,7 +356,7 @@ static void __vk_usbh_wifi_aic8800d_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         } else {
             int st = vk_usbh_urb_get_status(&iocb->urb);
-            vsf_trace_info("aic8800d_usb: tx done st=%d" VSF_TRACE_CFG_LINEEND, st);
+            __usbh_aic8800d_trace_debug("aic8800d_usb: tx done st=%d" VSF_TRACE_CFG_LINEEND, st);
             iocb->is_busy = false;
         }
         return;
@@ -377,19 +422,39 @@ static void * __vk_usbh_wifi_aic8800d_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
                     aic->rx_icb[j].urb.urb_hcd->timeout = 5000;
                 }
             } else {
-                aic->ep_out     = epaddr;
-                aic->ep_out_mps = desc_ep->wMaxPacketSize;
+                /* The runtime interface has two bulk OUT endpoints: ep 0x01 is
+                 * the data path (EAPOL/business frames), ep 0x02 carries LMAC
+                 * commands.  Assign by endpoint number. */
+                uint8_t epnum = epaddr & 0x0F;
                 has_tx = true;
-                for (int j = 0; j < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; j++) {
-                    vk_usbh_urb_prepare(&aic->tx_ocb[j].urb, dev, desc_ep);
-                    aic->tx_ocb[j].is_rx        = false;
-                    aic->tx_ocb[j].is_supported = true;
-                    if (VSF_ERR_NONE != vk_usbh_alloc_urb(usbh, dev, &aic->tx_ocb[j].urb))
-                        goto free_all;
-                    if (NULL == vk_usbh_urb_alloc_buffer(&aic->tx_ocb[j].urb,
-                            VSF_USBH_WIFI_AIC8800D_CFG_TX_BUFSIZE))
-                        goto free_all;
-                    aic->tx_ocb[j].urb.urb_hcd->timeout = 5000;
+                if (epnum == 1) {
+                    aic->ep_out_data     = epaddr;
+                    aic->ep_out_data_mps = desc_ep->wMaxPacketSize;
+                    for (int j = 0; j < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; j++) {
+                        vk_usbh_urb_prepare(&aic->tx_data_ocb[j].urb, dev, desc_ep);
+                        aic->tx_data_ocb[j].is_rx        = false;
+                        aic->tx_data_ocb[j].is_supported = true;
+                        if (VSF_ERR_NONE != vk_usbh_alloc_urb(usbh, dev, &aic->tx_data_ocb[j].urb))
+                            goto free_all;
+                        if (NULL == vk_usbh_urb_alloc_buffer(&aic->tx_data_ocb[j].urb,
+                                VSF_USBH_WIFI_AIC8800D_CFG_TX_BUFSIZE))
+                            goto free_all;
+                        aic->tx_data_ocb[j].urb.urb_hcd->timeout = 5000;
+                    }
+                } else {
+                    aic->ep_out_cmd     = epaddr;
+                    aic->ep_out_cmd_mps = desc_ep->wMaxPacketSize;
+                    for (int j = 0; j < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; j++) {
+                        vk_usbh_urb_prepare(&aic->tx_cmd_ocb[j].urb, dev, desc_ep);
+                        aic->tx_cmd_ocb[j].is_rx        = false;
+                        aic->tx_cmd_ocb[j].is_supported = true;
+                        if (VSF_ERR_NONE != vk_usbh_alloc_urb(usbh, dev, &aic->tx_cmd_ocb[j].urb))
+                            goto free_all;
+                        if (NULL == vk_usbh_urb_alloc_buffer(&aic->tx_cmd_ocb[j].urb,
+                                VSF_USBH_WIFI_AIC8800D_CFG_TX_BUFSIZE))
+                            goto free_all;
+                        aic->tx_cmd_ocb[j].urb.urb_hcd->timeout = 5000;
+                    }
                 }
             }
             break;
@@ -409,7 +474,8 @@ static void * __vk_usbh_wifi_aic8800d_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         aic->rx_icb[j].rx_retry_timer.on_timer = __vk_usbh_wifi_aic8800d_rx_retry_cb;
     }
     for (int j = 0; j < VSF_USBH_WIFI_AIC8800D_CFG_TX_NUM; j++) {
-        aic->tx_ocb[j].aic = aic;
+        aic->tx_cmd_ocb[j].aic  = aic;
+        aic->tx_data_ocb[j].aic = aic;
     }
 
     /* Initialise per-instance bus ops from the template and decide whether

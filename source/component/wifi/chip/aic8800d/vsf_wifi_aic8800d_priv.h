@@ -102,6 +102,8 @@ static const uint32_t __aic8800d_syscfg_masked[AIC8800D_SYSCFG_MASKED_COUNT][3] 
 #define AIC8800D_MM_SET_FILTER_CFM      (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 15)
 #define AIC8800D_MM_SET_CHANNEL_REQ     (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 16)
 #define AIC8800D_MM_SET_CHANNEL_CFM     (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 17)
+#define AIC8800D_MM_KEY_ADD_REQ         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 36)
+#define AIC8800D_MM_KEY_ADD_CFM         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 37)
 /* ... many MM messages omitted ... */
 #define AIC8800D_MM_GET_MAC_ADDR_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 115)
 #define AIC8800D_MM_GET_MAC_ADDR_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 116)
@@ -113,10 +115,12 @@ static const uint32_t __aic8800d_syscfg_masked[AIC8800D_SYSCFG_MASKED_COUNT][3] 
 
 #define AIC8800D_MM_SET_RF_CALIB_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 105)
 #define AIC8800D_MM_SET_RF_CALIB_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 106)
-#define AIC8800D_MM_SET_TXPWR_IDX_LVL_REQ (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 113)
-#define AIC8800D_MM_SET_TXPWR_IDX_LVL_CFM (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 114)
-#define AIC8800D_MM_SET_TXPWR_OFST_REQ  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 115)
-#define AIC8800D_MM_SET_TXPWR_OFST_CFM  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 116)
+#define AIC8800D_MM_SET_COEX_REQ        (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 101)
+#define AIC8800D_MM_SET_COEX_CFM        (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 102)
+#define AIC8800D_MM_SET_TXPWR_IDX_LVL_REQ (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 119)
+#define AIC8800D_MM_SET_TXPWR_IDX_LVL_CFM (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 120)
+#define AIC8800D_MM_SET_TXPWR_OFST_REQ  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 121)
+#define AIC8800D_MM_SET_TXPWR_OFST_CFM  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 122)
 #define AIC8800D_MM_SET_TXPWR_LVL_ADJ_REQ (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 131)
 #define AIC8800D_MM_SET_TXPWR_LVL_ADJ_CFM (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 132)
 
@@ -226,7 +230,7 @@ struct aic8800d_mm_reset_req {
 };
 
 struct aic8800d_mm_get_mac_addr_req {
-    aic_u8  sta_idx;
+    aic_u32 get;                    /* matches Linux mm_get_mac_addr_req */
 };
 
 struct aic8800d_mm_version_req {
@@ -234,9 +238,11 @@ struct aic8800d_mm_version_req {
 };
 
 struct aic8800d_mm_add_if_req {
-    aic_u8  type;                   /* MM_STA / MM_AP / ... (must be first, matches Linux) */
+    aic_u8  type;                   /* MM_STA / MM_AP / ... */
+    aic_u8  __pad0;                 /* mac_addr is 2-byte aligned -> addr at offset 2 */
     struct aic8800d_mac_addr addr;
     aic_u8  p2p;
+    aic_u8  __pad1;                 /* total 10 bytes, matches Linux mm_add_if_req */
 };
 
 struct aic8800d_mm_set_filter_req {
@@ -394,6 +400,17 @@ struct aic8800d_mm_set_filter_cfm {
     aic_u32 dummy;
 };
 
+/* MM_SET_COEX_REQ (16 bytes, matches Linux struct mm_set_coex_req) */
+struct aic8800d_mm_set_coex_req {
+    aic_u8  bt_on;
+    aic_u8  disable_coexnull;
+    aic_u8  enable_nullcts;
+    aic_u8  enable_periodic_timer;
+    aic_u8  coex_timeslot_set;
+    aic_u8  __pad[3];
+    aic_u32 coex_timeslot[2];
+};
+
 struct aic8800d_mm_start_req {
     aic_u32 phy_cfg[16];
     aic_u32 uapsd_timeout;
@@ -526,9 +543,9 @@ struct aic8800d_scanu_result_ind {
 #define AIC8800D_CONNECTION_FLAG_REASSOCIATION      (1u << 5)
 
 /* TX/RX data descriptor sizes */
-#define AIC8800D_TXDESC_API_SIZE    20  /* sizeof(struct hostdesc) */
+#define AIC8800D_TXDESC_API_SIZE    28  /* sizeof(struct hostdesc) */
 #define AIC8800D_RX_HWHDR_LEN       60  /* RX_HWHRD_LEN in Linux driver */
-#define AIC8800D_USB_TX_HEADER_LEN  8   /* USB bulk TX aggregation header */
+#define AIC8800D_USB_TX_HEADER_LEN  4   /* USB data TX header: [len u16][type u8][rsvd u8] */
 #define AIC8800D_USB_RX_ALIGNMENT   4
 
 struct aic8800d_sm_connect_req {
@@ -587,9 +604,37 @@ struct aic8800d_sm_disconnect_ind {
     aic_u8  vif_idx;
 };
 
+/* MM_KEY_ADD_REQ (44 bytes, matches Linux struct mm_key_add_req with
+ * mac_sec_key { u8 length; pad[3]; u32 array[8]; }) */
+#define AIC8800D_SEC_KEY_LEN            32
+#define AIC8800D_CIPHER_CCMP            2
+struct aic8800d_mm_key_add_req {
+    aic_u8  key_idx;
+    aic_u8  sta_idx;
+    aic_u8  __pad0[2];
+    aic_u8  key_len;
+    aic_u8  __pad1[3];
+    aic_u32 key[AIC8800D_SEC_KEY_LEN / 4];
+    aic_u8  cipher_suite;
+    aic_u8  inst_nbr;
+    aic_u8  spp;
+    aic_u8  pairwise;
+};
+
+struct aic8800d_mm_key_add_cfm {
+    aic_u8 status;
+    aic_u8 hw_key_idx;
+};
+
+struct aic8800d_me_set_control_port_req {
+    aic_u8 sta_idx;
+    aic_u8 control_port_open;
+};
+
 struct aic8800d_hostdesc {
     aic_u16 packet_len;
     aic_u16 flags_ext;
+    aic_u32 status_desc_addr;
     struct aic8800d_mac_addr eth_dest_addr;
     struct aic8800d_mac_addr eth_src_addr;
     aic_u16 ethertype;
@@ -646,10 +691,12 @@ static const uint32_t __aic8800d_patch_tbl[AIC8800D_PATCH_TBL_COUNT][2] = {
 };
 
 /* Boot-time upload addresses (from fw_patch_table INF record:
- * addr_adid=0x00201940, addr_patch=0x001E0000; the hardcoded defaults in
- * Linux aic_compat_8800d80.h are overridden by aicbt_patch_info_unpack()) */
+ * addr_adid=0x00201940, addr_patch=0x001E0000, ext patch 0 -> 0x0020B43C;
+ * the hardcoded defaults in Linux aic_compat_8800d80.h are overridden by
+ * aicbt_patch_info_unpack()) */
 #define AIC8800D_ADID_ADDR              0x00201940
 #define AIC8800D_PATCH_ADDR             0x001E0000
+#define AIC8800D_PATCH_EXT_ADDR         0x0020B43C
 
 /* Firmware binary (auto-generated from fmacfw_8800d80_u02.bin) */
 extern const uint8_t __aic8800d_firmware_data[];
@@ -660,6 +707,9 @@ extern const uint32_t __aic8800d_adid_size;
 /* Boot patch code, auto-generated from fw_patch_8800d80_u02.bin */
 extern const uint8_t __aic8800d_patch_data[];
 extern const uint32_t __aic8800d_patch_size;
+/* Boot patch ext data, auto-generated from fw_patch_8800d80_u02_ext0.bin */
+extern const uint8_t __aic8800d_patch_ext_data[];
+extern const uint32_t __aic8800d_patch_ext_size;
 /* Boot patch table, auto-generated from fw_patch_table_8800d80_u02.bin */
 extern const uint8_t __aic8800d_patch_table_data[];
 extern const uint32_t __aic8800d_patch_table_size;
@@ -699,6 +749,29 @@ struct aic8800d_dbg_mem_block_write_req {
     aic_u32 mem_size;
     aic_u32 mem_data[];
 };
+
+/* Firmware bundle selection.  The AIC8800D series has several chip variants
+ * (D80/D81/D40/DC/X2, and chip revisions U01/U02/U03/U04) each requiring a
+ * matching firmware image + patch table; using the wrong image either fails
+ * the download or misbehaves at runtime (e.g. no data forwarding).  The
+ * driver picks the bundle from the chip identification (chip_rev /
+ * chip_sub_rev / USB VID:PID) read during system_config. */
+#define AIC8800D_FW_IMG_ADID    0
+#define AIC8800D_FW_IMG_PATCH   1
+#define AIC8800D_FW_IMG_EXT     2
+#define AIC8800D_FW_IMG_MAIN    3
+#define AIC8800D_FW_IMG_NUM     4
+
+typedef struct aic8800d_fw_variant_t {
+    const char *name;
+    struct {
+        uint32_t       addr;    /* upload address, 0 = image not used */
+        const uint8_t *data;
+        uint32_t       size;    /* 0 = image skipped */
+    } img[AIC8800D_FW_IMG_NUM];
+    const uint8_t *patch_table;
+    uint32_t       patch_table_size;
+} aic8800d_fw_variant_t;
 
 struct aic8800d_dbg_mem_block_read_req {
     aic_u32 mem_addr;
@@ -759,11 +832,13 @@ typedef struct aic8800d_priv_t {
     vsf_wifi_done_t     fw_done;
     struct aic8800d_dbg_mem_read_cfm sysconfig_rd_cfm;
     uint8_t             chip_mcu_id;
+    uint8_t             chip_rev;   /* chip_id read from 0x40500000 */
+    aic8800d_fw_variant_t fw_variant;
 
     /* Boot patch table (fw_patch_table_8800d80_u02.bin) write state */
     uint16_t            patch_tbl_idx;
     uint16_t            patch_tbl_count;
-    uint32_t            patch_tbl_pairs[96][2];
+    uint32_t            patch_tbl_pairs[160][2];
 
     /* Patch config state */
     uint8_t             patch_step;
@@ -806,6 +881,11 @@ typedef struct aic8800d_priv_t {
     uint8_t             ap_idx;
     uint8_t             sta_idx;
     bool                qos;
+
+    /* Key install state (MM_KEY_ADD_REQ -> optional ME_SET_CONTROL_PORT_REQ) */
+    vsf_wifi_done_t     key_done;
+    struct aic8800d_mm_key_add_cfm key_add_cfm;
+    bool                key_open_port;
 } aic8800d_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

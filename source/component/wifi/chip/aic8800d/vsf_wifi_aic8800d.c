@@ -20,6 +20,9 @@
 #include "./vsf_wifi_aic8800d.h"
 #include "./vsf_wifi_aic8800d_priv.h"
 #include "../../vsf_wifi_priv.h"
+#if VSF_WIFI_USE_WPA == ENABLED
+#include "../../vsf_wifi_wpa.h"
+#endif
 #include "service/heap/vsf_heap.h"
 
 #if VSF_USE_WIFI == ENABLED && VSF_WIFI_USE_AIC8800D == ENABLED
@@ -416,27 +419,28 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
     uint8_t  type;
     (void)priv;
 
-    vsf_trace_info("aic8800d: on_rx len=%u hdr=%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_aic8800d_trace_debug("aic8800d: on_rx len=%u hdr=%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
             (unsigned)len, buf[0], buf[1], buf[2], buf[3]);
     if (len <= 32) {
-        vsf_trace_info("aic8800d: on_rx data=");
+        vsf_wifi_aic8800d_trace_debug("aic8800d: on_rx data=");
         for (uint16_t i = 0; i < len; i++) {
-            vsf_trace_info("%02X", buf[i]);
+            vsf_wifi_aic8800d_trace_debug("%02X", buf[i]);
         }
-        vsf_trace_info(VSF_TRACE_CFG_LINEEND);
+        vsf_wifi_aic8800d_trace_debug(VSF_TRACE_CFG_LINEEND);
     }
 
     if (len < 4) return;
     payload_len = buf[0] | ((buf[1] & 0x0F) << 8);
     type        = buf[2];
-    vsf_trace_info("aic8800d: on_rx type=0x%02X payload=%u" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_aic8800d_trace_debug("aic8800d: on_rx type=0x%02X payload=%u" VSF_TRACE_CFG_LINEEND,
             type, payload_len);
 
     if ((type & AIC8800D_USB_TYPE_CFG) == 0) {
-        /* Data path: USB header + hw_rxhdr (60 bytes) + 2-byte alignment +
-         * 802.11 data MPDU. The firmware has already decrypted CCMP; strip
-         * the 802.11 header/LLC and reconstruct the Ethernet frame. */
-        const uint16_t hdr_total = 4 + AIC8800D_RX_HWHDR_LEN + 2;
+        /* Data path: RX_HWHRD_LEN (60, already includes the 4-byte sub-packet
+         * header) of hw rxhdr, then the 802.11 data MPDU.  The firmware has
+         * already decrypted CCMP; strip the 802.11 header/LLC and rebuild the
+         * Ethernet frame. */
+        const uint16_t hdr_total = AIC8800D_RX_HWHDR_LEN;
         if (len < hdr_total + 24) {
             vsf_wifi_aic8800d_trace_debug("aic8800d: rx data too short (%u)" VSF_TRACE_CFG_LINEEND, len);
             return;
@@ -449,6 +453,7 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
         uint8_t subtype = (fc0 >> 4) & 0x0F;
         uint8_t to_from_ds = fc1 & 0x03;
         uint8_t hdr_len = 24;
+        uint8_t ccmp_len = 0;
         bool is_qos = false;
 
         if ((fc0 & 0x0F) != 0x08) {
@@ -461,6 +466,12 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
         }
         if (fc1 & 0x80) /* Order bit = HTC present */
             hdr_len += 4;
+        if (fc1 & 0x40) { /* Protected: the firmware keeps the 8-byte CCMP
+                           * header between the 802.11 header and the LLC/SNAP
+                           * payload. */
+            hdr_len += 8;
+            ccmp_len = 8;
+        }
         (void)is_qos;
         if (mpdu_len < hdr_len + 8)
             return;
@@ -481,19 +492,48 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
         }
 
         const uint8_t *llc = mpdu + hdr_len;
-        uint16_t ethertype = (uint16_t)llc[6] | ((uint16_t)llc[7] << 8);
+        /* ethertype in network byte order (EAPOL = 0x888E) */
+        uint16_t ethertype = ((uint16_t)llc[6] << 8) | (uint16_t)llc[7];
         uint16_t eth_payload_len = mpdu_len - hdr_len - 8;
 
-        uint8_t *eth = vsf_heap_malloc(14 + eth_payload_len);
-        if (eth == NULL) return;
-        memcpy(eth + 0, da, 6);
-        memcpy(eth + 6, sa, 6);
-        eth[12] = (uint8_t)(ethertype >> 0);
-        eth[13] = (uint8_t)(ethertype >> 8);
-        memcpy(eth + 14, llc + 8, eth_payload_len);
+        vsf_wifi_aic8800d_trace_debug("aic8800d: rx data fc=%02X%02X hdrlen=%u et=0x%04X state=%u da=%02X:%02X:%02X:%02X:%02X:%02X"
+                VSF_TRACE_CFG_LINEEND, mpdu[0], mpdu[1], hdr_len, ethertype,
+                wifi->mlme_state, da[0], da[1], da[2], da[3], da[4], da[5]);
 
-        vsf_wifi_on_rx(wifi, eth, 14 + eth_payload_len);
-        vsf_heap_free(eth);
+#if VSF_WIFI_USE_WPA == ENABLED
+        if ((ethertype == 0x888E) && (wifi->mlme_state == WIFI_MLME_4WAY)) {
+            /* EAPOL frame during the 4-way handshake: hand the EAPOL payload
+             * (after the LLC/SNAP header) to the WPA supplicant. */
+            uint8_t *eth = vsf_heap_malloc(14 + eth_payload_len);
+            if (eth == NULL) return;
+            memcpy(eth + 0, da, 6);
+            memcpy(eth + 6, sa, 6);
+            eth[12] = llc[6];
+            eth[13] = llc[7];
+            memcpy(eth + 14, llc + 8, eth_payload_len);
+            vsf_wifi_aic8800d_trace_info("aic8800d: EAPOL -> supplicant len=%u state=%u anonce=%02X%02X%02X%02X"
+                    VSF_TRACE_CFG_LINEEND, eth_payload_len, wifi->mlme_state,
+                    eth[14+17], eth[14+18], eth[14+19], eth[14+20]);
+            vsf_wifi_eapol_rx(wifi, eth + 14, eth_payload_len);
+            vsf_heap_free(eth);
+        } else
+#endif
+        {
+            /* Business frame: the netdrv backend expects a naked, decrypted
+             * 802.11 data frame (FC .. LLC/payload), NOT an Ethernet frame.
+             * The firmware already decrypted CCMP but keeps the 8-byte CCMP
+             * header in place; strip it and clear the Protected bit so the
+             * generic dot11 -> eth bridge parses the frame correctly. */
+            uint16_t base_hdr_len = hdr_len - ccmp_len;
+            uint16_t out_len = base_hdr_len + 8 + eth_payload_len;
+            uint8_t *out = vsf_heap_malloc(out_len);
+            if (out == NULL) return;
+            memcpy(out, mpdu, base_hdr_len);
+            out[1] &= (uint8_t)~0x40;               /* clear Protected bit */
+            memcpy(out + base_hdr_len, llc, 8 + eth_payload_len);
+            vsf_wifi_data_rx(wifi, out, out_len);
+            vsf_heap_free(out);
+        }
         return;
     }
 
@@ -502,7 +542,7 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
          * (Linux aic_txrxif.c passes skb_inblock->data + 4 to rwnx_rx_handle_msg). */
         const uint8_t e2a_header_size = 4 + 12; /* id/dest/src/param_len/pattern */
         if (len < e2a_header_size) {
-            vsf_trace_info("aic8800d: on_rx cmd_rsp too short (%u < %u)" VSF_TRACE_CFG_LINEEND,
+            vsf_wifi_aic8800d_trace_error("aic8800d: on_rx cmd_rsp too short (%u < %u)" VSF_TRACE_CFG_LINEEND,
                     len, e2a_header_size);
             return;
         }
@@ -514,10 +554,10 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
         msg.dummy_src_id  = p[4] | (p[5] << 8);
         msg.param_len     = p[6] | (p[7] << 8);
         msg.pattern       = p[8] | (p[9] << 8) | (p[10] << 16) | (p[11] << 24);
-        vsf_trace_info("aic8800d: on_rx e2a id=0x%04X param_len=%u pattern=0x%08X" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_aic8800d_trace_debug("aic8800d: on_rx e2a id=0x%04X param_len=%u pattern=0x%08X" VSF_TRACE_CFG_LINEEND,
                 msg.id, msg.param_len, msg.pattern);
         if (len < e2a_header_size + msg.param_len) {
-            vsf_trace_info("aic8800d: on_rx e2a truncated (%u < %u)" VSF_TRACE_CFG_LINEEND,
+            vsf_wifi_aic8800d_trace_error("aic8800d: on_rx e2a truncated (%u < %u)" VSF_TRACE_CFG_LINEEND,
                     len, e2a_header_size + msg.param_len);
             return;
         }
@@ -548,43 +588,44 @@ void vsf_wifi_aic8800d_on_rx(vsf_wifi_t *wifi, uint8_t *buf, uint16_t len)
     if (len < 4 || buf == NULL) return;
 
     /* AIC8800D USB RX aggregation: one bulk IN transfer may contain multiple
-     * sub-packets.  Each sub-packet is 4-byte aligned. */
+     * sub-packets.  Sub-packets START at 4-byte aligned offsets, but the LAST
+     * one in a URB is not padded — so process with the real length and only
+     * round up when advancing to the next one. */
     while (offset + 4 <= len) {
         uint16_t payload_len = buf[offset + 0] | ((buf[offset + 1] & 0x0F) << 8);
         uint8_t  type        = buf[offset + 2];
-        uint16_t sub_len;
+        uint16_t real_len, walk_len;
 
         if (payload_len == 0) {
-            vsf_wifi_aic8800d_trace_debug(
-                    "aic8800d: rx aggregation stop at offset=%u" VSF_TRACE_CFG_LINEEND,
-                    (unsigned)offset);
             break;
         }
 
         if ((type & AIC8800D_USB_TYPE_CFG) == 0) {
-            /* data: payload_len is MPDU length; sub-packet includes hw_rxhdr + 2-byte pad */
-            sub_len = 4 + AIC8800D_RX_HWHDR_LEN + payload_len;
+            /* data: the pkt_len field already covers the 4-byte sub-packet
+             * header (pkt_len = 4 + MPDU_len), so the real content length is
+             * pkt_len + hw_rxhdr (Linux: aggr_len = pkt_len + RX_HWHRD_LEN). */
+            real_len = AIC8800D_RX_HWHDR_LEN + payload_len;
         } else {
-            /* config: payload_len is cfg payload length */
-            sub_len = 4 + payload_len;
+            /* config: pkt_len field is the cfg message length */
+            real_len = 4 + payload_len;
         }
-        sub_len = (sub_len + (AIC8800D_USB_RX_ALIGNMENT - 1))
+        walk_len = (real_len + (AIC8800D_USB_RX_ALIGNMENT - 1))
                 & ~(AIC8800D_USB_RX_ALIGNMENT - 1);
 
-        if (offset + sub_len > len) {
+        if (offset + real_len > len) {
             vsf_wifi_aic8800d_trace_error(
-                    "aic8800d: rx aggregation overflow offset=%u sub_len=%u len=%u"
+                    "aic8800d: rx aggregation truncated offset=%u real_len=%u len=%u"
                     VSF_TRACE_CFG_LINEEND,
-                    (unsigned)offset, (unsigned)sub_len, (unsigned)len);
+                    (unsigned)offset, (unsigned)real_len, (unsigned)len);
             break;
         }
 
-        __aic8800d_on_rx_subpacket(wifi, buf + offset, sub_len);
-        offset += sub_len;
+        __aic8800d_on_rx_subpacket(wifi, buf + offset, real_len);
+        offset += walk_len;
         parsed++;
 
         /* sanity guard: malformed aggregation could loop forever */
-        if (parsed > 64 || sub_len == 0) break;
+        if (parsed > 64 || real_len == 0) break;
     }
 }
 
@@ -678,7 +719,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         txpwr_req.u.txpwr_lvl_v3 = __aic8800d_txpwr_lvl_v3_default;
         priv->init_step++;
         __aic8800d_send_msg(wifi, AIC8800D_MM_SET_TXPWR_IDX_LVL_REQ,
-                &txpwr_req, sizeof(txpwr_req),
+                &txpwr_req, sizeof(txpwr_req.u.txpwr_lvl_v3),
                 AIC8800D_MM_SET_TXPWR_IDX_LVL_CFM, NULL, 0,
                 __aic8800d_init_done_cb);
         break;
@@ -725,7 +766,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         memset(&reset_req, 0, sizeof(reset_req));
         priv->init_step++;
         __aic8800d_send_msg(wifi, AIC8800D_MM_RESET_REQ,
-                &reset_req, sizeof(reset_req),
+                &reset_req, 0 /* no param, matches Linux */,
                 AIC8800D_MM_RESET_CFM, &reset_cfm, sizeof(reset_cfm),
                 __aic8800d_init_done_cb);
         break;
@@ -736,7 +777,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         memset(&version_req, 0, sizeof(version_req));
         priv->init_step++;
         __aic8800d_send_msg(wifi, AIC8800D_MM_VERSION_REQ,
-                &version_req, sizeof(version_req),
+                &version_req, 0 /* no param, matches Linux */,
                 AIC8800D_MM_VERSION_CFM, &version_cfm, sizeof(version_cfm),
                 __aic8800d_init_done_cb);
         break;
@@ -751,14 +792,14 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
             memset(&me_req, 0, sizeof(me_req));
 
             me_req.ht_supp  = true;
-            me_req.vht_supp = false;
-            me_req.he_supp  = false;
+            me_req.vht_supp = true;
+            me_req.he_supp  = true;
             me_req.he_ul_on = false;
             me_req.ps_on    = true;
             me_req.dpsm     = false;
             me_req.ant_div_on = true;
             me_req.tx_lft   = 1000;
-            me_req.phy_bw_max = 1; /* PHY_CHNL_BW_40 for AIC8800D80 */
+            me_req.phy_bw_max = 2; /* PHY_CHNL_BW_80 (Linux use_80 for D81) */
 
             /* HT capability: matches Linux RWNX_HT_CAPABILITIES converted by
              * rwnx_send_me_config_req(). */
@@ -768,6 +809,11 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
             me_req.ht_cap.ht_extended_capa  = 0;
             me_req.ht_cap.tx_beamforming_capa = 0;
             me_req.ht_cap.asel_capa = 0;
+
+            /* VHT: nss=1, MCS0-9 (IEEE80211_VHT_MCS_SUPPORT_0_9), nss2-8 not
+             * supported -> 0xFFFA on both maps. */
+            me_req.vht_cap.rx_mcs_map = 0xFFFA;
+            me_req.vht_cap.tx_mcs_map = 0xFFFA;
 
             priv->init_step++;
             __aic8800d_send_msg(wifi, AIC8800D_ME_CONFIG_REQ,
@@ -821,6 +867,25 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         break;
 
     case 9:
+        /* Linux sends MM_SET_COEX_REQ (bt_on=1, enable_nullcts=1) before
+         * MM_START_REQ; without it the firmware's BT/WiFi coexistence logic
+         * can suppress the WiFi data path. */
+        vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_COEX_REQ"
+                VSF_TRACE_CFG_LINEEND);
+        {
+            struct aic8800d_mm_set_coex_req coex_req;
+            memset(&coex_req, 0, sizeof(coex_req));
+            coex_req.bt_on         = 1;
+            coex_req.enable_nullcts = 1;
+            priv->init_step++;
+            __aic8800d_send_msg(wifi, AIC8800D_MM_SET_COEX_REQ,
+                    &coex_req, sizeof(coex_req),
+                    AIC8800D_MM_SET_COEX_CFM, NULL, 0,
+                    __aic8800d_init_done_cb);
+        }
+        break;
+
+    case 10:
         /* Linux sends MM_START_REQ (rwnx_open) only after ME_CONFIG_REQ and
          * ME_CHAN_CONFIG_REQ have been programmed at probe time. Keep the same
          * order: starting the MAC before the channel table is configured makes
@@ -840,7 +905,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         }
         break;
 
-    case 10:
+    case 11:
         vsf_wifi_aic8800d_trace_info("aic8800d: MM_ADD_IF_REQ"
                 VSF_TRACE_CFG_LINEEND);
         memset(&add_if_req, 0, sizeof(add_if_req));
@@ -853,7 +918,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 11:
+    case 12:
         priv->vif_idx = add_if_cfm.inst_nbr;
         vsf_wifi_aic8800d_trace_info("aic8800d: vif_idx=%u status=%u"
                 VSF_TRACE_CFG_LINEEND, add_if_cfm.inst_nbr, add_if_cfm.status);
@@ -870,7 +935,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
                 __aic8800d_init_done_cb);
         break;
 
-    case 12:
+    case 13:
         vsf_wifi_aic8800d_trace_info("aic8800d: init done" VSF_TRACE_CFG_LINEEND);
         if (priv->init_done != NULL) {
             vsf_wifi_done_t done = priv->init_done;
@@ -1220,28 +1285,35 @@ static uint32_t __aic8800d_get_le32(const uint8_t *p)
             | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
 }
 
-/* Boot-time images uploaded before the main firmware, in Linux
- * aicfw_download_fw_8800d80() order: ADID trim data, boot patch code,
- * then the main fmacfw image. */
+/* Select the firmware bundle for the attached chip and log it.  Only the
+ * AIC8800D80 (chip_rev U02/U03) variant used by the current Mercury/TP-Link
+ * dongle is supported so far; its aic_load_fw uploads just the patch table
+ * and the main image (no adid/patch/ext files).  Key further variants on
+ * chip_rev / chip_sub_rev / USB VID:PID here when adding more AIC8800D
+ * series chips — always verify the image matches the chip, otherwise the
+ * download stalls or the firmware misbehaves (e.g. no data forwarding). */
+static void __aic8800d_fw_select_variant(aic8800d_priv_t *priv)
+{
+    aic8800d_fw_variant_t *v = &priv->fw_variant;
+    memset(v, 0, sizeof(*v));
+
+    v->name        = "aic8800d80-u02";
+    v->img[AIC8800D_FW_IMG_MAIN].addr = AIC8800D_FW_LOAD_ADDR;
+    v->img[AIC8800D_FW_IMG_MAIN].data = __aic8800d_firmware_data;
+    v->img[AIC8800D_FW_IMG_MAIN].size = __aic8800d_firmware_size;
+    v->patch_table      = __aic8800d_patch_table_data;
+    v->patch_table_size = __aic8800d_patch_table_size;
+
+    vsf_wifi_aic8800d_trace_info("aic8800d: fw variant=%s chip_rev=0x%02X size=%u"
+            VSF_TRACE_CFG_LINEEND, v->name, priv->chip_rev,
+            v->img[AIC8800D_FW_IMG_MAIN].size);
+}
+
 static void __aic8800d_fw_set_image(aic8800d_priv_t *priv, uint8_t idx)
 {
-    switch (idx) {
-    case 0:
-        priv->fw_addr = AIC8800D_ADID_ADDR;
-        priv->fw_buf  = (uint8_t *)__aic8800d_adid_data;
-        priv->fw_size = __aic8800d_adid_size;
-        break;
-    case 1:
-        priv->fw_addr = AIC8800D_PATCH_ADDR;
-        priv->fw_buf  = (uint8_t *)__aic8800d_patch_data;
-        priv->fw_size = __aic8800d_patch_size;
-        break;
-    default:
-        priv->fw_addr = AIC8800D_FW_LOAD_ADDR;
-        priv->fw_buf  = (uint8_t *)__aic8800d_firmware_data;
-        priv->fw_size = __aic8800d_firmware_size;
-        break;
-    }
+    priv->fw_addr   = priv->fw_variant.img[idx].addr;
+    priv->fw_buf    = (uint8_t *)priv->fw_variant.img[idx].data;
+    priv->fw_size   = priv->fw_variant.img[idx].size;
     priv->fw_offset = 0;
 }
 
@@ -1253,8 +1325,8 @@ static void __aic8800d_fw_set_image(aic8800d_priv_t *priv, uint8_t idx)
 #define AIC8800D_PT_REC_VER_INFO  6
 static vsf_err_t __aic8800d_patch_table_parse(aic8800d_priv_t *priv)
 {
-    const uint8_t *p   = __aic8800d_patch_table_data;
-    uint32_t size      = __aic8800d_patch_table_size;
+    const uint8_t *p   = priv->fw_variant.patch_table;
+    uint32_t size      = priv->fw_variant.patch_table_size;
     uint32_t offset    = 16; /* AICBT_PT_TAG */
     uint16_t count     = 0;
 
@@ -1281,12 +1353,15 @@ static vsf_err_t __aic8800d_patch_table_parse(aic8800d_priv_t *priv)
             uint32_t addr = __aic8800d_get_le32(p + offset + i * 8);
             uint32_t val  = __aic8800d_get_le32(p + offset + i * 8 + 4);
             if (type == AIC8800D_PT_REC_BTMODE) {
-                /* aicbt_patch_table_load() fills host-side fields */
+                /* aicbt_patch_table_load() fills host-side fields (pairs 0-8
+                 * only; later pairs keep the values from the file) */
                 switch (i) {
                 case 0:  val = 1;          break; /* hwinfo < 0 */
                 case 1:  val = 0xFFFFFFFF; break; /* hwinfo */
                 case 2:  val = 0;          break; /* cpmode = WORK */
-                default: val = 0;          break; /* btmode..txpwr: none for D81 */
+                case 3: case 4: case 5: case 6: case 7: case 8:
+                         val = 0;          break; /* btmode..txpwr: none for D81 */
+                default: break;                   /* keep file value */
                 }
             }
             priv->patch_tbl_pairs[count][0] = addr;
@@ -1335,9 +1410,10 @@ static void __aic8800d_patch_table_step(vsf_wifi_t *wifi, vsf_err_t err)
     }
 
     if (priv->patch_tbl_idx >= priv->patch_tbl_count) {
-        /* boot patch table done -> runtime patch config */
-        priv->patch_step = 0;
-        __aic8800d_patch_config_step(wifi, VSF_ERR_NONE);
+        /* boot patch table done -> upload the main firmware image */
+        priv->fw_img_idx = 3;
+        __aic8800d_fw_set_image(priv, 3);
+        __aic8800d_fw_step(wifi, VSF_ERR_NONE);
         return;
     }
 
@@ -1364,12 +1440,19 @@ static void __aic8800d_fw_step(vsf_wifi_t *wifi, vsf_err_t err)
 
     if (priv->fw_offset >= priv->fw_size) {
         if (priv->fw_img_idx < 2) {
-            /* ADID -> boot patch -> main firmware */
+            /* ADID -> boot patch -> patch ext */
             priv->fw_img_idx++;
             __aic8800d_fw_set_image(priv, priv->fw_img_idx);
-        } else {
-            /* all images uploaded -> boot patch table writes */
+        } else if (priv->fw_img_idx == 2) {
+            /* ext patch done -> boot patch table writes BEFORE the main
+             * firmware image (Linux order: the table configures the RAM/patch
+             * mapping that the main image download relies on) */
             __aic8800d_patch_table_step(wifi, VSF_ERR_NONE);
+            return;
+        } else {
+            /* main firmware done -> runtime patch config */
+            priv->patch_step = 0;
+            __aic8800d_patch_config_step(wifi, VSF_ERR_NONE);
             return;
         }
     }
@@ -1432,9 +1515,12 @@ static void __aic8800d_system_config_step(vsf_wifi_t *wifi, vsf_err_t err)
     case 1: {
         uint32_t rd_data = priv->sysconfig_rd_cfm.mem_data;
         priv->chip_mcu_id = ((rd_data >> 25) & 0x01UL) ? 0 : 1;
+        priv->chip_rev    = (uint8_t)(rd_data >> 16);
         vsf_wifi_aic8800d_trace_info("aic8800d: chip_id=0x%02X chip_mcu_id=%u"
-                VSF_TRACE_CFG_LINEEND,
-                (unsigned)(uint8_t)(rd_data >> 16), priv->chip_mcu_id);
+                VSF_TRACE_CFG_LINEEND, priv->chip_rev, priv->chip_mcu_id);
+        /* chip_rev is known now: pick the matching firmware bundle */
+        __aic8800d_fw_select_variant(priv);
+        __aic8800d_fw_set_image(priv, 0);
         priv->fw_load_step = 2;
         __aic8800d_system_config_step(wifi, VSF_ERR_NONE);
         break;
@@ -1515,7 +1601,6 @@ static vsf_err_t __aic8800d_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done
             VSF_TRACE_CFG_LINEEND, __aic8800d_firmware_size);
 
     priv->fw_img_idx = 0;
-    __aic8800d_fw_set_image(priv, 0);
     priv->fw_done   = done;
     priv->fw_load_step = 0;
     priv->patch_tbl_count = 0;
@@ -1828,6 +1913,13 @@ static vsf_err_t __aic8800d_connect(vsf_wifi_t *wifi,
         ie_bytes[21] = (uint8_t)(rsn_cap & 0xFF);
         req.ie_len = sizeof(__aic8800d_assoc_ie);
         priv->ap_rsn_cap = rsn_cap;
+
+        /* Cache the STA RSN IE (first 22 bytes of the assoc IE buffer) so the
+         * 4-way handshake M2 can echo it in its key_data — the AP verifies M2's
+         * RSN IE matches the assoc-req's.  Without this the M2 carries no RSN
+         * IE and the AP rejects the handshake. */
+        memcpy(wifi->wpa_rsn_ie, ie_bytes, 22);
+        wifi->wpa_rsn_ie_len = 22;
     }
 #endif
 
@@ -1915,15 +2007,12 @@ static vsf_err_t __aic8800d_tx(vsf_wifi_t *wifi,
     if (NULL == buf) return VSF_ERR_NOT_ENOUGH_RESOURCES;
     memset(buf, 0, usb_len);
 
-    /* USB TX aggregation header */
-    buf[0] = (payload_len >> 0) & 0xFF;
-    buf[1] = (payload_len >> 8) & 0x0F;
-    buf[2] = buf[0];
-    buf[3] = buf[1];
-    buf[4] = buf[0];
-    buf[5] = buf[1];
-    buf[6] = AIC8800D_USB_DATA_TYPE;
-    buf[7] = 0;
+    /* USB data TX header (4 bytes): [total_len u16][type=0x01][reserved u8],
+     * matching the Linux driver's unaggregated data path (aicwf_usb_send_pkt). */
+    buf[0] = (usb_len >> 0) & 0xFF;
+    buf[1] = (usb_len >> 8) & 0x0F;
+    buf[2] = AIC8800D_USB_DATA_TYPE;
+    buf[3] = 0;
 
     /* host descriptor */
     struct aic8800d_txdesc_api *desc = (struct aic8800d_txdesc_api *)(buf + AIC8800D_USB_TX_HEADER_LEN);
@@ -1931,19 +2020,129 @@ static vsf_err_t __aic8800d_tx(vsf_wifi_t *wifi,
     memcpy(&desc->host.eth_dest_addr, frame + 0, 6);
     memcpy(&desc->host.eth_src_addr, frame + 6, 6);
     desc->host.ethertype = (uint16_t)frame[12] | ((uint16_t)frame[13] << 8);
+    /* Request a TX confirmation for EAPOL-Key frames (bit31 + desc index),
+     * matching the Linux driver (status_desc_addr = (1<<31) | idx). */
+    if ((frame[12] == 0x88) && (frame[13] == 0x8E)) {
+        desc->host.status_desc_addr = (1u << 31) | 1;
+    } else {
+        vsf_wifi_aic8800d_trace_debug("aic8800d: biz tx len=%u et=%02X%02X da=%02X:%02X:%02X:%02X:%02X:%02X"
+                VSF_TRACE_CFG_LINEEND, len, frame[12], frame[13],
+                frame[0], frame[1], frame[2], frame[3], frame[4], frame[5]);
+    }
     desc->host.vif_idx = priv->vif_idx;
     desc->host.staid   = priv->sta_idx;
-    desc->host.tid     = 0xFF; /* no QoS priority by default */
+    /* EAPOL-Key frames are sent as QoS data (matching the AP's M1 and the
+     * Linux driver's behaviour); other traffic defaults to non-QoS. */
+    desc->host.tid     = ((frame[12] == 0x88) && (frame[13] == 0x8E)) ? 0 : 0xFF;
     desc->host.ac      = 1;    /* BE */
     desc->host.flags   = 0;
 
     /* Ethernet payload follows the descriptor */
     memcpy(buf + AIC8800D_USB_TX_HEADER_LEN + AIC8800D_TXDESC_API_SIZE, frame + 14, len - 14);
 
+    if ((desc->host.ethertype == 0x8E88) || (desc->host.ethertype == 0x888E)) {
+        char hexbuf[8 * 48 + 1];
+        uint16_t n = (usb_len < 48) ? usb_len : 48;
+        for (uint16_t i = 0; i < n; i++) {
+            static const char hexdig[] = "0123456789ABCDEF";
+            hexbuf[i * 2]     = hexdig[(buf[i] >> 4) & 0xF];
+            hexbuf[i * 2 + 1] = hexdig[buf[i] & 0xF];
+        }
+        hexbuf[n * 2] = '\0';
+        vsf_wifi_aic8800d_trace_debug("aic8800d: EAPOL tx usb_len=%u: %s" VSF_TRACE_CFG_LINEEND, usb_len, hexbuf);
+    }
+
     err = bus_ops->send(wifi, buf, usb_len, NULL);
     vsf_heap_free(buf);
     return err;
 }
+
+#if VSF_WIFI_USE_WPA == ENABLED
+/* Key installation (WPA 4-way handshake backend).
+ * PTK (pairwise): MM_KEY_ADD_REQ with sta_idx of the AP; GTK (group): default
+ * key with sta_idx=0xFF.  After the GTK is programmed the 802.1X control port
+ * is opened via ME_SET_CONTROL_PORT_REQ so business data can flow (Linux
+ * flow: KEY_ADD x2 -> SET_CONTROL_PORT). */
+static void __aic8800d_key_install_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    aic8800d_priv_t *priv = __aic8800d_priv(wifi);
+    vsf_wifi_done_t done = priv->key_done;
+    priv->key_done = NULL;
+    priv->key_open_port = false;
+    if (done != NULL) {
+        done(wifi, err);
+    }
+}
+
+static void __aic8800d_key_add_done(vsf_wifi_t *wifi, vsf_err_t err)
+{
+    aic8800d_priv_t *priv = __aic8800d_priv(wifi);
+
+    if ((err == VSF_ERR_NONE) && (priv->key_add_cfm.status != 0)) {
+        err = VSF_ERR_FAIL;
+    }
+    if (err != VSF_ERR_NONE) {
+        __aic8800d_key_install_done(wifi, err);
+        return;
+    }
+
+    if (priv->key_open_port) {
+        struct aic8800d_me_set_control_port_req req;
+        req.sta_idx           = priv->sta_idx;
+        req.control_port_open = 1;
+        vsf_err_t send_err = __aic8800d_send_msg(wifi,
+                AIC8800D_ME_SET_CONTROL_PORT_REQ, &req, sizeof(req),
+                AIC8800D_ME_SET_CONTROL_PORT_CFM, NULL, 0,
+                __aic8800d_key_install_done);
+        if (send_err != VSF_ERR_NONE) {
+            __aic8800d_key_install_done(wifi, send_err);
+        }
+        return;
+    }
+    __aic8800d_key_install_done(wifi, VSF_ERR_NONE);
+}
+
+static vsf_err_t __aic8800d_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
+        bool pairwise, const uint8_t *key, uint8_t key_len,
+        const uint8_t *bssid, vsf_wifi_done_t done)
+{
+    aic8800d_priv_t *priv = __aic8800d_priv(wifi);
+    struct aic8800d_mm_key_add_req req;
+    (void)bssid;
+
+    if ((priv == NULL) || (key == NULL) || (key_len > AIC8800D_SEC_KEY_LEN)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    if (priv->key_done != NULL) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+
+    memset(&req, 0, sizeof(req));
+    req.key_idx      = pairwise ? 0 : key_idx;
+    req.sta_idx      = pairwise ? priv->sta_idx : 0xFF;
+    req.key_len      = key_len;
+    memcpy(req.key, key, key_len);
+    req.cipher_suite = AIC8800D_CIPHER_CCMP;
+    req.inst_nbr     = priv->vif_idx;
+    req.pairwise     = pairwise ? 1 : 0;
+
+    priv->key_done      = done;
+    priv->key_open_port = !pairwise;    /* open the control port after GTK */
+    vsf_err_t err = __aic8800d_send_msg(wifi, AIC8800D_MM_KEY_ADD_REQ,
+            &req, sizeof(req),
+            AIC8800D_MM_KEY_ADD_CFM, &priv->key_add_cfm, sizeof(priv->key_add_cfm),
+            __aic8800d_key_add_done);
+    if (err != VSF_ERR_NONE) {
+        priv->key_done      = NULL;
+        priv->key_open_port = false;
+    }
+    return err;
+}
+
+static const vsf_wifi_crypto_ops_t __aic8800d_crypto_ops = {
+    .install_key = __aic8800d_install_key,
+};
+#endif  /* VSF_WIFI_USE_WPA == ENABLED */
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -1959,6 +2158,9 @@ const vsf_wifi_chip_drv_t vsf_wifi_aic8800d_drv = {
         .disconnect     = __aic8800d_disconnect,
         .get_link_info  = __aic8800d_get_link_info,
     },
+#if VSF_WIFI_USE_WPA == ENABLED
+    .crypto_ops     = &__aic8800d_crypto_ops,
+#endif
     .tx             = __aic8800d_tx,
 };
 

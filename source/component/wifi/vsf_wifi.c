@@ -1609,7 +1609,9 @@ static void __vsf_wifi_mlme_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
 }
 
 /* FullMAC drv->fullmac.connect completion.  The firmware has finished auth/
- * assoc/4-way internally; move to RUN and notify the application. */
+ * assoc; for WPA2 the 4-way handshake then runs over the data path driven by
+ * the host WPA supplicant (the firmware does NOT do it internally), otherwise
+ * the link is up immediately. */
 static void __vsf_wifi_fullmac_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     if (wifi->disconnecting) return;
@@ -1620,6 +1622,17 @@ static void __vsf_wifi_fullmac_connect_done(vsf_wifi_t *wifi, vsf_err_t err)
         __vsf_wifi_mlme_finish(wifi, WIFI_REASON_UNSPECIFIED);
         return;
     }
+#if VSF_WIFI_USE_WPA == ENABLED
+    if (wifi->wpa_auth.auth_mode == WIFI_AUTH_WPA2_PSK) {
+        /* Associated; wait for the AP's EAPOL-Key M1 on the data path.  The
+         * WPA module drives M1..M4 and calls vsf_wifi_mlme_handshake_done,
+         * which programs the keys through crypto_ops before link-up. */
+        wifi->mlme_state = WIFI_MLME_4WAY;
+        wifi->mlme_retry = 0;
+        vsf_wifi_mlme_arm_timer(wifi, 10000);
+        return;
+    }
+#endif
     wifi->mlme_state = WIFI_MLME_RUN;
     wifi->mlme_retry = 0;
     vsf_wifi_link_info_t info;
@@ -2066,6 +2079,29 @@ static vsf_err_t __vsf_wifi_tx_frame(vsf_wifi_t *wifi,
     if (!wifi->is_ready)                return VSF_ERR_NOT_READY;
     if (NULL == wifi->drv->tx)          return VSF_ERR_NOT_SUPPORT;
     if ((NULL == frame) || (0 == len))  return VSF_ERR_INVALID_PARAMETER;
+
+    if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
+        /* FullMAC TX takes Ethernet frames, while the WPA module hands us
+         * 802.11 data frames (EAPOL M2/M4).  Convert: DA = addr3, SA = addr2,
+         * ethertype from the LLC/SNAP header, payload follows. */
+        if ((frame[0] & 0x0C) != 0x08) return VSF_ERR_INVALID_PARAMETER;
+        uint16_t hdr_len = 24;
+        if (frame[0] & 0x80) hdr_len += 2;      /* QoS control present */
+        if (frame[1] & 0x80) hdr_len += 4;      /* HTC present */
+        if (len < hdr_len + 8) return VSF_ERR_INVALID_PARAMETER;
+        uint16_t eth_payload_len = len - hdr_len - 8;
+        uint16_t eth_len = (uint16_t)(14 + eth_payload_len);
+        uint8_t *eth = vsf_heap_malloc(eth_len);
+        if (eth == NULL) return VSF_ERR_NOT_ENOUGH_RESOURCES;
+        memcpy(eth + 0, frame + 16, 6);         /* DA = addr3 */
+        memcpy(eth + 6, frame + 10, 6);         /* SA = addr2 */
+        eth[12] = frame[hdr_len + 6];
+        eth[13] = frame[hdr_len + 7];
+        memcpy(eth + 14, frame + hdr_len + 8, eth_payload_len);
+        vsf_err_t err = wifi->drv->tx(wifi, eth, eth_len);
+        vsf_heap_free(eth);
+        return err;
+    }
 
     return wifi->drv->tx(wifi, frame, len);
 }
