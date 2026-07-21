@@ -65,7 +65,8 @@ static const uint32_t __aic8800d_syscfg_masked[AIC8800D_SYSCFG_MASKED_COUNT][3] 
  * Regenerate the C array when switching to a different firmware file. */
 #define AIC8800D_FW_LOAD_ADDR       0x00120000
 #define AIC8800D_FW_CHUNK_SIZE      1024
-#define AIC8800D_FW_START_APP_TYPE  1
+#define AIC8800D_FW_START_APP_TYPE  1       /* HOST_START_APP_AUTO */
+#define AIC8800D_START_APP_REBOOT   3       /* HOST_START_APP_REBOOT: reset to boot ROM */
 
 /* USB packet types */
 #define AIC8800D_USB_TYPE_DATA          0x00
@@ -906,6 +907,12 @@ typedef struct aic8800d_priv_t {
     vsf_wifi_done_t     key_done;
     struct aic8800d_mm_key_add_cfm key_add_cfm;
     bool                key_open_port;
+
+    /* Init watchdog (stale-firmware self-heal): armed when the init chain runs
+     * on a runtime-mode device; if the chain stalls (stale firmware does not
+     * answer MM_SET_STACK_START_REQ), the timer fires and reboots the chip
+     * into boot ROM so the cold download flow can run. */
+    vsf_callback_timer_t init_wd_timer;
 } aic8800d_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

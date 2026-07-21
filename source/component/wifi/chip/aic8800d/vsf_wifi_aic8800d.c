@@ -52,6 +52,7 @@ static void __aic8800d_parse_rsn(const uint8_t *body, uint8_t len,
 static void __aic8800d_scan_finish(vsf_wifi_t *wifi);
 static void __aic8800d_scan_finish_timer_cb(vsf_callback_timer_t *timer);
 static void __aic8800d_connect_cancel_cfm(vsf_wifi_t *wifi, vsf_err_t err);
+static void __aic8800d_init_wd_cb(vsf_callback_timer_t *timer);
 
 /*============================ LOCAL FUNCTIONS ===============================*/
 
@@ -937,6 +938,7 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
 
     case 13:
         vsf_wifi_aic8800d_trace_info("aic8800d: init done" VSF_TRACE_CFG_LINEEND);
+        vsf_callback_timer_remove(&priv->init_wd_timer);
         if (priv->init_done != NULL) {
             vsf_wifi_done_t done = priv->init_done;
             priv->init_done = NULL;
@@ -1610,6 +1612,30 @@ static vsf_err_t __aic8800d_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done
     return VSF_ERR_NONE;
 }
 
+/* Init watchdog: fires when the init chain stalls on a runtime-mode device
+ * (stale firmware does not answer MM_SET_STACK_START_REQ — verified against
+ * a previously-connected dongle).  Reboot the chip into boot ROM so it
+ * re-enumerates as a boot device and the cold download + init flow runs.
+ * Fire-and-forget like the firmware-load start_app: the device disconnects
+ * itself on reboot and the usbh teardown handles the rest. */
+#define AIC8800D_INIT_WD_TIMEOUT_MS     5000
+static void __aic8800d_init_wd_cb(vsf_callback_timer_t *timer)
+{
+    aic8800d_priv_t *priv = vsf_container_of(timer, aic8800d_priv_t, init_wd_timer);
+    vsf_wifi_t *wifi = priv->wifi;
+    struct aic8800d_dbg_start_app_req reboot_req;
+
+    vsf_wifi_aic8800d_trace_info("aic8800d: init stalled on runtime device, rebooting to boot ROM"
+            VSF_TRACE_CFG_LINEEND);
+    memset(&reboot_req, 0, sizeof(reboot_req));
+    reboot_req.boot_addr = 2000;    /* firmware delay before reboot (ms) */
+    reboot_req.boot_type = AIC8800D_START_APP_REBOOT;
+    __aic8800d_send_msg(wifi, AIC8800D_DBG_START_APP_REQ,
+            &reboot_req, sizeof(reboot_req),
+            0, NULL, 0,
+            NULL);
+}
+
 static vsf_err_t __aic8800d_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 {
     aic8800d_priv_t *priv = __aic8800d_priv(wifi);
@@ -1624,6 +1650,14 @@ static vsf_err_t __aic8800d_init(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 
     priv->init_step  = 0;
     priv->init_done = done;
+    vsf_callback_timer_init(&priv->init_wd_timer);
+    priv->init_wd_timer.on_timer = __aic8800d_init_wd_cb;
+    if ((priv->bus_ops != NULL) && priv->bus_ops->skip_firmware_load) {
+        /* Runtime device whose firmware was NOT loaded by us: it may be a
+         * stale one from a previous run that never answers the init chain.
+         * Arm the watchdog; a healthy firmware completes init in ~2s. */
+        vsf_callback_timer_add_ms(&priv->init_wd_timer, AIC8800D_INIT_WD_TIMEOUT_MS);
+    }
     priv->scan_finish_timer.on_timer = __aic8800d_scan_finish_timer_cb;
     priv->scan_finish_pending = false;
     __aic8800d_init_step(wifi, VSF_ERR_NONE);
@@ -1634,6 +1668,8 @@ static void __aic8800d_fini(vsf_wifi_t *wifi)
 {
     aic8800d_priv_t *priv = __aic8800d_priv(wifi);
     if (priv != NULL) {
+        vsf_callback_timer_remove(&priv->init_wd_timer);
+        vsf_callback_timer_remove(&priv->scan_finish_timer);
         vsf_heap_free(priv);
         wifi->chip_priv = NULL;
     }
