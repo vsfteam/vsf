@@ -1800,7 +1800,10 @@ static vsf_err_t __aic8800d_scan(vsf_wifi_t *wifi,
             priv->vif_idx, num_channels);
     req.vif_idx  = priv->vif_idx;
     req.chan_cnt = num_channels;
-    req.ssid_cnt = 0;                   /* wildcard active probe */
+    /* Wildcard active scan: one empty SSID entry (length 0), mirroring
+     * cfg80211/wpa_supplicant wildcard scans (n_ssids=1, ssid_len=0) so the
+     * firmware actively probes instead of passively listening. */
+    req.ssid_cnt = 1;
     req.duration = 0;                   /* use firmware default dwell time */
     for (int i = 0; i < num_channels; i++) {
         vsf_wifi_aic8800d_trace_debug("aic8800d: scan chan[%d]=%u" VSF_TRACE_CFG_LINEEND,

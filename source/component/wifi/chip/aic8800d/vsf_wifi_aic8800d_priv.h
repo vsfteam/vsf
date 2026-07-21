@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -497,15 +498,34 @@ struct aic8800d_me_chan_config_req {
 struct aic8800d_scanu_start_req {
     struct aic8800d_mac_chan_def chan[AIC8800D_SCAN_CHANNEL_MAX];
     struct aic8800d_mac_ssid     ssid[AIC8800D_SCAN_SSID_MAX];
+    /* Field offsets MUST match the golden Linux SCANU_START_REQ byte-for-byte
+     * (verified from aic_connect_linux_success.pcap frame 17, param_len=376):
+     *   bssid@352 (2-aligned, implicit pad after the 33B ssid entries),
+     *   add_ies@358, add_ie_len@362, vif_idx@364, chan_cnt@367, ssid_cnt@368,
+     *   no_cck@369, duration@372.
+     * If these offsets drift (e.g. C alignment pads add_ies to 4 bytes), the
+     * firmware reads chan_cnt/ssid_cnt as 0 and silently scans a default
+     * profile, returning only a small subset of the APs in range. */
     struct aic8800d_mac_addr     bssid;
-    aic_u32 add_ies;
-    aic_u16 add_ie_len;
-    aic_u8  vif_idx;
-    aic_u8  chan_cnt;
-    aic_u8  ssid_cnt;
-    aic_u16 no_cck;
-    aic_u32 duration;
+    aic_u16 add_ies[2];                         /* @358 host ptr, unused -> 0 */
+    aic_u16 add_ie_len;                         /* @362 */
+    aic_u8  vif_idx;                            /* @364 */
+    aic_u8  __pad0[2];                          /* @365..366 */
+    aic_u8  chan_cnt;                           /* @367 */
+    aic_u8  ssid_cnt;                           /* @368 */
+    aic_u8  no_cck;                             /* @369 */
+    aic_u8  __pad1;                             /* @370 */
+    aic_u32 duration;                           /* @372 (implicit pad @371) */
 };
+
+/* The firmware parses this message by fixed offsets; lock the layout down so
+ * a careless struct edit cannot silently re-break scanning. */
+VSF_STATIC_ASSERT(sizeof(struct aic8800d_scanu_start_req) == 376, scan_req_size);
+VSF_STATIC_ASSERT(offsetof(struct aic8800d_scanu_start_req, bssid) == 352, scan_req_bssid_off);
+VSF_STATIC_ASSERT(offsetof(struct aic8800d_scanu_start_req, vif_idx) == 364, scan_req_vif_off);
+VSF_STATIC_ASSERT(offsetof(struct aic8800d_scanu_start_req, chan_cnt) == 367, scan_req_chancnt_off);
+VSF_STATIC_ASSERT(offsetof(struct aic8800d_scanu_start_req, ssid_cnt) == 368, scan_req_ssidcnt_off);
+VSF_STATIC_ASSERT(offsetof(struct aic8800d_scanu_start_req, duration) == 372, scan_req_duration_off);
 
 struct aic8800d_scanu_start_cfm {
     aic_u8 vif_idx;

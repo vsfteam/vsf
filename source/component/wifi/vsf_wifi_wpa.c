@@ -226,13 +226,6 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
     if (!is_retransmit) {
         memcpy(wifi->wpa_anonce, &ek[EK_NONCE_OFF], 32);
         __wpa_gen_snonce(wifi, wifi->wpa_snonce);
-#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
-        vsf_wifi_trace_info("wifi: SNonce after gen: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X ..." VSF_TRACE_CFG_LINEEND,
-                wifi->wpa_snonce[0], wifi->wpa_snonce[1], wifi->wpa_snonce[2], wifi->wpa_snonce[3],
-                wifi->wpa_snonce[4], wifi->wpa_snonce[5], wifi->wpa_snonce[6], wifi->wpa_snonce[7],
-                wifi->wpa_snonce[8], wifi->wpa_snonce[9], wifi->wpa_snonce[10], wifi->wpa_snonce[11],
-                wifi->wpa_snonce[12], wifi->wpa_snonce[13], wifi->wpa_snonce[14], wifi->wpa_snonce[15]);
-#endif
 
         /* PTK = PRF(PMK, AA=BSSID, SPA=our MAC, ANonce, SNonce). */
         if (vsf_wifi_prf_ptk(wifi->wpa_auth.psk, wifi->mlme_bssid, wifi->mac,
@@ -245,39 +238,6 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
         }
         vsf_wifi_trace_debug("wifi: PTK derived OK"
                 VSF_TRACE_CFG_LINEEND);
-#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
-        vsf_wifi_trace_info("wifi: PMK: %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
-                wifi->wpa_auth.psk[0], wifi->wpa_auth.psk[1], wifi->wpa_auth.psk[2], wifi->wpa_auth.psk[3],
-                wifi->wpa_auth.psk[4], wifi->wpa_auth.psk[5], wifi->wpa_auth.psk[6], wifi->wpa_auth.psk[7],
-                wifi->wpa_auth.psk[8], wifi->wpa_auth.psk[9], wifi->wpa_auth.psk[10], wifi->wpa_auth.psk[11],
-                wifi->wpa_auth.psk[12], wifi->wpa_auth.psk[13], wifi->wpa_auth.psk[14], wifi->wpa_auth.psk[15],
-                wifi->wpa_auth.psk[16], wifi->wpa_auth.psk[17], wifi->wpa_auth.psk[18], wifi->wpa_auth.psk[19],
-                wifi->wpa_auth.psk[20], wifi->wpa_auth.psk[21], wifi->wpa_auth.psk[22], wifi->wpa_auth.psk[23],
-                wifi->wpa_auth.psk[24], wifi->wpa_auth.psk[25], wifi->wpa_auth.psk[26], wifi->wpa_auth.psk[27],
-                wifi->wpa_auth.psk[28], wifi->wpa_auth.psk[29], wifi->wpa_auth.psk[30], wifi->wpa_auth.psk[31]);
-        vsf_wifi_trace_info("wifi: PTK: %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
-                wifi->wpa_ptk[0], wifi->wpa_ptk[1], wifi->wpa_ptk[2], wifi->wpa_ptk[3],
-                wifi->wpa_ptk[4], wifi->wpa_ptk[5], wifi->wpa_ptk[6], wifi->wpa_ptk[7],
-                wifi->wpa_ptk[8], wifi->wpa_ptk[9], wifi->wpa_ptk[10], wifi->wpa_ptk[11],
-                wifi->wpa_ptk[12], wifi->wpa_ptk[13], wifi->wpa_ptk[14], wifi->wpa_ptk[15],
-                wifi->wpa_ptk[16], wifi->wpa_ptk[17], wifi->wpa_ptk[18], wifi->wpa_ptk[19],
-                wifi->wpa_ptk[20], wifi->wpa_ptk[21], wifi->wpa_ptk[22], wifi->wpa_ptk[23],
-                wifi->wpa_ptk[24], wifi->wpa_ptk[25], wifi->wpa_ptk[26], wifi->wpa_ptk[27],
-                wifi->wpa_ptk[28], wifi->wpa_ptk[29], wifi->wpa_ptk[30], wifi->wpa_ptk[31],
-                wifi->wpa_ptk[32], wifi->wpa_ptk[33], wifi->wpa_ptk[34], wifi->wpa_ptk[35],
-                wifi->wpa_ptk[36], wifi->wpa_ptk[37], wifi->wpa_ptk[38], wifi->wpa_ptk[39],
-                wifi->wpa_ptk[40], wifi->wpa_ptk[41], wifi->wpa_ptk[42], wifi->wpa_ptk[43],
-                wifi->wpa_ptk[44], wifi->wpa_ptk[45], wifi->wpa_ptk[46], wifi->wpa_ptk[47]);
-        vsf_wifi_trace_info("wifi: ANonce: %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X%02X%02X%02X%02X" VSF_TRACE_CFG_LINEEND,
-                wifi->wpa_anonce[0], wifi->wpa_anonce[1], wifi->wpa_anonce[2], wifi->wpa_anonce[3],
-                wifi->wpa_anonce[4], wifi->wpa_anonce[5], wifi->wpa_anonce[6], wifi->wpa_anonce[7],
-                wifi->wpa_anonce[8], wifi->wpa_anonce[9], wifi->wpa_anonce[10], wifi->wpa_anonce[11],
-                wifi->wpa_anonce[12], wifi->wpa_anonce[13], wifi->wpa_anonce[14], wifi->wpa_anonce[15],
-                wifi->wpa_anonce[16], wifi->wpa_anonce[17], wifi->wpa_anonce[18], wifi->wpa_anonce[19],
-                wifi->wpa_anonce[20], wifi->wpa_anonce[21], wifi->wpa_anonce[22], wifi->wpa_anonce[23],
-                wifi->wpa_anonce[24], wifi->wpa_anonce[25], wifi->wpa_anonce[26], wifi->wpa_anonce[27],
-                wifi->wpa_anonce[28], wifi->wpa_anonce[29], wifi->wpa_anonce[30], wifi->wpa_anonce[31]);
-#endif
     } else {
         vsf_wifi_trace_debug("wifi: 4-way M1 retransmit, re-sending M2"
                 VSF_TRACE_CFG_LINEEND);
@@ -289,13 +249,6 @@ static void __wpa_handle_m1(vsf_wifi_t *wifi, const uint8_t *ek,
      * the same M2.  For the first M2, wait for either the AP's M3 or another
      * M1 retransmit.  Sending M2 back-to-back without waiting can keep us
      * transmitting while the AP is sending M3, causing us to miss M3. */
-#if VSF_WIFI_CFG_WPA_DEBUG_LOG == ENABLED
-    vsf_wifi_trace_info("wifi: SNonce before M2 send: %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X ..." VSF_TRACE_CFG_LINEEND,
-            wifi->wpa_snonce[0], wifi->wpa_snonce[1], wifi->wpa_snonce[2], wifi->wpa_snonce[3],
-            wifi->wpa_snonce[4], wifi->wpa_snonce[5], wifi->wpa_snonce[6], wifi->wpa_snonce[7],
-            wifi->wpa_snonce[8], wifi->wpa_snonce[9], wifi->wpa_snonce[10], wifi->wpa_snonce[11],
-            wifi->wpa_snonce[12], wifi->wpa_snonce[13], wifi->wpa_snonce[14], wifi->wpa_snonce[15]);
-#endif
     vsf_err_t m2_err = __wpa_send_eapol(wifi, ek[0], KI_M2, key_len,
             wifi->wpa_snonce, wifi->wpa_rsn_ie, wifi->wpa_rsn_ie_len);
     if (m2_err != VSF_ERR_NONE) {

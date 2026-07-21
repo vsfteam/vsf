@@ -517,8 +517,8 @@ static void * __vk_usbh_wifi_aic8800d_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     aic->eda.fn.evthandler = __vk_usbh_wifi_aic8800d_evthandler;
     aic->eda.on_terminate  = __vk_usbh_wifi_aic8800d_on_eda_terminate;
     vsf_err_t eda_err = vsf_eda_init(&aic->eda);
-    vsf_trace_info("aic8800d_usb: eda_init err=%d prio=%d" VSF_TRACE_CFG_LINEEND, (int)eda_err, (int)aic->eda.priority);
-    vsf_trace_info("aic8800d_usb: about to return aic=%p" VSF_TRACE_CFG_LINEEND, (void *)aic);
+    __usbh_aic8800d_trace_debug("aic8800d_usb: eda_init err=%d prio=%d" VSF_TRACE_CFG_LINEEND, (int)eda_err, (int)aic->eda.priority);
+    __usbh_aic8800d_trace_debug("aic8800d_usb: about to return aic=%p" VSF_TRACE_CFG_LINEEND, (void *)aic);
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info(&aic->eda, "usbh_wifi_aic8800d", NULL, 0);
 #endif
