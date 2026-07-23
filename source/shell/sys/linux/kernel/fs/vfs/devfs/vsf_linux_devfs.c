@@ -1037,13 +1037,28 @@ static ssize_t __vsf_linux_mal_read(vsf_linux_fd_t *sfd, void *buf, size_t count
     vsf_linux_mal_priv_t *priv = (vsf_linux_mal_priv_t *)sfd->priv;
     vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)priv->file;
     vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    // clamp to device end: read at/past EOF returns 0; the drivers assert
+    // on out-of-range accesses, so never let pos + count cross mal->size
+    if (vfs_file->pos >= mal->size) {
+        return 0;
+    }
+    uint64_t remain = mal->size - vfs_file->pos;
+    if (count > remain) {
+        count = (size_t)remain;
+    }
     uint_fast32_t blksz = vk_mal_blksz(mal, vfs_file->pos, count, VSF_MAL_OP_READ);
 
-    if (count % blksz) {
+    // block device: both the address and the size must be block-aligned
+    if ((0 == blksz) || (count % blksz) || (vfs_file->pos % blksz)) {
         return -1;
     }
     vk_mal_read(mal, vfs_file->pos, count, (uint8_t *)buf);
-    return vsf_eda_get_return_value();
+    ssize_t result = (ssize_t)vsf_eda_get_return_value();
+    if (result > 0) {
+        vfs_file->pos += (uint64_t)result;
+    }
+    return result;
 }
 
 static ssize_t __vsf_linux_mal_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
@@ -1051,13 +1066,28 @@ static ssize_t __vsf_linux_mal_write(vsf_linux_fd_t *sfd, const void *buf, size_
     vsf_linux_mal_priv_t *priv = (vsf_linux_mal_priv_t *)sfd->priv;
     vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)priv->file;
     vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    // clamp to device end: write at/past end returns 0; the drivers assert
+    // on out-of-range accesses, so never let pos + count cross mal->size
+    if (vfs_file->pos >= mal->size) {
+        return 0;
+    }
+    uint64_t remain = mal->size - vfs_file->pos;
+    if (count > remain) {
+        count = (size_t)remain;
+    }
     uint_fast32_t blksz = vk_mal_blksz(mal, vfs_file->pos, count, VSF_MAL_OP_WRITE);
 
-    if (count % blksz) {
+    // block device: both the address and the size must be block-aligned
+    if ((0 == blksz) || (count % blksz) || (vfs_file->pos % blksz)) {
         return -1;
     }
     vk_mal_write(mal, vfs_file->pos, count, (uint8_t *)buf);
-    return vsf_eda_get_return_value();
+    ssize_t result = (ssize_t)vsf_eda_get_return_value();
+    if (result > 0) {
+        vfs_file->pos += (uint64_t)result;
+    }
+    return result;
 }
 
 static const vsf_linux_fd_op_t __vsf_linux_mal_fdop = {

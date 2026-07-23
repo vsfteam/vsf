@@ -2209,7 +2209,10 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 off64_t lseek64(int fd, off64_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if ((NULL == sfd) || (sfd->op != &__vsf_linux_fs_fdop)) {
+    // accept any fs-backed fd (same convention as __vsf_linux_get_fs_ex):
+    // bound vfs devices (e.g. mal block devices) use their own fdop but
+    // keep a fs_priv-compatible priv with a valid priv->file
+    if ((NULL == sfd) || !(sfd->op->feature & VSF_LINUX_FDOP_FEATURE_FS)) {
         return (off64_t)-1;
     }
 
@@ -2229,7 +2232,10 @@ off64_t lseek64(int fd, off64_t offset, int whence)
         }
     }
 #endif
-    vk_file_seek(priv->file, offset, whence);
+    if (VSF_ERR_NONE != vk_file_seek(priv->file, offset, whence)) {
+        errno = EINVAL;
+        return (off64_t)-1;
+    }
 #if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
     priv->cache_size = 0;
 #endif
