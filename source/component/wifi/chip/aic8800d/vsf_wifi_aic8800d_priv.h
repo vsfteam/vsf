@@ -108,6 +108,10 @@ static const uint32_t __aic8800d_syscfg_masked[AIC8800D_SYSCFG_MASKED_COUNT][3] 
 #define AIC8800D_MM_KEY_ADD_CFM         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 37)
 #define AIC8800D_MM_SET_ARPOFFLOAD_REQ  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x61)
 #define AIC8800D_MM_SET_ARPOFFLOAD_CFM  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x62)
+#define AIC8800D_MM_BA_ADD_REQ          (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x28)
+#define AIC8800D_MM_BA_ADD_CFM          (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x29)
+#define AIC8800D_MM_BA_DEL_REQ          (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x2A)
+#define AIC8800D_MM_BA_DEL_CFM          (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x2B)
 /* ... many MM messages omitted ... */
 #define AIC8800D_MM_GET_MAC_ADDR_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 115)
 #define AIC8800D_MM_GET_MAC_ADDR_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 116)
@@ -261,6 +265,29 @@ struct aic8800d_mm_set_arpoffload_en_req {
     aic_u8  enable;
     aic_u8  vif_idx;
     aic_u8  __pad[2];
+};
+
+/* MM_BA_ADD_REQ / MM_BA_DEL_REQ: explicit Block Ack session management
+ * (Linux lmac_msg.h mm_ba_add_req / mm_ba_del_req). */
+struct aic8800d_mm_ba_add_req {
+    aic_u8  type;       /* 0: TX, 1: RX */
+    aic_u8  sta_idx;
+    aic_u8  tid;
+    aic_u8  bufsz;      /* MPDUs held per TID */
+    aic_u16 ssn;        /* start sequence number */
+};
+
+struct aic8800d_mm_ba_add_cfm {
+    aic_u8  sta_idx;
+    aic_u8  tid;
+    aic_u8  status;
+    aic_u8  aligned;
+};
+
+struct aic8800d_mm_ba_del_req {
+    aic_u8  type;       /* 0: TX, 1: RX */
+    aic_u8  sta_idx;
+    aic_u8  tid;
 };
 
 /* TX power level configurations (v1/v2/v3/v4 unions) */

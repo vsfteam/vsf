@@ -2103,17 +2103,14 @@ static vsf_err_t __aic8800d_tx(vsf_wifi_t *wifi,
     }
     desc->host.vif_idx = priv->vif_idx;
     desc->host.staid   = priv->sta_idx;
-    /* Business data goes out on TID 1, not TID 0.  The firmware autonomously
-     * establishes an uplink Block Ack session on TID 0, and the A-MPDU stream
-     * it then produces is rejected by the AP (visible on the air as the AP's
-     * BlockAckReq window-resync probes), so unicast data stalls shortly after
-     * DHCP while broadcast keeps flowing (this is what broke 5G: DHCP worked
-     * but ARP/DNS/HTTP got no replies).  TID 1 has no such auto-BA session, so
-     * frames go out as plain QoS and the link carries data reliably on both
-     * bands.  Linux avoids the issue by having mac80211 manage BA from the
-     * host; our firmware manages BA itself, hence the different TID choice.
-     * EAPOL-Key frames stay on TID 0 as during the handshake. */
-    desc->host.tid     = ((frame[12] == 0x88) && (frame[13] == 0x8E)) ? 0 : 1;
+    /* Business data goes out on TID 0 (BE), matching the Linux rwnx data
+     * path (desc->host.tid = txq tid = 0 for BE traffic).  A TID-0 uplink
+     * Block Ack session is explicitly established via MM_BA_ADD_REQ after the
+     * control port opens (see __aic8800d_key_install_done), so the firmware's
+     * A-MPDU stream is correctly windowed by the AP.  Without that explicit
+     * session the firmware's autonomous TID-0 BA is mis-windowed and the AP
+     * drops unicast data after DHCP (the 5G stall). */
+    desc->host.tid     = 0;
     desc->host.ac      = 1;    /* BE */
     desc->host.flags   = 0;
 
@@ -2147,8 +2144,35 @@ static void __aic8800d_key_install_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     aic8800d_priv_t *priv = __aic8800d_priv(wifi);
     vsf_wifi_done_t done = priv->key_done;
+    bool open_port = priv->key_open_port;
     priv->key_done = NULL;
     priv->key_open_port = false;
+
+    /* Establish the TID-0 uplink Block Ack session explicitly (MM_BA_ADD_REQ)
+     * right after the control port opens, before any business data flows.
+     * Without this the firmware sets up its TID-0 uplink BA autonomously with
+     * a mis-aligned sequence window, and the AP drops the resulting A-MPDU
+     * stream (visible on the air as the AP's BlockAckReq resync probes) --
+     * unicast data then stalls while broadcast keeps flowing (the 5G failure).
+     * The AIC firmware honors the first aggregated MPDU's SN (lmac_msg.h note
+     * on mm_ba_add_req.ssn), so ssn=0 is a valid starting hint.  With the
+     * session explicitly in place the AP accepts A-MPDU and both short flows
+     * (DNS) and bulk transfers (vpm install) work on 5G and 2.4G. */
+    if ((err == VSF_ERR_NONE) && open_port) {
+        struct aic8800d_mm_ba_add_req bareq;
+        memset(&bareq, 0, sizeof(bareq));
+        bareq.type    = 0;              /* TX (uplink) */
+        bareq.sta_idx = priv->sta_idx;
+        bareq.tid     = 0;
+        bareq.bufsz   = 64;
+        bareq.ssn     = 0;
+        vsf_wifi_aic8800d_trace_info("aic8800d: MM_BA_ADD_REQ sta=%u tid=0 bufsz=64 ssn=0"
+                VSF_TRACE_CFG_LINEEND, priv->sta_idx);
+        __aic8800d_send_msg(wifi, AIC8800D_MM_BA_ADD_REQ,
+                &bareq, sizeof(bareq),
+                AIC8800D_MM_BA_ADD_CFM, NULL, 0, NULL);
+    }
+
     if (done != NULL) {
         done(wifi, err);
     }
