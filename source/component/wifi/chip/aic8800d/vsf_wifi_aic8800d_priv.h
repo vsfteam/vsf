@@ -106,6 +106,8 @@ static const uint32_t __aic8800d_syscfg_masked[AIC8800D_SYSCFG_MASKED_COUNT][3] 
 #define AIC8800D_MM_SET_CHANNEL_CFM     (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 17)
 #define AIC8800D_MM_KEY_ADD_REQ         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 36)
 #define AIC8800D_MM_KEY_ADD_CFM         (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 37)
+#define AIC8800D_MM_SET_ARPOFFLOAD_REQ  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x61)
+#define AIC8800D_MM_SET_ARPOFFLOAD_CFM  (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 0x62)
 /* ... many MM messages omitted ... */
 #define AIC8800D_MM_GET_MAC_ADDR_REQ    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 115)
 #define AIC8800D_MM_GET_MAC_ADDR_CFM    (AIC8800D_LMAC_FIRST_MSG(AIC8800D_TASK_MM) + 116)
@@ -249,6 +251,16 @@ struct aic8800d_mm_add_if_req {
 
 struct aic8800d_mm_set_filter_req {
     aic_u32 filter;
+};
+
+/* MM_SET_ARPOFFLOAD_REQ (8 bytes, matches Linux mm_set_arpoffload_en_req):
+ * tells the firmware our DHCP-assigned IP so its ARP offload engine relays
+ * ARP traffic for that IP to the host correctly. */
+struct aic8800d_mm_set_arpoffload_en_req {
+    aic_u32 ipaddr;
+    aic_u8  enable;
+    aic_u8  vif_idx;
+    aic_u8  __pad[2];
 };
 
 /* TX power level configurations (v1/v2/v3/v4 unions) */
@@ -902,6 +914,10 @@ typedef struct aic8800d_priv_t {
     uint8_t             ap_idx;
     uint8_t             sta_idx;
     bool                qos;
+
+    /* ARP offload: MM_SET_ARPOFFLOAD_REQ sent to the firmware with our
+     * DHCP-assigned IP (only once, on the first DHCP ACK). */
+    bool                arp_offload_done;
 
     /* Key install state (MM_KEY_ADD_REQ -> optional ME_SET_CONTROL_PORT_REQ) */
     vsf_wifi_done_t     key_done;

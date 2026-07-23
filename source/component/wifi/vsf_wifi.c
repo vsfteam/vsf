@@ -2088,7 +2088,15 @@ static vsf_err_t __vsf_wifi_tx_frame(vsf_wifi_t *wifi,
         uint16_t hdr_len = 24;
         if (frame[0] & 0x80) hdr_len += 2;      /* QoS control present */
         if (frame[1] & 0x80) hdr_len += 4;      /* HTC present */
-        if (len < hdr_len + 8) return VSF_ERR_INVALID_PARAMETER;
+        if (len < hdr_len + 8) {
+            /* 802.11 null-data frames (e.g. the keepalive null frame) carry
+             * no LLC header / payload, so there is no Ethernet frame to hand
+             * to the FullMAC TX path. The FullMAC firmware emits its own
+             * keepalive null frames autonomously, so dropping the host-side
+             * one here is harmless; report success instead of INVALID_PARAMETER
+             * so the keepalive timer does not spam a bogus error. */
+            return (len == hdr_len) ? VSF_ERR_NONE : VSF_ERR_INVALID_PARAMETER;
+        }
         uint16_t eth_payload_len = len - hdr_len - 8;
         uint16_t eth_len = (uint16_t)(14 + eth_payload_len);
         uint8_t *eth = vsf_heap_malloc(eth_len);

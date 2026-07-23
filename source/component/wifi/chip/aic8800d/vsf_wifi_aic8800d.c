@@ -33,15 +33,17 @@
 #define AIC8800D_USB_DATA_TYPE      0x01
 #define AIC8800D_USB_DUMMY_LEN      4
 
-/* Default TX power table for AIC8800D80 (matches Linux txpwr_lvl_v3) */
+/* Default TX power table for AIC8800D80 (Linux txpwr_lvl_v3 as overridden by
+ * aic_userconfig_8800d80.txt from the reference dongle package; the 11a slots
+ * 0..3 stay 0x80 = N/A, matching the Linux parser defaults). */
 static const struct aic8800d_txpwr_lvl_conf_v3 __aic8800d_txpwr_lvl_v3_default = {
     .enable = 1,
-    .pwrlvl_11b_11ag_2g4 = { 20, 20, 20, 20, 20, 20, 20, 20, 18, 18, 16, 16 },
-    .pwrlvl_11n_11ac_2g4 = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 16 },
-    .pwrlvl_11ax_2g4     = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 16, 15, 15 },
-    .pwrlvl_11a_5g       = { 0x80, 0x80, 0x80, 0x80, 20, 20, 20, 20, 18, 18, 16, 16 },
-    .pwrlvl_11n_11ac_5g  = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 15 },
-    .pwrlvl_11ax_5g      = { 20, 20, 20, 20, 18, 18, 16, 16, 16, 15, 14, 14 },
+    .pwrlvl_11b_11ag_2g4 = { 20, 20, 20, 20, 20, 20, 20, 20, 20, 19, 18, 17 },
+    .pwrlvl_11n_11ac_2g4 = { 20, 20, 20, 20, 20, 19, 18, 17, 17, 16 },
+    .pwrlvl_11ax_2g4     = { 20, 20, 20, 20, 20, 19, 18, 17, 17, 16, 15, 15 },
+    .pwrlvl_11a_5g       = { 0x80, 0x80, 0x80, 0x80, 19, 19, 19, 18, 18, 18, 18, 18 },
+    .pwrlvl_11n_11ac_5g  = { 19, 19, 19, 18, 18, 18, 18, 17, 15, 15 },
+    .pwrlvl_11ax_5g      = { 19, 19, 19, 18, 18, 18, 18, 17, 15, 15, 13, 13 },
 };
 
 /*============================ FORWARD DECLARATIONS ==========================*/
@@ -525,6 +527,49 @@ static void __aic8800d_on_rx_subpacket(vsf_wifi_t *wifi,
              * The firmware already decrypted CCMP but keeps the 8-byte CCMP
              * header in place; strip it and clear the Protected bit so the
              * generic dot11 -> eth bridge parses the frame correctly. */
+
+            /* DHCP ACK (sport 67 -> dport 68, msg type ACK): report our
+             * assigned IP to the firmware's ARP offload engine so ARP traffic
+             * for that IP is relayed to the host (Linux rwnx arpoffload_proc). */
+            if (!priv->arp_offload_done && (ethertype == 0x0800)
+                    && (eth_payload_len >= 20 + 8 + 240)) {
+                const uint8_t *ip = llc + 8;
+                uint8_t ihl = (uint8_t)((ip[0] & 0x0F) * 4);
+                if ((ihl >= 20) && (ip[9] == 17 /* UDP */)) {
+                    const uint8_t *udp = ip + ihl;
+                    uint16_t sport = (uint16_t)((udp[0] << 8) | udp[1]);
+                    uint16_t dport = (uint16_t)((udp[2] << 8) | udp[3]);
+                    if ((sport == 67) && (dport == 68)) {
+                        const uint8_t *dhcp = udp + 8;
+                        const uint8_t *end = llc + 8 + eth_payload_len;
+                        if ((dhcp[0] == 2)
+                                && (dhcp[236] == 0x63) && (dhcp[237] == 0x82)
+                                && (dhcp[238] == 0x53) && (dhcp[239] == 0x63)
+                                && !memcmp(&dhcp[28], wifi->mac, 6)) {
+                            const uint8_t *opt = dhcp + 240;
+                            while ((opt + 3 <= end) && (opt[0] != 0xFF)) {
+                                if ((opt[0] == 53) && (opt[2] == 5 /* ACK */)) {
+                                    struct aic8800d_mm_set_arpoffload_en_req areq;
+                                    memset(&areq, 0, sizeof(areq));
+                                    memcpy(&areq.ipaddr, &dhcp[16], 4); /* yiaddr */
+                                    areq.enable  = 1;   /* secured (CCMP) */
+                                    areq.vif_idx = priv->vif_idx;
+                                    priv->arp_offload_done = true;
+                                    vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_ARPOFFLOAD_REQ ip=%u.%u.%u.%u"
+                                            VSF_TRACE_CFG_LINEEND,
+                                            dhcp[16], dhcp[17], dhcp[18], dhcp[19]);
+                                    __aic8800d_send_msg(wifi, AIC8800D_MM_SET_ARPOFFLOAD_REQ,
+                                            &areq, sizeof(areq),
+                                            AIC8800D_MM_SET_ARPOFFLOAD_CFM, NULL, 0, NULL);
+                                    break;
+                                }
+                                opt += 2 + opt[1];
+                            }
+                        }
+                    }
+                }
+            }
+
             uint16_t base_hdr_len = hdr_len - ccmp_len;
             uint16_t out_len = base_hdr_len + 8 + eth_payload_len;
             uint8_t *out = vsf_heap_malloc(out_len);
@@ -658,7 +703,6 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
     struct aic8800d_mm_set_channel_cfm channel_cfm;
     struct aic8800d_mm_start_cfm start_cfm;
     struct aic8800d_mm_set_stack_start_cfm stack_cfm;
-    struct aic8800d_mm_set_filter_req filter_req;
     struct aic8800d_mm_set_txpwr_lvl_req txpwr_req;
     struct aic8800d_mm_set_rf_calib_req rf_calib_req;
     struct aic8800d_mm_set_rf_calib_cfm rf_calib_cfm;
@@ -789,36 +833,30 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_aic8800d_trace_info("aic8800d: ME_CONFIG_REQ"
                 VSF_TRACE_CFG_LINEEND);
         {
-            struct aic8800d_me_config_req me_req;
-            memset(&me_req, 0, sizeof(me_req));
-
-            me_req.ht_supp  = true;
-            me_req.vht_supp = true;
-            me_req.he_supp  = true;
-            me_req.he_ul_on = false;
-            me_req.ps_on    = true;
-            me_req.dpsm     = false;
-            me_req.ant_div_on = true;
-            me_req.tx_lft   = 1000;
-            me_req.phy_bw_max = 2; /* PHY_CHNL_BW_80 (Linux use_80 for D81) */
-
-            /* HT capability: matches Linux RWNX_HT_CAPABILITIES converted by
-             * rwnx_send_me_config_req(). */
-            me_req.ht_cap.ht_capa_info = 0x0001; /* LDPC coding */
-            me_req.ht_cap.a_mpdu_param = 0x12;   /* factor=64K, density=16 */
-            me_req.ht_cap.mcs_rate[0]  = 0xFF;   /* MCS 0-7 */
-            me_req.ht_cap.ht_extended_capa  = 0;
-            me_req.ht_cap.tx_beamforming_capa = 0;
-            me_req.ht_cap.asel_capa = 0;
-
-            /* VHT: nss=1, MCS0-9 (IEEE80211_VHT_MCS_SUPPORT_0_9), nss2-8 not
-             * supported -> 0xFFFA on both maps. */
-            me_req.vht_cap.rx_mcs_map = 0xFFFA;
-            me_req.vht_cap.tx_mcs_map = 0xFFFA;
-
+            /* ME_CONFIG copied byte-for-byte (including the 112-byte length)
+             * from the golden Linux usbmon (aic_linux_init.pcap, id=0x1400).
+             * Field-wise construction is NOT equivalent: the golden carries a
+             * full HT capability (ht_capa_info=0x0963, a_mpdu_param=0x1f),
+             * VHT capa info, HE caps and VHT mcs maps (0xFFFE = 1x1 MCS0-9). */
+            static const uint8_t __me_config_golden[112] = {
+                0x63, 0x09, 0x1f, 0xff, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x96, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x32, 0x71, 0x98, 0x03, 0xfe, 0xff, 0x86, 0x01,
+                0xfe, 0xff, 0x86, 0x01, 0x00, 0x00, 0x02, 0x00,
+                0x00, 0x00, 0x06, 0xe0, 0x2b, 0x58, 0x0d, 0xc0,
+                0xcf, 0x04, 0x02, 0x30, 0x00, 0x00, 0xfe, 0xff,
+                0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+                0xff, 0xff, 0x38, 0x1c, 0xc7, 0x07, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0xe8, 0x03, 0x02, 0x01,
+                0x01, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00,
+            };
             priv->init_step++;
             __aic8800d_send_msg(wifi, AIC8800D_ME_CONFIG_REQ,
-                    &me_req, sizeof(me_req),
+                    __me_config_golden, sizeof(__me_config_golden),
                     AIC8800D_ME_CONFIG_CFM, NULL, 0,
                     __aic8800d_init_done_cb);
         }
@@ -924,16 +962,11 @@ static void __aic8800d_init_step(vsf_wifi_t *wifi, vsf_err_t err)
         vsf_wifi_aic8800d_trace_info("aic8800d: vif_idx=%u status=%u"
                 VSF_TRACE_CFG_LINEEND, add_if_cfm.inst_nbr, add_if_cfm.status);
 
-        vsf_wifi_aic8800d_trace_info("aic8800d: MM_SET_FILTER_REQ"
-                VSF_TRACE_CFG_LINEEND);
-        memset(&filter_req, 0, sizeof(filter_req));
-        /* Linux RWNX_DEFAULT_RX_FILTER */
-        filter_req.filter = 0x35078788;
+        /* Linux probe does NOT send MM_SET_FILTER_REQ (firmware default RX
+         * filter is used); matching it.  Do not restrict the filter below the
+         * firmware default. */
         priv->init_step++;
-        __aic8800d_send_msg(wifi, AIC8800D_MM_SET_FILTER_REQ,
-                &filter_req, sizeof(filter_req),
-                AIC8800D_MM_SET_FILTER_CFM, NULL, 0,
-                __aic8800d_init_done_cb);
+        __aic8800d_init_done_cb(wifi, VSF_ERR_NONE);
         break;
 
     case 13:
@@ -2070,9 +2103,17 @@ static vsf_err_t __aic8800d_tx(vsf_wifi_t *wifi,
     }
     desc->host.vif_idx = priv->vif_idx;
     desc->host.staid   = priv->sta_idx;
-    /* EAPOL-Key frames are sent as QoS data (matching the AP's M1 and the
-     * Linux driver's behaviour); other traffic defaults to non-QoS. */
-    desc->host.tid     = ((frame[12] == 0x88) && (frame[13] == 0x8E)) ? 0 : 0xFF;
+    /* Business data goes out on TID 1, not TID 0.  The firmware autonomously
+     * establishes an uplink Block Ack session on TID 0, and the A-MPDU stream
+     * it then produces is rejected by the AP (visible on the air as the AP's
+     * BlockAckReq window-resync probes), so unicast data stalls shortly after
+     * DHCP while broadcast keeps flowing (this is what broke 5G: DHCP worked
+     * but ARP/DNS/HTTP got no replies).  TID 1 has no such auto-BA session, so
+     * frames go out as plain QoS and the link carries data reliably on both
+     * bands.  Linux avoids the issue by having mac80211 manage BA from the
+     * host; our firmware manages BA itself, hence the different TID choice.
+     * EAPOL-Key frames stay on TID 0 as during the handshake. */
+    desc->host.tid     = ((frame[12] == 0x88) && (frame[13] == 0x8E)) ? 0 : 1;
     desc->host.ac      = 1;    /* BE */
     desc->host.flags   = 0;
 
