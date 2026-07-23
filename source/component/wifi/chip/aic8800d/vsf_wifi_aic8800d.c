@@ -2035,6 +2035,22 @@ static vsf_err_t __aic8800d_disconnect(vsf_wifi_t *wifi, vsf_wifi_done_t done)
     struct aic8800d_sm_disconnect_req req;
 
     if (priv == NULL) return VSF_ERR_NOT_READY;
+
+    /* Tear down the uplink Block Ack session established at connect time
+     * (MM_BA_ADD_REQ) before disconnecting.  Fire-and-forget: the firmware
+     * clears BA state on deauth anyway and the AP times idle sessions out,
+     * so a CFM error here (e.g. no session) must not block the disconnect. */
+    {
+        struct aic8800d_mm_ba_del_req bareq;
+        memset(&bareq, 0, sizeof(bareq));
+        bareq.type    = 0;              /* TX (uplink), matches MM_BA_ADD_REQ */
+        bareq.sta_idx = priv->sta_idx;
+        bareq.tid     = 0;
+        __aic8800d_send_msg(wifi, AIC8800D_MM_BA_DEL_REQ,
+                &bareq, sizeof(bareq),
+                AIC8800D_MM_BA_DEL_CFM, NULL, 0, NULL);
+    }
+
     memset(&req, 0, sizeof(req));
     req.vif_idx = priv->vif_idx;
     req.reason_code = 3;
