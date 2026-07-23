@@ -789,12 +789,23 @@ vsf_err_t vk_file_seek(vk_file_t *file, int64_t offset, vk_file_whence_t whence)
         pos = offset;
         break;
     case VSF_FILE_SEEK_CUR:
+        // reject a negative resulting position instead of letting the
+        // uint64_t pos wrap around; 0 - (uint64_t)offset is the
+        // well-defined magnitude of a negative offset (INT64_MIN safe)
+        if ((offset < 0) && (file->pos < 0 - (uint64_t)offset)) {
+            return VSF_ERR_INVALID_PARAMETER;
+        }
         pos = file->pos + offset;
         break;
     case VSF_FILE_SEEK_END:
         VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
+        if ((offset < 0) && (file->size < 0 - (uint64_t)offset)) {
+            return VSF_ERR_INVALID_PARAMETER;
+        }
         pos = file->size + offset;
         break;
+    default:
+        return VSF_ERR_INVALID_PARAMETER;
     }
     __vsf_component_call_peda(__vk_file_setpos, err, file,
         .offset     = pos,
