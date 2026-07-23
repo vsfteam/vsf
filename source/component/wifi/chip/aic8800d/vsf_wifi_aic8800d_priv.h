@@ -654,9 +654,14 @@ struct aic8800d_sm_connect_ind {
     aic_u32 ac_param[4];
 };
 
+/* Field order MUST match Linux lmac_msg.h struct sm_disconnect_req
+ * { u16 reason_code; u8 vif_idx; } -- the firmware decodes reason_code
+ * first; swapped fields make it read vif_idx=3 (a non-existent vif),
+ * the disconnect never completes and the SM stays busy (next connect
+ * rejected with CO_OP_IN_PROGRESS). */
 struct aic8800d_sm_disconnect_req {
-    aic_u8  vif_idx;
     aic_u16 reason_code;
+    aic_u8  vif_idx;
 };
 
 struct aic8800d_sm_disconnect_ind {
