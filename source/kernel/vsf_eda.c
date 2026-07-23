@@ -1113,7 +1113,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
 
-            uint_fast32_t tick = now - timer->due;
+            vsf_systimer_tick_t tick = timer->due - now;
             timer->due = 0;
             vsf_callback_timer_add(timer, tick);
         }
