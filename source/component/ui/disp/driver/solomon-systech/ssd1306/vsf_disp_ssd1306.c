@@ -29,6 +29,10 @@
 #include "./vsf_disp_ssd1306.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_SSD1306_CFG_ISR_PRIO
+#   define VSF_SSD1306_CFG_ISR_PRIO         vsf_arch_prio_0
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -149,7 +153,7 @@ static vsf_err_t __vk_disp_ssd1306_init(vk_disp_t *pthis)
         .isr = {
             .handler_fn = __ssd1306_i2c_isr,
             .target_ptr = disp_ssd1306,
-            .prio = vsf_arch_prio_0,
+            .prio = VSF_SSD1306_CFG_ISR_PRIO,
         },
     };
     vsf_err_t err = vsf_i2c_init(disp_ssd1306->hw.port, &cfg);
