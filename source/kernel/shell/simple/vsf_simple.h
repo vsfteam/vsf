@@ -70,11 +70,11 @@ extern "C" {
  *----------------------------------------------------------------------------*/
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #   define vsf_delay(__tick)                                                    \
-    if (VSF_EVT_TIMER == __vsf_delay((uint_fast32_t)__tick))
+    if (VSF_EVT_TIMER == __vsf_delay((vsf_systimer_tick_t)__tick))
 #   define vsf_delay_ms(__ms)                                                   \
-    if (VSF_EVT_TIMER == __vsf_delay((uint_fast32_t)vsf_systimer_ms_to_tick(__ms)))
+    if (VSF_EVT_TIMER == __vsf_delay((vsf_systimer_tick_t)vsf_systimer_ms_to_tick(__ms)))
 #   define vsf_delay_us(__us)                                                   \
-    if (VSF_EVT_TIMER == __vsf_delay((uint_fast32_t)vsf_systimer_us_to_tick(__us)))
+    if (VSF_EVT_TIMER == __vsf_delay((vsf_systimer_tick_t)vsf_systimer_us_to_tick(__us)))
 #endif
 
 
@@ -291,17 +291,17 @@ extern "C" {
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 VSF_CAL_SECTION(".text.vsf.kernel.__vsf_delay")
-extern vsf_evt_t __vsf_delay(uint_fast32_t ms);
+extern vsf_evt_t __vsf_delay(vsf_systimer_tick_t tick);
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 VSF_CAL_SECTION(".text.vsf.kernel.__vsf_sem_pend")
 extern
-vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out);
+vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, vsf_timeout_tick_t time_out);
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_mutex_enter")
 extern
-vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out);
+vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, vsf_timeout_tick_t time_out);
 #endif
 
 #endif

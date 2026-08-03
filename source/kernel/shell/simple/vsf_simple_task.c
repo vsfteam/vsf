@@ -47,7 +47,7 @@
 #endif
 
 VSF_CAL_SECTION(".text.vsf.kernel.__vsf_delay")
-vsf_evt_t __vsf_delay(uint_fast32_t tick)
+vsf_evt_t __vsf_delay(vsf_systimer_tick_t tick)
 {
     vsf_evt_t result = VSF_EVT_INVALID;
     enum {
@@ -100,7 +100,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
 
 
 VSF_CAL_SECTION(".text.vsf.kernel.__vsf_sem_pend")
-vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
+vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, vsf_timeout_tick_t time_out)
 {
     vsf_sync_reason_t result = VSF_SYNC_PENDING;
     vsf_err_t err;
@@ -147,7 +147,7 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_mutex_enter")
-vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out)
+vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, vsf_timeout_tick_t time_out)
 {
     VSF_KERNEL_ASSERT(NULL != mtx_ptr);
     return __vsf_sem_pend(&(mtx_ptr->use_as__vsf_sync_t), time_out);
