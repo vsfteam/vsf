@@ -103,7 +103,7 @@ extern "C" {
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__mutex_addr),                  \
                     (__timeout)),                                               \
-                    (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_mutex_try_enter_timeout_ms(__mutex_addr, __timeout)              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
