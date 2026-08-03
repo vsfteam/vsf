@@ -206,7 +206,7 @@ extern "C" {
         __name##_init(__fsm __VA_ARGS__)
 
 #define init_simple_fsm(__name, __fsm, ...)                                     \
-        init_vsf_fsm(__fsm __VA_ARGS__)
+        init_vsf_fsm(__name, __fsm, __VA_ARGS__)
 
 #define start_vsf_fsm(__name, __fsm, __pri, ...)                                \
             init_vsf_task(__name, (__fsm), (__pri), __VA_ARGS__)

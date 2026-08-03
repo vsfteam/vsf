@@ -320,11 +320,7 @@ vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer)
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_systimer_get_duration")
 vsf_systimer_tick_t vsf_systimer_get_duration(vsf_systimer_tick_t from_time, vsf_systimer_tick_t to_time)
 {
-    if (to_time >= from_time) {
-        return (vsf_systimer_tick_t)(to_time - from_time);
-    } else {
-        return (vsf_systimer_tick_t)(to_time + 0xFFFFFFFF - from_time);
-    }
+    return (vsf_systimer_tick_t)(to_time - from_time);
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_systimer_get_elapsed")

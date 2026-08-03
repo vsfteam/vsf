@@ -982,7 +982,7 @@ void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx)
         ctx->ticks = 0;
         ctx->duration = vsf_systimer_get_tick();
 
-        VSF_KERNEL_ASSERT(NULL != pthis->usage.ctx);
+        VSF_KERNEL_ASSERT(NULL == pthis->usage.ctx);
         pthis->usage.ctx = ctx;
     vsf_unprotect_int(origlevel);
 }

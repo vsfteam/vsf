@@ -136,7 +136,7 @@ extern "C" {
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__crit_addr),                   \
                     (__timeout)),                                               \
-                    (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_crit_try_enter_timeout_ms(__crit_addr, __timeout)                \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
@@ -170,7 +170,7 @@ extern "C" {
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_sem_pend((__psem),                           \
                     (__timeout)),                                               \
-                    (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 
 #   define vsf_sem_pend_timeout_ms(__psem, __timeout)                           \
@@ -206,7 +206,7 @@ extern "C" {
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_sem_pend((__ptrig),                          \
                     (__timeout)),                                               \
-                    (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 
 #   define vsf_trig_wait_timeout_ms(__ptrig, __timeout)                         \
