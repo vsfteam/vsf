@@ -84,7 +84,7 @@ extern "C" {
  * IPC Common                                                                 *
  *----------------------------------------------------------------------------*/
 #   define on_timeout()                                                         \
-                if (VSF_SYNC_TIMEOUT == vsf_eda_get_cur_evt())
+                if (VSF_EVT_TIMER == vsf_eda_get_cur_evt())
 
 /*----------------------------------------------------------------------------*
  * Mutex                                                                      *
