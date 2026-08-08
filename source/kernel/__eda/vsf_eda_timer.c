@@ -183,6 +183,12 @@ VSF_CAL_SECTION(".text.vsf.kernel.teda")
 static vsf_err_t __vsf_teda_set_timer_imp(vsf_teda_t *this_ptr, vsf_systimer_tick_t due)
 {
     __vsf_teda_timer_enqueue(this_ptr, due);
+    // reprogram the systimer for the new earliest due(compare match or
+    //  reload value, impl dependent), so the first timeout can fire an
+    //  interrupt - mandatory on COMP_TIMER targets(no periodic round
+    //  would fire otherwise), and avoids a one-round latency on
+    //  NORMAL_TIMER targets
+    __vsf_systimer_update(false);
     return VSF_ERR_NONE;
 }
 
