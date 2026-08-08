@@ -2319,7 +2319,7 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
         return -1;
     }
     return __vsf_linux_execvpe(entry, argv, envp,
-#if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH && (VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED)
             localpath
 #else
             NULL
@@ -2349,7 +2349,7 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
         return -1;
     }
     return __vsf_linux_execvpe(entry, argv, envp,
-#if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH && (VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED)
             localpath
 #else
             NULL
@@ -2436,7 +2436,7 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
         return -1;
     }
     return __vsf_linux_execlp_va(entry, arg, ap,
-#if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH && (VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED)
             localpath,
 #else
             NULL,
@@ -2473,7 +2473,7 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap, bool ha
         return -1;
     }
     return __vsf_linux_execlp_va(entry, arg, ap,
-#if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH && (VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED)
             localpath,
 #else
             NULL,
