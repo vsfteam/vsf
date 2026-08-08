@@ -35,7 +35,7 @@
 #endif
 
 #ifndef VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP
-#   ifdef __CPU_ARM__
+#   if defined(__CPU_ARM__) || defined(__CPU_RV__) || defined(__CPU_RISCV__)
 #       define VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP    ENABLED
 #   endif
 #endif

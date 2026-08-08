@@ -22,6 +22,9 @@ typedef setjmp_float128 jmp_buf[16];
 
 #   elif    defined(__CPU_ARM__)
 typedef unsigned long long int jmp_buf[16];
+#   elif    defined(__CPU_RV__) || defined(__CPU_RISCV__)
+// 16 words, matches the gp-aware rv_setjmp in hal/arch/rv
+typedef unsigned long int jmp_buf[16];
 #   else
 #   error not supported, do not add to path, use setjmp from libc instead
 #   endif
