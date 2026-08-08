@@ -117,8 +117,9 @@ else()
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/stdint
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/assert
     )
-    if((${VSF_ARCH_SERIES} STREQUAL "arm") OR (${VSF_ARCH_SERIES} STREQUAL "x64"))
-        # setjmp implementation only supports arm and x64
+    if((${VSF_ARCH_SERIES} STREQUAL "arm") OR (${VSF_ARCH_SERIES} STREQUAL "x64")
+        OR (${VSF_ARCH_SERIES} STREQUAL "rv"))
+        # setjmp implementation only supports arm, x64 and rv
         vsf_add_include_directories(
             ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
         )
