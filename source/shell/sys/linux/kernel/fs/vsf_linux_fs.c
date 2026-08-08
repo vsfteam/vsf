@@ -327,8 +327,14 @@ ssize_t __vsf_linux_stdio_fallback_read(vsf_linux_fd_t *sfd, void *buf, size_t c
 VSF_CAL_WEAK(__vsf_linux_stdio_fallback_write)
 ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
+#if VSF_USE_TRACE == ENABLED
     extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
     return (ssize_t)__vsf_trace_output(buf, count);
+#else
+    // trace is disabled: __vsf_trace_output must not be referenced,
+    //  discard the output instead
+    return count;
+#endif
 }
 #endif
 
