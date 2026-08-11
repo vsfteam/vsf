@@ -2966,7 +2966,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_buffer_read, vk_file_read)
     int realsize;
 
     if (vfs_file->pos >= vfs_file->size) {
-        realsize = -1;
+        realsize = 0;
     } else if (vfs_file->pos + vsf_local.size > vfs_file->size) {
         realsize = vfs_file->size - vfs_file->pos;
     } else {
@@ -3040,16 +3040,21 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
     ssize_t result;
+    bool is_eof = false;
 
     vsf_linux_trigger_t trig;
     vsf_linux_trigger_init(&trig);
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN) && (0 == vsf_stream_get_rbuf(stream, NULL))) {
-            if (vsf_linux_fd_is_block(sfd) && vsf_stream_is_tx_connected(stream)) {
+            if (!vsf_stream_is_tx_connected(stream)) {
+                vsf_unprotect_sched(orig);
+                is_eof = true;
+                break;
+            } else if (vsf_linux_fd_is_block(sfd)) {
                 if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
                     // triggered by signal
-                    return -1;
+                    goto do_return;
                 }
             } else {
                 vsf_unprotect_sched(orig);
@@ -3061,6 +3066,22 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         }
 
         cursize = vsf_stream_read(stream, buf, size);
+        if (0 == cursize) {
+            // POLLIN is set, but no data is actually available
+            orig = vsf_protect_sched();
+            if (!vsf_stream_is_tx_connected(stream)) {
+                vsf_unprotect_sched(orig);
+                is_eof = true;
+                break;
+            }
+            // clear the stale POLLIN status and wait for data again
+            __vsf_linux_stream_evt(priv, orig, POLLIN, false);
+            if (!vsf_linux_fd_is_block(sfd)) {
+                errno = EAGAIN;
+                goto do_return;
+            }
+            continue;
+        }
         if ((buf != NULL) && isatty(sfd->fd) && !(priv->flags & O_NOCTTY)) {
             vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
 
@@ -3165,8 +3186,11 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 
 do_return:
     result = count - size;
-    // return 0 means EOF
-    return 0 == result ? -1 : result;
+    if (result > 0) {
+        return result;
+    }
+    // POSIX: read() returns 0 on EOF, returns -1(with errno set) on error
+    return is_eof ? 0 : -1;
 }
 
 ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)

@@ -206,14 +206,24 @@ static int __vsf_linux_socket_bluetooth_rxevt(int fd, uint8_t *buffer, uint16_t 
 {
     uint8_t *ptr = buffer;
     int result = 0, total = 3;
+    ssize_t rsize;
 
     while (result < total) {
-        result += read(fd, ptr, total - result);
+        rsize = read(fd, ptr, total - result);
+        if (rsize <= 0) {
+            return rsize < 0 ? -1 : result;
+        }
+        result += (int)rsize;
+        ptr += rsize;
     }
     total = 3 + buffer[2];
-    ptr += 3;
     while (result < total) {
-        result += read(fd, ptr, total - result);
+        rsize = read(fd, ptr, total - result);
+        if (rsize <= 0) {
+            return rsize < 0 ? -1 : result;
+        }
+        result += (int)rsize;
+        ptr += rsize;
     }
     return result;
 }

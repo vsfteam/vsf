@@ -1581,7 +1581,8 @@ static ssize_t __vsf_linux_audio_timer_read(vsf_linux_fd_t *sfd, void *buf, size
         }
         done++;
     }
-    return done;
+    // POSIX: read() returns number of bytes read
+    return done * sizeof(struct snd_timer_tread);
 }
 
 static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)

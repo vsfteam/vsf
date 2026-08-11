@@ -2468,7 +2468,8 @@ int vsf_linux_fs_bind_gpio_hw(char *path)
 
 static ssize_t __vsf_linux_null_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    return EOF;
+    // POSIX: read() on /dev/null returns 0(EOF)
+    return 0;
 }
 
 static ssize_t __vsf_linux_null_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)

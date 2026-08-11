@@ -736,8 +736,10 @@ int vsh_main(int argc, char *argv[])
         fflush(stdout);
         while (1) {
             term_priv->line_start = !ctx.pos;
-            while (read(STDIN_FILENO, &ch, 1) != 1) {
-                if ((errno != EINTR) && isatty(STDIN_FILENO)) {
+            ssize_t rsize;
+            while ((rsize = read(STDIN_FILENO, &ch, 1)) != 1) {
+                // rsize == 0 means EOF, rsize < 0 means error
+                if (((rsize >= 0) || (errno != EINTR)) && isatty(STDIN_FILENO)) {
                     fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);
                     VSF_LINUX_ASSERT(false);
                 }

@@ -329,11 +329,12 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytes_t, 2, 2, arg)
 #ifdef vsf_pyal_buffer_t
     vsf_pyal_buffer_t buffer = vsf_pyal_new_buffer(length);
     length = read(fd, vsf_pyal_buffer_getptr(buffer), vsf_pyal_buffer_getlen(buffer));
-    if (length <= 0) {
+    if (length < 0) {
         vsf_pyal_raise("fail to read fd %d\n", fd);
         vsf_pyal_buffer_free(buffer);
         return VSF_PYAL_OBJ_NULL;
     }
+    // length == 0 means EOF, return empty bytes
 
     return vsf_pyal_newarg_bytes_ret_from_buffer(buffer, length);
 #else
@@ -344,11 +345,12 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytes_t, 2, 2, arg)
     }
 
     length = read(fd, buffer, length);
-    if (length <= 0) {
+    if (length < 0) {
         vsf_pyal_raise("fail to read fd %d\n", fd);
         free(buffer);
         return VSF_PYAL_OBJ_NULL;
     }
+    // length == 0 means EOF, return empty bytes
 
     return vsf_pyal_newfuncarg_bytes_ret_and_free(buffer, length);
 #endif
