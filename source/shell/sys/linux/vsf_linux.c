@@ -1457,7 +1457,9 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
     VSF_LINUX_ASSERT(process != NULL);
     VSF_LINUX_ASSERT(process->status == 0);
 
-    __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
+    // MUST use foreach_next here: the node is freed in the body,
+    //  foreach_unsafe would read the freed node->next in its increment step(use-after-free)
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, _);
         vsf_linux_process_heap_free(process, _);
     }
@@ -2920,13 +2922,10 @@ int setpgid(pid_t pid, pid_t pgid)
     if (process->is_vforking) {
         process = process->vfork_child;
     }
-    if (0 == pgid) {
-        process->id.gid = process->id.pid;
-    } else if (process->id.gid != pgid) {
-        vsf_linux_process_t *process_group = vsf_linux_get_process(pgid);
-        vsf_linux_detach_process(process);
-        vsf_linux_attach_process(process, process_group);
-    }
+    // setpgid only changes the process group id,
+    //  it MUST NOT change the parent-child relationship(child_list),
+    //  or the exit path of the group leader will wait/free other group members
+    process->id.gid = (0 == pgid) ? process->id.pid : pgid;
     return 0;
 }
 
