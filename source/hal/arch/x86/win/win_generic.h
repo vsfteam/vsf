@@ -233,6 +233,15 @@ extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request);
 
+// In windows release mode, CRT internals allocate memory without VSF heap mcb
+//  and such foreign pointers may reach the overridden free/realloc/etc. Since
+//  both VSF heap and CRT heap are implemented on windows process heap, foreign
+//  pointers can be forwarded to windows heap APIs directly, see win_generic.c.
+extern bool __vsf_win_heap_is_vsf_block(void *buffer);
+extern void __vsf_win_heap_foreign_free(void *buffer);
+extern void * __vsf_win_heap_foreign_realloc(void *buffer, size_t size);
+extern size_t __vsf_win_heap_foreign_size(void *buffer);
+
 extern vsf_arch_irq_thread_t * __vsf_arch_irq_get_cur(void);
 extern void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
     vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority);

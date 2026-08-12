@@ -122,6 +122,15 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_
 void __free_ex(vsf_linux_process_t *process, void *ptr)
 {
     if (ptr != NULL) {
+#if defined(__WIN__) && !defined(_DEBUG)
+        if (!__vsf_win_heap_is_vsf_block(ptr)) {
+            // not allocated by VSF heap, in windows release mode it's likely
+            // allocated by CRT internals(_calloc_base etc.) from windows process
+            // heap, forward to windows heap API directly.
+            __vsf_win_heap_foreign_free(ptr);
+            return;
+        }
+#endif
         vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)((char *)ptr - sizeof(vsf_liunx_heap_node_t));
 #ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
         if (node->before_entry) {
@@ -167,6 +176,12 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size,
         }
         return NULL;
     } else {
+#if defined(__WIN__) && !defined(_DEBUG)
+        if (!__vsf_win_heap_is_vsf_block(p)) {
+            // not allocated by VSF heap, forward to windows heap API directly.
+            return __vsf_win_heap_foreign_realloc(p, size);
+        }
+#endif
         vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)((uint8_t *)p - sizeof(vsf_liunx_heap_node_t));
         size_t total_size;
         void *new_buff;
@@ -230,6 +245,12 @@ size_t malloc_usable_size(void *p)
         return (size_t)0;
     }
 
+#if defined(__WIN__) && !defined(_DEBUG)
+    if (!__vsf_win_heap_is_vsf_block(p)) {
+        // not allocated by VSF heap, forward to windows heap API directly.
+        return __vsf_win_heap_foreign_size(p);
+    }
+#endif
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return vsf_linux_process_heap_size(NULL, (uint8_t *)p - sizeof(vsf_liunx_heap_node_t))
         - sizeof(vsf_liunx_heap_node_t);
@@ -902,9 +923,11 @@ static void *_ptds[32];
 
 void *_malloc_dbg(size_t size, int blockType, const char *filename, int linenumber)
 {
-#ifndef _DEBUG
-#   error Windows applications can only run in debug mode, see comments below for reason.
-#endif
+    // NOTE: Windows release mode is supported by forwarding foreign pointers
+    // (allocated by CRT internals without VSF heap mcb) to windows heap APIs,
+    // see __vsf_win_heap_is_vsf_block in hal/arch/x86/win/win_generic.c.
+    // _malloc_dbg will not be called by CRT internals in release mode, the ptd
+    // workaround below is only used in debug mode.
     // IMPORTANT: UGLY FIX FOR WINDOWS PTD
     // Windows ptd will be allocated in per_thread_data.cpp::,
     //  and freed in per_thread_data.cpp::destroy_fls.

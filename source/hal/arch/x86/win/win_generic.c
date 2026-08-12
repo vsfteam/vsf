@@ -1191,11 +1191,21 @@ void vsf_arch_reset(void)
  *----------------------------------------------------------------------------*/
 
 typedef struct vsf_arch_heap_mcb_t {
-    void *ptr;
+    struct vsf_arch_heap_mcb_t *next;   // link of all live blocks, for identifying vsf blocks
+    void *ptr;                          // base returned by HeapAlloc
+    void *user_ptr;                     // aligned buffer returned to caller
     uint_fast32_t alignment;
     uint_fast32_t size;             // size of memory allocated, smaller than memory_size
     uint_fast32_t memory_size;      // total memory size
 } vsf_arch_heap_mcb_t;
+
+// In windows release mode, CRT internals allocate memory without VSF heap mcb
+//  and such foreign pointers may reach the overridden free/realloc/etc. Since
+//  both VSF heap and CRT heap are implemented on windows process heap, foreign
+//  pointers can be forwarded to windows heap APIs directly. The list below is
+//  used to identify VSF blocks.
+static SRWLOCK __vsf_arch_heap_lock = SRWLOCK_INIT;
+static vsf_arch_heap_mcb_t *__vsf_arch_heap_mcb_list;
 
 void * vsf_arch_heap_malloc(uint_fast32_t size, uint_fast32_t alignment)
 {
@@ -1214,9 +1224,15 @@ void * vsf_arch_heap_malloc(uint_fast32_t size, uint_fast32_t alignment)
     aligned_buffer = (void *)(((uintptr_t)buffer + offset) & ~(uintptr_t)(alignment - 1));
     mcb = &((vsf_arch_heap_mcb_t *)aligned_buffer)[-1];
     mcb->ptr = buffer;
+    mcb->user_ptr = aligned_buffer;
     mcb->alignment = alignment;
     mcb->size = size;
     mcb->memory_size = HeapSize(GetProcessHeap(), 0, buffer) - (aligned_buffer - buffer);
+
+    AcquireSRWLockExclusive(&__vsf_arch_heap_lock);
+        mcb->next = __vsf_arch_heap_mcb_list;
+        __vsf_arch_heap_mcb_list = mcb;
+    ReleaseSRWLockExclusive(&__vsf_arch_heap_lock);
     return aligned_buffer;
 }
 
@@ -1247,8 +1263,26 @@ void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
 
 void vsf_arch_heap_free(void *buffer)
 {
-    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
-    HeapFree(GetProcessHeap(), 0, mcb->ptr);
+    vsf_arch_heap_mcb_t **link = &__vsf_arch_heap_mcb_list;
+
+    AcquireSRWLockExclusive(&__vsf_arch_heap_lock);
+        while (*link != NULL) {
+            if ((*link)->user_ptr == buffer) {
+                vsf_arch_heap_mcb_t *mcb = *link;
+                *link = mcb->next;
+                ReleaseSRWLockExclusive(&__vsf_arch_heap_lock);
+                HeapFree(GetProcessHeap(), 0, mcb->ptr);
+                return;
+            }
+            link = &(*link)->next;
+        }
+    ReleaseSRWLockExclusive(&__vsf_arch_heap_lock);
+
+    // not a vsf block. In windows release mode, CRT internals allocate memory
+    //  without VSF heap mcb while free is overridden by VSF, so such foreign
+    //  pointers will reach here. Since both VSF heap and CRT heap are implemented
+    //  on windows process heap, forward to windows heap API directly.
+    HeapFree(GetProcessHeap(), 0, buffer);
 }
 
 unsigned int vsf_arch_heap_alignment(void)
@@ -1268,6 +1302,37 @@ void vsf_arch_heap_statistics(vsf_arch_heap_statistics_t *statistics)
     HeapSummary(GetProcessHeap(), 0, &summary);
     statistics->all_size = summary.cbMaxReserve;
     statistics->used_size = summary.cbAllocated;
+}
+
+bool __vsf_win_heap_is_vsf_block(void *buffer)
+{
+    bool result = false;
+
+    AcquireSRWLockShared(&__vsf_arch_heap_lock);
+        for (vsf_arch_heap_mcb_t *mcb = __vsf_arch_heap_mcb_list; mcb != NULL; mcb = mcb->next) {
+            if (    ((uintptr_t)buffer >= (uintptr_t)mcb->user_ptr)
+                &&  ((uintptr_t)buffer < (uintptr_t)mcb->user_ptr + mcb->memory_size)) {
+                result = true;
+                break;
+            }
+        }
+    ReleaseSRWLockShared(&__vsf_arch_heap_lock);
+    return result;
+}
+
+void __vsf_win_heap_foreign_free(void *buffer)
+{
+    HeapFree(GetProcessHeap(), 0, buffer);
+}
+
+void * __vsf_win_heap_foreign_realloc(void *buffer, size_t size)
+{
+    return HeapReAlloc(GetProcessHeap(), 0, buffer, (SIZE_T)size);
+}
+
+size_t __vsf_win_heap_foreign_size(void *buffer)
+{
+    return HeapSize(GetProcessHeap(), 0, buffer);
 }
 
 /*----------------------------------------------------------------------------*
