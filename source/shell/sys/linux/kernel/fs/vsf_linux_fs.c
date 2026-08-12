@@ -3756,40 +3756,36 @@ static int __vsf_linux_key_stat(vsf_linux_fd_t *sfd, struct stat *buf)
 }
 
 // mntent
+//  no mtab is kept in this port: behave like an empty/unavailable mtab
+//  instead of asserting, so callers like busybox df degrade gracefully
 
 FILE * setmntent(const char *filename, const char *type)
 {
-    VSF_LINUX_ASSERT(false);
     return (FILE *)NULL;
 }
 
 struct mntent * getmntent(FILE *stream)
 {
-    VSF_LINUX_ASSERT(false);
     return (struct mntent *)NULL;
 }
 
 int addmntent(FILE *stream, const struct mntent *mnt)
 {
-    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
 int endmntent(FILE *stream)
 {
-    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
 char * hasmntopt(const struct mntent *mnt, const char *opt)
 {
-    VSF_LINUX_ASSERT(false);
     return (char *)NULL;
 }
 
 struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int buflen)
 {
-    VSF_LINUX_ASSERT(false);
     return (struct mntent *)NULL;
 }
 
