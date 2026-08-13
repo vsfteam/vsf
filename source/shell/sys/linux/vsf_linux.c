@@ -701,6 +701,15 @@ int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig)
     pending_process = trig->pending_process;
     if (NULL == pending_process) {
         vsf_unprotect_sched(orig);
+        // the pend side may not have finished arming(trigger_list add +
+        //  pending_process assignment in vsf_linux_trigger_pend) when an event
+        //  fires in between; the wake MUST NOT be swallowed here, or the
+        //  eventual pend blocks forever with data already available(lost
+        //  wakeup, observed as a dead shell with bytes stuck in the rx stream).
+        //  the trig is auto-reset, so setting it now makes the coming pend
+        //  return immediately. the list is untouched: the trig was not linked
+        //  yet, and the pend side delinks-if-linked on exit.
+        vsf_eda_trig_set_isr(&trig->use_as__vsf_trig_t);
         return 0;
     }
 
@@ -738,11 +747,14 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
     orig = vsf_protect_sched();
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     trig->pending_process = NULL;
+    // the wake may have arrived before arming was visible(see trigger_signal):
+    //  then nobody removed the trig from the list - delink-if-linked on any
+    //  exit path, or the dead stack frame stays linked(stale node corruption)
+    if (vsf_dlist_is_in(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig)) {
+        vsf_dlist_remove(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig);
+    }
 #endif
     if (VSF_SYNC_TIMEOUT == r) {
-#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-        vsf_dlist_remove(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig);
-#endif
         vsf_unprotect_sched(orig);
         return 1;
     }
