@@ -57,46 +57,6 @@ bool vsf_arch_low_level_init(void)
 }
 
 /*----------------------------------------------------------------------------*
- * Interrupt                                                                  *
- *----------------------------------------------------------------------------*/
-/*! \note default interrupt control implementation based on mstatus.MIE.
- *!       A chip with a BASEPRI-style priority threshold register(eg: Qingke
- *!       PFIC ITHRESDR) can provide strong overrides in its driver, the same
- *!       way cortex_m_generic.c does for arm chips.
- */
-VSF_CAL_WEAK(vsf_get_interrupt)
-vsf_gint_state_t vsf_get_interrupt(void)
-{
-    vsf_gint_state_t result;
-    __asm volatile("csrr %0, mstatus" : "=r"(result) : );
-    return result;
-}
-
-VSF_CAL_WEAK(vsf_set_interrupt)
-vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
-{
-    vsf_gint_state_t result;
-    __asm volatile("csrrs %0, mstatus, %1" : "=r"(result) : "r"(level));
-    return result & 8;
-}
-
-VSF_CAL_WEAK(vsf_disable_interrupt)
-vsf_gint_state_t vsf_disable_interrupt(void)
-{
-    vsf_gint_state_t result;
-    __asm volatile("csrrci %0, mstatus, 8" : "=r"(result) :);
-    return result & 8;
-}
-
-VSF_CAL_WEAK(vsf_enable_interrupt)
-vsf_gint_state_t vsf_enable_interrupt(void)
-{
-    vsf_gint_state_t result;
-    __asm volatile("csrrsi %0, mstatus, 8" : "=r"(result) :);
-    return result & 8;
-}
-
-/*----------------------------------------------------------------------------*
  * callstack trace                                                            *
  *----------------------------------------------------------------------------*/
 

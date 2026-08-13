@@ -106,10 +106,33 @@ typedef uint32_t vsf_gint_state_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-// interrupt control is implemented as WEAK functions in rv_generic.c
-//  (mstatus.MIE based); a chip with a BASEPRI-style threshold register
-//  (eg: Qingke PFIC ITHRESDR) can provide strong overrides in its driver,
-//  same as cortex_m_generic.c
+static VSF_CAL_ALWAYS_INLINE vsf_gint_state_t vsf_get_interrupt(void)
+{
+    vsf_gint_state_t result;
+    __asm volatile("csrr %0, mstatus" : "=r"(result) : );
+    return result;
+}
+
+static VSF_CAL_ALWAYS_INLINE vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
+{
+    vsf_gint_state_t result;
+    __asm volatile("csrrs %0, mstatus, %1" : "=r"(result) : "r"(level));
+    return result & 8;
+}
+
+static VSF_CAL_ALWAYS_INLINE vsf_gint_state_t vsf_disable_interrupt(void)
+{
+    vsf_gint_state_t result;
+    __asm volatile("csrrci %0, mstatus, 8" : "=r"(result) :);
+    return result & 8;
+}
+
+static VSF_CAL_ALWAYS_INLINE vsf_gint_state_t vsf_enable_interrupt(void)
+{
+    vsf_gint_state_t result;
+    __asm volatile("csrrsi %0, mstatus, 8" : "=r"(result) :);
+    return result & 8;
+}
 
 static VSF_CAL_ALWAYS_INLINE void vsf_arch_sleep(uint_fast32_t mode)
 {
