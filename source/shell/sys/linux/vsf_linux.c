@@ -1472,6 +1472,14 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
     // MUST use foreach_next here: the node is freed in the body,
     //  foreach_unsafe would read the freed node->next in its increment step(use-after-free)
     __vsf_dlist_foreach_next_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
+        // fini the thread BEFORE removing it from thread_list:
+        //  1. a thread which is still scheduled (e.g. pending on an event) must be
+        //      terminated before its block is freed, or the freed block can be
+        //      dispatched again later(use-after-free)
+        //  2. vsf_linux_thread_on_terminate frees the thread block itself if the
+        //      thread is NOT in thread_list any more, so fini MUST be called while
+        //      the thread is still in the list to avoid double free
+        vsf_eda_fini(&_->use_as__vsf_eda_t);
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, _);
         vsf_linux_process_heap_free(process, _);
     }
