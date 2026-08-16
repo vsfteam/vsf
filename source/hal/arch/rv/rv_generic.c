@@ -72,6 +72,11 @@ void vsf_arch_add_text_region(vsf_arch_text_region_t *region)
     // TODO
 }
 
+void vsf_arch_remove_text_region(vsf_arch_text_region_t *region)
+{
+    // TODO
+}
+
 uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num)
 {
     uint32_t pc;
