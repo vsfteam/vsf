@@ -549,6 +549,10 @@ vsf_class(vk_usbh_t) {
 // APIs to be called by user
 extern vsf_err_t vk_usbh_init(vk_usbh_t *usbh);
 extern vsf_err_t vk_usbh_fini(vk_usbh_t *usbh);
+// NOTE: class drivers are probed in REVERSE registration order - the core
+//  walks class_list LIFO(vk_usbh_register_class prepends). register the
+//  fallback/wildcard drivers FIRST so they are matched LAST, the specific
+//  drivers LAST so they are matched FIRST(see usrapp_usbh_common.c)
 extern void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
 extern void vk_usbh_unregister_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
 
