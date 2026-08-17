@@ -122,11 +122,11 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_
 void __free_ex(vsf_linux_process_t *process, void *ptr)
 {
     if (ptr != NULL) {
-#if defined(__WIN__)
+#if defined(__WIN__) && !defined(_DEBUG)
         if (!__vsf_win_heap_is_vsf_block(ptr)) {
-            // not allocated by VSF heap, on windows it's likely allocated by
-            // CRT internals(_calloc_base etc.) from windows process heap,
-            // forward to windows heap API directly.
+            // not allocated by VSF heap, in windows release mode it's likely
+            // allocated by CRT internals(_calloc_base etc.) from windows process
+            // heap, forward to windows heap API directly.
             __vsf_win_heap_foreign_free(ptr);
             return;
         }
@@ -176,7 +176,7 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size,
         }
         return NULL;
     } else {
-#if defined(__WIN__)
+#if defined(__WIN__) && !defined(_DEBUG)
         if (!__vsf_win_heap_is_vsf_block(p)) {
             // not allocated by VSF heap, forward to windows heap API directly.
             return __vsf_win_heap_foreign_realloc(p, size);
@@ -245,7 +245,7 @@ size_t malloc_usable_size(void *p)
         return (size_t)0;
     }
 
-#if defined(__WIN__)
+#if defined(__WIN__) && !defined(_DEBUG)
     if (!__vsf_win_heap_is_vsf_block(p)) {
         // not allocated by VSF heap, forward to windows heap API directly.
         return __vsf_win_heap_foreign_size(p);
