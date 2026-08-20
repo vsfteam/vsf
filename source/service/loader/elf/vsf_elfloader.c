@@ -585,7 +585,12 @@ second_round_for_ram_base:
                         linfo.export.str_len += symbol_len;
                     } else {
                         linfo.export.vplt_entry->name = linfo.export.str;
-                        linfo.export.vplt_entry->ptr = (void *)((uintptr_t)sym.st_value + base);
+                        /* vsf_elfloader_remap handles the vaddr->real mapping
+                         *  for both XIP(object + vaddr2off, RX p_offset!=0) and
+                         *  RAM-loaded(ram_base + vaddr - ram_base_vaddr); the
+                         *  plain "st_value + base" was wrong whenever the RX
+                         *  segment's file offset differed from its vaddr */
+                        linfo.export.vplt_entry->ptr = vsf_elfloader_remap(elfloader, (void *)(uintptr_t)sym.st_value);
                         strcpy(linfo.export.str, symbol_name);
                         linfo.export.str += symbol_len;
                         linfo.export.vplt_entry++;
