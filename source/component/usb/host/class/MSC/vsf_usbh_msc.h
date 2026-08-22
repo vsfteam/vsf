@@ -31,6 +31,14 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+// number of scsi instances the host msc driver exposes(= max LUNs addressable
+//  per BOT interface). USB BOT allows up to 16 LUNs(bCBWLUN is 4-bit wide);
+//  override to the real LUN count of the target device to save RAM.
+#ifndef VSF_USBH_MSC_CFG_MAX_LUN
+#   define VSF_USBH_MSC_CFG_MAX_LUN         2
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

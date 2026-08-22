@@ -29,6 +29,13 @@
 
 /*============================ MACROS ========================================*/
 
+// READ CAPACITY retry bound during mal init. an unbounded busy retry here
+//  hangs the whole mount flow forever on devices that keep failing the
+//  command(e.g. a card slot with no medium reporting CHECK CONDITION)
+#ifndef VSF_SCSI_MAL_CFG_CAPACITY_RETRY
+#   define VSF_SCSI_MAL_CFG_CAPACITY_RETRY      3
+#endif
+
 #if VSF_SCSI_MAL_CFG_DEBUG == ENABLED
 #   define __vk_scsi_mal_trace(...)                                             \
             vsf_trace_debug("scsi_mal: " __VA_ARGS__)
@@ -96,6 +103,7 @@ static bool __vk_scsi_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_
 
 __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init,
     uint8_t state;
+    uint_fast8_t capacity_retry;
 )
 {
     vsf_peda_begin();
@@ -111,6 +119,7 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init,
     case VSF_EVT_INIT:
         VSF_MAL_ASSERT((pthis != NULL) && (pthis->scsi != NULL));
         vsf_local.state = STATE_INIT;
+        vsf_local.capacity_retry = 0;
         vk_scsi_init(pthis->scsi);
         break;
     case VSF_EVT_RETURN:
@@ -148,6 +157,9 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init,
             break;
         case STATE_CAPACITY:
             if (err < 0){
+                if (++vsf_local.capacity_retry > VSF_SCSI_MAL_CFG_CAPACITY_RETRY) {
+                    goto __return;
+                }
                 goto retry_read_capacity;
             }
 

@@ -53,10 +53,11 @@ typedef struct vk_usbh_msc_t {
     } buffer;
 
 #if VSF_USE_SCSI == ENABLED
-    vk_scsi_t scsi;
+    vk_scsi_t scsi_devs[VSF_USBH_MSC_CFG_MAX_LUN];
 #endif
 
     vsf_eda_t eda;
+    __vsf_crit_npb_t crit;
     uint64_t addr;
     uint32_t total_size;
     uint32_t remain_size;
@@ -158,11 +159,19 @@ __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_fini, vk_scsi_fini)
 #   pragma diag_suppress=pe546,pe068
 #endif
 
-static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uint8_t *cbd, bool is_stream, void *mem_stream)
+static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, uint_fast8_t lun, vsf_evt_t evt, uint8_t *cbd, bool is_stream, void *mem_stream)
 {
     switch (evt) {
-    case VSF_EVT_INIT: {
-            // TODO: add mutex for protection
+    case VSF_EVT_INIT:
+        // one command at a time: BOT allows only one outstanding command per
+        //  interface, and the whole CBW->DATA->CSW sequence below shares one
+        //  cbw/state/urb set. hold the crit from command start until the
+        //  final vsf_eda_return; contended callers wait for VSF_EVT_SYNC
+        if (VSF_ERR_NONE != __vsf_eda_crit_npb_enter(&msc->crit)) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC: {
             uint_fast8_t cbd_len = vk_scsi_get_command_len(cbd);
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
             bool is_rw = vk_scsi_get_rw_param(cbd, &msc->addr, &msc->total_size);
@@ -180,7 +189,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             msc->remain_size = msc->total_size;
             msc->buffer.cbw.dCBWDataTransferLength = cpu_to_le32(msc->total_size);
             msc->buffer.cbw.bmCBWFlags = (SCSI_CMDCODE_WRITE == cmd_code) ? 0x00 : 0x80;
-            msc->buffer.cbw.bCBWLUN = 0;
+            msc->buffer.cbw.bCBWLUN = lun;
             msc->buffer.cbw.bCBWCBLength = cbd_len;
             memcpy(msc->buffer.cbw.CBWCB, cbd, cbd_len);
 
@@ -198,7 +207,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                     vk_usbh_clear_endpoint_halt(msc->usbh, msc->dev,
                         pipe.endpoint | (pipe.dir_in1out0 ? USB_DIR_IN : USB_DIR_OUT));
                 } else {
-                    vsf_eda_return(VSF_ERR_FAIL);
+                    goto return_fail;
                 }
                 break;
             }
@@ -249,12 +258,17 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             case VSF_USBH_MSC_STATE_CLEAR_STALL:
                 goto reply_stage;
             case VSF_USBH_MSC_STATE_REPLY:
+                __vsf_eda_crit_npb_leave(&msc->crit);
                 vsf_eda_return(msc->buffer.csw.dCSWStatus == 0 ? msc->total_size - msc->remain_size : VSF_ERR_FAIL);
                 break;
             }
         }
         break;
     }
+    return;
+return_fail:
+    __vsf_eda_crit_npb_leave(&msc->crit);
+    vsf_eda_return(VSF_ERR_FAIL);
 }
 
 #if __IS_COMPILER_IAR__
@@ -266,8 +280,10 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
 __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute, vk_scsi_execute)
 {
     vsf_peda_begin();
-    vk_usbh_msc_t *msc = vsf_container_of(&vsf_this, vk_usbh_msc_t, scsi);
-    __vk_usbh_msc_scsi_execute_do(msc, evt, vsf_local.cbd, false, &vsf_local.mem);
+    vk_usbh_msc_t *msc = (vk_usbh_msc_t *)((vk_scsi_t *)&vsf_this)->param;
+    __vk_usbh_msc_scsi_execute_do(msc,
+        (vk_scsi_t *)(void *)&vsf_this - &msc->scsi_devs[0],
+        evt, vsf_local.cbd, false, &vsf_local.mem);
     vsf_peda_end();
 }
 
@@ -277,8 +293,10 @@ __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute_stream, vk_scsi_execut
     vsf_peda_begin();
     VSF_USB_ASSERT(false);
     // not supported yet
-//    vk_usbh_msc_t *msc = vsf_container_of(&vsf_this, vk_usbh_msc_t, scsi);
-//    __vk_usbh_msc_scsi_execute_do(msc, evt, vsf_local.cbd, true, &vsf_local.stream);
+//    vk_usbh_msc_t *msc = vsf_container_of(&vsf_this, vk_usbh_msc_t, scsi_devs[0]);
+//    __vk_usbh_msc_scsi_execute_do(msc,
+//        (vk_scsi_t *)(void *)&vsf_this - &msc->scsi_devs[0],
+//        evt, vsf_local.cbd, true, &vsf_local.stream);
     vsf_peda_end();
 }
 #endif
@@ -318,14 +336,23 @@ static void __vk_usbh_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         // fall through
     case VSF_EVT_SYNC:
         if (VSF_ERR_NONE != __vk_usbh_msc_get_max_lun(msc)) {
-            vk_usbh_remove_interface(msc->usbh, dev, msc->ifs);
-            return;
+            // per the USB BOT spec, a device not supporting multiple LUNs may
+            //  STALL GET_MAX_LUN: fall back to a single-LUN device instead of
+            //  removing a working mass-storage interface
+            msc->max_lun = 0;
         }
         break;
     case VSF_EVT_MESSAGE:
         __vsf_eda_crit_npb_leave(&dev->ep0.crit);
 #if VSF_USE_SCSI == ENABLED
-        vsf_scsi_on_new(&msc->scsi);
+        // max_lun is the max LUN index(BOT allows up to 16); only expose as
+        //  many instances as the scsi_devs array can hold
+        if (msc->max_lun >= dimof(msc->scsi_devs)) {
+            msc->max_lun = dimof(msc->scsi_devs) - 1;
+        }
+        for (uint_fast8_t i = 0; i <= msc->max_lun; i++) {
+            vsf_scsi_on_new(&msc->scsi_devs[i]);
+        }
 #endif
         break;
     }
@@ -375,10 +402,16 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     }
 
 #if VSF_USE_SCSI == ENABLED
-    msc->scsi.drv = &__vk_usbh_msc_scsi_drv;
+    for (uint_fast8_t i = 0; i < dimof(msc->scsi_devs); i++) {
+        msc->scsi_devs[i].drv = &__vk_usbh_msc_scsi_drv;
+        // back-pointer for the execute entry(container_of can not recover the
+        //  owner through scsi_devs[0] for instances other than [0])
+        msc->scsi_devs[i].param = msc;
+    }
 #endif
     msc->eda.fn.evthandler = __vk_usbh_msc_evthandler;
     msc->eda.on_terminate = __vk_usbh_msc_on_eda_terminate;
+    __vsf_eda_crit_npb_init(&msc->crit);
 #ifdef VSF_USBH_MSC_CFG_PRIORITY
     vsf_eda_init(&msc->eda, VSF_USBH_MSC_CFG_PRIORITY);
 #else
@@ -399,7 +432,9 @@ static void __vk_usbh_msc_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
 {
     vk_usbh_msc_t *msc = (vk_usbh_msc_t *)param;
 #if VSF_USE_SCSI == ENABLED
-    vsf_scsi_on_delete(&msc->scsi);
+    for (uint_fast8_t i = 0; i < dimof(msc->scsi_devs); i++) {
+        vsf_scsi_on_delete(&msc->scsi_devs[i]);
+    }
 #endif
     __vk_usbh_msc_free_urb(msc);
 }

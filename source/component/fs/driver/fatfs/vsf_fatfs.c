@@ -374,6 +374,60 @@ static bool __vk_fatfs_try_unicode2ascii(uint16_t *uchar)
     return is_unicode;
 }
 
+// convert nul-terminated utf16(exFAT/FAT-LFN, little-endian) to utf8.
+// pass NULL out to just get the needed size(NUL included). invalid surrogate
+// halves are emitted as U+FFFD
+static uint_fast16_t __vk_fatfs_utf16_to_utf8(const uint16_t *utf16, char *out)
+{
+    uint_fast16_t len = 0;
+
+    while (*utf16 != 0) {
+        uint32_t code = *utf16++;
+        uint_fast8_t size;
+
+        if (    ((code >= 0xD800) && (code <= 0xDBFF))
+            &&  ((utf16[0] >= 0xDC00) && (utf16[0] <= 0xDFFF))) {
+            code = 0x10000 + ((code - 0xD800) << 10) + (uint32_t)(utf16[0] - 0xDC00);
+            utf16++;
+        } else if ((code >= 0xD800) && (code <= 0xDFFF)) {
+            code = 0xFFFD;      // stray surrogate half
+        }
+
+        if (code < 0x80) {
+            size = 1;
+            if (out != NULL) {
+                out[len] = code;
+            }
+        } else if (code < 0x800) {
+            size = 2;
+            if (out != NULL) {
+                out[len] = 0xC0 | (code >> 6);
+                out[len + 1] = 0x80 | (code & 0x3F);
+            }
+        } else if (code < 0x10000) {
+            size = 3;
+            if (out != NULL) {
+                out[len] = 0xE0 | (code >> 12);
+                out[len + 1] = 0x80 | ((code >> 6) & 0x3F);
+                out[len + 2] = 0x80 | (code & 0x3F);
+            }
+        } else {
+            size = 4;
+            if (out != NULL) {
+                out[len] = 0xF0 | (code >> 18);
+                out[len + 1] = 0x80 | ((code >> 12) & 0x3F);
+                out[len + 2] = 0x80 | ((code >> 6) & 0x3F);
+                out[len + 3] = 0x80 | (code & 0x3F);
+            }
+        }
+        len += size;
+    }
+    if (out != NULL) {
+        out[len] = '\0';
+    }
+    return len + 1;
+}
+
 static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
 {
     fatfs_dbr_t *dbr = (fatfs_dbr_t *)buff;
@@ -1653,35 +1707,43 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                     }
 
                     if (parsed) {
-                        if (!name || vk_file_is_match((char *)name, dparser->filename)) {
-                            vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)vk_file_alloc(sizeof(vk_fatfs_file_t));
-                            if (NULL == fatfs_file) {
+                        char *filename_str;
+                        uint_fast16_t filename_len;
+
+                        if (dparser->is_unicode) {
+                            // exFAT/LFN names are utf16: convert to utf8 for
+                            //  both matching and storage
+                            filename_len = __vk_fatfs_utf16_to_utf8((uint16_t *)dparser->filename, NULL);
+                            filename_str = vsf_heap_malloc(filename_len);
+                            if (NULL == filename_str) {
                             fail_mem:
                                 err = VSF_ERR_NOT_ENOUGH_RESOURCES;
                                 goto __fail_and_exit;
                             }
+                            __vk_fatfs_utf16_to_utf8((uint16_t *)dparser->filename, filename_str);
+                        } else {
+                            filename_str = dparser->filename;
+                            filename_len = strlen(dparser->filename) + 1;
+                        }
 
-                            uint_fast16_t filename_len;
-                            if (dparser->is_unicode) {
-                                uint16_t *uchar = (uint16_t *)dparser->filename;
-                                filename_len = 0;
-                                while (*uchar++ != 0) {
-                                    filename_len += 2;
+                        if (!name || vk_file_is_match((char *)name, filename_str)) {
+                            vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)vk_file_alloc(sizeof(vk_fatfs_file_t));
+                            if (NULL == fatfs_file) {
+                                if (filename_str != dparser->filename) {
+                                    vsf_heap_free(filename_str);
                                 }
-                                filename_len += 2;
-                                // TODO: convert to utf8 length
-                                VSF_FS_ASSERT(false);
-                            } else {
-                                filename_len = strlen(dparser->filename) + 1;
+                                goto fail_mem;
                             }
 
                             fatfs_file->name = vsf_heap_malloc(filename_len);
                             if (NULL == fatfs_file->name) {
+                                if (filename_str != dparser->filename) {
+                                    vsf_heap_free(filename_str);
+                                }
                                 vk_file_free(&fatfs_file->use_as__vk_file_t);
                                 goto fail_mem;
                             }
-                            // TODO: convert to utf8
-                            memcpy(fatfs_file->name, dparser->filename, filename_len);
+                            memcpy(fatfs_file->name, filename_str, filename_len);
 
                             fatfs_file->attr |= (vk_file_attr_t)__vk_fatfs_parse_file_attr(dparser->attr);
                             fatfs_file->fsop = &vk_fatfs_op;
