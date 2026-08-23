@@ -15,13 +15,41 @@
  *                                                                           *
  ****************************************************************************/
 
+/**
+ * @file
+ * \~english
+ * @brief VSF kernel shell aggregation header.
+ *
+ * This header exposes the simple kernel shell APIs by including the
+ * corresponding sub-module headers. It is the intended entry point for
+ * applications that use the VSF kernel shell layer.
+ *
+ * \~chinese
+ * @brief VSF 内核 shell 聚合头文件。
+ *
+ * 此头文件通过包含对应的子模块头文件来暴露简单的内核 shell API。
+ * 它是使用 VSF 内核 shell 层的应用程序的推荐入口点。
+ */
 #ifndef __VSF_KERNEL_SHELL_H__
 #define __VSF_KERNEL_SHELL_H__
 
 /*============================ INCLUDES ======================================*/
 #include "../vsf_kernel_cfg.h"
 
+/**
+ * \~english
+ * @brief Include the simple kernel shell API.
+ * \~chinese
+ * @brief 包含简单的内核 shell API。
+ */
 #include "./simple/vsf_simple.h"
+
+/**
+ * \~english
+ * @brief POSIX-compatible kernel shell API (currently disabled).
+ * \~chinese
+ * @brief POSIX 兼容的内核 shell API（当前未启用）。
+ */
 //#include "./posix/vsf_posix.h"
 
 #ifdef __cplusplus
