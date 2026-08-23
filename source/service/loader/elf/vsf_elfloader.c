@@ -58,6 +58,7 @@ typedef struct vsf_elfloader_info_t {
     Elf_Word memsz;
     Elf_Word memstart_xip;
     Elf_Word memsz_xip;
+    Elf_Word memstart_w;
 
     // for .dynamic
     struct {
@@ -322,6 +323,11 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
             if (linfo->memstart > header->p_vaddr) {
                 linfo->memstart = header->p_vaddr;
             }
+            if ((header->p_flags & PF_W) != 0) {
+                if (linfo->memstart_w > header->p_vaddr) {
+                    linfo->memstart_w = header->p_vaddr;
+                }
+            }
             if (target->support_xip && ((header->p_flags & PF_W) != 0)) {
                 if (linfo->memstart_xip != (Elf_Word)-1) {
                     uintptr_t offset = header->p_vaddr - (linfo->memstart_xip + linfo->memsz_xip);
@@ -470,6 +476,7 @@ int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
     linfo.memsz = 0;
     linfo.memsz_xip = 0;
     linfo.memstart_xip = (Elf_Word)-1;
+    linfo.memstart_w = (Elf_Word)-1;
     linfo.memstart = (Elf_Word)-1;
     memset(&linfo.dynamic, 0, sizeof(linfo.dynamic));
     memset(&linfo.export, 0, sizeof(linfo.export));
@@ -625,6 +632,15 @@ second_round_for_ram_base:
     Elf_Shdr header;
     if (vsf_elfloader_get_section(elfloader, target, ".got", &header) > 0) {
         elfloader->static_base = (uint8_t *)elfloader->static_base + header.sh_addr - elfloader->ram_base_vaddr;
+        elfloader->is_got = true;
+    } else if (!elfloader->is_xip && (linfo.memstart_w != (Elf_Word)-1)) {
+        /* no .got section: images built with a dedicated static-base register
+         * convention anchor static data at the first writable segment.
+         * ram-loaded images copy the whole image from its min p_vaddr
+         * (including read-only segments), so re-anchor static_base there;
+         * xip images need no fixup, their ram_base_vaddr already is the
+         * writable-segment start. */
+        elfloader->static_base = (uint8_t *)elfloader->static_base + linfo.memstart_w - elfloader->ram_base_vaddr;
         elfloader->is_got = true;
     }
 
