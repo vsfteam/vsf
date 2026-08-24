@@ -979,6 +979,12 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unmount, vk_fs_unmount)
         err = VSF_ERR_NOT_ENOUGH_RESOURCES;
     case VSF_EVT_RETURN:
         dir->attr &= ~VSF_VFS_FILE_ATTR_MOUNTED;
+        // the subfs fields share storage with d.child_list(union): leave
+        // them dangling and a later close/unlink of the node reads stale
+        // pointers as children(same cleanup as the failed-mount path)
+        dir->subfs.op = NULL;
+        dir->subfs.data = NULL;
+        dir->subfs.root = NULL;
         vsf_eda_return(err);
         break;
     }
