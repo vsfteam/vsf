@@ -56,6 +56,7 @@ typedef enum vk_malfs_mount_state_t {
     VSF_MOUNT_STATE_OPEN_ROOT,
     VSF_MOUNT_STATE_MOUNT,
     VSF_MOUNT_STATE_RENAME_ROOT,
+    VSF_MOUNT_STATE_CLOSE_ROOT,
     VSF_MOUNT_STATE_UNLINK_ROOT,
 } vk_malfs_mount_state_t;
 
@@ -632,6 +633,14 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             }
             // fall through
         case VSF_MOUNT_STATE_RENAME_ROOT:
+            // release the reference taken by OPEN_ROOT: the mountpoint node
+            // stays alive through its creation reference, and holding this
+            // one forever would keep the node in the tree even after
+            // unmount + unlink(hot-removal can never clean it up)
+            vsf_local.mount_state = VSF_MOUNT_STATE_CLOSE_ROOT;
+            vk_file_close(partition->root);
+            break;
+        case VSF_MOUNT_STATE_CLOSE_ROOT:
             mounter->partition_mounted++;
             goto next_partition;
         case VSF_MOUNT_STATE_UNLINK_ROOT:
