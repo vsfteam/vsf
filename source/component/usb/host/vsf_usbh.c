@@ -310,6 +310,9 @@ vk_usbh_dev_t * vk_usbh_new_device(vk_usbh_t *usbh, enum usb_device_speed_t spee
     if (dev_new != NULL) {
         dev_new->speed = speed;
         vsf_trace_info("usbh: new %s speed device connected" VSF_TRACE_CFG_LINEEND,
+                        USB_SPEED_SUPER_PLUS == speed ? "super-plus" :
+                        USB_SPEED_SUPER == speed ? "super" :
+                        USB_SPEED_WIRELESS == speed ? "wireless" :
                         USB_SPEED_HIGH == speed ? "high" :
                         USB_SPEED_FULL == speed ? "full" :
                         USB_SPEED_LOW == speed ? "low" : "unknown");
