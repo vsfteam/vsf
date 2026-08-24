@@ -287,7 +287,7 @@ typedef union vk_usbh_pipe_flag_t {
         uint32_t size               : 11;
         uint32_t endpoint           : 4;
         uint32_t type               : 2;
-        uint32_t speed              : 2;
+        uint32_t speed              : 3;
         uint32_t address            : 7;
         uint32_t dir_in1out0        : 1;
         uint32_t toggle             : 1;
@@ -493,7 +493,7 @@ vsf_class(vk_usbh_dev_t) {
 
         uint8_t devnum;
         uint8_t num_of_ifs;
-        uint8_t speed       : 2;
+        uint8_t speed       : 3;
         uint8_t cur_config  : 5;
         uint8_t is_ep0_rdy  : 1;
         uint8_t maxchild    : 4;

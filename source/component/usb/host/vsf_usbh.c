@@ -152,9 +152,9 @@ uint32_t __vk_usbh_get_pipe_value(vk_usbh_dev_t *dev,
     return         1|   (size << 1)                         /* 11-bit size */
                     |   ((endpoint & 0xF) << 12)            /* 4-bit endpoint */
                     |   (type << 16)                        /* 2-bit type */
-                    |   (dev->speed << 18)                  /* 2-bit speed */
-                    |   (dev->devnum << 20)                 /* 7-bit address */
-                    |   ((endpoint & USB_DIR_MASK) << 20);  /* 1-bit direction */
+                    |   (dev->speed << 18)                  /* 3-bit speed */
+                    |   (dev->devnum << 21)                 /* 7-bit address */
+                    |   (((endpoint >> 7) & 1) << 28);      /* 1-bit direction */
 }
 
 vk_usbh_pipe_t __vk_usbh_get_pipe(vk_usbh_dev_t *dev,
