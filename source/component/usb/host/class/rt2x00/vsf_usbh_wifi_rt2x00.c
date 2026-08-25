@@ -705,8 +705,9 @@ vsf_err_t vk_usbh_wifi_send(void *dev, uint8_t *frame, uint16_t len)
     if (NULL == ocb) return VSF_ERR_NOT_AVAILABLE;
 
 #if VSF_USBH_WIFI_CFG_TX_USE_LOCAL_BUFFER == ENABLED
-    memcpy(ocb->urb.urb_hcd->buffer, frame, len);
-    ocb->urb.urb_hcd->transfer_length = len;
+    /* pre-allocated buffer(start_tx), resized in place - no realloc churn */
+    vk_usbh_urb_set_buffer(&ocb->urb, NULL, len);
+    memcpy(vk_usbh_urb_peek_buffer(&ocb->urb), frame, len);
 #else
     vk_usbh_urb_set_buffer(&ocb->urb, frame, len);
 #endif

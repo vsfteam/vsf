@@ -476,9 +476,17 @@ void vk_usbh_urb_set_buffer(vk_usbh_urb_t *urb, void *buffer,
 {
     VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
     vk_usbh_hcd_urb_t *urb_hcd = urb->urb_hcd;
-    vk_usbh_urb_free_buffer(urb);
-    urb_hcd->buffer = buffer;
-    urb_hcd->transfer_length = size;
+    if (NULL == buffer) {
+        // resize-in-place: keep the attached buffer(and its deleter, if any),
+        // update transfer_length only. for pre-allocated URB buffers that are
+        // reused across submissions.
+        VSF_USB_ASSERT(urb_hcd->buffer != NULL);
+        urb_hcd->transfer_length = size;
+    } else {
+        vk_usbh_urb_free_buffer(urb);
+        urb_hcd->buffer = buffer;
+        urb_hcd->transfer_length = size;
+    }
 }
 
 int_fast16_t vk_usbh_urb_get_status(vk_usbh_urb_t *urb)
