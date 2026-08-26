@@ -307,6 +307,7 @@ extern void vk_disp_on_ready(vk_disp_t *pthis);
 #include "./driver/sitronix/st7789/vsf_disp_st7789.h"
 #include "./driver/sitronix/st7735/vsf_disp_st7735.h"
 #include "./driver/solomon-systech/ssd1306/vsf_disp_ssd1306.h"
+#include "./driver/chipwealth/ch1115/vsf_disp_ch1115.h"
 #include "./driver/vga/m480/vsf_disp_vga_m480.h"
 #include "./driver/fb/vsf_disp_fb.h"
 #if VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
