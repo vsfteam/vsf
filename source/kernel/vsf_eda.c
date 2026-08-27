@@ -1067,7 +1067,10 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
 #if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
         __vsf_eda.timer.processing = false;
+#   if     (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE)           \
+        &&  (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE)
         __vsf_systimer_update(true);
+#   endif
 #endif
         vsf_unprotect_sched(origlevel);
         break;

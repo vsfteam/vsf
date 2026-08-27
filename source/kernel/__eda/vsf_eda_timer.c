@@ -79,6 +79,48 @@ extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+// __vsf_systimer_update: reprogram the systimer for the new earliest due
+//  timer. Shared by BOTH kernel timer modes (tick and tickless), and
+//  DEFINED ONLY when the systimer impl supports programming:
+//  - NONE / TICK_MODE systimer impl: nothing to reprogram (the periodic
+//    tick drives the queue) -- no definition, and every call site is
+//    guarded by the same condition, so nothing is emitted at all;
+//  - NORMAL/COMP_TIMER systimer impl: vsf_systimer_set() is mandatory on
+//    COMP_TIMER (no periodic round would fire otherwise) and avoids a
+//    one-round latency on NORMAL_TIMER.
+//  pre_tick dedupe and the post-on-set-failure wakeup only exist in
+//  tickless mode (the timer.pre_tick field and __vsf_systimer_wakeup are
+//  tickless-only); in tick mode a failed set merely delays the timeout to
+//  the next systimer round, nothing is lost.
+#if     (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE)              \
+    &&  (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE)
+#   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+static void __vsf_systimer_wakeup(void);
+#   endif
+static void __vsf_systimer_update(bool force)
+{
+    vsf_teda_t *teda;
+
+    // TODO: need protect here?
+    vsf_timq_peek(&__vsf_eda.timer.timq, teda);
+    if (NULL == teda) {
+        vsf_systimer_set_idle();
+        return;
+    }
+#   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+    if (force || (teda->due != __vsf_eda.timer.pre_tick)) {
+        __vsf_eda.timer.pre_tick = teda->due;
+        if (!vsf_systimer_set(teda->due)) {
+            __vsf_systimer_wakeup();
+        }
+    }
+#   else
+    (void)force;
+    vsf_systimer_set(teda->due);
+#   endif
+}
+#endif
+
 #if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 
 static void __vsf_systimer_wakeup(void)
@@ -90,29 +132,6 @@ static void __vsf_systimer_wakeup(void)
         }
     }
 }
-
-#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
-static void __vsf_systimer_update(bool force)
-{
-    vsf_teda_t *teda;
-
-    // TODO: need protect here?
-    vsf_timq_peek(&__vsf_eda.timer.timq, teda);
-    if (NULL == teda) {
-        vsf_systimer_set_idle();
-    } else if (force || (teda->due != __vsf_eda.timer.pre_tick)) {
-        __vsf_eda.timer.pre_tick = teda->due;
-        if (!vsf_systimer_set(teda->due)) {
-            __vsf_systimer_wakeup();
-        }
-    }
-}
-#else
-static void __vsf_systimer_update(bool force)
-{
-
-}
-#endif
 
 VSF_CAL_SECTION(".text.vsf.kernel.teda")
 static bool __vsf_systimer_is_due(vsf_systimer_tick_t due)
@@ -151,7 +170,10 @@ VSF_CAL_SECTION(".text.vsf.kernel.teda")
 static vsf_err_t __vsf_teda_set_timer_imp(vsf_teda_t *this_ptr, vsf_systimer_tick_t due)
 {
     __vsf_teda_timer_enqueue(this_ptr, due);
+#if     (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE)              \
+    &&  (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE)
     __vsf_systimer_update(false);
+#endif
     return VSF_ERR_NONE;
 }
 
@@ -176,19 +198,48 @@ static bool __vsf_systimer_is_due(vsf_systimer_tick_t due)
 VSF_CAL_SECTION(".text.vsf.kernel.teda")
 void vsf_systimer_on_tick(void)
 {
-    vsf_eda_post_evt((vsf_eda_t *)&__vsf_eda.task, VSF_EVT_TIMER);
+    // Tick mode dedupe, race-free form: skip the post whenever the kernel
+    //  task eda has ANY queued event. If the pending event is a TIMER event,
+    //  its dispatch walks the whole due timq/callback_timq anyway; if it is
+    //  another event (MESSAGE/CALLBACK_TIMER), that dispatch does NOT walk
+    //  the timer queues, but the queue drains and the next tick re-posts --
+    //  worst case is a bounded delay (busy period + 1 tick), never a loss.
+    //  An earlier flag-based dedupe (producer sets, consumer clears)
+    //  could wedge with evt_pending==1 and an empty queue -> all timer
+    //  processing stopped (observed as the TLS-window freeze).
+    //  Worst case is a duplicate TIMER event (extra timq walk), which is
+    //  harmless. Posting every systick allocs an evt node per tick from a
+    //  16-entry pool; without dedupe a slow/preempted drain exhausts the
+    //  pool (assert -> halt).
+    //  NOTE: the pending-event check is implementation-specific -- evt_list
+    //  exists only in __VSF_OS_CFG_EVTQ_LIST, evt_cnt in
+    //  __VSF_OS_CFG_EVTQ_ARRAY; the single-slot evt_pending variant absorbs
+    //  repeat posts by design and needs no dedupe.
+    vsf_eda_t *task = (vsf_eda_t *)&__vsf_eda.task;
+#if defined(__VSF_OS_CFG_EVTQ_LIST)
+    if (vsf_slist_queue_is_empty(&task->evt_list)) {
+        vsf_eda_post_evt(task, VSF_EVT_TIMER);
+    }
+#elif defined(__VSF_OS_CFG_EVTQ_ARRAY)
+    if (0 == task->evt_cnt) {
+        vsf_eda_post_evt(task, VSF_EVT_TIMER);
+    }
+#else
+    vsf_eda_post_evt(task, VSF_EVT_TIMER);
+#endif
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.teda")
 static vsf_err_t __vsf_teda_set_timer_imp(vsf_teda_t *this_ptr, vsf_systimer_tick_t due)
 {
     __vsf_teda_timer_enqueue(this_ptr, due);
-    // reprogram the systimer for the new earliest due(compare match or
-    //  reload value, impl dependent), so the first timeout can fire an
-    //  interrupt - mandatory on COMP_TIMER targets(no periodic round
-    //  would fire otherwise), and avoids a one-round latency on
-    //  NORMAL_TIMER targets
+    // reprogram the systimer for the new earliest due (mandatory on
+    //  COMP_TIMER, latency optimization on NORMAL_TIMER; TICK_MODE
+    //  systimers are driven by the periodic tick and need nothing)
+#if     (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE)              \
+    &&  (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE)
     __vsf_systimer_update(false);
+#endif
     return VSF_ERR_NONE;
 }
 
