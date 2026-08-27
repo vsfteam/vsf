@@ -44,8 +44,8 @@ extern "C" {
 
 extern unsigned int __hpm_systimer_get_frequency(void);
 
-#ifndef __VSF_ARCH_PRIO_DEFINED
-#define __VSF_ARCH_PRIO_DEFINED
+#ifndef __VSF_ARCH_PRIORITY_DEFINED__
+#define __VSF_ARCH_PRIORITY_DEFINED__
 typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID = -1,
     vsf_arch_prio_invalid = -1,

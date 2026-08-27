@@ -87,8 +87,8 @@ extern "C" {
  *!       device.h of the target it runs on - a chip-independent build
  *!       cannot and must not pick one.
  */
-#ifndef __VSF_ARCH_PRIO_DEFINED
-#   define __VSF_ARCH_PRIO_DEFINED
+#ifndef __VSF_ARCH_PRIORITY_DEFINED__
+#   define __VSF_ARCH_PRIORITY_DEFINED__
 typedef int vsf_arch_prio_t;
 #endif
 
