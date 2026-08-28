@@ -32,7 +32,10 @@
 
 /*============================ MACROS ========================================*/
 
-// configuration start
+#ifndef VSF_ARCH_WIN_ERR_TO_STDERR
+#   define VSF_ARCH_WIN_ERR_TO_STDERR           DISABLED
+#endif
+
 //#define VSF_ARCH_CFG_BACKGROUND_TRACE           ENABLED
 #define VSF_ARCH_CFG_LOW_LANTECY                DISABLED
 //#define VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER    &__vsf_x86_systimer.use_as__vsf_arch_irq_thread_t
@@ -914,6 +917,10 @@ bool vsf_arch_low_level_init(void)
 
     InitializeCriticalSection(&__vsf_x86.lock);
     InitializeCriticalSection(&__vsf_x86.trace_lock);
+
+#if VSF_ARCH_WIN_ERR_TO_STDERR == ENABLED
+    _set_error_mode(_OUT_TO_STDERR);
+#endif
 
     __vsf_x86.por_thread.thread_id = GetCurrentThreadId();
     __vsf_x86.por_thread.thread = OpenThread(THREAD_ALL_ACCESS, false, __vsf_x86.por_thread.thread_id);

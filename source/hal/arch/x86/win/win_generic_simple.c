@@ -27,6 +27,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_ARCH_WIN_ERR_TO_STDERR
+#   define VSF_ARCH_WIN_ERR_TO_STDERR       DISABLED
+#endif
+
 #define VSF_ARCH_BG_TRACE_EN                ENABLED
 #define VSF_ARCH_SYSTIMER_FREQ              (10 * 1000 * 1000)
 
@@ -175,6 +179,10 @@ bool vsf_arch_low_level_init(void)
     __vsf_arch_tls_thread_ctx = TlsAlloc();
     VSF_ASSERT(__vsf_arch_tls_thread_ctx != TLS_OUT_OF_INDEXES);
     TlsSetValue(__vsf_arch_tls_thread_ctx, &__vsf_arch_common.por_thread);
+
+#if VSF_ARCH_WIN_ERR_TO_STDERR == ENABLED
+    _set_error_mode(_OUT_TO_STDERR);
+#endif
 
     memset(&__vsf_arch_systimer, 0, sizeof(__vsf_arch_systimer));
     strcpy((char *)__vsf_arch_common.por_thread.name, "por");
