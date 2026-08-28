@@ -52,7 +52,7 @@ extern void __vsf_os_free_evt_node(vsf_evt_node_t *node);
 
 static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *pthis, vsf_prio_t priority)
 {
-    if (pthis->flag.state.is_ready) {
+    if (pthis->is_ready) {
         vsf_evtq_t *evtq = __vsf_os_evtq_get((vsf_prio_t)pthis->cur_priority);
         vsf_dlist_remove(
                 vsf_eda_t, rdy_node,
@@ -108,6 +108,7 @@ void vsf_evtq_on_eda_init(vsf_eda_t *pthis)
 {
     pthis->cur_priority = pthis->priority;
     vsf_slist_queue_init(&pthis->evt_list);
+    pthis->is_ready = false;
 }
 
 void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
@@ -122,11 +123,11 @@ void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
         pthis->flag.state.is_to_exit = true;
         vsf_unprotect_int(orig);
         return;
-    } else if (pthis->flag.state.is_ready) {
+    } else if (pthis->is_ready) {
         vsf_dlist_remove(vsf_eda_t, rdy_node,
                 &evtq->rdy_list,
                 pthis);
-        pthis->flag.state.is_ready = false;
+        pthis->is_ready = false;
     }
     vsf_unprotect_int(orig);
 
@@ -188,7 +189,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 
     orig = vsf_protect_int();
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-    if (eda->flag.state.is_limitted && eda->flag.state.is_ready && !force) {
+    if (eda->flag.state.is_limitted && eda->is_ready && !force) {
         vsf_unprotect_int(orig);
         __vsf_os_free_evt_node(node);
         return VSF_ERR_FAIL;
@@ -198,8 +199,8 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
     vsf_slist_queue_enqueue(vsf_evt_node_t, use_as__vsf_slist_node_t, &eda->evt_list, node);
     evtq = __vsf_os_evtq_get((vsf_prio_t)eda->cur_priority);
     VSF_KERNEL_ASSERT(evtq != NULL);
-    if (!eda->flag.state.is_ready) {
-        eda->flag.state.is_ready = true;
+    if (!eda->is_ready) {
+        eda->is_ready = true;
         vsf_dlist_queue_enqueue(vsf_eda_t, rdy_node,
                     &evtq->rdy_list,
                     eda);
@@ -361,7 +362,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                     &pthis->rdy_list,
                     eda);
             if (NULL == eda->evt_list.head.next) {
-                eda->flag.state.is_ready = false;
+                eda->is_ready = false;
 #if VSF_KERNEL_CFG_TRACE == ENABLED
                 vsf_kernel_trace_eda_idle(eda);
 #endif
@@ -384,7 +385,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                 orig = vsf_protect_int();
             }
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-            else if (!eda->flag.state.is_ready) {
+            else if (!eda->is_ready) {
                 vsf_unprotect_int(orig);
                 // refer to comments of __vsf_eda_sync_set_timeout in vsf_eda_sync.c
                 orig = vsf_protect_sched();

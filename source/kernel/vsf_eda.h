@@ -1738,7 +1738,6 @@ typedef union __vsf_eda_state_t {
     struct {
 #if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #   if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-        uint8_t                 is_ready : 1;
         uint8_t                 is_new_prio : 1;
 #   endif
         uint8_t                 is_to_exit : 1;
@@ -1875,6 +1874,7 @@ vsf_class(vsf_eda_t) {
         uint8_t                 cur_priority;
         uint8_t                 new_priority;
         uint8_t                 priority;
+        bool                    is_ready;
 #       else
         uint8_t                 evt_cnt;
         uint8_t                 priority;
