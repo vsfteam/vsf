@@ -53,6 +53,8 @@ static void __vsf_wifi_mlme_send_auth (vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason);
 static void __vsf_wifi_mlme_finish    (vsf_wifi_t *wifi, uint8_t reason);
+static void __vsf_wifi_reconnect_timer_cb(vsf_callback_timer_t *timer);
+static void __vsf_wifi_auto_reconnect_schedule(vsf_wifi_t *wifi, bool was_linked, uint8_t reason);
 #if VSF_WIFI_USE_WPA == ENABLED
 static void __vsf_wifi_retry_key_install(vsf_wifi_t *wifi);
 static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err);
@@ -170,6 +172,9 @@ static void __vsf_wifi_deliver_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len
 static void __vsf_wifi_deliver_link_up(vsf_wifi_t *wifi,
         const vsf_wifi_link_info_t *info)
 {
+    /* A fresh link-up restores the auto-reconnect budget. */
+    wifi->mlme_linked = true;
+    wifi->auto_reconnect_retries = 0;
     /* Link events are delivered to BOTH sinks: the weak application hook is a
      * control-plane notification (e.g. unblocking a wifi_connect command),
      * while the attached netif backend treats it as a data-plane action
@@ -223,8 +228,13 @@ static void __vsf_wifi_keepalive_send(vsf_wifi_t *wifi)
     /* addr3 = BSSID (DA in ToDS) */
     memcpy(&frame[16], wifi->mlme_bssid, 6);
 
-    /* Sequence control: the hardware/driver is responsible for the real
-     * sequence number; zero is fine here. */
+    /* Sequence control.  Backends raising the TXWI "no sequence" bit
+     * (RT5572) never overwrite this field, so software must allocate a
+     * fresh number: frames repeating seq=0 are dropped by AP duplicate
+     * detection, which to the AP looks like total uplink silence. */
+    uint16_t seq = __vsf_wifi_next_tx_seq(wifi);
+    frame[22] = (uint8_t)(seq & 0xFF);
+    frame[23] = (uint8_t)((seq >> 8) & 0xFF);
 
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, sizeof(frame));
     if (err != VSF_ERR_NONE) {
@@ -643,6 +653,9 @@ void vsf_wifi_init(vsf_wifi_t *wifi,
     wifi->read_poll_timer.on_timer = __vsf_wifi_read_poll_timer_cb;
     vsf_callback_timer_init(&wifi->mlme_timer);
     wifi->mlme_timer.on_timer = __vsf_wifi_mlme_timer_cb;
+    vsf_callback_timer_init(&wifi->reconnect_timer);
+    wifi->reconnect_timer.on_timer = __vsf_wifi_reconnect_timer_cb;
+    wifi->auto_reconnect = (VSF_WIFI_CFG_AUTO_RECONNECT == ENABLED);
 #   if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
     vsf_callback_timer_init(&wifi->keepalive_timer);
     wifi->keepalive_timer.on_timer = __vsf_wifi_keepalive_cb;
@@ -741,6 +754,16 @@ static void __vsf_wifi_on_rxfilter_done(vsf_wifi_t *wifi, vsf_err_t err)
     vsf_wifi_on_ready(wifi);
 }
 
+void vsf_wifi_set_auto_reconnect(vsf_wifi_t *wifi, bool auto_reconnect)
+{
+    wifi->auto_reconnect = auto_reconnect;
+    if (!auto_reconnect) {
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+        vsf_callback_timer_remove(&wifi->reconnect_timer);
+#endif
+    }
+}
+
 void vsf_wifi_fini(vsf_wifi_t *wifi)
 {
     /* Step 1: gate further events.  After this flag is set every async
@@ -755,6 +778,7 @@ void vsf_wifi_fini(vsf_wifi_t *wifi)
     vsf_callback_timer_remove(&wifi->scan_timer);
     vsf_callback_timer_remove(&wifi->read_poll_timer);
     vsf_callback_timer_remove(&wifi->mlme_timer);
+    vsf_callback_timer_remove(&wifi->reconnect_timer);
 #   if VSF_WIFI_CFG_KEEPALIVE_PERIOD_MS > 0
     vsf_callback_timer_remove(&wifi->keepalive_timer);
 #   endif
@@ -1122,6 +1146,11 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                     | wifi->wpa_snonce[2] | wifi->wpa_snonce[3])) return;
             /* Fall through to attempt decryption with derived PTK. */
         }
+        /* HW-crypto mode: the chip holds both the PTK and the GTK and has
+         * already decrypted the frame -- deliver it as-is.  (A hybrid split
+         * -- group frames routed back through software CCMP -- proved
+         * unreliable: this ASIC has no way to transmit sw-encrypted frames
+         * unharmed, and the mesh rekey path requires the GTK in the chip.) */
         if (wifi->wpa_hw_crypto) {
             __vsf_wifi_deliver_rx(wifi, (uint8_t *)dot11, len);
             return;
@@ -1132,12 +1161,35 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                     out, VSF_WIFI_CFG_CCMP_BUF_SIZE);
             bool is_uc = !(dot11[4] & 0x01);
             if (plen == 0) {
-                if (++wifi->wpa_ccmp_fail_cnt <= 5) {
-                    vsf_wifi_trace_info("wifi: CCMP decap FAIL #%u len=%u"
+                if (++wifi->wpa_ccmp_fail_cnt <= 30) {
+                    vsf_wifi_trace_info("wifi: CCMP decap FAIL #%u len=%u "
+                            "sa=%02X:%02X:%02X:%02X:%02X:%02X "
+                            "body=%02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X"
                             VSF_TRACE_CFG_LINEEND,
-                            (unsigned)wifi->wpa_ccmp_fail_cnt, (unsigned)len);
+                            (unsigned)wifi->wpa_ccmp_fail_cnt, (unsigned)len,
+                            dot11[10], dot11[11], dot11[12], dot11[13],
+                            dot11[14], dot11[15],
+                            dot11[24], dot11[25], dot11[26], dot11[27],
+                            dot11[28], dot11[29], dot11[30], dot11[31],
+                            dot11[32], dot11[33], dot11[34], dot11[35]);
                 }
                 return;
+            }
+            if (!is_uc) {
+                /* DIAG: successful group decaps, capped -- the sender and
+                 * payload prefix identify mesh-forwarded traffic and decode
+                 * DHCP offers. */
+                static uint32_t __grp_ok_cnt = 0;
+                if (++__grp_ok_cnt <= 20) {
+                    vsf_wifi_trace_info("wifi: GRP decap OK #%u plen=%u "
+                            "sa=%02X:%02X:%02X:%02X:%02X:%02X "
+                            "body=%02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X"
+                            VSF_TRACE_CFG_LINEEND, (unsigned)__grp_ok_cnt,
+                            (unsigned)plen,
+                            out[10], out[11], out[12], out[13], out[14], out[15],
+                            out[24], out[25], out[26], out[27], out[28], out[29],
+                            out[30], out[31], out[32], out[33], out[34], out[35]);
+                }
             }
             if (is_uc) {
                 /* Unicast data from the AP decrypted OK: this is the path DHCP
@@ -1572,12 +1624,64 @@ static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason)
 
 /* Reset MLME to IDLE and notify the application of a link-down.  Called for
  * every non-RUN exit (timeout / rejected / deauth / user disconnect). */
+/* Auto-reconnect timer: re-issue connect to the stashed target. */
+static void __vsf_wifi_reconnect_timer_cb(vsf_callback_timer_t *timer)
+{
+    vsf_wifi_t *wifi = vsf_container_of(timer, vsf_wifi_t, reconnect_timer);
+
+    if (!wifi->auto_reconnect || wifi->disconnecting || !wifi->is_ready) return;
+    if (wifi->mlme_state != WIFI_MLME_IDLE) return;
+
+    vsf_wifi_trace_info("wifi: auto-reconnect to "
+            "%02X:%02X:%02X:%02X:%02X:%02X (ch=%u)"
+            VSF_TRACE_CFG_LINEEND,
+            wifi->mlme_bssid[0], wifi->mlme_bssid[1], wifi->mlme_bssid[2],
+            wifi->mlme_bssid[3], wifi->mlme_bssid[4], wifi->mlme_bssid[5],
+            (unsigned)wifi->mlme_channel);
+    vsf_err_t err = vsf_wifi_connect(wifi, wifi->mlme_bssid,
+            wifi->mlme_ssid, wifi->mlme_ssid_len, wifi->mlme_channel);
+    if (err != VSF_ERR_NONE) {
+        /* busy (scan / script in flight): re-arm; the retry budget bounds
+         * this loop. */
+        vsf_callback_timer_add_ms(&wifi->reconnect_timer,
+                VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS);
+    }
+}
+
+/* Arm the auto-reconnect timer if the torn-down session qualified.
+ * LOCAL_DISCONNECT (user teardown) never arms it. */
+static void __vsf_wifi_auto_reconnect_schedule(vsf_wifi_t *wifi, bool was_linked,
+        uint8_t reason)
+{
+#if (VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED) && \
+    (VSF_WIFI_CFG_AUTO_RECONNECT != DISABLED)
+    if (!was_linked || wifi->disconnecting || !wifi->auto_reconnect) return;
+    if (reason == WIFI_REASON_LOCAL_DISCONNECT) return;   /* user teardown */
+    if (wifi->auto_reconnect_retries >= VSF_WIFI_CFG_AUTO_RECONNECT_RETRIES) {
+        vsf_wifi_trace_info("wifi: auto-reconnect gave up after %u attempts"
+                VSF_TRACE_CFG_LINEEND, (unsigned)wifi->auto_reconnect_retries);
+        return;
+    }
+    wifi->auto_reconnect_retries++;
+    vsf_wifi_trace_info("wifi: link down - auto-reconnect in %u ms "
+            "(attempt %u/%u)"
+            VSF_TRACE_CFG_LINEEND,
+            VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS,
+            (unsigned)wifi->auto_reconnect_retries,
+            (unsigned)VSF_WIFI_CFG_AUTO_RECONNECT_RETRIES);
+    vsf_callback_timer_add_ms(&wifi->reconnect_timer,
+            VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS);
+#endif
+}
+
 static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
 {
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
     vsf_callback_timer_remove(&wifi->mlme_timer);
 #endif
     bool was_active = (wifi->mlme_state != WIFI_MLME_IDLE);
+    bool was_linked = wifi->mlme_linked;
+    wifi->mlme_linked = false;
     wifi->mlme_state = WIFI_MLME_IDLE;
     wifi->mlme_retry = 0;
     wifi->mlme_aid   = 0;
@@ -1590,6 +1694,7 @@ static void __vsf_wifi_mlme_finish(vsf_wifi_t *wifi, uint8_t reason)
     if (was_active) {
         __vsf_wifi_deliver_link_down(wifi, reason);
     }
+    __vsf_wifi_auto_reconnect_schedule(wifi, was_linked, reason);
 }
 
 /* drv->connect completion: channel/bssid/rx-filter locked -> kick off the
@@ -1805,6 +1910,15 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
 
     case __DOT11_STYPE_DEAUTH:
     case __DOT11_STYPE_DISASSOC: {
+        /* Only honor deauth/disassoc from the BSSID we associate with.
+         * Same-SSID mesh siblings and other nodes emit their own kick /
+         * steering frames; without this gate any foreign deauth tears down
+         * a healthy link. */
+        if (memcmp(&dot11[10], wifi->mlme_bssid, 6) != 0) {
+            vsf_wifi_trace_info("wifi: drop %s from foreign source" VSF_TRACE_CFG_LINEEND,
+                    (subtype == __DOT11_STYPE_DEAUTH) ? "deauth" : "disassoc");
+            break;
+        }
         uint16_t reason = (body_len >= 2) ? __vsf_wifi_rd16(&body[0])
                                           : WIFI_REASON_UNSPECIFIED;
         vsf_wifi_trace_info("wifi: received %s (reason=%u)" VSF_TRACE_CFG_LINEEND,
@@ -1984,6 +2098,7 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
     if (wifi->drv->flags & VSF_WIFI_CHIP_FLAG_FULLMAC) {
         if (!wifi->drv->fullmac.connect) return VSF_ERR_NOT_READY;
         if (wifi->mlme_state != WIFI_MLME_IDLE) return VSF_ERR_NOT_AVAILABLE;
+        wifi->auto_reconnect_retries = 0;   /* manual connect: fresh budget */
         memcpy(wifi->mlme_bssid, bssid, 6);
         if (ssid_len > sizeof(wifi->mlme_ssid) - 1) {
             ssid_len = sizeof(wifi->mlme_ssid) - 1;
@@ -2004,6 +2119,7 @@ vsf_err_t vsf_wifi_connect(vsf_wifi_t *wifi,
 
     if (!wifi->drv->softmac.connect) return VSF_ERR_NOT_READY;
     if (wifi->mlme_state != WIFI_MLME_IDLE) return VSF_ERR_NOT_AVAILABLE;
+    wifi->auto_reconnect_retries = 0;   /* manual connect: fresh budget */
 
     /* Stash the target so the MLME state machine can build auth / assoc
      * frames and so a retransmit has the same parameters. */
@@ -2043,6 +2159,9 @@ vsf_err_t vsf_wifi_disconnect(vsf_wifi_t *wifi)
         if (wifi->mlme_state == WIFI_MLME_IDLE) return VSF_ERR_NONE;
         vsf_err_t err = wifi->drv->fullmac.disconnect(wifi, NULL);
         __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_DISCONNECT);
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+        vsf_callback_timer_remove(&wifi->reconnect_timer);
+#endif
         return err;
     }
 
@@ -2057,6 +2176,9 @@ vsf_err_t vsf_wifi_disconnect(vsf_wifi_t *wifi)
 
     /* Drop the link locally regardless of the deauth/disconnect outcome. */
     __vsf_wifi_mlme_finish(wifi, WIFI_REASON_LOCAL_DISCONNECT);
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_remove(&wifi->reconnect_timer);
+#endif
     return err;
 }
 
@@ -2119,11 +2241,16 @@ vsf_err_t vsf_wifi_tx(vsf_wifi_t *wifi, const uint8_t *frame, uint16_t len)
     if (wifi->scanning) return VSF_ERR_NOT_AVAILABLE;
 
 #if VSF_WIFI_USE_WPA == ENABLED
-    /* Software CCMP encap for plaintext unicast/multicast data frames once
-     * the 4-way handshake installed keys.  Skipped when a hardware crypto
-     * backend owns encryption (wpa_hw_crypto), and never applied to frames
+    /* Software CCMP encap for plaintext data frames once the 4-way handshake
+     * installed keys.  Skipped when a hardware crypto backend owns encryption
+     * (wpa_hw_crypto) - EXCEPT for group-addressed frames in hybrid mode:
+     * the chip group-key path is bypassed (GTK stays in software), so group
+     * DA frames are always software-encapped with the PTK (STA -> AP group
+     * frames are pairwise-protected per 802.11i).  Never applied to frames
      * that are already Protected or are not data type. */
-    if (wifi->wpa_ptk_valid && !wifi->wpa_hw_crypto &&
+    if (wifi->wpa_ptk_valid &&
+            (!wifi->wpa_hw_crypto ||
+             ((len >= 17) && ((frame[16] & 0x01) != 0))) &&
             (len >= 2) && (((frame[0] >> 2) & 0x03) == 2) &&
             ((frame[1] & 0x40) == 0)) {
         uint8_t *enc = (uint8_t *)wifi->wpa_ccmp_tx_buf;
@@ -2259,6 +2386,10 @@ static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err)
         return;
     }
 
+    /* Install the GTK into the chip as well: the hardware RX engine looks
+     * broadcast frames up by the shared-key entry, and mesh APs rekey right
+     * after association -- skipping this install (or the rekey re-install)
+     * silently kills broadcast RX.  See wifi_crypto.md. */
     if ((wifi->wpa_gtk_len > 0)
             && (wifi->drv->crypto_ops != NULL)
             && (wifi->drv->crypto_ops->install_key != NULL)) {

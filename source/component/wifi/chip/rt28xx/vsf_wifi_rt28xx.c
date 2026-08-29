@@ -1267,6 +1267,7 @@ static int __rt28xx_emit_bssid(vsf_wifi_reg_op_t *ops, int n, const uint8_t bssi
  * the PHY received but failed FCS on -- mac80211 drops these; we must too,
  * otherwise corrupted weak-signal beacons leak garbage BSSID/SSID results. */
 #define RT28XX_RXD_W0_CRC_ERROR         0x00000100u
+#define RT28XX_RXD_W0_CIPHER_ERROR      0x00000200u   /* ref rt2800usb.h RXD_W0_CIPHER_ERROR */
 #define RT28XX_DOT11_HDR_MIN            24
 #define RT28XX_BEACON_FIXED             12      /* timestamp+interval+capa */
 
@@ -1277,6 +1278,7 @@ static int __rt28xx_emit_bssid(vsf_wifi_reg_op_t *ops, int n, const uint8_t bssi
 #define RT28XX_STYPE_DISASSOC           0xA
 #define RT28XX_STYPE_AUTH               0xB
 #define RT28XX_STYPE_DEAUTH             0xC
+#define RT28XX_STYPE_ACTION_DBG         0xD
 
 /* Map an RSN/WPA cipher-suite selector (OUI 00-0F-AC) type byte to a
  * WIFI_CIPHER_xxx constant. */
@@ -1461,10 +1463,15 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
      * corrupted beacons pass the loose mgmt filter and surface as bogus APs
      * (e.g. BSSID FF:FF:..). */
     bool crc_err = false;
+    bool cipher_err = false;
     if ((uint32_t)RT28XX_RXINFO_DESC_SIZE + rx_pkt_len + RT28XX_RXD_DESC_SIZE <= len) {
         uint32_t rxd_w0 = get_unaligned_le32(frame
                 + RT28XX_RXINFO_DESC_SIZE + rx_pkt_len);
         if (rxd_w0 & RT28XX_RXD_W0_CRC_ERROR) crc_err = true;
+        /* HW attempted decrypt (WCID had a pairwise key) and failed: the body
+         * is garbage, and a garbled mgmt frame can masquerade as e.g. deauth.
+         * mac80211 drops these; we must too. */
+        if (rxd_w0 & RT28XX_RXD_W0_CIPHER_ERROR) cipher_err = true;
     }
     /* CRC result computed above (crc_err); defer the drop until after the
      * scan diagnostic below so CRC-failed beacons are visible too. */
@@ -1520,6 +1527,11 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     }
 
     /* 802.11 frame control: type/subtype encoded in the low byte. */
+    /* Cipher-error RX policy (mainline drops these too, but only when the
+     * hardware owns the keys): in SW-crypto mode the chip has no keys, so
+     * a cipher-error flag on received frames is EXPECTED -- software CCMP
+     * decaps them.  Dropping here would lose every unicast frame. */
+    if (cipher_err && wifi->wpa_hw_crypto) goto __advance_frame;
     uint16_t fc      = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
     uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt, 2 = data */
     uint8_t  subtype = (uint8_t)((fc >> 4) & 0xF);   /* 8 = beacon, 5 = probe-resp */
@@ -2913,8 +2925,11 @@ static void __rt28xx_emit_key32(vsf_wifi_reg_op_t *ops, int *n,
 static void __rt28xx_emit_iveiv(vsf_wifi_reg_op_t *ops, int *n,
         uint8_t key_idx, uint16_t base)
 {
-    /* CCMP IV/EIV.  iv[3] bits: ExtIV=0x20, keyid in upper 2 bits. */
-    uint32_t iv_lo = 0x20 | ((uint32_t)(key_idx & 3) << 6);
+    /* CCMP IV/EIV entry, mainline layout (rt2800_config_wcid_attr_cipher):
+     * byte[3] carries ExtIV(0x20) + key id in bits 6-7, bytes 0-2 and
+     * the EIV word stay zero.  (Was written to byte[0] before -- the
+     * hardware then inserts a malformed IV on hw-encrypted TX.) */
+    uint32_t iv_lo = ((uint32_t)0x20u | ((uint32_t)(key_idx & 3) << 6)) << 24;
     ops[(*n)++] = (vsf_wifi_reg_op_t)RT_OP_REG(base, iv_lo);       /* iv[0..3] */
     ops[(*n)++] = (vsf_wifi_reg_op_t)RT_OP_REG(base + 4, 0);       /* iv[4..7] */
 }
@@ -2928,6 +2943,11 @@ static void __rt28xx_key_install_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
+/* mainline constraint (rt2x00mac_set_key): "the hardware requires keys to
+ * be assigned in correct order (When key 1 is provided but key 0 is not,
+ * then the key is not found by the hardware during RX)".  Any future
+ * full-HW rekey work must keep the shared-key slots ordered -- leading
+ * suspect for the rekey-broadcast failures recorded in wifi_crypto.md. */
 static vsf_err_t __rt28xx_crypto_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
         bool pairwise, const uint8_t *key, uint8_t key_len,
         const uint8_t *mac, vsf_wifi_done_t done)
@@ -2963,12 +2983,20 @@ static vsf_err_t __rt28xx_crypto_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
 
         /* Update shadow and write the SHARED_KEY_MODE register this slot lives in. */
         uint8_t mode_reg = hw_idx / 8;
-        uint8_t mode_bit = (hw_idx % 8) * 3;
+        uint8_t mode_bit = (hw_idx % 8) * 4;
         priv->shared_key_mode[mode_reg] &= ~(0x7u << mode_bit);
         priv->shared_key_mode[mode_reg] |= (uint32_t)RT28XX_CIPHER_AES << mode_bit;
         ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(
                 RT28XX_SHARED_KEY_MODE_ENTRY(mode_reg),
                 priv->shared_key_mode[mode_reg]);
+
+        /* mainline config_shared_key also programs WCID_ATTR[slot]
+        * (KEYTAB=0 = shared, CIPHER, RX_WIUDF): without it the RX engine
+        * reports "key not found" for this slot.  BSSIDX stays 0 (STA). */
+        ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(
+                RT28XX_MAC_WCID_ATTR_ENTRY(hw_idx),
+                (RT28XX_CIPHER_AES << RT28XX_WCID_ATTR_CIPHER_SHIFT)
+              | (RT28XX_CIPHER_AES << RT28XX_WCID_ATTR_WIUDF_SHIFT));
 
         /* IVEIV for the shared key slot so hardware can insert/verify IV. */
         __rt28xx_emit_iveiv(ops, &n, gtk_idx, RT28XX_MAC_IVEIV_ENTRY(hw_idx));
@@ -3194,23 +3222,48 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
     uint16_t pkt_len   = (uint16_t)(RT28XX_TXWI_DESC_SIZE_5592 + frame_pad);
     bool is_data = (frame_len >= 2) && ((frame[0] & 0x0Cu) == 0x08u);
 #if VSF_WIFI_USE_WPA == ENABLED
-    bool hw_encrypt = !wifi->raw_radio_active && wifi->wpa_hw_crypto && is_data;
+    /* HYBRID: frames already Protected (software CCMP encap of group DA in
+     * hw-crypto mode) pass through untouched with WIV=1, never re-encrypted. */
+    bool hw_encrypt = !wifi->raw_radio_active && wifi->wpa_hw_crypto &&
+            is_data && ((frame[1] & 0x40) == 0);
 #else
     bool hw_encrypt = false;
 #endif
     bool is_mcast   = (frame_len >= 6) && ((frame[4] & 0x01) != 0);
+    /* WIV bit (mainline rt2800usb_write_tx_desc): WIV=1 means the frame is
+     * transmitted as built (the IV inside the 802.11 header goes on air);
+     * WIV=0 means the hardware inserts the IV from the IVEIV register
+     * (hw-encryption path).  All sw-encrypted/passthrough frames must set
+     * WIV=1. */
     uint32_t txinfo_w0 = ((uint32_t)pkt_len & 0xFFFFu)
                        | RT28XX_TXINFO_W0_QSEL_BE
                        | (hw_encrypt ? 0u : RT28XX_TXINFO_W0_WIV);
     uint32_t txwi_w0   = RT28XX_TXWI_W0_PHYMODE_OFDM;   /* OFDM, MCS0 (6 Mbps) */
 
 #if VSF_WIFI_USE_WPA == ENABLED
+    /* WCID = crypto-entry selector (mainline rt2800_write_tx_data):
+     * "The TXWI_W1_WIRELESS_CLI_ID indicates which crypto entry in the
+     * registers should be used to encrypt the frame."  Mainline assigns
+     * key_idx only to hw-encrypted frames and the station wcid (0 for
+     * broadcast, sta == NULL) otherwise, and never 0xFF.  Byte-level
+     * capture (2026-08-29): with wcid=0xFF this ASIC overwrites the
+     * frame's CCMP IV area (ExtIV byte zeroed on air) and mangles the
+     * payload, so software-encrypted frames must keep the plain station
+     * wcid -- in SW mode the WCID_ATTR entry stays NONE and the frame
+     * passes through untouched. */
     uint8_t wcid = hw_encrypt ? (is_mcast ? wifi->wpa_gtk_keyidx : RT28XX_STA_WCID)
                               : RT28XX_STA_WCID;
 #else
     uint8_t wcid = RT28XX_STA_WCID;
 #endif
 
+    /* NSEQ (mainline rt2800.h): "0: Don't assign hw sequence number,
+     * 1: Assign hw sequence number".  Mainline also documents a rt2800
+     * H/W (or F/W) bug: "device incorrectly increase seqno on
+     * retransmitted data (non-QOS) and management frames", worked around
+     * by software-generated seqnos.  We set NSEQ=1 for data frames and
+     * write the seq in software (EAPOL / netdrv / keepalive); on-air
+     * captures show the chip leaves those values untouched. */
     uint32_t txwi_w1   = RT28XX_TXWI_W1_ACK
                        | (is_data ? RT28XX_TXWI_W1_NSEQ : 0u)
                        | ((uint32_t)wcid << 8)
@@ -3220,6 +3273,10 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
     __rt28xx_put_le32(dst +  0, txinfo_w0);
     __rt28xx_put_le32(dst +  4, txwi_w0);
     __rt28xx_put_le32(dst +  8, txwi_w1);
+    /* mainline rt2800_write_tx_data: "Always write 0 to IV/EIV fields
+     * (word 2 and 3)" -- the IV belongs to the 802.11 header of
+     * sw-encrypted frames, and hw-encrypted frames take it from the
+     * IVEIV registers, never from here. */
     __rt28xx_put_le32(dst + 12, 0);     /* TXWI W2 (IV)  */
     __rt28xx_put_le32(dst + 16, 0);     /* TXWI W3 (EIV) */
     __rt28xx_put_le32(dst + 20, 0);     /* TXWI W4 (RT5592 5-word) */

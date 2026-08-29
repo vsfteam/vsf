@@ -131,7 +131,14 @@ static vsf_err_t __wpa_send_eapol(vsf_wifi_t *wifi, uint8_t ver,
     memcpy(&buf[4],  wifi->mlme_bssid, 6);
     memcpy(&buf[10], wifi->mac,        6);
     memcpy(&buf[16], wifi->mlme_bssid, 6);
-    /* bytes 22-23: seq control (hardware fills) */
+    /* bytes 22-23: seq control -- software-filled.  Backends with the
+     * TXWI "no sequence" flag never rewrite it, and a constant value
+     * trips AP duplicate-detection drops. */
+    {
+        uint16_t seq = __vsf_wifi_next_tx_seq(wifi);
+        buf[22] = (uint8_t)(seq & 0xFF);
+        buf[23] = (uint8_t)((seq >> 8) & 0xFF);
+    }
     /* bytes 24-25: QoS Control = 0x0000 (TID 0, BE).
      * The AP sends EAPOL-Key M1 with TID 0; mirror that for M2/M4 so the
      * frame is not classified into an AC that the AP may drop before the
@@ -435,10 +442,10 @@ static void __wpa_handle_group_m1(vsf_wifi_t *wifi, const uint8_t *ek,
         __wpa_parse_gtk(wifi, kd, out_len);
     }
 
-    /* If a hardware crypto backend owns the keys, re-program the new GTK.
-     * The install is asynchronous; G2 is sent immediately so the AP does not
-     * retransmit group M1.  A transient mismatch means a few broadcast frames
-     * may be dropped until the key script finishes. */
+    /* Re-program the new GTK into the chip on rekey: the hardware RX engine
+     * needs the current group key (see wifi_crypto.md for the failure
+     * analysis when this is skipped).  Asynchronous: G2 is echoed
+     * immediately so the AP does not retransmit group M1. */
     if (wifi->wpa_hw_crypto && (wifi->wpa_gtk_len > 0)
             && (wifi->drv != NULL) && (wifi->drv->crypto_ops != NULL)
             && (wifi->drv->crypto_ops->install_key != NULL)) {

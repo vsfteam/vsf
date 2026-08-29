@@ -132,7 +132,7 @@ static uint16_t __wifi_dot11_to_eth(const uint8_t *frame, uint16_t len,
  * not apply to normal post-handshake data frames.
  *
  * Note: this helper is generic and not chip-specific. */
-static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
+static uint16_t __wifi_eth_to_dot11(vsf_wifi_t *wifi, const uint8_t *bssid,
         const uint8_t *eth, uint16_t eth_len,
         uint8_t *dot11, uint16_t dot11_cap, bool qos)
 {
@@ -160,6 +160,18 @@ static uint16_t __wifi_eth_to_dot11(const uint8_t *bssid,
         dot11[24] = 0x40;                           /* Ack Policy = No Explicit Ack */
     }
 
+    /* Seq-ctl: software allocates a fresh number.  TXWI "no sequence"
+     * backends never rewrite it; a constant value trips AP duplicate-
+     * detection drops and the AP sees no uplink at all.  mainline
+     * rt2x00queue.c also documents a rt2800 hw/fw bug -- "device
+     * incorrectly increase seqno on retransmitted data (non-QOS) and
+     * management frames" -- so a software seq is the conservative
+     * choice here. */
+    {
+        uint16_t seq = __vsf_wifi_next_tx_seq(wifi);
+        dot11[22] = (uint8_t)(seq & 0xFF);
+        dot11[23] = (uint8_t)((seq >> 8) & 0xFF);
+    }
     uint8_t *llc = &dot11[hdr_len];
     llc[0] = 0xAA; llc[1] = 0xAA; llc[2] = 0x03;
     llc[3] = 0x00; llc[4] = 0x00; llc[5] = 0x00;
@@ -324,8 +336,9 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
      * BSSes.  This avoids the Ack-Policy/EOSP/A-MSDU bits in QoS Control that
      * several firmware implementations mishandle, and it produces a simpler
      * CCMP AAD that is less error-prone for software-encrypted group traffic. */
-    uint16_t dot11_len = __wifi_eth_to_dot11(wifi_netdrv->bssid, eth, eth_len,
-            wifi_netdrv->tx_frame, sizeof(wifi_netdrv->tx_frame), use_qos);
+    uint16_t dot11_len = __wifi_eth_to_dot11(wifi_netdrv->wifi, wifi_netdrv->bssid,
+            eth, eth_len, wifi_netdrv->tx_frame, sizeof(wifi_netdrv->tx_frame),
+            use_qos);
     if (dot11_len > 0) {
         vsf_wifi_tx(wifi_netdrv->wifi, wifi_netdrv->tx_frame, dot11_len);
     }

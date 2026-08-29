@@ -282,11 +282,13 @@ struct vsf_wifi_reg_bus_t {
 #if VSF_WIFI_USE_WPA == ENABLED
 /*
  * Optional hardware crypto backend.  When a chip driver supplies crypto_ops
- * with a non-NULL install_key, the wifi layer hands the negotiated PTK.TK /
- * GTK to the hardware engine and assumes the chip performs CCMP in-line; the
- * software CCMP path (wpa_hw_crypto == false) is then skipped on both TX and
- * RX.  Leaving crypto_ops (or install_key) NULL selects the built-in software
- * CCMP fallback.
+ * with a non-NULL install_key, the wifi layer hands the negotiated PTK.TK to
+ * the hardware engine and assumes the chip performs CCMP in-line for
+ * UNICAST frames (wpa_hw_crypto == true; software TX encap / RX decap
+ * skipped for unicast).  HYBRID: the GTK stays in software - group frames
+ * are software-CCMP-encapped/decapped on TX/RX even in this mode, because
+ * chip group-key decrypt proved unreliable on some APs.  Leaving crypto_ops
+ * (or install_key) NULL selects the built-in software CCMP fallback.
  *
  *   install_key : program a key.  key_idx 0 + pairwise == the unicast TK;
  *                 key_idx 1..3 + !pairwise == a GTK.  `mac` is the peer for
@@ -496,6 +498,14 @@ vsf_err_t    vsf_wifi_connect      (vsf_wifi_t *wifi,
                                     const uint8_t *ssid, uint8_t ssid_len,
                                     uint8_t channel);
 vsf_err_t    vsf_wifi_disconnect   (vsf_wifi_t *wifi);
+
+/* Enable/disable automatic reconnection: when a linked session is torn down
+ * by an over-the-air deauth/disassoc, the MLME re-issues connect to the same
+ * target after VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS (up to
+ * VSF_WIFI_CFG_AUTO_RECONNECT_RETRIES attempts; the budget resets on a fresh
+ * vsf_wifi_connect or link-up).  User-initiated disconnects never trigger
+ * it.  Enabled by default via VSF_WIFI_CFG_AUTO_RECONNECT. */
+void         vsf_wifi_set_auto_reconnect(vsf_wifi_t *wifi, bool auto_reconnect);
 vsf_err_t    vsf_wifi_get_link_info(vsf_wifi_t *wifi,
                                     vsf_wifi_link_info_t *info);
 

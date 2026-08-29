@@ -149,6 +149,22 @@
 #   define VSF_WIFI_CFG_KEEPALIVE_MIN_PERIOD_MS     2000
 #endif
 
+/* Auto-reconnect: when a previously-LINKED session is torn down by an
+ * over-the-air deauth/disassoc (mesh client-steering kicks, AP restarts),
+ * the MLME re-issues vsf_wifi_connect to the same target after
+ * AUTO_RECONNECT_DELAY_MS, up to AUTO_RECONNECT_RETRIES attempts.  The
+ * retry budget resets on a fresh vsf_wifi_connect or on link-up.
+ * User-initiated disconnects never trigger it. */
+#ifndef VSF_WIFI_CFG_AUTO_RECONNECT
+#   define VSF_WIFI_CFG_AUTO_RECONNECT              ENABLED
+#endif
+#ifndef VSF_WIFI_CFG_AUTO_RECONNECT_RETRIES
+#   define VSF_WIFI_CFG_AUTO_RECONNECT_RETRIES      3
+#endif
+#ifndef VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS
+#   define VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS     3000
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
