@@ -239,9 +239,7 @@ static void __vk_netdrv_wifi_thread(void *param)
         vsf_unprotect_sched(orig);
 
         if (pending & __WIFI_NETDRV_PEND_LINK_UP) {
-            vsf_wifi_netdrv_trace_info("wifi-netdrv: worker LINK_UP -> vk_netdrv_connect" VSF_TRACE_CFG_LINEEND);
             vsf_err_t cerr = vk_netdrv_connect(&wifi_netdrv->use_as__vk_netdrv_t);
-            vsf_wifi_netdrv_trace_info("wifi-netdrv: vk_netdrv_connect err=%d" VSF_TRACE_CFG_LINEEND, (int)cerr);
             (void)cerr;
         }
         if (pending & __WIFI_NETDRV_PEND_RX) {
@@ -303,34 +301,6 @@ static vsf_err_t __vk_netdrv_wifi_netlink_output(vk_netdrv_t *netdrv, void *slot
         eth_len += (uint16_t)mem.size;
     } while (netbuf_cur != NULL);
 
-    /* Diagnostic: dump outgoing Ethernet frame (DA/SA/ethertype, and for IPv4
-     * the L4 proto + UDP ports) to confirm DHCP DISCOVER is emitted correctly. */
-    {
-        static uint32_t __tx_cnt = 0;
-        if (++__tx_cnt <= 16) {
-            if ((eth_len >= 38) && (eth[12] == 0x08) && (eth[13] == 0x00)) {
-                uint8_t  ihl   = (eth[14] & 0x0F) * 4;
-                uint8_t  proto = eth[23];
-                uint16_t sport = (eth[14 + ihl] << 8) | eth[14 + ihl + 1];
-                uint16_t dport = (eth[14 + ihl + 2] << 8) | eth[14 + ihl + 3];
-                vsf_wifi_netdrv_trace_info("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
-                        " SA=%02X%02X%02X%02X%02X%02X IPv4 proto=%u sport=%u dport=%u"
-                        VSF_TRACE_CFG_LINEEND,
-                        (unsigned)__tx_cnt, (unsigned)eth_len,
-                        eth[0],eth[1],eth[2],eth[3],eth[4],eth[5],
-                        eth[6],eth[7],eth[8],eth[9],eth[10],eth[11],
-                        (unsigned)proto, (unsigned)sport, (unsigned)dport);
-                (void)proto; (void)sport; (void)dport;
-            } else {
-                vsf_wifi_netdrv_trace_info("wifi-netdrv: TX #%u eth_len=%u DA=%02X%02X%02X%02X%02X%02X"
-                        " et=%02X%02X" VSF_TRACE_CFG_LINEEND,
-                        (unsigned)__tx_cnt, (unsigned)eth_len,
-                        eth[0],eth[1],eth[2],eth[3],eth[4],eth[5],
-                        eth[12], eth[13]);
-            }
-        }
-    }
-
     bool use_qos = wifi_netdrv->wifi->bss_wmm && ((eth[0] & 0x01) == 0);
     /* Broadcast/multicast data is sent as plain Data (non-QoS) even on WMM
      * BSSes.  This avoids the Ack-Policy/EOSP/A-MSDU bits in QoS Control that
@@ -373,33 +343,6 @@ static void __vk_netdrv_wifi_on_rx(void *param, vsf_wifi_t *wifi,
     }
     slot->len = eth_len;
 
-    {
-        /* Make the bridged Ethernet frames visible: et=0x0800 IPv4, 0x0806 ARP.
-         * DHCP OFFER/ACK ride IPv4/UDP, so this confirms data reaches lwIP.
-         * For IPv4/UDP also dump proto + src/dst ports + dst IP so we can tell
-         * a DHCP OFFER (sport 67 -> dport 68) from other traffic. */
-        static uint32_t __rx_cnt = 0;
-        if (++__rx_cnt <= 16) {
-            uint8_t *b = slot->buf;
-            if ((b[12] == 0x08) && (b[13] == 0x00) && (eth_len >= 38)) {
-                uint8_t  ihl   = (b[14] & 0x0F) * 4;
-                uint8_t  proto = b[23];
-                uint16_t sport = (b[14 + ihl] << 8) | b[14 + ihl + 1];
-                uint16_t dport = (b[14 + ihl + 2] << 8) | b[14 + ihl + 3];
-                vsf_wifi_netdrv_trace_info("wifi-netdrv: rx->lwIP #%u eth_len=%u IPv4"
-                        " proto=%u sport=%u dport=%u dst=%u.%u.%u.%u"
-                        VSF_TRACE_CFG_LINEEND, (unsigned)__rx_cnt,
-                        (unsigned)eth_len, proto, sport, dport,
-                        b[30], b[31], b[32], b[33]);
-                (void)proto; (void)sport; (void)dport;
-            } else {
-                vsf_wifi_netdrv_trace_info("wifi-netdrv: rx->lwIP #%u eth_len=%u et=%02X%02X"
-                        VSF_TRACE_CFG_LINEEND, (unsigned)__rx_cnt,
-                        (unsigned)eth_len, b[12], b[13]);
-            }
-        }
-    }
-
     orig = vsf_protect_sched();
     wifi_netdrv->rx_tail = next;
     wifi_netdrv->pending |= __WIFI_NETDRV_PEND_RX;
@@ -413,7 +356,6 @@ static void __vk_netdrv_wifi_on_link_up(void *param, vsf_wifi_t *wifi,
 {
     vk_netdrv_wifi_t *wifi_netdrv = param;
 
-    vsf_wifi_netdrv_trace_info("wifi-netdrv: on_link_up hook fired, posting to worker" VSF_TRACE_CFG_LINEEND);
     memcpy(wifi_netdrv->bssid, info->bssid, 6);
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -441,7 +383,6 @@ static void __vk_netdrv_wifi_on_link_down(void *param, vsf_wifi_t *wifi, uint8_t
 void vsf_wifi_netdrv_start(vk_netdrv_wifi_t *netdrv, vsf_wifi_t *wifi)
 {
     VSF_WIFI_ASSERT((netdrv != NULL) && (wifi != NULL));
-    vsf_wifi_netdrv_trace_info("wifi-netdrv: start (bridge wifi->lwIP)" VSF_TRACE_CFG_LINEEND);
 
     memset(netdrv, 0, sizeof(*netdrv));
     netdrv->wifi = wifi;

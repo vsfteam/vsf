@@ -147,21 +147,6 @@ void vsf_wifi_netdrv_detach(vsf_wifi_t *wifi)
 
 static void __vsf_wifi_deliver_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
-    {
-        static uint32_t __deliver_cnt = 0;
-        uint16_t dh = (((frame[0] >> 4) & 0x0F) & 0x08) ? 26 : 24;
-        uint8_t et0 = (len > dh + 7) ? frame[dh + 6] : 0;
-        uint8_t et1 = (len > dh + 7) ? frame[dh + 7] : 0;
-        /* Only log IPv4 / ARP business frames (post-handshake), skip the
-         * mgmt/scan noise that otherwise floods the counter. */
-        if (((et0 == 0x08) && ((et1 == 0x00) || (et1 == 0x06)))
-                && (++__deliver_cnt <= 16)) {
-            vsf_wifi_trace_debug("wifi: deliver_rx #%u len=%u fc=%02X%02X prot=%u"
-                    " et=%02X%02X" VSF_TRACE_CFG_LINEEND,
-                    (unsigned)__deliver_cnt, (unsigned)len, frame[0], frame[1],
-                    (unsigned)((frame[1] >> 6) & 1), et0, et1);
-        }
-    }
     if ((wifi->netif_ops != NULL) && (wifi->netif_ops->on_rx != NULL)) {
         wifi->netif_ops->on_rx(wifi->netif_param, wifi, frame, len);
     } else {
@@ -1159,50 +1144,14 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
             uint8_t *out = (uint8_t *)wifi->wpa_ccmp_rx_buf;
             uint16_t plen = __vsf_wifi_ccmp_decap(wifi, dot11, len,
                     out, VSF_WIFI_CFG_CCMP_BUF_SIZE);
-            bool is_uc = !(dot11[4] & 0x01);
             if (plen == 0) {
-                if (++wifi->wpa_ccmp_fail_cnt <= 30) {
-                    vsf_wifi_trace_info("wifi: CCMP decap FAIL #%u len=%u "
-                            "sa=%02X:%02X:%02X:%02X:%02X:%02X "
-                            "body=%02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X"
+                if (++wifi->wpa_ccmp_fail_cnt <= 5) {
+                    vsf_wifi_trace_info("wifi: CCMP decap FAIL #%u len=%u"
                             VSF_TRACE_CFG_LINEEND,
-                            (unsigned)wifi->wpa_ccmp_fail_cnt, (unsigned)len,
-                            dot11[10], dot11[11], dot11[12], dot11[13],
-                            dot11[14], dot11[15],
-                            dot11[24], dot11[25], dot11[26], dot11[27],
-                            dot11[28], dot11[29], dot11[30], dot11[31],
-                            dot11[32], dot11[33], dot11[34], dot11[35]);
+                            (unsigned)wifi->wpa_ccmp_fail_cnt, (unsigned)len);
                 }
                 return;
             }
-            if (!is_uc) {
-                /* DIAG: successful group decaps, capped -- the sender and
-                 * payload prefix identify mesh-forwarded traffic and decode
-                 * DHCP offers. */
-                static uint32_t __grp_ok_cnt = 0;
-                if (++__grp_ok_cnt <= 20) {
-                    vsf_wifi_trace_info("wifi: GRP decap OK #%u plen=%u "
-                            "sa=%02X:%02X:%02X:%02X:%02X:%02X "
-                            "body=%02X%02X%02X%02X%02X%02X%02X%02X %02X%02X%02X%02X"
-                            VSF_TRACE_CFG_LINEEND, (unsigned)__grp_ok_cnt,
-                            (unsigned)plen,
-                            out[10], out[11], out[12], out[13], out[14], out[15],
-                            out[24], out[25], out[26], out[27], out[28], out[29],
-                            out[30], out[31], out[32], out[33], out[34], out[35]);
-                }
-            }
-            if (is_uc) {
-                /* Unicast data from the AP decrypted OK: this is the path DHCP
-                 * OFFER/ACK arrive on.  Make it visible regardless of the
-                 * multicast-noise fail counter. */
-                static uint32_t __uc_ok_cnt = 0;
-                if (++__uc_ok_cnt <= 12) {
-                    vsf_wifi_trace_debug("wifi: UC decap OK #%u plen=%u et=%02X%02X"
-                            VSF_TRACE_CFG_LINEEND, (unsigned)__uc_ok_cnt,
-                            (unsigned)plen,
-                            (plen > 32) ? out[(((out[0]>>4)&0x0F)&0x08)?32:30] : 0,
-                            (plen > 33) ? out[(((out[0]>>4)&0x0F)&0x08)?33:31] : 0);
-                }
             }
             /* After decryption, check if this is an EAPOL frame (encrypted
              * M3 during 4-way handshake).  Route to eapol_rx if so. */

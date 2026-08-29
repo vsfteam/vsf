@@ -440,9 +440,6 @@ typedef struct rt28xx_wifi_priv_t {
     vsf_wifi_reg_op_t   ops_buf[384];
     uint32_t            asic_ver;
     uint8_t             xtal40;
-    uint32_t            txfifo_val;
-    uint32_t            txfifo_ok;
-    uint32_t            txfifo_fail;
     uint32_t            macdbg_val;
     struct {
         uint32_t        detect_val;
@@ -1340,51 +1337,6 @@ static void __rt28xx_parse_rsn(const uint8_t *body, uint8_t len,
     }
 }
 
-/* ---- TX_STA_FIFO sampler (diagnostic) -------------------------------------
- * Asynchronously read TX_STA_FIFO from the RX path while associated, to learn
- * whether our uplink data frames (DHCP DISCOVER) are actually ACKed by the AP.
- * 802.11 ACK happens at the MAC layer BEFORE decryption, so:
- *   TX_SUCCESS=1 -> frame reached AP and was ACKed (any later drop is a higher
- *                   layer / decryption issue, NOT a radio/uplink issue);
- *   TX_SUCCESS=0 -> frame never reached AP or AP did not ACK (uplink problem).
- * Single-flight via the wifi-layer script slot; if busy we just skip. */
-/* TX_STA_FIFO is a pop-on-read hardware FIFO (ref rt2800usb.c:106): each read
- * pops one entry, and the reader must keep reading until VALID=0 to drain it.
- * The previous single-shot read kept returning the SAME stale head entry
- * (raw stuck at 0x40000189) which falsely looked like 100% TX failure.  Drain
- * the whole FIFO here by re-issuing run_read from the completion callback
- * (script_busy is already cleared by the dispatcher finish) until VALID=0, and
- * accumulate real per-frame ACK stats so success is actually observable. */
-static void __rt28xx_txfifo_done(vsf_wifi_t *wifi, vsf_err_t err)
-{
-    rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
-    if (VSF_ERR_NONE != err) {
-        return;
-    }
-    uint32_t v = priv->txfifo_val;
-    if (0 == (v & 0x1u)) {  /* VALID=0 -> FIFO drained */
-        return;
-    }
-    unsigned ack_ok = (unsigned)((v >> 5) & 0x1u);   /* TX_SUCCESS */
-    if (ack_ok) {
-        priv->txfifo_ok++;
-    } else {
-        priv->txfifo_fail++;
-    }
-    vsf_wifi_chip_rt28xx_trace_debug("wifi: TX_STA_FIFO ack_ok=%u ack_req=%u wcid=%u pid=%u mcs=%u"
-            " raw=0x%08X (ok=%u fail=%u)" VSF_TRACE_CFG_LINEEND,
-            ack_ok,
-            (unsigned)((v >> 7) & 0x1u),    /* TX_ACK_REQUIRED */
-            (unsigned)((v >> 8) & 0xFFu),   /* WCID            */
-            (unsigned)((v >> 1) & 0xFu),    /* PID_TYPE        */
-            (unsigned)((v >> 16) & 0x7Fu),  /* MCS             */
-            (unsigned)v,
-            (unsigned)priv->txfifo_ok, (unsigned)priv->txfifo_fail);
-    /* Re-issue to pop the next entry; stop automatically when VALID=0. */
-    vsf_wifi_reg_read(wifi, RT28XX_TX_STA_FIFO,
-            &priv->txfifo_val, __rt28xx_txfifo_done);
-}
-
 static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
 {
     rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
@@ -1400,58 +1352,6 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
             + RT28XX_RXD_DESC_SIZE);
 
     while (len >= min_frame) {
-
-    /* === RAW-TOP DIAG (temporary): log EVERY frame at the very top of the loop,
-     * BEFORE any length-validity break below.  This is the most upstream point we
-     * can observe: if a BSSID shows here but NOT in the RAW SCAN DIAG further down,
-     * the frame was dropped by our length checks (fixable, root cause B); if a
-     * BSSID never shows here at all, the chip never DMA'd it up (root cause A/C,
-     * not our software).  addr3(BSSID) sits at MPDU+16; here len>=min_frame so
-     * the read is in-bounds.  Remove after debug. */
-    /* Also fire whenever a frame's receiver address (addr1/da at MPDU+4) equals
-     * our own MAC, REGARDLESS of mlme_state.  The previous gate (mlme_state==4WAY)
-     * had a blind spot: if M1 arrives while the state machine is still in ASSOC
-     * (before it flips to 4WAY), the frame would never be logged and we'd wrongly
-     * conclude "M1 never came".  Matching on da==our-MAC guarantees every frame
-     * physically delivered to us is observed, at any handshake stage.  da sits at
-     * MPDU+4; here len>=min_frame so the read is in-bounds.  Remove after debug. */
-    {
-        const uint8_t *ht  = frame + RT28XX_RXINFO_DESC_SIZE + RT28XX_RXWI_DESC_SIZE_5572;
-        bool to_us = (ht[4] == wifi->mac[0]) && (ht[5] == wifi->mac[1])
-                  && (ht[6] == wifi->mac[2]) && (ht[7] == wifi->mac[3])
-                  && (ht[8] == wifi->mac[4]) && (ht[9] == wifi->mac[5]);
-        if (wifi->scanning || to_us) {
-#if VSF_WIFI_CFG_CHIP_RT28XX_LOG_LEVEL >= 4
-            uint16_t fct = (uint16_t)ht[0] | ((uint16_t)ht[1] << 8);
-            vsf_wifi_chip_rt28xx_trace_debug("wifi: RAW-TOP fc=%04X type=%u sub=%u prot=%u mlme=%u buflen=%u"
-                    " da=%02X:%02X:%02X:%02X:%02X:%02X bssid=%02X:%02X:%02X:%02X:%02X:%02X"
-                    VSF_TRACE_CFG_LINEEND,
-                    fct, (unsigned)((fct >> 2) & 0x3u), (unsigned)((fct >> 4) & 0xFu),
-                    (unsigned)((fct >> 14) & 0x1u), (unsigned)wifi->mlme_state, (unsigned)len,
-                    ht[4], ht[5], ht[6], ht[7], ht[8], ht[9],
-                    ht[16], ht[17], ht[18], ht[19], ht[20], ht[21]);
-            /* When fc protocol-version bits are non-zero (illegal in 802.11),
-             * the parsed offset is wrong.  Dump the first 96 bytes of the
-             * USB transfer raw, plus a few key offsets, so we can see chip's
-             * actual layout (RXINFO/RXWI sizes, possible prefix, aggregation
-             * boundary).  Remove after debug. */
-            if ((fct & 0x0003u) != 0u) {
-                unsigned dump_n = (len < 96u) ? len : 96u;
-                char hex[3 * 96 + 1];
-                unsigned hi = 0;
-                for (unsigned i = 0; i < dump_n; i++) {
-                    static const char d[] = "0123456789ABCDEF";
-                    hex[hi++] = d[(frame[i] >> 4) & 0xFu];
-                    hex[hi++] = d[frame[i] & 0xFu];
-                    hex[hi++] = ' ';
-                }
-                hex[hi] = '\0';
-                vsf_wifi_chip_rt28xx_trace_debug("wifi: RAW-DUMP n=%u %s" VSF_TRACE_CFG_LINEEND,
-                        dump_n, hex);
-            }
-#endif
-        }
-    }
 
     uint32_t rxinfo_w0 = get_unaligned_le32(frame);
     uint16_t rx_pkt_len = (uint16_t)(rxinfo_w0 & 0xFFFF);
@@ -1480,51 +1380,12 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     uint32_t rxwi_w0 = get_unaligned_le32(rxwi + 0);
     uint32_t rxwi_w2 = get_unaligned_le32(rxwi + 8);
 
-    /* === RAW SCAN DIAG (temporary): log EVERY frame the chip demodulated and
-     * DMA'd up while scanning, BEFORE any mpdu_len validity check below, so a
-     * frame dropped at the length checks is still visible.  This distinguishes
-     * "dropped at length check (fixable)" from "chip never demodulated it (PHY)".
-     * Reads addr3 (BSSID) at the fixed mgmt-header offset.  Remove after debug. */
-    if (wifi->scanning) {
-        const uint8_t *h0  = rxwi + RT28XX_RXWI_DESC_SIZE_5572;
-        uint16_t       fc0 = (uint16_t)h0[0] | ((uint16_t)h0[1] << 8);
-        uint16_t       ml0 = (uint16_t)((rxwi_w0 >> 16) & 0xFFFu);
-        vsf_wifi_chip_rt28xx_trace_debug("wifi: RAW scan fc=%04X rxlen=%u mpdu=%u buflen=%u crc=%u bssid=%02X:%02X:%02X:%02X:%02X:%02X"
-                VSF_TRACE_CFG_LINEEND,
-                fc0, (unsigned)rx_pkt_len, (unsigned)ml0, (unsigned)len, (unsigned)crc_err,
-                h0[16], h0[17], h0[18], h0[19], h0[20], h0[21]);
-        (void)fc0; (void)ml0;
-    }
-
     uint16_t mpdu_len = (uint16_t)((rxwi_w0 >> 16) & 0xFFFu);
     if (mpdu_len < RT28XX_DOT11_HDR_MIN) goto __advance_frame;
     if ((uint32_t)RT28XX_RXINFO_DESC_SIZE + RT28XX_RXWI_DESC_SIZE_5572 + mpdu_len > len)
         goto __advance_frame;
 
     const uint8_t *hdr = rxwi + RT28XX_RXWI_DESC_SIZE_5572;
-
-    /* === TEMP DIAG 2: dump ALL type=2 frames (no A1 filter) during 4-way, to see
-     * if M1 reaches the parser with some unexpected A1.  Remove after debug. */
-    if (wifi->mlme_state == WIFI_MLME_4WAY) {
-        uint16_t __fc_dbg = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
-        uint8_t  __type_dbg = (uint8_t)((__fc_dbg >> 2) & 0x3);
-        if (__type_dbg == 2) {
-            static uint32_t __all_data_cnt = 0;
-            if (__all_data_cnt < 50) {
-                __all_data_cnt++;
-                vsf_wifi_chip_rt28xx_trace_debug("wifi: ALLDATA[%u] mpdu=%u W0=0x%08X fc=%02X%02X "
-                        "a1=%02X:%02X:%02X:%02X:%02X:%02X "
-                        "a2=%02X:%02X:%02X:%02X:%02X:%02X "
-                        "a3=%02X:%02X:%02X:%02X:%02X:%02X"
-                        VSF_TRACE_CFG_LINEEND,
-                        (unsigned)__all_data_cnt, (unsigned)mpdu_len,
-                        (unsigned)rxwi_w0, hdr[0], hdr[1],
-                        hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9],
-                        hdr[10], hdr[11], hdr[12], hdr[13], hdr[14], hdr[15],
-                        hdr[16], hdr[17], hdr[18], hdr[19], hdr[20], hdr[21]);
-            }
-        }
-    }
 
     /* 802.11 frame control: type/subtype encoded in the low byte. */
     /* Cipher-error RX policy (mainline drops these too, but only when the
@@ -1536,40 +1397,6 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt, 2 = data */
     uint8_t  subtype = (uint8_t)((fc >> 4) & 0xF);   /* 8 = beacon, 5 = probe-resp */
 
-    /* === SCAN DIAGNOSTIC (temporary): log every mgmt beacon / probe-resp that
-     * physically arrived — including CRC-failed ones — so we can distinguish
-     * "AP never received" from "received but dropped".  Remove after debug. */
-    if (wifi->scanning && (type == 0) && ((subtype == 8) || (subtype == 5))) {
-        char     dssid[33];
-        uint8_t  dssid_len = 0;
-        dssid[0] = '\0';
-        if (mpdu_len >= RT28XX_DOT11_HDR_MIN + RT28XX_BEACON_FIXED) {
-            const uint8_t *b    = hdr + RT28XX_DOT11_HDR_MIN;
-            uint16_t       blen = (uint16_t)(mpdu_len - RT28XX_DOT11_HDR_MIN);
-            const uint8_t *die  = b + RT28XX_BEACON_FIXED;
-            const uint8_t *dend = b + blen;
-            while (die + 2 <= dend) {
-                uint8_t t = die[0];
-                uint8_t l = die[1];
-                if (die + 2 + l > dend) break;
-                if (t == 0) {
-                    uint8_t cc = (l > 32) ? 32 : l;
-                    memcpy(dssid, die + 2, cc);
-                    dssid[cc] = '\0';
-                    dssid_len = cc;
-                    break;
-                }
-                die += 2 + l;
-            }
-        }
-        vsf_wifi_chip_rt28xx_trace_debug("wifi: DIAG sub=%u crc=%u len=%u bssid=%02X:%02X:%02X:%02X:%02X:%02X ssid=\"%s\"(%u)"
-                VSF_TRACE_CFG_LINEEND,
-                subtype, (unsigned)crc_err, (unsigned)mpdu_len,
-                hdr[16], hdr[17], hdr[18], hdr[19], hdr[20], hdr[21],
-                dssid, (unsigned)dssid_len);
-        (void)dssid_len;
-    }
-
     if (crc_err) goto __advance_frame;
 
     /* Raw radio mode: deliver the de-descriptored 802.11 frame to the
@@ -1577,45 +1404,6 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
     if (wifi->raw_radio_active) {
         vsf_wifi_radio_on_rx(wifi, (uint8_t *)hdr, mpdu_len);
         goto __advance_frame;
-    }
-
-    /* Diagnose post-handshake frame types (state >= 2 = 4WAY/RUN). */
-    if (wifi->mlme_state >= 2) {
-        static uint32_t __parse_run_cnt = 0;
-        static uint32_t __parse_tome_cnt = 0;
-        __parse_run_cnt++;
-        /* Log frames addressed to our MAC or broadcast. */
-        bool to_me = (memcmp(&hdr[4], wifi->mac, 6) == 0);
-        bool bcast  = (hdr[4] & 0x01);  /* multicast/broadcast bit */
-        if (to_me || (bcast && type == 2)) {
-            if (++__parse_tome_cnt <= 40) {
-                vsf_wifi_chip_rt28xx_trace_debug("wifi: parse_rx TO_ME[%u/%u] type=%u sub=%u fc=%04X len=%u prot=%u"
-                        VSF_TRACE_CFG_LINEEND,
-                        (unsigned)__parse_tome_cnt, (unsigned)__parse_run_cnt,
-                        type, subtype, fc, (unsigned)mpdu_len,
-                        (unsigned)((fc >> 14) & 1));
-            }
-        } else if (__parse_run_cnt <= 10) {
-            vsf_wifi_chip_rt28xx_trace_debug("wifi: parse_rx[%u] type=%u sub=%u fc=%04X len=%u A1=%02X:%02X:%02X:%02X:%02X:%02X"
-                    VSF_TRACE_CFG_LINEEND,
-                    (unsigned)__parse_run_cnt, type, subtype, fc, (unsigned)mpdu_len,
-                    hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9]);
-        }
-    }
-
-    /* Drain one TX_STA_FIFO entry per few RX frames while associated, to learn
-     * whether uplink data frames are ACKed by the AP (see helper above).
-     * Also sample during 4WAY: we are stuck there (no M1 received) and need to
-     * know whether the AP ACKs OUR frames (assoc-req etc.) -- ack_ok tells us if
-     * the AP can hear us at all, which distinguishes "AP never sent M1" from
-     * "M1 was sent but we failed to ACK it". */
-    if ((wifi->mlme_state == WIFI_MLME_RUN)
-            || (wifi->mlme_state == WIFI_MLME_4WAY)) {
-        static uint32_t __txfifo_gate = 0;
-        if ((++__txfifo_gate & 0x1u) == 0) {
-            vsf_wifi_reg_read(wifi, RT28XX_TX_STA_FIFO,
-                    &priv->txfifo_val, __rt28xx_txfifo_done);
-        }
     }
 
     /* Data frames (type 2) are only meaningful once the link is associated.
@@ -1629,26 +1417,6 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
      * strip L2PAD before passing the frame up.  Ref: rt2x00queue_remove_l2pad,
      * RXD_W0_L2PAD (bit 14), REQUIRE_L2PAD. */
     if (type == 2) {
-        /* === TEMP DIAG: dump first 50 data frames during 4-way, to see if M1
-         * ever reaches the parser (vs being dropped at MAC).  Remove after debug. */
-        if (wifi->mlme_state == WIFI_MLME_4WAY) {
-            static uint32_t __data_diag_cnt = 0;
-            if (__data_diag_cnt < 200) {
-                uint32_t w1 = get_unaligned_le32(rxwi + 4);
-                uint32_t w3 = get_unaligned_le32(rxwi + 12);
-                (void)w1; (void)w3;
-                __data_diag_cnt++;
-                vsf_wifi_chip_rt28xx_trace_debug("wifi: DATA[%u] mpdu=%u W0=0x%08X W1=0x%08X W2=0x%08X W3=0x%08X "
-                        "fc=%02X%02X dur=%02X%02X a1=%02X:%02X:%02X:%02X:%02X:%02X "
-                        "a2=%02X:%02X:%02X:%02X:%02X:%02X"
-                        VSF_TRACE_CFG_LINEEND,
-                        (unsigned)__data_diag_cnt, (unsigned)mpdu_len,
-                        (unsigned)rxwi_w0, (unsigned)w1, (unsigned)rxwi_w2, (unsigned)w3,
-                        hdr[0], hdr[1], hdr[2], hdr[3],
-                        hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9],
-                        hdr[10], hdr[11], hdr[12], hdr[13], hdr[14], hdr[15]);
-            }
-        }
         if ((wifi->mlme_state == WIFI_MLME_RUN)
                 || (wifi->mlme_state == WIFI_MLME_4WAY)) {
             /* Strip RX L2PAD: shift the 802.11 header forward by l2pad bytes
@@ -3186,22 +2954,6 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
         uint16_t dst_cap, const uint8_t *frame, uint16_t frame_len)
 {
     (void)wifi;
-    /* Temporary diagnostic: identify every non-probe-request frame we hand
-     * to the chip so we can correlate TX_STA_FIFO entries with the actual
-     * 802.11 header during auth/assoc/4-way.  Probe requests are numerous
-     * during scans and only clutter the log. */
-    if ((frame_len >= 10) && ((frame[0] & 0xFC) != 0x40)) {
-        static uint32_t __tx_build_cnt = 0;
-        if (__tx_build_cnt < 80) {
-            __tx_build_cnt++;
-            vsf_wifi_chip_rt28xx_trace_info("wifi: TX build[%u] fc=%02X%02X a1=%02X:%02X:%02X:%02X:%02X:%02X len=%u"
-                    VSF_TRACE_CFG_LINEEND,
-                    (unsigned)__tx_build_cnt,
-                    frame[0], frame[1],
-                    frame[4], frame[5], frame[6], frame[7], frame[8], frame[9],
-                    (unsigned)frame_len);
-        }
-    }
     /* Determine 802.11 header length (QoS data has 2 extra bytes).
      * QoS: Type must be Data (bits[3:2]=10 → byte0 & 0x0C == 0x08) AND
      * subtype bit3 must be set (bit7 of byte0). */
@@ -3288,14 +3040,6 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
         /* Hardware crypto: mark the frame as protected and let the chip
          * insert the CCMP IV/EIV from the IVEIV registers. */
         dst[hdr + 1] |= 0x40;
-        static uint32_t __hw_tx_cnt = 0;
-        if (++__hw_tx_cnt <= 20) {
-            vsf_wifi_chip_rt28xx_trace_info(
-                    "wifi: HW TX[%u] wcid=%u mcast=%u fc=%02X%02X len=%u"
-                    VSF_TRACE_CFG_LINEEND,
-                    (unsigned)__hw_tx_cnt, (unsigned)wcid, (unsigned)is_mcast,
-                    frame[0], frame[1], (unsigned)frame_len);
-        }
     }
     if (l2pad > 0) {
         memset(dst + hdr + payload_off, 0, l2pad);      /* L2 padding */
