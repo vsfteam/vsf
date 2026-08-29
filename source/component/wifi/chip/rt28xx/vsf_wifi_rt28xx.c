@@ -427,6 +427,7 @@
 #endif
 
 typedef struct rt28xx_wifi_priv_t {
+    vsf_wifi_t         *wifi;
     uint8_t             rf_shadow[64];
     uint8_t             bbp_shadow[256];
     uint8_t             freq_offset;
@@ -449,6 +450,12 @@ typedef struct rt28xx_wifi_priv_t {
     } efuse_ctx;
     uint32_t            bbp_probe;
     uint8_t             bbp_wait_tries;
+    /* post-firmware settle: the 8051 hands the USB vendor interface from ROM
+     * to firmware asynchronously after USB_MODE_FIRMWARE; Linux rt2800usb
+     * sleeps 100ms at the same point. Timer-based so the bus EDA never
+     * blocks. */
+    vsf_callback_timer_t fw_settle_timer;
+    bool                fw_settle_armed;
     uint32_t            rf_probe;
     uint32_t            init_pbf;
     vsf_wifi_done_t     init_done;
@@ -1275,7 +1282,6 @@ static int __rt28xx_emit_bssid(vsf_wifi_reg_op_t *ops, int n, const uint8_t bssi
 #define RT28XX_STYPE_DISASSOC           0xA
 #define RT28XX_STYPE_AUTH               0xB
 #define RT28XX_STYPE_DEAUTH             0xC
-#define RT28XX_STYPE_ACTION_DBG         0xD
 
 /* Map an RSN/WPA cipher-suite selector (OUI 00-0F-AC) type byte to a
  * WIFI_CIPHER_xxx constant. */
@@ -1373,8 +1379,8 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
          * mac80211 drops these; we must too. */
         if (rxd_w0 & RT28XX_RXD_W0_CIPHER_ERROR) cipher_err = true;
     }
-    /* CRC result computed above (crc_err); defer the drop until after the
-     * scan diagnostic below so CRC-failed beacons are visible too. */
+    /* CRC drop is deferred to after the mgmt-type decode below so that
+     * deauth/disassoc frames are honored even with a marginal FCS. */
 
     uint8_t *rxwi = frame + RT28XX_RXINFO_DESC_SIZE;
     uint32_t rxwi_w0 = get_unaligned_le32(rxwi + 0);
@@ -1622,7 +1628,7 @@ static void __rt28xx_xtal_select_done(vsf_wifi_t *wifi, vsf_err_t err)
     rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
     if (VSF_ERR_NONE == err) {
         priv->xtal40 = (priv->macdbg_val & RT28XX_MAC_DEBUG_INDEX_XTAL) ? 1 : 0;
-        vsf_wifi_chip_rt28xx_trace_info("rt28xx: MAC_DEBUG_INDEX=0x%08X xtal=%uMHz ASIC=0x%08X rev=0x%04X %s" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_chip_rt28xx_trace_debug("rt28xx: MAC_DEBUG_INDEX=0x%08X xtal=%uMHz ASIC=0x%08X rev=0x%04X %s" VSF_TRACE_CFG_LINEEND,
                 (unsigned)priv->macdbg_val, priv->xtal40 ? 40u : 20u,
                 (unsigned)priv->asic_ver, (unsigned)(priv->asic_ver & 0xFFFF),
                 __rt28xx_is_5592c(priv) ? "(RT5592C+)" : "(pre-RT5592C)");
@@ -1683,7 +1689,7 @@ static void __rt28xx_eeprom_after_detect(vsf_wifi_t *wifi, vsf_err_t err)
         __rt28xx_chain_finish(wifi, VSF_ERR_NONE);
         return;
     }
-    vsf_wifi_chip_rt28xx_trace_info("rt28xx: EFUSE_CTRL=0x%08X (PRESENT=%d)" VSF_TRACE_CFG_LINEEND,
+    vsf_wifi_chip_rt28xx_trace_debug("rt28xx: EFUSE_CTRL=0x%08X (PRESENT=%d)" VSF_TRACE_CFG_LINEEND,
             (unsigned)priv->efuse_ctx.detect_val,
             (priv->efuse_ctx.detect_val & RT28XX_EFUSE_PRESENT) ? 1 : 0);
     if (!(priv->efuse_ctx.detect_val & RT28XX_EFUSE_PRESENT)) {
@@ -1805,7 +1811,7 @@ static void __rt28xx_eeprom_after_data0(vsf_wifi_t *wifi, vsf_err_t err)
                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     } else {
         memcpy(wifi->mac, mac, 6);
-        vsf_wifi_chip_rt28xx_trace_info(
+        vsf_wifi_chip_rt28xx_trace_debug(
                 "rt28xx: MAC %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
@@ -1978,7 +1984,7 @@ static void __rt28xx_pbf_ready_done(vsf_wifi_t *wifi, vsf_err_t err)
          * (the read_poll already printed the last PBF_SYS_CTRL value). */
         vsf_wifi_chip_rt28xx_trace_info("rt28xx: MCU firmware NOT ready (PBF_SYS_CTRL_READY=0), err=%d" VSF_TRACE_CFG_LINEEND, (int)err);
     } else {
-        vsf_wifi_chip_rt28xx_trace_info("rt28xx: MCU firmware running (PBF_SYS_CTRL_READY=1)" VSF_TRACE_CFG_LINEEND);
+        vsf_wifi_chip_rt28xx_trace_debug("rt28xx: MCU firmware running (PBF_SYS_CTRL_READY=1)" VSF_TRACE_CFG_LINEEND);
     }
     vsf_err_t e = vsf_wifi_reg_read_poll(wifi, RT28XX_ASIC_VER_ID,
             __rt28xx_mcu_ready_match, priv,
@@ -2081,6 +2087,8 @@ static void __rt28xx_fw_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
+static void __rt28xx_fw_settle_timer_cb(vsf_callback_timer_t *timer);
+
 static vsf_err_t __rt28xx_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 {
     rt28xx_wifi_priv_t *priv = __rt28xx_priv_ensure(wifi);
@@ -2088,6 +2096,9 @@ static vsf_err_t __rt28xx_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
         if (done != NULL) done(wifi, VSF_ERR_NOT_ENOUGH_RESOURCES);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
+    priv->wifi = wifi;
+    vsf_callback_timer_init(&priv->fw_settle_timer);
+    priv->fw_settle_timer.on_timer = __rt28xx_fw_settle_timer_cb;
 
     if (__rt2870_firmware_size == 0) {
         if (done != NULL) done(wifi, VSF_ERR_NONE);
@@ -2202,6 +2213,7 @@ static void __rt28xx_init_built_done(vsf_wifi_t *wifi, vsf_err_t err)
 }
 
 /* Got BBP0 readback: if awake (non 0x00/0xFF) proceed to init; else retry. */
+static void __rt28xx_fw_settle_timer_cb(vsf_callback_timer_t *timer);
 static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
@@ -2209,7 +2221,10 @@ static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
     if (VSF_ERR_NONE == err && v != 0x00 && v != 0xFF) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: BBP0=0x%02X ready after %u tries" VSF_TRACE_CFG_LINEEND,
                 v, (unsigned)priv->bbp_wait_tries);
-        __rt28xx_init_emit(wifi);
+        /* Give the freshly-kicked 8051 time to finish taking over the USB
+         * vendor interface before the first register writes of init. */
+        priv->fw_settle_armed = true;
+        vsf_callback_timer_add_ms(&priv->fw_settle_timer, 100);
         return;
     }
     if (priv->bbp_wait_tries < 50) {
@@ -2219,6 +2234,19 @@ static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
     vsf_wifi_chip_rt28xx_trace_info("rt28xx: BBP not ready (BBP0=0x%02X after %u tries), "
             "continuing" VSF_TRACE_CFG_LINEEND, v, (unsigned)priv->bbp_wait_tries);
+    __rt28xx_init_emit(wifi);
+}
+
+/* 100ms post-firmware settle elapsed: safe to start register init now. */
+static void __rt28xx_fw_settle_timer_cb(vsf_callback_timer_t *timer)
+{
+    rt28xx_wifi_priv_t *priv = vsf_container_of(timer,
+            rt28xx_wifi_priv_t, fw_settle_timer);
+    vsf_wifi_t *wifi = priv->wifi;
+
+    priv->fw_settle_armed = false;
+    if (wifi->disconnecting) return;
+    vsf_wifi_chip_rt28xx_trace_debug("rt28xx: fw settle done, init registers" VSF_TRACE_CFG_LINEEND);
     __rt28xx_init_emit(wifi);
 }
 
@@ -3016,7 +3044,13 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
      * by software-generated seqnos.  We set NSEQ=1 for data frames and
      * write the seq in software (EAPOL / netdrv / keepalive); on-air
      * captures show the chip leaves those values untouched. */
-    uint32_t txwi_w1   = RT28XX_TXWI_W1_ACK
+    /* ACK request only for unicast frames.  802.11 broadcast/multicast frames
+     * are never ACKed; requesting an ACK for them makes the MAC wait the full
+     * ACK timeout and retry up to the retry limit for a frame that will never
+     * be ACKed - blocking the TX queue and (in TX_STA_FIFO) reporting every
+     * such frame as a failed transmit.  DHCP DISCOVER and ARP requests are
+     * broadcast, so they were the bulk of the spurious no-ACK entries. */
+    uint32_t txwi_w1   = (is_mcast ? 0u : RT28XX_TXWI_W1_ACK)
                        | (is_data ? RT28XX_TXWI_W1_NSEQ : 0u)
                        | ((uint32_t)wcid << 8)
                        | (((uint32_t)frame_len & 0x0FFFu) << 16)

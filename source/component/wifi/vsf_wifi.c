@@ -1152,7 +1152,6 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
                 }
                 return;
             }
-            }
             /* After decryption, check if this is an EAPOL frame (encrypted
              * M3 during 4-way handshake).  Route to eapol_rx if so. */
             {
@@ -1549,7 +1548,7 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
         char buf[384]; int pos = 0;
         for (uint16_t k = 0; k < i && pos < (int)sizeof(buf) - 3; k++)
             pos += snprintf(&buf[pos], sizeof(buf) - pos, "%02X", frame[k]);
-        vsf_wifi_trace_info("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_debug("wifi: assoc-req (%u bytes): %s" VSF_TRACE_CFG_LINEEND,
                 (unsigned)i, buf);
     }
     vsf_err_t err = __vsf_wifi_tx_frame(wifi, frame, i);
@@ -1870,7 +1869,7 @@ void vsf_wifi_mlme_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
         }
         uint16_t reason = (body_len >= 2) ? __vsf_wifi_rd16(&body[0])
                                           : WIFI_REASON_UNSPECIFIED;
-        vsf_wifi_trace_info("wifi: received %s (reason=%u)" VSF_TRACE_CFG_LINEEND,
+        vsf_wifi_trace_error("wifi: received %s (reason=%u)" VSF_TRACE_CFG_LINEEND,
                 (subtype == __DOT11_STYPE_DEAUTH) ? "deauth" : "disassoc",
                 (unsigned)reason);
         __vsf_wifi_mlme_finish(wifi, (uint8_t)reason);

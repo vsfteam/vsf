@@ -101,6 +101,7 @@ struct vk_usbh_wifi_t {
     uint16_t             bus_vendor_value;
     uint16_t             bus_vendor_index;
 
+
     /* Bulk RX/TX iocb pool */
     union {
         struct {
