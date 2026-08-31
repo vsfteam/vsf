@@ -3153,6 +3153,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer")
  *
  * @note Only available when VSF_KERNEL_CFG_EDA_SUPPORT_TIMER is ENABLED.
  * @note Operates on the current task; must be called in the current eda/teda task's event handler context.
+ * @note A teda can have only ONE pending one-shot timer: setting a new timer
+ * while the previous one is still pending triggers a kernel assertion. To
+ * restart the timer, cancel the pending one with vsf_teda_cancel_timer() first.
  * \~chinese
  * @brief 为当前 teda 任务设置一个给定 tick 数的单次定时器；定时器到期后任务
  * 会收到 VSF_EVT_TIMER 事件
@@ -3162,6 +3165,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer")
  *
  * @note 仅在 VSF_KERNEL_CFG_EDA_SUPPORT_TIMER 使能时可用。
  * @note 作用于当前任务，必须在当前 eda/teda 任务的事件处理函数上下文中调用。
+ * @note 一个 teda 只允许有一个挂起的单次定时器：前一个定时器未到期时再次设置
+ * 会触发内核断言。若需重新设置（重启定时器），请先调用 vsf_teda_cancel_timer()
+ * 取消挂起的定时器。
  */
 extern vsf_err_t vsf_teda_set_timer(vsf_systimer_tick_t tick);
 
@@ -3176,6 +3182,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_due_ex")
  * @note Only available when VSF_KERNEL_CFG_EDA_SUPPORT_TIMER is ENABLED. The
  * task receives VSF_EVT_TIMER when the timer expires.
  * @note Must be called in task context, NOT in interrupt context (in interrupt context use the corresponding _isr API if available).
+ * @note A teda can have only ONE pending one-shot timer: setting a new timer
+ * while the previous one is still pending triggers a kernel assertion. To
+ * restart the timer, cancel the pending one with vsf_teda_cancel_timer() first.
  * \~chinese
  * @brief 为给定的 teda 任务设置一个绝对到期 tick 的单次定时器
  * @param[in] this_ptr: 指向结构体 @ref vsf_teda_t 的指针
@@ -3185,6 +3194,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_due_ex")
  * @note 仅在 VSF_KERNEL_CFG_EDA_SUPPORT_TIMER 使能时可用。定时器到期后任务
  * 会收到 VSF_EVT_TIMER 事件。
  * @note 必须在任务上下文中调用，禁止在中断上下文中调用（如有对应的 _isr API，中断里请使用它）。
+ * @note 一个 teda 只允许有一个挂起的单次定时器：前一个定时器未到期时再次设置
+ * 会触发内核断言。若需重新设置（重启定时器），请先调用 vsf_teda_cancel_timer()
+ * 取消挂起的定时器。
  */
 extern vsf_err_t vsf_teda_set_due_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t due);
 
@@ -3200,6 +3212,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
  *
  * @note Only available when VSF_KERNEL_CFG_EDA_SUPPORT_TIMER is ENABLED.
  * @note Must be called in task context, NOT in interrupt context (in interrupt context use the corresponding _isr API if available).
+ * @note A teda can have only ONE pending one-shot timer: setting a new timer
+ * while the previous one is still pending triggers a kernel assertion. To
+ * restart the timer, cancel the pending one with vsf_teda_cancel_timer() first.
  * \~chinese
  * @brief 为给定的 teda 任务设置一个给定 tick 数的单次定时器；定时器到期后任务
  * 会收到 VSF_EVT_TIMER 事件
@@ -3210,6 +3225,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
  *
  * @note 仅在 VSF_KERNEL_CFG_EDA_SUPPORT_TIMER 使能时可用。
  * @note 必须在任务上下文中调用，禁止在中断上下文中调用（如有对应的 _isr API，中断里请使用它）。
+ * @note 一个 teda 只允许有一个挂起的单次定时器：前一个定时器未到期时再次设置
+ * 会触发内核断言。若需重新设置（重启定时器），请先调用 vsf_teda_cancel_timer()
+ * 取消挂起的定时器。
  */
 extern vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, vsf_systimer_tick_t tick);
 
