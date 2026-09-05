@@ -450,12 +450,6 @@ typedef struct rt28xx_wifi_priv_t {
     } efuse_ctx;
     uint32_t            bbp_probe;
     uint8_t             bbp_wait_tries;
-    /* post-firmware settle: the 8051 hands the USB vendor interface from ROM
-     * to firmware asynchronously after USB_MODE_FIRMWARE; Linux rt2800usb
-     * sleeps 100ms at the same point. Timer-based so the bus EDA never
-     * blocks. */
-    vsf_callback_timer_t fw_settle_timer;
-    bool                fw_settle_armed;
     uint32_t            rf_probe;
     uint32_t            init_pbf;
     vsf_wifi_done_t     init_done;
@@ -2087,8 +2081,6 @@ static void __rt28xx_fw_kick_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
-static void __rt28xx_fw_settle_timer_cb(vsf_callback_timer_t *timer);
-
 static vsf_err_t __rt28xx_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
 {
     rt28xx_wifi_priv_t *priv = __rt28xx_priv_ensure(wifi);
@@ -2097,8 +2089,6 @@ static vsf_err_t __rt28xx_firmware_load(vsf_wifi_t *wifi, vsf_wifi_done_t done)
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     priv->wifi = wifi;
-    vsf_callback_timer_init(&priv->fw_settle_timer);
-    priv->fw_settle_timer.on_timer = __rt28xx_fw_settle_timer_cb;
 
     if (__rt2870_firmware_size == 0) {
         if (done != NULL) done(wifi, VSF_ERR_NONE);
@@ -2213,7 +2203,6 @@ static void __rt28xx_init_built_done(vsf_wifi_t *wifi, vsf_err_t err)
 }
 
 /* Got BBP0 readback: if awake (non 0x00/0xFF) proceed to init; else retry. */
-static void __rt28xx_fw_settle_timer_cb(vsf_callback_timer_t *timer);
 static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
 {
     rt28xx_wifi_priv_t *priv = __rt28xx_priv(wifi);
@@ -2221,10 +2210,7 @@ static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
     if (VSF_ERR_NONE == err && v != 0x00 && v != 0xFF) {
         vsf_wifi_chip_rt28xx_trace_debug("rt28xx: BBP0=0x%02X ready after %u tries" VSF_TRACE_CFG_LINEEND,
                 v, (unsigned)priv->bbp_wait_tries);
-        /* Give the freshly-kicked 8051 time to finish taking over the USB
-         * vendor interface before the first register writes of init. */
-        priv->fw_settle_armed = true;
-        vsf_callback_timer_add_ms(&priv->fw_settle_timer, 100);
+        __rt28xx_init_emit(wifi);
         return;
     }
     if (priv->bbp_wait_tries < 50) {
@@ -2234,19 +2220,6 @@ static void __rt28xx_bbp_probe_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
     vsf_wifi_chip_rt28xx_trace_info("rt28xx: BBP not ready (BBP0=0x%02X after %u tries), "
             "continuing" VSF_TRACE_CFG_LINEEND, v, (unsigned)priv->bbp_wait_tries);
-    __rt28xx_init_emit(wifi);
-}
-
-/* 100ms post-firmware settle elapsed: safe to start register init now. */
-static void __rt28xx_fw_settle_timer_cb(vsf_callback_timer_t *timer)
-{
-    rt28xx_wifi_priv_t *priv = vsf_container_of(timer,
-            rt28xx_wifi_priv_t, fw_settle_timer);
-    vsf_wifi_t *wifi = priv->wifi;
-
-    priv->fw_settle_armed = false;
-    if (wifi->disconnecting) return;
-    vsf_wifi_chip_rt28xx_trace_debug("rt28xx: fw settle done, init registers" VSF_TRACE_CFG_LINEEND);
     __rt28xx_init_emit(wifi);
 }
 
