@@ -79,6 +79,10 @@
 #   include "lwip/raw.h"
 #endif
 
+#if MEM_LIBC_MALLOC
+#   error "MEM_LIBC_MALLOC can not be used because it needs linux environment if VSF_USE_LINUX is enabled, and lwip thread is not linux environment"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_LWIP != ENABLED
