@@ -1296,6 +1296,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 parse_failed:
     if (dev != NULL) {
+        __vsf_eda_crit_npb_leave(&dev->ep0.crit);
         __vk_usbh_clean_device(usbh, dev);
     }
 parse_ok:
