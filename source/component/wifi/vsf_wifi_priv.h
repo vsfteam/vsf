@@ -124,6 +124,19 @@ struct vsf_wifi_t {
     vsf_callback_timer_t mlme_timer;
 #endif
 
+    /* Auto-reconnect (see VSF_WIFI_CFG_AUTO_RECONNECT): armed when a linked
+     * session is torn down by an over-the-air deauth/disassoc; re-issues
+     * connect to the same target after a delay.  mlme_linked tracks whether
+     * the torn-down session had actually reached link-up (only then is
+     * auto-reconnect eligible).  Not WPA-specific -- applies to open
+     * networks too, so it lives outside the VSF_WIFI_USE_WPA guard. */
+    bool     auto_reconnect;
+    bool     mlme_linked;
+    uint8_t  auto_reconnect_retries;
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+    vsf_callback_timer_t reconnect_timer;
+#endif
+
 #if VSF_WIFI_USE_WPA == ENABLED
     /* ---- WPA2-PSK security context ----
      *
@@ -158,18 +171,6 @@ struct vsf_wifi_t {
      * software CCMP encap/decap is bypassed (the chip does it in-line). */
     uint8_t  wpa_tx_pn[6];
     bool     wpa_hw_crypto;
-
-    /* Auto-reconnect (see VSF_WIFI_CFG_AUTO_RECONNECT): armed when a linked
-     * session is torn down by an over-the-air deauth/disassoc; re-issues
-     * connect to the same target after a delay.  mlme_linked tracks whether
-     * the torn-down session had actually reached link-up (only then is
-     * auto-reconnect eligible). */
-    bool     auto_reconnect;
-    bool     mlme_linked;
-    uint8_t  auto_reconnect_retries;
-#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
-    vsf_callback_timer_t reconnect_timer;
-#endif
 
     /* Software CCMP working buffers.  Placed in the instance instead of local
      * static arrays so the code remains re-entrant when multiple wifi instances

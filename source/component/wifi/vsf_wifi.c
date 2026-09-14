@@ -53,7 +53,9 @@ static void __vsf_wifi_mlme_send_auth (vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi);
 static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason);
 static void __vsf_wifi_mlme_finish    (vsf_wifi_t *wifi, uint8_t reason);
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 static void __vsf_wifi_reconnect_timer_cb(vsf_callback_timer_t *timer);
+#endif
 static void __vsf_wifi_auto_reconnect_schedule(vsf_wifi_t *wifi, bool was_linked, uint8_t reason);
 #if VSF_WIFI_USE_WPA == ENABLED
 static void __vsf_wifi_retry_key_install(vsf_wifi_t *wifi);
@@ -1092,8 +1094,10 @@ void vsf_wifi_data_rx(vsf_wifi_t *wifi, const uint8_t *dot11, uint16_t len)
     }
     if (len <= hdr_len) return;
 
+#if VSF_WIFI_USE_WPA == ENABLED
     const uint8_t *payload     = dot11 + hdr_len;
     uint16_t       payload_len = len - hdr_len;
+#endif
 
     if (prot) {
 #if VSF_WIFI_USE_WPA == ENABLED
@@ -1573,6 +1577,7 @@ static void __vsf_wifi_mlme_send_deauth(vsf_wifi_t *wifi, uint16_t reason)
 /* Reset MLME to IDLE and notify the application of a link-down.  Called for
  * every non-RUN exit (timeout / rejected / deauth / user disconnect). */
 /* Auto-reconnect timer: re-issue connect to the stashed target. */
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 static void __vsf_wifi_reconnect_timer_cb(vsf_callback_timer_t *timer)
 {
     vsf_wifi_t *wifi = vsf_container_of(timer, vsf_wifi_t, reconnect_timer);
@@ -1595,6 +1600,7 @@ static void __vsf_wifi_reconnect_timer_cb(vsf_callback_timer_t *timer)
                 VSF_WIFI_CFG_AUTO_RECONNECT_DELAY_MS);
     }
 }
+#endif
 
 /* Arm the auto-reconnect timer if the torn-down session qualified.
  * LOCAL_DISCONNECT (user teardown) never arms it. */
