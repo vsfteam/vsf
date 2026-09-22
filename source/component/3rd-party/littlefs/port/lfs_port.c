@@ -23,6 +23,7 @@
 
 // to access protected member in mal->drv
 #define __VSF_MAL_CLASS_INHERIT__
+#include "component/mal/vsf_mal.h"
 #include "component/fs/vsf_fs.h"
 
 /*============================ MACROS ========================================*/
