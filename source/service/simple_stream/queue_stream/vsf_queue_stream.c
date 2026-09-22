@@ -144,17 +144,20 @@ static uint_fast32_t __vsf_queue_stream_write(vsf_stream_t *stream, uint8_t *buf
     uint_fast32_t avail_len = __vsf_queue_stream_get_avail_length(stream);
     uint_fast32_t wsize = vsf_min(avail_len, size);
 
-    buffer_node = vsf_heap_malloc(sizeof(*buffer_node) + size);
+    if (wsize == 0) {
+        return 0;
+    }
+    buffer_node = vsf_heap_malloc(sizeof(*buffer_node) + wsize);
     if (NULL == buffer_node) {
         return 0;
     }
     vsf_slist_init_node(vsf_queue_stream_buffer_node_t, buffer_node, buffer_node);
     buffer_node->pos = 0;
-    buffer_node->size = size;
-    memcpy(&buffer_node[1], buf, size);
+    buffer_node->size = wsize;
+    memcpy(&buffer_node[1], buf, wsize);
 
     vsf_protect_t orig = __vsf_queue_stream_protect();
-        queue_stream->size += size;
+        queue_stream->size += wsize;
         queue_stream->entry_num++;
         vsf_slist_queue_enqueue(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
     __vsf_queue_stream_unprotect(orig);
