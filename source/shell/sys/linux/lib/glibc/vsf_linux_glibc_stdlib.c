@@ -546,6 +546,7 @@ unsigned long long strtoull(const char *str, char **endptr, int base)
 
 double strtod(const char *str, char **endptr)
 {
+    const char *str_orig = str;
     double number = 0;
     int exponent;
     bool is_negative;
@@ -597,6 +598,9 @@ double strtod(const char *str, char **endptr)
         }
 
         exponent = (int)__strtonum(str, &str_tmp, 10, 308);
+        if (str_tmp != str) {
+            str = str_tmp;
+        }
         while (exponent) {
             if (exponent & 1) {
                 number *= ten_n;
@@ -606,8 +610,17 @@ double strtod(const char *str, char **endptr)
         }
     }
 
+    // POSIX: on success *endptr points one past the last consumed char;
+    // callers like busybox xatod reject the input when it is left unset
+    if (endptr != NULL) {
+        *endptr = (char *)str;
+    }
     return number;
 error:
+    // POSIX: no conversion -> *endptr = nptr
+    if (endptr != NULL) {
+        *endptr = (char *)str_orig;
+    }
     errno = ERANGE;
     return 0.0;
 }
