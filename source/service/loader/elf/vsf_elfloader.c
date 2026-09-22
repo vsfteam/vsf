@@ -584,6 +584,17 @@ second_round_for_ram_base:
                 if (!vsf_loader_read(target, dynstr_offset + sym.st_name, symbol_name, sizeof(symbol_name))) {
                     return -1;
                 }
+                // a symbol name at least as long as the buffer has no room
+                // for the NUL terminator: the strlen below would read past
+                // the stack buffer, and registering a truncated name would
+                // silently never match a lookup. fail the load instead;
+                // increase VSF_ELFLOADER_CFG_MAX_SYM_LEN to cover the
+                // longest exported symbol name of the image
+                if (NULL == memchr(symbol_name, '\0', sizeof(symbol_name))) {
+                    vsf_trace_error("export symbol name \"%.*s...\" too long, increase VSF_ELFLOADER_CFG_MAX_SYM_LEN" VSF_TRACE_CFG_LINEEND,
+                        (int)sizeof(symbol_name) - 1, symbol_name);
+                    goto cleanup_and_fail;
+                }
 
                 size_t symbol_len = strlen(symbol_name) + 1;
                 if ((STB_GLOBAL == ELF_ST_BIND(sym.st_info)) && (sym.st_size > 0)) {

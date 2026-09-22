@@ -611,7 +611,8 @@ double strtod(const char *str, char **endptr)
     }
 
     // POSIX: on success *endptr points one past the last consumed char;
-    // callers like busybox xatod reject the input when it is left unset
+    // on no conversion *endptr = nptr. callers validate the parse through
+    // endptr, so leaving it unset makes every valid input look invalid
     if (endptr != NULL) {
         *endptr = (char *)str;
     }
