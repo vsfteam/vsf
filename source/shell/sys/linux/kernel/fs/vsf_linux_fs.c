@@ -961,7 +961,7 @@ vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd)
 vk_vfs_file_t * __vsf_linux_get_vfs(int fd)
 {
     vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
-    if (file->fsop != &vk_vfs_op) {
+    if ((NULL == file) || (file->fsop != &vk_vfs_op)) {
         return NULL;
     }
     return (vk_vfs_file_t *)file;
@@ -2215,14 +2215,23 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 off64_t lseek64(int fd, off64_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    // accept any fs-backed fd (same convention as __vsf_linux_get_fs_ex):
-    // bound vfs devices (e.g. mal block devices) use their own fdop but
-    // keep a fs_priv-compatible priv with a valid priv->file
     if ((NULL == sfd) || !(sfd->op->feature & VSF_LINUX_FDOP_FEATURE_FS)) {
+        errno = EBADF;
         return (off64_t)-1;
     }
 
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    // accept any fs-backed fd (same convention as __vsf_linux_get_fs_ex):
+    // bound vfs devices (e.g. mal block devices) use their own fdop but
+    // keep a fs_priv-compatible priv with a valid priv->file.
+    // pipe/stream/term fdops also carry the feature bit (fs-compatible
+    // priv layout) yet never set file -- seek on them is ESPIPE, not a
+    // NULL deref in vk_file_seek (busybox tail probes stdin with
+    // lseek(SEEK_END) and falls back to the read-all path on -1)
+    if (NULL == priv->file) {
+        errno = ESPIPE;
+        return (off64_t)-1;
+    }
 #if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
     if (    (whence == SEEK_CUR)
         &&  (priv->cache_size > 0)
