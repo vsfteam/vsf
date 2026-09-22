@@ -3207,6 +3207,13 @@ ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t co
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
     vsf_stream_t *stream = priv->stream_tx;
     VSF_LINUX_ASSERT(stream != NULL);
+    // POSIX: writing to a pipe whose read end is gone fails with EPIPE.
+    // Without this the queue stream keeps enqueueing buffer nodes that no
+    // reader will ever drain ("yes | head" exhausts the heap)
+    if (!vsf_stream_is_rx_connected(stream)) {
+        errno = EPIPE;
+        return -1;
+    }
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
 
@@ -3463,7 +3470,10 @@ int __vsf_linux_rx_pipe_init(vsf_linux_pipe_priv_t *priv_rx, vsf_queue_stream_t 
         priv_rx->stream_rx_allocated = true;
     }
 
-    queue_stream->max_buffer_size = -1;
+    // bounded like a real pipe (linux default capacity 64KB): an unbounded
+    // queue never blocks the writer, which starves the reader on the
+    // cooperative scheduler and exhausts the heap ("yes | head")
+    queue_stream->max_buffer_size = 64 * 1024;
     queue_stream->max_entry_num = -1;
     queue_stream->op = &vsf_queue_stream_op;
     priv_rx->stream_rx = &queue_stream->use_as__vsf_stream_t;
