@@ -186,6 +186,8 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_thread_reg(void)
 #   ifndef VSF_ARCH_LONGJMP
 #       define VSF_ARCH_LONGJMP     vsf_arch_rv_longjmp
 #   endif
+extern int vsf_arch_rv_setjmp(unsigned long *env);
+extern void vsf_arch_rv_longjmp(unsigned long *env, int val);
 #endif
 
 #if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
