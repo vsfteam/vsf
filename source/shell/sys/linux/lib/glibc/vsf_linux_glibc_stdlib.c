@@ -201,7 +201,10 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size,
         } else {
             new_buff = __malloc_ex(process, size);
             if (new_buff != NULL) {
-                size = vsf_min(size, node->size);
+                /* glibc semantics: preserve contents up to the old block's
+                 * usable size, not just the last requested size, so slack
+                 * written through malloc_usable_size survives the move. */
+                size = vsf_min(size, total_size);
                 memcpy(new_buff, p, size);
             }
             __free_ex(process, p);
@@ -231,8 +234,17 @@ size_t malloc_usable_size(void *p)
     }
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    return vsf_linux_process_heap_size(NULL, (uint8_t *)p - sizeof(vsf_liunx_heap_node_t))
-        - sizeof(vsf_liunx_heap_node_t);
+    /* glibc semantics: report the block's usable size (not just the last
+     * requested size); ____realloc_ex preserves this range on move. Route
+     * through the same heap the block lives in, mirroring ____realloc_ex's
+     * before_entry special case. */
+    vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)p - 1;
+#   ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
+    if (node->before_entry) {
+        return vsf_heap_size((uint8_t *)node) - sizeof(vsf_liunx_heap_node_t);
+    }
+#   endif
+    return vsf_linux_process_heap_size(NULL, (uint8_t *)node) - sizeof(vsf_liunx_heap_node_t);
 #else
     return vsf_linux_process_heap_size(NULL, p);
 #endif
