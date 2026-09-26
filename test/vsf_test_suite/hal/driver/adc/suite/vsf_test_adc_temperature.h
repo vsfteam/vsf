@@ -30,6 +30,14 @@
 #   define VSF_TEST_ADC_TEMPERATURE_SAMPLE_CYCLES             0
 #endif
 
+#ifndef VSF_TEST_ADC_TEMPERATURE_PRIO
+#   define VSF_TEST_ADC_TEMPERATURE_PRIO                     vsf_arch_prio_1
+#endif
+
+#ifndef VSF_TEST_ADC_TEMPERATURE_TIMEOUT_MS
+#   define VSF_TEST_ADC_TEMPERATURE_TIMEOUT_MS               500
+#endif
+
 
 #ifndef VSF_TEST_ADC_CLOCK_HZ
 #   define VSF_TEST_ADC_CLOCK_HZ                   48000000
