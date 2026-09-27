@@ -142,6 +142,7 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason( vsf_sync_t *sync,
             eda->flag.state.is_sync_got = false;
         } else if (evt == VSF_EVT_SYNC_CANCEL) {
             reason = VSF_SYNC_CANCEL;
+            eda->flag.state.is_sync_got = false;
         } else {
             VSF_KERNEL_ASSERT(false);
         }
