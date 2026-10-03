@@ -1392,7 +1392,9 @@ static void __rt28xx_parse_rx(vsf_wifi_t *wifi, uint8_t *frame, uint16_t len)
      * hardware owns the keys): in SW-crypto mode the chip has no keys, so
      * a cipher-error flag on received frames is EXPECTED -- software CCMP
      * decaps them.  Dropping here would lose every unicast frame. */
+#if VSF_WIFI_USE_WPA == ENABLED
     if (cipher_err && wifi->wpa_hw_crypto) goto __advance_frame;
+#endif
     uint16_t fc      = (uint16_t)hdr[0] | ((uint16_t)hdr[1] << 8);
     uint8_t  type    = (uint8_t)((fc >> 2) & 0x3);   /* 0 = mgmt, 2 = data */
     uint8_t  subtype = (uint8_t)((fc >> 4) & 0xF);   /* 8 = beacon, 5 = probe-resp */
