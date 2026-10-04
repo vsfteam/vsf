@@ -145,6 +145,9 @@ vsf_class(vk_input_notifier_t) {
 #if VSF_INPUT_USE_CST8 == ENABLED
 #   include "./driver/touch_screen/hynitron/cst8/vsf_input_cst8.h"
 #endif
+#if VSF_INPUT_USE_GT9XX == ENABLED
+#   include "./driver/touch_screen/goodix/gt9xx/vsf_input_gt9xx.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

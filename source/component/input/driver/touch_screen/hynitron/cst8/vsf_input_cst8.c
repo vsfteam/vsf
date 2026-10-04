@@ -107,6 +107,10 @@ vsf_err_t vk_input_cst8_init(vk_input_cst8_t *cst8, vsf_arch_prio_t prio)
 {
     VSF_INPUT_ASSERT((cst8 != NULL) && (prio != vsf_arch_prio_invalid));
 
+    // 8-bit register map(vsf_i2c_regacc contract: device drivers state
+    // their register address size explicitly)
+    cst8->regacc.reg_addr_len = 1;
+
     vsf_i2c_init(cst8->i2c_ptr, &(vsf_i2c_cfg_t){
         .mode           = VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_FAST_MODE | VSF_I2C_ADDR_7_BITS,
         .clock_hz       = 400 * 1000,

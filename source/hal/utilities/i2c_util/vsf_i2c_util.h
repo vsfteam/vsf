@@ -43,13 +43,21 @@ vsf_class(vsf_i2c_regacc_t) {
     public_member(
         vsf_i2c_t *i2c_ptr;
         uint8_t i2c_addr;
+        // register address size in bytes: 1 or 2(sent big-endian, for
+        // devices with a 16-bit register map). device drivers state this
+        // explicitly in their init; the instance zero default reads as 1
+        // only to keep pre-existing callers source-compatible
+        uint8_t reg_addr_len;
     )
     protected_member(
-        uint8_t reg;
+        uint16_t reg;
         uint16_t datalen;
         void *data;
     )
     private_member(
+        // register address staging bytes(big-endian), implementation
+        // scratch only - no consumer touches it across completion
+        uint8_t reg_buf[2];
         uint8_t is_busy     : 1;
         uint8_t is_read     : 1;
         uint8_t is_regaddr  : 1;
@@ -63,7 +71,7 @@ vsf_class(vsf_i2c_regacc_t) {
 
 extern vsf_err_t vsf_i2c_regacc_irqhandler(vsf_i2c_regacc_t *i2c_regacc,
                         vsf_i2c_irq_mask_t irq_mask);
-extern vsf_err_t vsf_i2c_regacc(vsf_i2c_regacc_t *i2c_regacc, uint_fast8_t reg,
+extern vsf_err_t vsf_i2c_regacc(vsf_i2c_regacc_t *i2c_regacc, uint_fast16_t reg,
                         bool is_read, uint8_t *data, uint_fast16_t datalen);
 
 #endif      // VSF_HAL_USE_I2C
