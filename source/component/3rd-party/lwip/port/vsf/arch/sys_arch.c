@@ -298,9 +298,12 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 {
     VSF_ASSERT(size <= VSF_SYNC_MAX);
 
-    // vsf_eda_queue_init can accept a minimal size of 1
+    // lwip uses 0 for DEFAULT_*_RECVMBOX_SIZE/DEFAULT_ACCEPTMBOX_SIZE to mean
+    // "no limit, port sizes the queue"; a 1-deep ring silently drops every
+    // packet arriving while one is queued (raw/udp sockets on loopback also
+    // receive their own outgoing packets, shadowing the reply)
     if (size <= 0) {
-        size = 1;
+        size = 8;
     }
 
     mbox->queue = vsf_heap_malloc(sizeof(void *) * size);

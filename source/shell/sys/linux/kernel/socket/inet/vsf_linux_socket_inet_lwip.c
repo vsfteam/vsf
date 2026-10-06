@@ -1415,7 +1415,18 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     if (NULL == pbuf) {
         err_t err = ERR_OK;
 
-    recv_next:
+    recv_next: {
+#if LWIP_SO_RCVTIMEO
+        // an infinite recv wait never re-enters the thread-wait where pending
+        // signal handlers run (__vsf_thread_check_signal); bound the wait to
+        // 200ms and retry so signals (SIGALRM/SIGINT/...) get dispatched even
+        // when nothing arrives
+        u32_t recv_timeout_saved = conn->recv_timeout;
+        bool recv_timeout_retry = (0 == recv_timeout_saved) && !(flags & MSG_DONTWAIT);
+        if (recv_timeout_retry) {
+            conn->recv_timeout = 200;
+        }
+#endif
         if ((type == NETCONN_UDP) || (type == NETCONN_RAW)) {
             struct netbuf *netbuf;
             err = netconn_recv_udp_raw_netbuf_flags(conn, &netbuf, flags);
@@ -1444,6 +1455,15 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
                 errno = EIO;
             }
         }
+#if LWIP_SO_RCVTIMEO
+        if (recv_timeout_retry) {
+            conn->recv_timeout = recv_timeout_saved;
+            if (ERR_TIMEOUT == err) {
+                goto recv_next;
+            }
+        }
+#endif
+    }
 
         if (err != ERR_OK) {
             return 0 == len ? -1 : len;
