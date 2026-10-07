@@ -476,7 +476,16 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-    return !(priv->file->size - vk_file_tell(priv->file));
+    uint64_t remaining = priv->file->size - vk_file_tell(priv->file);
+#if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+    // vk_file_tell() is already past the prefetched-but-unconsumed cache
+    // bytes, so without counting them a small file fully prefetched by the
+    // first read would be reported as EOF while cached data is still left.
+    if (priv->cache_size > priv->cache_offset) {
+        remaining += priv->cache_size - priv->cache_offset;
+    }
+#endif
+    return !remaining;
 }
 
 static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size)
