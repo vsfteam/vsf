@@ -34,7 +34,19 @@ const struct vsf_test_adc_oneshot_s {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
+static volatile bool __adc_oneshot_completed = false;
+
 /*============================ IMPLEMENTATION ================================*/
+
+static void __adc_oneshot_isr(void *target_ptr, vsf_adc_t *adc_ptr,
+                              vsf_adc_irq_mask_t irq_mask)
+{
+    VSF_UNUSED_PARAM(target_ptr);
+    VSF_UNUSED_PARAM(adc_ptr);
+    if (irq_mask & VSF_ADC_IRQ_MASK_CPL) {
+        __adc_oneshot_completed = true;
+    }
+}
 
 void vsf_test_adc_oneshot_run(const vsf_test_suite_t *suite, const vsf_test_case_t *tc, const vsf_test_inst_t *inst)
 {
@@ -69,7 +81,11 @@ void vsf_test_adc_oneshot_run(const vsf_test_suite_t *suite, const vsf_test_case
     VSF_TEST_TRACE_DEBUG("adc_oneshot:vsf_adc_init" VSF_TRACE_CFG_LINEEND);
     vsf_adc_cfg_t cfg = {
         .mode     = VSF_TEST_ADC_ONESHOT_MODE,
-        .isr      = {NULL, NULL, 0},
+        .isr      = {
+            .handler_fn = __adc_oneshot_isr,
+            .target_ptr = NULL,
+            .prio       = VSF_TEST_ADC_ONESHOT_PRIO,
+        },
         .clock_hz = VSF_TEST_ADC_CLOCK_HZ,
     };
     vsf_err_t err = vsf_adc_init(adc, &cfg);
@@ -91,10 +107,22 @@ void vsf_test_adc_oneshot_run(const vsf_test_suite_t *suite, const vsf_test_case
         .sample_cycles = VSF_TEST_ADC_ONESHOT_SAMPLE_CYCLES,
     };
     uint16_t sample = 0;
+    __adc_oneshot_completed = false;
     err = vsf_adc_channel_request_once(adc, &ch_cfg, &sample);
     VSF_TEST_ASSERT_ERR_NONE(err,
         "adc_oneshot:vsf_adc_channel_request_once failed (err=%d) (ch=%u)"
                              VSF_TRACE_CFG_LINEEND, (int)err, (unsigned)ch_cfg.channel);
+
+    // vsf_adc_channel_request_once is asynchronous: wait for the conversion-complete
+    // interrupt (VSF_ADC_IRQ_MASK_CPL) before reading the result.
+    VSF_TEST_TRACE_DEBUG("adc_oneshot:waiting for completion" VSF_TRACE_CFG_LINEEND);
+    VSF_TEST_WAIT_FOR(__adc_oneshot_completed, VSF_TEST_ADC_ONESHOT_TIMEOUT_MS);
+    if (!__adc_oneshot_completed) {
+        VSF_TEST_TRACE_ERROR("adc_oneshot:conversion timeout after %u ms"
+                             VSF_TRACE_CFG_LINEEND,
+                             (unsigned)VSF_TEST_ADC_ONESHOT_TIMEOUT_MS);
+    }
+    VSF_TEST_ASSERT(__adc_oneshot_completed);
 
     // Result must be within 12-bit range
     if (sample > VSF_TEST_ADC_ONESHOT_MAX_SAMPLE) {

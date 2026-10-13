@@ -36,7 +36,19 @@ const struct vsf_test_adc_temperature_s {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
+static volatile bool __adc_temperature_completed = false;
+
 /*============================ IMPLEMENTATION ================================*/
+
+static void __adc_temperature_isr(void *target_ptr, vsf_adc_t *adc_ptr,
+                                  vsf_adc_irq_mask_t irq_mask)
+{
+    VSF_UNUSED_PARAM(target_ptr);
+    VSF_UNUSED_PARAM(adc_ptr);
+    if (irq_mask & VSF_ADC_IRQ_MASK_CPL) {
+        __adc_temperature_completed = true;
+    }
+}
 
 void vsf_test_adc_temperature_run(const vsf_test_suite_t *suite, const vsf_test_case_t *tc, const vsf_test_inst_t *inst)
 {
@@ -62,7 +74,11 @@ void vsf_test_adc_temperature_run(const vsf_test_suite_t *suite, const vsf_test_
     VSF_TEST_TRACE_DEBUG("adc_temperature:vsf_adc_init" VSF_TRACE_CFG_LINEEND);
     vsf_adc_cfg_t cfg = {
         .mode     = VSF_TEST_ADC_TEMPERATURE_MODE,
-        .isr      = {NULL, NULL, 0},
+        .isr      = {
+            .handler_fn = __adc_temperature_isr,
+            .target_ptr = NULL,
+            .prio       = VSF_TEST_ADC_TEMPERATURE_PRIO,
+        },
         .clock_hz = VSF_TEST_ADC_CLOCK_HZ,
     };
     vsf_err_t err = vsf_adc_init(adc, &cfg);
@@ -83,10 +99,22 @@ void vsf_test_adc_temperature_run(const vsf_test_suite_t *suite, const vsf_test_
         .sample_cycles = VSF_TEST_ADC_TEMPERATURE_SAMPLE_CYCLES,
     };
     uint16_t sample = 0;
+    __adc_temperature_completed = false;
     err = vsf_adc_channel_request_once(adc, &ch_cfg, &sample);
     VSF_TEST_ASSERT_ERR_NONE(err,
         "adc_temperature:vsf_adc_channel_request_once failed (err=%d) (ch=%u)"
                              VSF_TRACE_CFG_LINEEND, (int)err, (unsigned)ch_cfg.channel);
+
+    // vsf_adc_channel_request_once is asynchronous: wait for the conversion-complete
+    // interrupt (VSF_ADC_IRQ_MASK_CPL) before reading the result.
+    VSF_TEST_TRACE_DEBUG("adc_temperature:waiting for completion" VSF_TRACE_CFG_LINEEND);
+    VSF_TEST_WAIT_FOR(__adc_temperature_completed, VSF_TEST_ADC_TEMPERATURE_TIMEOUT_MS);
+    if (!__adc_temperature_completed) {
+        VSF_TEST_TRACE_ERROR("adc_temperature:conversion timeout after %u ms"
+                             VSF_TRACE_CFG_LINEEND,
+                             (unsigned)VSF_TEST_ADC_TEMPERATURE_TIMEOUT_MS);
+    }
+    VSF_TEST_ASSERT(__adc_temperature_completed);
 
     /* Verify raw value is within 12-bit range. Temperature varies by
      * environment and VREF tolerance, so no tight bounds. */
