@@ -368,6 +368,13 @@ __vsf_component_peda_private_entry(__vk_file_open,
             break;
         }
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the SYNC grant: a stale
+        // latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT immediate-grant
+        // fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&__vk_fs.open.lock.use_as__vsf_sync_t, evt);
+        }
 #endif
     do_lookup_child:
         if (vsf_local.name != NULL) {

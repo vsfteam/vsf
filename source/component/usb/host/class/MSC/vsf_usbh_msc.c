@@ -172,6 +172,12 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, uint_fast8_t lun, 
         }
         // fall through
     case VSF_EVT_SYNC: {
+            // consume the is_sync_got latch carried by the crit grant:
+            // a stale latch misjudges later TIMER wakeups on this eda
+            // as VSF_SYNC_PENDING. evt guard = the INIT fallthrough
+            if (evt == VSF_EVT_SYNC) {
+                vsf_eda_sync_get_reason((vsf_sync_t *)&msc->crit, evt);
+            }
             uint_fast8_t cbd_len = vk_scsi_get_command_len(cbd);
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
             bool is_rw = vk_scsi_get_rw_param(cbd, &msc->addr, &msc->total_size);

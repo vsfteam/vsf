@@ -351,6 +351,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_unmount, vk_fs_unmount)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -382,6 +389,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_lookup, vk_file_lookup)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -422,6 +436,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_create, vk_file_create)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -457,6 +478,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_unlink, vk_file_unlink)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -489,6 +517,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_close, vk_file_close)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -530,6 +565,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_setsize, vk_file_setsize)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -565,6 +607,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_setpos, vk_file_setpos)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -599,6 +648,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_read, vk_file_read)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 
@@ -633,6 +689,13 @@ __vsf_component_peda_ifs_entry(__vk_lfs_write, vk_file_write)
         }
         // fall through
     case VSF_EVT_SYNC:
+        // consume the is_sync_got latch carried by the crit grant: a
+        // stale latch misjudges later TIMER wakeups on this eda as
+        // VSF_SYNC_PENDING. the evt guard keeps the INIT
+        // immediate-grant fallthrough out of the cleanup
+        if (evt == VSF_EVT_SYNC) {
+            vsf_eda_sync_get_reason(&fsinfo->crit.use_as__vsf_sync_t, evt);
+        }
         fsinfo->caller = vsf_eda_get_cur();
         VSF_FS_ASSERT(fsinfo->caller != NULL);
 

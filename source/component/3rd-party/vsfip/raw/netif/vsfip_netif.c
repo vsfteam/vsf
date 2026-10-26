@@ -103,21 +103,21 @@ static vsf_err_t __vsfip_netif_construct(vsfip_netif_t *netif)
 
 static void __vsfip_netif_output_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-	vsfip_netif_t *netif = vsf_container_of(eda, vsfip_netif_t, output_eda);
-	vsfip_netbuf_t *netbuf;
+    vsfip_netif_t *netif = vsf_container_of(eda, vsfip_netif_t, output_eda);
+    vsfip_netbuf_t *netbuf;
 
-	switch (evt) {
-	case VSFIP_NETIF_EVT_OUTPUTTED:
-	case VSF_EVT_INIT:
+    switch (evt) {
+    case VSFIP_NETIF_EVT_OUTPUTTED:
+    case VSF_EVT_INIT:
     wait_next:
         if (!netif->op->can_output(netif)) {
             break;
         }
-		if (VSF_ERR_NONE != vsf_eda_sem_pend(&netif->output_sem, -1)) {
-			break;
+        if (VSF_ERR_NONE != vsf_eda_sem_pend(&netif->output_sem, -1)) {
+            break;
         }
         // fall through
-	case VSF_EVT_SYNC:
+    case VSF_EVT_SYNC:
         do {
             vsf_sched_lock_status_t origlevel = vsf_sched_lock();
                 vsf_slist_queue_dequeue(vsfip_netbuf_t, netif_node, &netif->output_queue, netbuf);

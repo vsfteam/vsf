@@ -3850,6 +3850,30 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_sync_get_reason")
  * @return vsf_sync_reason_t: VSF_SYNC_GET if the resource is obtained,
  * VSF_SYNC_TIMEOUT on timeout, VSF_SYNC_CANCEL if cancelled, VSF_SYNC_PENDING if
  * the sync was obtained before the timeout event and the wait should continue
+ *
+ * @note Sync-consumption convention. A granted token is delivered as
+ * VSF_EVT_SYNC together with the per-eda is_sync_got latch (also set for
+ * VSF_EVT_SYNC_CANCEL). The latch is eda state, NOT sync state: it survives
+ * the wait that set it and is cleared ONLY by this function. Any wait whose
+ * result is classified through this call (eg __vsf_thread_wait_for_sync -
+ * thread-side trig/mutex/sem pends with a timeout, nanosleep) hangs while a
+ * stale latch is set: the TIMER is misjudged as VSF_SYNC_PENDING.
+ * @note Consumption styles:
+ *  - get_reason style (default, always sound): the SYNC re-entry calls this
+ *    function and acts on the returned reason. REQUIRED whenever the eda
+ *    hosts - now or later - wait_for_sync-style pends: linux-thread code
+ *    (nanosleep/trig/mutex/sem timeouts) or peda subcalls that pend through
+ *    syncs (mal/fs-style ops run on the CALLER's eda).
+ *  - self-managed style (exception): a DEDICATED eda whose handlers treat
+ *    VSF_EVT_SYNC as a plain "granted - act now" notification, managing
+ *    their crit/sem state around it, may skip this call - PROVIDED no code
+ *    running on that eda uses wait_for_sync-style pends or calls this
+ *    function. The latch then stays set as inert state. This precondition
+ *    is present-tense and checkable (no get_reason call, no thread-side
+ *    timed sync pend anywhere in the eda's own code); record the skip at
+ *    the site. If a wait of the get_reason style is ever added to that eda,
+ *    the stale latch hangs it - convert the handlers to this-function style
+ *    in the same change.
  * @note Must be called in an eda task context (i.e. inside an event handler); must NOT be called in interrupt context.
  * \~chinese
  * @brief 根据唤醒事件获取同步操作的结果
@@ -3858,6 +3882,25 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_sync_get_reason")
  * @return vsf_sync_reason_t: 已获得资源返回 VSF_SYNC_GET，超时返回
  * VSF_SYNC_TIMEOUT，被取消返回 VSF_SYNC_CANCEL，如果超时事件到达前已获得同步
  * 且需要继续等待返回 VSF_SYNC_PENDING
+ *
+ * @note 同步消费规范。授予的令牌以 VSF_EVT_SYNC 事件送达，同时置起 eda 级的
+ * is_sync_got 锁存位（VSF_EVT_SYNC_CANCEL 亦置位）。该位是 eda 状态而非 sync
+ * 状态：越过置位它的那次等待继续存活，且只有本函数能清它。任何结果经本调用
+ * 裁决的等待（如 __vsf_thread_wait_for_sync——线程侧带超时的 trig/mutex/sem
+ * pend、nanosleep）在残留位置位期间会把 TIMER 误判为 VSF_SYNC_PENDING 并
+ * 永久挂起。
+ * @note 消费风格两种：
+ *  - get_reason 风格（默认，永远正确）：SYNC 重入处调用本函数并按返回值行动。
+ *    只要该 eda 上现在或将来会承载 wait_for_sync 式 pend 就必须用它——即
+ *    linux 线程代码（nanosleep/trig/mutex/sem 超时），或经 sync 带超时 pend
+ *    的 peda 子调用（mal/fs 式操作跑在调用者的 eda 上）。
+ *  - 自管风格（豁免）：专用 eda 的 handler 把 VSF_EVT_SYNC 当作纯粹的
+ *    “已授予——立即行动”通知、自行管理周边 crit/sem 状态时，可跳过本调用——
+ *    前提是该 eda 上没有任何代码使用 wait_for_sync 式 pend 或调用本函数。
+ *    此时锁存位保持置位但为惰性状态。该前提是现在时态、可检查的（该 eda
+ *    自身代码中无 get_reason 调用、无线程侧带超时的 sync pend）；跳过须在
+ *    原地登记。将来若向该 eda 加入 get_reason 风格的等待，残留位会挂死该
+ *    等待——须在同一次改动里把 handler 转换为本函数风格。
  * @note 必须在 eda 任务上下文（事件处理函数）中调用，禁止在中断上下文中调用。
  */
 extern vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *pthis, vsf_evt_t evt);
