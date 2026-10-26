@@ -231,6 +231,9 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_read, vk_mal_read)
         }
         // fall througn
     case VSF_EVT_SYNC:
+        if ((pthis->mutex != NULL) && (evt == VSF_EVT_SYNC)) {
+            vsf_eda_sync_get_reason(&pthis->mutex->use_as__vsf_sync_t, evt);
+        }
         err = vk_mal_read(pthis->mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         if (err != VSF_ERR_NONE) {
             vsf_eda_return(err);
@@ -264,6 +267,9 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_write, vk_mal_write)
         }
         // fall througn
     case VSF_EVT_SYNC:
+        if ((pthis->mutex != NULL) && (evt == VSF_EVT_SYNC)) {
+            vsf_eda_sync_get_reason(&pthis->mutex->use_as__vsf_sync_t, evt);
+        }
         err = vk_mal_write(pthis->mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         if (err != VSF_ERR_NONE) {
             vsf_eda_return(err);
