@@ -52,11 +52,21 @@ vsf_class(vk_sdmmc_mal_t) {
         implement(vk_mal_t)
         vsf_sdio_t             *sdio;
         vsf_arch_prio_t         hw_priority;
+        // Optional caller-owned bounce buffer, initialized before the first
+        // read/write. Align it to the strictest SDIO read/write pointer
+        // requirement (including cache alignment) and provide at least one
+        // legal transfer unit. Keep it valid until fini; the caller retains ownership.
+        // Set both fields to NULL/0 when not providing one. In that case,
+        // VSF_SDMMC_MAL_CFG_BOUNCE_BUFFER_SIZE > 0 with heap support enables
+        // lazy allocation; otherwise unaligned caller buffers are rejected.
+        uint8_t                *bounce_buffer;
+        uint32_t                bounce_buffer_size;
         implement(vsf_sdio_probe_t)
     )
     private_member(
         vsf_callback_timer_t    timer;
         vsf_eda_t              *eda;
+        bool                    bounce_is_owned;
         bool                    is_probing;
         bool                    is_stopping;
         bool                    is_to_stop;

@@ -90,8 +90,11 @@ typedef enum vsf_mal_feature_t {
 
 typedef struct vsf_mal_capability_t {
     // alignment in bytes, 1 byte alignment if 0
-    uint16_t data_ptr_alignment;    // alignment of data pointer
+    uint16_t data_ptr_alignment;    // default for read and write
     uint16_t data_size_alignment;   // alignment of data size
+    // direction-specific pointer alignment, 0 inherits data_ptr_alignment
+    uint16_t read_data_ptr_alignment;
+    uint16_t write_data_ptr_alignment;
 } vsf_mal_capability_t;
 
 /**

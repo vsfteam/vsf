@@ -156,6 +156,7 @@ vsf_sdio_capability_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)(
         .support_ddr        = true,
         .data_ptr_alignment = 4,
         .data_size_alignment= 32,
+        .max_data_size      = 0x1FFFFFF,
     };
 }
 

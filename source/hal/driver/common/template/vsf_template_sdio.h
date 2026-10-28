@@ -794,10 +794,25 @@ typedef struct vsf_sdio_capability_t {
         SDIO_CAP_BUS_WIDTH_8        = (0x1ul <<  2),
     } bus_width;
     uint32_t max_freq_hz;
-    // data alignment(address and size) in bytes
-    uint16_t data_ptr_alignment;    // alignment of data pointer
-    uint16_t data_size_alignment;   // alignment of data size
+    // DMA data alignment(address and size) shared by RX and TX, in bytes
+    uint16_t data_ptr_alignment;
+    uint16_t data_size_alignment;
     bool support_ddr;
+    // Extra cache-maintenance alignment for direct buffer address and size,
+    // in bytes; 0 = no extra requirement beyond data_*_alignment above.
+    // read_cache_alignment applies to device-to-memory (RX) buffers, where the
+    // driver typically invalidates cache after DMA. write_cache_alignment
+    // applies to memory-to-device (TX) buffers, where the driver typically
+    // writes back cache before DMA.
+    // Set each field from the actual requirement of that cache operation, not
+    // simply from the cache-line size: use the line size only if whole-line
+    // address/size alignment is required, or 0 if unaligned maintenance is safe.
+    // The effective address/size alignment is the maximum of the corresponding
+    // data_*_alignment and read/write_cache_alignment.
+    uint16_t read_cache_alignment;
+    uint16_t write_cache_alignment;
+    // maximum byte count of one data request; 0 = no limit
+    uint32_t max_data_size;
 } vsf_sdio_capability_t;
 #endif
 
@@ -1111,8 +1126,8 @@ extern vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
  @note Completion is signaled through the ISR callback registered in cfg.isr (see
        vsf_sdio_init): SDIO_IRQ_MASK_HOST_RESP_DONE when the command response is received
        and SDIO_IRQ_MASK_HOST_DATA_DONE when the data transfer finishes.
- @note req_ptr (and req_ptr->buffer, if any) must remain valid until completion is signaled; for a
-       read, req_ptr->buffer content is undefined before completion.
+ @note req_ptr->buffer, if any, must remain valid until completion is signaled;
+       for a read, its content is undefined before completion.
 
  \~chinese
  @brief 启动 sdio 请求
@@ -1125,8 +1140,7 @@ extern vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
        并不代表命令/数据传输已经完成。
  @note 完成通过在 cfg.isr 中注册的回调（参见 vsf_sdio_init）通知：收到命令响应时为
        SDIO_IRQ_MASK_HOST_RESP_DONE，数据传输结束时为 SDIO_IRQ_MASK_HOST_DATA_DONE。
- @note req_ptr（及其 req_ptr->buffer，若有）在完成通知之前必须保持有效；读操作时 req_ptr->buffer 的内容
-       在完成前是未定义的。
+ @note req_ptr->buffer（若有）在完成通知之前必须保持有效；读操作时其内容在完成前是未定义的。
  */
 extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req_ptr);
 

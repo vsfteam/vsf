@@ -37,6 +37,10 @@
 #   define VSF_MAL_USE_CACHED_MAL       VSF_USE_HEAP
 #endif
 
+#ifndef VSF_SDMMC_MAL_CFG_BOUNCE_BUFFER_SIZE
+#   define VSF_SDMMC_MAL_CFG_BOUNCE_BUFFER_SIZE     0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

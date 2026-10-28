@@ -95,6 +95,7 @@ typedef struct vk_fatfs_dentry_parser_t {
     uint8_t attr;
     uint32_t first_cluster;
     uint64_t size;
+    uint64_t data_length;
 
     union {
         struct {
@@ -106,6 +107,7 @@ typedef struct vk_fatfs_dentry_parser_t {
             uint8_t namepos;
             uint8_t entry_num;
             int16_t root_entry_num;
+            uint8_t stream_flags;
         } exfat;
 #endif
         uint32_t zero_before_first_call;
@@ -140,6 +142,8 @@ vsf_class(vk_fatfs_file_t) {
 #if VSF_FS_USE_EXFATFS == ENABLED
             // root 0/entry_offset is the entry for Critical Primary Directory Entries of exfat
             uint8_t root_entry_offset;
+            uint8_t stream_flags;
+            uint64_t data_length;
 #endif
         } dentry;
     )
@@ -181,6 +185,7 @@ vsf_class(__vk_fatfs_info_t) {
         uint32_t fat_size;
         uint32_t data_sector;
         uint32_t cluster_num;
+        uint16_t fsinfo_sector;
         uint8_t sector_size_bits;
         uint8_t cluster_size_bits;
         uint8_t fat_num;

@@ -184,7 +184,16 @@ typedef struct vsf_sdio_capability_t {
     uint16_t data_ptr_alignment;
     uint16_t data_size_alignment;
     bool support_ddr;
+    uint16_t read_cache_alignment;
+    uint16_t write_cache_alignment;
+    uint32_t max_data_size;
 } vsf_sdio_capability_t;
+#endif
+
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_sdio_ctrl_t {
+    __VSF_SDIO_CTRL_DUMMY = 0,
+} vsf_sdio_ctrl_t;
 #endif
 // HW/IPCore end
 

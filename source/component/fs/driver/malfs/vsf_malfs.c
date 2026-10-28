@@ -214,13 +214,17 @@ __vsf_component_peda_private_entry(__vk_malfs_alloc_cache,
                 return;
             }
 
-            least_node->is_dirty = false;
             __vk_malfs_write(info, least_node->block_addr, 1, __vk_malfs_get_cache_buff(&info->cache, least_node));
             break;
         }
         break;
     case VSF_EVT_RETURN:
-        vsf_eda_return(vsf_local.result);
+        if ((int32_t)vsf_eda_get_return_value() == info->block_size) {
+            vsf_local.result->is_dirty = false;
+            vsf_eda_return(vsf_local.result);
+        } else {
+            vsf_eda_return(NULL);
+        }
         break;
     }
     vsf_peda_end();
@@ -240,16 +244,24 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     vsf_peda_begin();
     __vk_malfs_info_t *info = (__vk_malfs_info_t *)&vsf_this;
     vsf_mal_capability_t cap = vk_mal_capability(info->mal);
+    uint16_t read_ptr_alignment = cap.read_data_ptr_alignment;
     enum {
         STATE_GET_CACHE,
         STATE_COMMIT_READ,
         STATE_FINISH_READ,
     };
 
+    if (!read_ptr_alignment) {
+        read_ptr_alignment = cap.data_ptr_alignment;
+    }
+    if (!read_ptr_alignment) {
+        read_ptr_alignment = 1;
+    }
+
     switch (evt) {
     case VSF_EVT_INIT:
         vsf_local.cur_buff = vsf_local.buff;
-        if ((NULL == vsf_local.buff) || ((uintptr_t)vsf_local.buff & (cap.data_ptr_alignment - 1))) {
+        if ((NULL == vsf_local.buff) || ((uintptr_t)vsf_local.buff & (read_ptr_alignment - 1))) {
             if (NULL == vsf_local.buff) {
                 VSF_FS_ASSERT(vsf_local.block_num == 1);
             }
@@ -265,14 +277,26 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
         switch (vsf_local.state) {
         case STATE_GET_CACHE: {
                 vsf_local.node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
-                VSF_FS_ASSERT(vsf_local.node != NULL);
+                if (NULL == vsf_local.node) {
+                    vsf_eda_return(NULL);
+                    break;
+                }
 
                 vsf_local.read_buff = __vk_malfs_get_cache_buff(&info->cache, vsf_local.node);
                 if (vsf_local.node->block_addr == vsf_local.block_addr) {
-                    vsf_eda_return(vsf_local.read_buff);
-                    break;
+                    if (NULL == vsf_local.buff) {
+                        vsf_eda_return(vsf_local.read_buff);
+                        break;
+                    }
+                    memcpy(vsf_local.cur_buff, vsf_local.read_buff, info->block_size);
+                    if (--vsf_local.block_num == 0) {
+                        vsf_eda_return(vsf_local.buff);
+                        break;
+                    }
+                    vsf_local.block_addr++;
+                    vsf_local.cur_buff += info->block_size;
                 }
-                vsf_local.node->block_addr = vsf_local.block_addr;
+                vsf_local.node->block_addr = (uint64_t)-1;
             }
             // fall through
         case STATE_COMMIT_READ:
@@ -282,21 +306,27 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
                         info->block_size * vsf_local.read_block_num, vsf_local.read_buff);
             break;
         case STATE_FINISH_READ:
+            if ((int32_t)vsf_eda_get_return_value() <= 0) {
+                vsf_eda_return(NULL);
+                break;
+            }
+            if (vsf_local.buff != vsf_local.read_buff) {
+                vsf_local.node->block_addr = vsf_local.block_addr;
+            }
             if (NULL == vsf_local.buff) {
                 vsf_local.buff = vsf_local.read_buff;
             } else if (vsf_local.buff != vsf_local.read_buff) {
-                // unaligned buffer
                 memcpy(vsf_local.cur_buff, vsf_local.read_buff, info->block_size);
 
                 if (--vsf_local.block_num > 0) {
                     vsf_local.block_addr++;
-                    vsf_local.node->block_addr = vsf_local.block_addr;
                     vsf_local.cur_buff += info->block_size;
+                    vsf_local.node->block_addr = (uint64_t)-1;
                     goto read_next_block;
                 }
             }
 
-            vsf_eda_return((int32_t)vsf_eda_get_return_value() > 0 ? vsf_local.buff : NULL);
+            vsf_eda_return(vsf_local.buff);
             break;
         }
         break;
@@ -335,7 +365,14 @@ vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, ui
 {
     // TODO: add lock and unlock
     vsf_mal_capability_t cap = vk_mal_capability(info->mal);
-    VSF_FS_ASSERT(((uintptr_t)buff & (cap.data_ptr_alignment - 1)));
+    uint16_t write_ptr_alignment = cap.write_data_ptr_alignment;
+    if (!write_ptr_alignment) {
+        write_ptr_alignment = cap.data_ptr_alignment;
+    }
+    if (!write_ptr_alignment) {
+        write_ptr_alignment = 1;
+    }
+    VSF_FS_ASSERT(!((uintptr_t)buff & (write_ptr_alignment - 1)));
     return vk_mal_write(info->mal, info->block_size * block_addr, info->block_size * block_num, buff);
 }
 
