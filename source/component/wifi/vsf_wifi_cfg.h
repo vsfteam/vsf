@@ -130,13 +130,11 @@
  * skips software CCMP encap/decap.  When DISABLED the existing software CCMP
  * path is used.
  *
- * Default DISABLED (2026-08-30): on RT5572 the hw-crypto path breaks the link
- * right after the 4-way handshake (AP-side deauth reason=15 storm, unicast RX
- * dead -> DHCP never completes) regardless of the key-programming layout
- * (byte[0]/byte[3] IVEIV, SHARED_KEY_MODE stride, WCID_ATTR all tried --
- * see wifi.md board A/B).  mainline rt2800usb carries the `nohwcrypt` module
- * param for the same class of problem.  The software CCMP path is the
- * battle-tested default; re-enable only for dedicated hw-crypto bring-up.
+ * Default DISABLED: on RT5572 the hw-crypto path can break the link after
+ * the 4-way handshake regardless of the key-programming layout. Mainline
+ * rt2800usb carries the `nohwcrypt` module parameter for the same class of
+ * problem. Use the software CCMP path unless hardware crypto is being
+ * specifically validated.
  */
 #ifndef VSF_WIFI_CFG_RT28XX_HW_CRYPTO
 #   define VSF_WIFI_CFG_RT28XX_HW_CRYPTO    DISABLED

@@ -442,9 +442,8 @@ static void __wpa_handle_group_m1(vsf_wifi_t *wifi, const uint8_t *ek,
         __wpa_parse_gtk(wifi, kd, out_len);
     }
 
-    /* Re-program the new GTK into the chip on rekey: the hardware RX engine
-     * needs the current group key (see wifi_crypto.md for the failure
-     * analysis when this is skipped).  Asynchronous: G2 is echoed
+    /* Re-program the new GTK into the chip on rekey so the hardware RX
+     * engine keeps using the current group key. Asynchronous: G2 is echoed
      * immediately so the AP does not retransmit group M1. */
     if (wifi->wpa_hw_crypto && (wifi->wpa_gtk_len > 0)
             && (wifi->drv != NULL) && (wifi->drv->crypto_ops != NULL)

@@ -719,11 +719,10 @@ static int __rt28xx_build_init(rt28xx_wifi_priv_t *priv)
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_LED_CFG,             0x7F031E46);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_AMPDU_MAX_LEN_20M1S, 0x0000A8FF);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_AMPDU_MAX_LEN_40M1S, 0x000108EB);
-    /* RT5592 TX_SW_CFG: match Windows native driver capture (ref/rt5572_win_usb.log
-     * reg 0x1330=0x00000404, 0x1334=0x00080606, 0x1338=0).  CFG1=0x00080606 sets
-     * the PA switch on/off timing; leaving it 0 (the generic rt2800 default) can
-     * leave the PA mis-timed during TX so the on-air frame is malformed and the
-     * AP never ACKs it -- consistent with TX_STA_FIFO ack_ok=0 on every frame. */
+    /* RT5592 TX_SW_CFG: use the Windows native driver values
+     * (0x1330=0x00000404, 0x1334=0x00080606, 0x1338=0). CFG1 sets the PA
+     * switch timing; leaving it 0 can mis-time the PA during TX and prevent
+     * the AP from acknowledging malformed frames. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_SW_CFG0,          0x00000404);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_SW_CFG1,          0x00080606);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_SW_CFG2,          0x00000000);
@@ -750,16 +749,10 @@ static int __rt28xx_build_init(rt28xx_wifi_priv_t *priv)
     /* ---- TX link config (rt2800_init_registers:6030) ----
      * MFB_LIFETIME=32, TX_CF_ACK_EN=1. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_LINK_CFG,          0x00001020);
-    /* ---- TX power per-rate ----
-     * Match the Windows native driver's TX_PWR_CFG values captured while
-     * successfully connecting to the SAME AP (ref/rt5572_win_usb.log, regs
-     * 0x1314-0x1324 reassembled from 16-bit halves):
-     *   CFG0=0xAAAA6666 CFG1/2/3=0xAAAA6688 CFG4=0xFFFF6688.
-     * Our previous 0x0C0C0C0C was a guess: its nibble layout (0,C,0,C) is not
-     * even a valid per-rate power map, and the hardware TX_STA_FIFO showed
-     * EVERY uplink frame to the AP going un-ACKed (ack_ok=0 x34, mcs=0).  The
-     * Windows map uses regular nibbles (6/8 for CCK/OFDM, A/F for HT) which is
-     * the real calibrated layout for this dongle. */
+    /* TX power per-rate: use the Windows native driver's TX_PWR_CFG values
+     * (registers 0x1314-0x1324 reassembled from 16-bit halves):
+     * CFG0=0xAAAA6666, CFG1/2/3=0xAAAA6688, CFG4=0xFFFF6688.
+     * The regular nibble map uses 6/8 for CCK/OFDM and A/F for HT rates. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_0,        0xAAAA6666);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_1,        0xAAAA6688);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TX_PWR_CFG_2,        0xAAAA6688);
@@ -772,17 +765,9 @@ static int __rt28xx_build_init(rt28xx_wifi_priv_t *priv)
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MM40_PROT_CFG,        0x03E54084);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_GF20_PROT_CFG,        0x01654004);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_GF40_PROT_CFG,        0x03E54084);
-    /* AUTO_RSP_CFG (0x1404): match the Windows native driver's runtime value
-     * 0x13 = AUTORESPONDER | BAC_ACK_POLICY | AR_PREAMBLE(short).  The Windows
-     * USB capture writes 0x13 every time (ref/rt5572_win_usb.log
-     * L2121/7876/8220/17615/18074), whereas the Linux rt2800 init writes 0x07
-     * (AUTORESPONDER|BAC_ACK_POLICY|CTS_40_MMODE).  Two differences vs our old
-     * 0x07: (1) drop bit2 CTS_40_MMODE -- the target network is 20MHz on ch1 so
-     * 40MHz CTS duplicate mode should be off; (2) set bit4 AR_PREAMBLE=1 so the
-     * hardware auto-ACK uses short preamble, which the AP expects.  A
-     * long-preamble auto-ACK the AP can't decode would explain the observed
-     * symptom: AP keeps retransmitting auth/assoc-resp and never advances to
-     * EAPOL M1 (handshake timeout). */
+    /* AUTO_RSP_CFG (0x1404): use the Windows native driver's 0x13 rather
+     * than the Linux rt2800 init value 0x07. This disables CTS_40_MMODE
+     * and enables short-preamble hardware auto-ACK (AR_PREAMBLE). */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_AUTO_RSP_CFG,        0x00000013);
     /* ---- TXOP_CTRL_CFG: match Windows capture 0x0000243F (reg 0x1340).
      * Previously disabled "for regression testing"; the Windows native driver
@@ -1219,13 +1204,11 @@ static int __rt28xx_emit_bssid(vsf_wifi_reg_op_t *ops, int n, const uint8_t bssi
      * Bit 21 (vendor/reserved) = 1: observed in Windows native driver.
      * DW1 high half = 0x23 (bits 21:16 = 100011).
      *
-     * The Windows Ralink driver stores OUR OWN STA MAC in MAC_BSSID_DW0/1
-     * (ref/rt5572_win_usb.log L23583-23584 reads 0x1014=0x00234103 and then
-     * rewrites 0x1010/0x1012 with our MAC before EAPOL-Key M1 arrives).
-     * With BSS_ID_MASK=0 the chip runs 1-BSSID mode and compares the incoming
-     * frame's BSSID field (addr3 = AP BSSID) against MAC_BSSID (= our MAC),
-     * dropping all unicast data frames including plaintext EAPOL M1.
-     * Management frames are unaffected because they match on addr1.
+     * The Windows Ralink driver stores the station's own MAC in
+     * MAC_BSSID_DW0/1. With BSS_ID_MASK=0 the chip compares the incoming
+     * BSSID field (addr3 = AP BSSID) against that own MAC, which would drop
+     * unicast data frames including plaintext EAPOL M1. Management frames
+     * are unaffected because they match on addr1.
      *
      * Setting BSS_ID_MASK=3 matches the Windows driver (DW1 high = 0x0023) and
      * disables that strict BSSID comparison, so frames addressed to us (addr1
@@ -2666,9 +2649,8 @@ static int __rt28xx_emit_wcid(vsf_wifi_reg_op_t *ops, int n, const uint8_t mac[6
      * attr=0x00000000 clears the entry. */
     uint32_t lo = (uint32_t)mac[0] | ((uint32_t)mac[1] << 8)
                 | ((uint32_t)mac[2] << 16) | ((uint32_t)mac[3] << 24);
-    /* The Windows native driver leaves the upper 16 bits of the WCID entry
-     * at 0x0000 (ref/rt5572_win_usb.log L17975), not 0xFFFF.  Keep the
-     * writable part of the register exactly as observed. */
+    /* Match the Windows native driver: the upper 16 bits of the WCID entry
+     * remain 0x0000 rather than 0xFFFF. */
     uint32_t hi = (uint32_t)mac[4] | ((uint32_t)mac[5] << 8);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID),     lo);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_WCID_ENTRY(RT28XX_STA_WCID) + 4, hi);
@@ -2714,11 +2696,9 @@ static void __rt28xx_key_install_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 }
 
-/* mainline constraint (rt2x00mac_set_key): "the hardware requires keys to
- * be assigned in correct order (When key 1 is provided but key 0 is not,
- * then the key is not found by the hardware during RX)".  Any future
- * full-HW rekey work must keep the shared-key slots ordered -- leading
- * suspect for the rekey-broadcast failures recorded in wifi_crypto.md. */
+/* Mainline constraint (rt2x00mac_set_key): the hardware requires keys to
+ * be assigned in order; a later slot is not found during RX when an earlier
+ * slot is empty. Full-hardware rekeying must preserve this slot order. */
 static vsf_err_t __rt28xx_crypto_install_key(vsf_wifi_t *wifi, uint8_t key_idx,
         bool pairwise, const uint8_t *key, uint8_t key_len,
         const uint8_t *mac, vsf_wifi_done_t done)
@@ -2797,11 +2777,9 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
     /* bssid(2) + wcid(3) + channel(~75) + edca/wmm(~20) -> per-instance ops buffer. */
     vsf_wifi_reg_op_t *ops = priv->ops_buf;
     int n = 0;
-    /* MAC_BSSID (0x1010/0x1014): the Windows Ralink driver stores our own
-     * STA MAC here with BSS_ID_MASK=3 (ref/rt5572_win_usb.log L6547-6550,
-     * L8235-8238, L18043-18047).  With BSS_ID_MASK=3 the strict BSSID
-     * comparison is disabled, so frames addressed to us (addr1 matches our
-     * MAC/WCID) are accepted regardless of the BSSID field. */
+    /* MAC_BSSID (0x1010/0x1014): store the station's own MAC with
+     * BSS_ID_MASK=3, matching the Windows driver. This disables strict
+     * BSSID comparison, so frames matching our addr1/WCID are accepted. */
     n = __rt28xx_emit_bssid  (ops, n, wifi->mac);  /* 0x1010 = own MAC, mask=3 */
     /* WCID / peer configuration for WPA2-PSK STA mode (matches Windows):
      *
@@ -2817,65 +2795,41 @@ static vsf_err_t __rt28xx_connect(vsf_wifi_t *wifi,
      * hardware try to decrypt frames before handing them to the driver. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_MAC_WCID_ATTR_ENTRY(0), 0x00000001u);
     n = __rt28xx_emit_wcid   (ops, n, bssid, 0x00000001u);
-    /* SHARED_KEY_MODE: Windows sets entry 0 to 0x2AA7 at connect time
-     * (ref/rt5572_win_usb.log L17978-L17979: 0x7000 = 0x2AA70000).
-     * The group-key mode bits are updated by the WPA layer after M3. */
+    /* SHARED_KEY_MODE: match the Windows driver's connect-time entry 0
+     * (0x7000 = 0x2AA70000). WPA updates the group-key mode after M3. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(0x7000, 0x2AA70000u);
     n = __rt28xx_emit_channel(priv, n, channel);
-    /* --- EDCA / WMM: match Windows connect sequence (ref/rt5572_win_usb.log
-     *     L23597-L23614).  These are the 802.11e/WMM access-category parameters
-     *     that the AP expects from an associated STA.  Without them the chip uses
-     *     power-on defaults that may violate the AP's admission-control policy,
-     *     causing it to silently discard our uplink frames (including ACKs for
-     *     its own downlink management frames).  Values are standard WMM
-     *     infrastructure-mode defaults: BK(AIFSN=7,CW=4/10,TXOP=0),
-     *     BE(4,4,10,0), VI(3,4,4,0x5E=94), VO(2,3,4,0x2F=47). ---- */
+    /* EDCA / WMM access-category parameters for infrastructure mode:
+     * BK(AIFSN=7,CW=4/10,TXOP=0), BE(4,4,10,0),
+     * VI(3,4,4,0x5E=94), VO(2,3,4,0x2F=47). */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_EDCA_AC0_CFG, 0x00064300);  /* BK */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_EDCA_AC1_CFG, 0x000A4700);  /* BE */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_EDCA_AC2_CFG, 0x00043338);  /* VI */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_EDCA_AC3_CFG, 0x0003222F);  /* VO */
-    /* WMM parameter values captured from the Windows native driver connect
-     * sequence (ref/rt5572_win_usb.log L23609-L23614).  These differ from our
-     * earlier hard-coded defaults and match the AP's expected infrastructure
-     * EDCA parameters more closely. */
+    /* WMM parameters matching the Windows native driver's connect sequence. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_WMM_AIFSN_CFG, 0x00001273);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_WMM_CWMIN_CFG, 0x00001344);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_WMM_CWMAX_CFG, 0x000034A6);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_WMM_TXOP0_CFG, 0x00000000);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_WMM_TXOP1_CFG, 0x002F005E);
-    /* TXOP_THRES_CFG: Windows writes 0 during connect (ref L23656).  A non-zero
-     * threshold may prevent the auto-responder from sending ACK when the
-     * channel-busy estimate exceeds the limit.  Force to 0 = no restriction. */
+    /* TXOP_THRES_CFG=0 leaves auto-responder ACKs unrestricted by the
+     * channel-busy estimate, matching the Windows connect sequence. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_TXOP_THRES_CFG, 0x00000000);
-    /* AUTO_RSP_CFG + LEGACY_BASIC_RATE: re-program during connect to match
-     * Windows native driver (ref L23615/L23619).  Windows writes 0x017F for
-     * LEGACY_BASIC_RATE (includes 12 Mbps rate bit that our init 0x013F omits).
-     * AUTO_RSP_CFG = 0x13 = AUTORESPONDER | BAC_ACK_POLICY | AR_PREAMBLE. */
+    /* Re-program AUTO_RSP_CFG and LEGACY_BASIC_RATE during connect.
+     * 0x017F includes the 12 Mbps rate bit; AUTO_RSP_CFG=0x13 enables
+     * AUTORESPONDER, BAC_ACK_POLICY and AR_PREAMBLE. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_AUTO_RSP_CFG, 0x00000013);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_LEGACY_BASIC_RATE, 0x0000017F);
-    /* BCN_TIME_CFG: enable STA mode TSF sync + TBTT timer.  Windows native
-     * driver writes 0x000B0640 in the connect sequence (ref/rt5572_win_usb.log
-     * L23441-L23444): BEACON_INTERVAL=0x0640 (1600 TU = 1.6384s scaled),
-     * TSF_TICKING=1 (bit16), TSF_SYNC=01 STA mode (bits17-18, follow AP TSF),
-     * TBTT_ENABLE=1 (bit19).  Linux rt2800_config_intf does the same via
-     * BCN_TIME_CFG_TSF_SYNC = TSF_SYNC_INFRA after STA association.  Without
-     * this the chip MAC RX path silently drops to-me unicast data frames
-     * (EAPOL M1 etc) even though they are physically received and ACKed --
-     * the chip apparently treats the BSS as not yet joined and refuses to
-     * DMA data frames to USB.  init writes 0x00006400 (no TSF sync) which is
-     * fine for scan/pre-assoc; this overrides for the connected state. */
+    /* BCN_TIME_CFG: enable STA-mode TSF sync and the TBTT timer after
+     * association. 0x000B0640 sets BEACON_INTERVAL=0x0640, TSF_TICKING,
+     * TSF_SYNC_INFRA and TBTT_ENABLE, matching rt2800_config_intf. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_BCN_TIME_CFG, 0x000B0640);
     /* RX_FILTER_CFG: drop CRC/PHY/NOT_TO_ME errors, keep bc/mc.
      * DROP_NOT_TO_ME(bit2)=1 is critical: without it the USB is flooded with
      * all other stations' frames, wasting bandwidth. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_RX_FILTER_CFG, 0x00017F97);
-    /* HT_FBK_CFG0 / LG_FBK_CFG0: rate fallback tables for TX rate adaptation.
-     * Windows writes these during connect (ref/rt5572_win_usb.log L23640-23643).
-     * The hardware reset default for HT_FBK_CFG0 is 0x00004360 (each MCS falls
-     * back to a lower MCS) and LG_FBK_CFG0 is 0x00000000.  Explicitly writing
-     * them ensures the TX rate adaptation engine is properly configured and
-     * may also serve as a MAC register bus "warm-up" that activates the TX/RX
-     * data path. */
+    /* Program the HT and legacy rate-fallback tables used by the Windows
+     * driver during connect: each HT MCS falls back to the next lower MCS. */
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_HT_FBK_CFG0, 0x00004360);
     ops[n++] = (vsf_wifi_reg_op_t)RT_OP_REG(RT28XX_LG_FBK_CFG0, 0x00000000);
     wifi->channel = channel;
@@ -3000,12 +2954,10 @@ static uint16_t __rt28xx_build_tx(vsf_wifi_t *wifi, uint8_t *dst,
      * "The TXWI_W1_WIRELESS_CLI_ID indicates which crypto entry in the
      * registers should be used to encrypt the frame."  Mainline assigns
      * key_idx only to hw-encrypted frames and the station wcid (0 for
-     * broadcast, sta == NULL) otherwise, and never 0xFF.  Byte-level
-     * capture (2026-08-29): with wcid=0xFF this ASIC overwrites the
-     * frame's CCMP IV area (ExtIV byte zeroed on air) and mangles the
-     * payload, so software-encrypted frames must keep the plain station
-     * wcid -- in SW mode the WCID_ATTR entry stays NONE and the frame
-     * passes through untouched. */
+     * broadcast, sta == NULL) otherwise, and never 0xFF. On this ASIC,
+     * wcid=0xFF can overwrite the CCMP IV area and mangle the payload.
+     * Software-encrypted frames therefore keep the plain station wcid;
+     * the SW-mode WCID_ATTR entry stays NONE and the frame passes through. */
     uint8_t wcid = hw_encrypt ? (is_mcast ? wifi->wpa_gtk_keyidx : RT28XX_STA_WCID)
                               : RT28XX_STA_WCID;
 #else

@@ -1461,9 +1461,8 @@ static void __vsf_wifi_mlme_send_assoc(vsf_wifi_t *wifi)
      * against the native Linux mt76 driver on the same AP showed the AP
      * silently drops an assoc-req that lacks VHT Capabilities (auth is
      * ACKed/answered, but assoc-req gets no assoc-resp).  Add VHT
-     * Capabilities + RM Enabled + Supported Operating Classes, copied from
-     * the Linux mt76 5 GHz assoc-req (same chip family).  See
-     * ref/mt76/MT7612U_progress.md (2026-07-01). */
+     * Capabilities + RM Enabled + Supported Operating Classes, matching
+     * the Linux mt76 5 GHz assoc-req for the same chip family. */
     if (wifi->mlme_channel > 14) {
         static const uint8_t __vht_cap_ie[] = {
             0xBF, 0x0C,
@@ -2341,9 +2340,8 @@ static void __vsf_wifi_handshake_ptk_done(vsf_wifi_t *wifi, vsf_err_t err)
     }
 
     /* Install the GTK into the chip as well: the hardware RX engine looks
-     * broadcast frames up by the shared-key entry, and mesh APs rekey right
-     * after association -- skipping this install (or the rekey re-install)
-     * silently kills broadcast RX.  See wifi_crypto.md. */
+     * broadcast frames up by the shared-key entry. Skipping this install
+     * or the rekey re-install prevents reception of broadcast frames. */
     if ((wifi->wpa_gtk_len > 0)
             && (wifi->drv->crypto_ops != NULL)
             && (wifi->drv->crypto_ops->install_key != NULL)) {
