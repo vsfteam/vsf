@@ -5,7 +5,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED
+#if (VSF_USE_UI == ENABLED) && (VSF_USE_FBCON == ENABLED)
 
 #include "component/ui/disp/vsf_disp.h"
 #include "service/simple_stream/vsf_simple_stream.h"
@@ -48,9 +48,10 @@ extern "C" {
  * stream rx events and display ready callbacks.
  *
  * Memory-efficient design:
- *   - Uses a single-text-row line buffer instead of a full-frame pixel buffer.
- *   - Dirty rows are tracked with a bitmask and refreshed one at a time
- *     (async chain via ui_on_ready).
+ *   - FB displays render all dirty rows directly into the back buffer and
+ *     present once per batch, without allocating a pixel line buffer.
+ *   - Other displays use a single-text-row line buffer and refresh one row
+ *     at a time (async chain via ui_on_ready).
  *   - char_grid stores palette indices (1 byte each) rather than raw pixel
  *     colors, keeping it format-independent and compact (3 bytes/cell).
  *   - Pixel format is auto-detected from disp->param.color; supported:
@@ -72,10 +73,12 @@ vsf_class(vsf_fbcon_t) {
     )
     private_member(
         bool disp_ready;
+        bool paused;
+        bool is_disp_fb;
         volatile bool refresh_busy;
         uint32_t dirty_rows;        // bitmask of rows that need refresh
 
-        void *line_buf;             // one-text-row pixel buffer
+        void *line_buf;             // one-text-row buffer for non-FB displays
 
         int cols, rows;
         int cursor_x, cursor_y;
@@ -119,6 +122,11 @@ vsf_class(vsf_fbcon_t) {
  */
 extern vsf_err_t vsf_fbcon_init(vsf_fbcon_t *fbcon);
 
+// Pause/resume display refreshes while retaining incoming console text.
+// Resume after a paused interval marks all rows dirty and redraws them.
+extern void vsf_fbcon_pause(vsf_fbcon_t *fbcon);
+extern void vsf_fbcon_resume(vsf_fbcon_t *fbcon);
+
 /**
  * vsf_fbcon_fini - finalize and release fbcon resources
  * @param fbcon     pointer to a previously initialized vsf_fbcon_t instance.
@@ -132,5 +140,5 @@ extern void vsf_fbcon_fini(vsf_fbcon_t *fbcon);
 }
 #endif
 
-#endif  // VSF_USE_UI
+#endif  // VSF_USE_UI && VSF_USE_FBCON
 #endif  // __VSF_FBCON_H__

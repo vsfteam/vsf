@@ -229,6 +229,46 @@ vsf_class(vk_disp_cvrt_t) {
     )
 };
 
+#if VSF_DISP_USE_MUX == ENABLED
+vsf_dcl_class(vk_disp_mux_t)
+vsf_dcl_class(vk_disp_mux_ctx_t)
+
+typedef enum vk_disp_mux_evt_t {
+    VK_DISP_MUX_EVT_ACTIVE = 0,
+    VK_DISP_MUX_EVT_INACTIVE,
+} vk_disp_mux_evt_t;
+
+vsf_class(vk_disp_mux_ctx_t) {
+    public_member(
+        vk_disp_t *disp_real;
+    )
+    private_member(
+        vk_disp_mux_t *layers;
+        vk_disp_mux_t *active;
+        vk_disp_mux_t *real_owner;
+        uint8_t real_state;
+        uint8_t real_op;
+    )
+};
+
+vsf_class(vk_disp_mux_t) {
+    public_member(
+        implement(vk_disp_t)
+        vk_disp_mux_ctx_t *ctx;
+        uint8_t layer;
+        void (*on_evt)(vk_disp_mux_t *pthis, vk_disp_mux_evt_t evt, void *param);
+        void *on_evt_param;
+    )
+    private_member(
+        vk_disp_mux_t *next;
+        bool is_registered;
+        bool is_inited;
+        bool init_pending;
+        bool fini_pending;
+    )
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
@@ -238,8 +278,23 @@ extern const vk_disp_drv_t vk_disp_reentrant_drv;
 extern const vk_disp_drv_t vk_disp_dummy_drv;
 // vk_disp_cvrt_t/vk_disp_cvrt_drv is used to convert color format
 extern const vk_disp_drv_t vk_disp_cvrt_drv;
+#if VSF_DISP_USE_MUX == ENABLED
+extern const vk_disp_drv_t vk_disp_mux_drv;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_DISP_USE_MUX == ENABLED
+/**
+ * Configure a multiplexed display layer before use. ctx->disp_real must be set.
+ * The initialized layer with the highest layer number is visible. ACTIVE tells
+ * a layer to redraw after becoming visible; INACTIVE tells it to stop refreshing.
+ * Refresh requests on invisible layers are discarded and completed normally.
+ */
+extern void vk_disp_mux_config(vk_disp_mux_t *pthis, vk_disp_mux_ctx_t *ctx,
+                               uint8_t layer);
+extern bool vk_disp_mux_is_active(vk_disp_mux_t *pthis);
+#endif
 
 /*
  * vk_disp_init / vk_disp_fini / vk_disp_refresh are asynchronous.

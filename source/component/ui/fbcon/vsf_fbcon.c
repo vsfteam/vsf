@@ -1,6 +1,6 @@
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED
+#if (VSF_USE_UI == ENABLED) && (VSF_USE_FBCON == ENABLED)
 
 #define __VSF_FBCON_CLASS_IMPLEMENT
 #define __VSF_DISP_CLASS_INHERIT__
@@ -105,13 +105,10 @@ static inline void __vsf_fbcon_write_pixel(void *buf, int offset,
 }
 
 /*----------------------------------------------------------------------------*
- * Internal: render one character cell into line_buf                           *
- *                                                                            *
- * line_buf holds pixels for one text row (pixel_w * font_height * bytesize). *
- * col specifies which character column to render within that line_buf.        *
+ * Internal: render one character cell into a display-width pixel buffer       *
  *----------------------------------------------------------------------------*/
 
-static void __vsf_fbcon_render_cell_to_linebuf(vsf_fbcon_t *fbcon, int row, int col)
+static void __vsf_fbcon_render_cell(vsf_fbcon_t *fbcon, void *buf, int row, int col)
 {
     if (col < 0 || col >= fbcon->cols || row < 0 || row >= fbcon->rows) {
         return;
@@ -132,7 +129,7 @@ static void __vsf_fbcon_render_cell_to_linebuf(vsf_fbcon_t *fbcon, int row, int 
         int poff = y * pixel_w + px;
         uint8_t bits = font_row[y];
         for (int x = 0; x < VSF_FBCON_CFG_FONT_WIDTH; x++) {
-            __vsf_fbcon_write_pixel(fbcon->line_buf, poff + x,
+            __vsf_fbcon_write_pixel(buf, poff + x,
                 (bits & 0x80) ? fg : bg, bytesize);
             bits <<= 1;
         }
@@ -404,19 +401,16 @@ static void __vsf_fbcon_process_char(vsf_fbcon_t *fbcon, uint8_t ch)
  *   1. __vsf_fbcon_on_stream_rx   (VSF_STREAM_ON_RX on the input stream)    *
  *   2. __vsf_fbcon_on_disp_ready  (vk_disp_t::ui_on_ready)                  *
  *                                                                            *
- * try_kick is the chain STARTER: drain stream, start one-row refresh.        *
- * on_disp_ready is the chain CONTINUER: flush remaining dirty rows, then     *
- * re-drain, and release refresh_busy when everything is done.                *
- *                                                                            *
- * ui_on_ready may fire synchronously (within vk_disp_refresh) or             *
- * asynchronously (after it returns).  For sync drivers, the flush chain      *
- * forms bounded recursion (depth <= dirty_rows <= 30).  For async drivers,   *
- * each on_disp_ready is a separate call stack — no recursion.                *
+ * try_kick drains the stream and starts a flush. on_disp_ready continues     *
+ * pending rows, re-drains, and releases refresh_busy when done.              *
+ * FB displays render all dirty rows into the back buffer and present once;   *
+ * their completion enters on_disp_ready directly because present has no      *
+ * completion callback. Other displays keep an async one-row refresh chain.   *
+ * Synchronous non-FB drivers recurse at most once per dirty row.             *
  *----------------------------------------------------------------------------*/
 
 static void __vsf_fbcon_flush_next_row(vsf_fbcon_t *fbcon)
 {
-    // Find lowest dirty row
     uint32_t mask = fbcon->dirty_rows;
     int row = 0;
     while (!(mask & 1u)) {
@@ -425,12 +419,10 @@ static void __vsf_fbcon_flush_next_row(vsf_fbcon_t *fbcon)
     }
     fbcon->dirty_rows &= ~(1u << row);
 
-    // Render entire row to line_buf
     for (int col = 0; col < fbcon->cols; col++) {
-        __vsf_fbcon_render_cell_to_linebuf(fbcon, row, col);
+        __vsf_fbcon_render_cell(fbcon, fbcon->line_buf, row, col);
     }
 
-    // Issue partial refresh for this text row
     vk_disp_area_t area = {
         .pos  = { .x = 0, .y = (vk_disp_coord_t)(row * VSF_FBCON_CFG_FONT_HEIGHT) },
         .size = { .x = (vk_disp_coord_t)fbcon->disp->param.width,
@@ -439,26 +431,66 @@ static void __vsf_fbcon_flush_next_row(vsf_fbcon_t *fbcon)
     vk_disp_refresh(fbcon->disp, &area, fbcon->line_buf);
 }
 
-static void __vsf_fbcon_try_kick(vsf_fbcon_t *fbcon)
+#if VSF_DISP_USE_FB == ENABLED
+static void __vsf_fbcon_flush_fb(vsf_fbcon_t *fbcon)
 {
-    if (!fbcon->disp_ready) {
-        return;
+    vk_disp_t *disp = fbcon->disp;
+    uint32_t all_rows = (fbcon->rows >= VSF_FBCON_MAX_ROWS)
+                      ? 0xFFFFFFFFu : ((1u << fbcon->rows) - 1);
+    bool full_frame = (fbcon->dirty_rows == all_rows)
+                   && (fbcon->cols * VSF_FBCON_CFG_FONT_WIDTH == disp->param.width)
+                   && (fbcon->rows * VSF_FBCON_CFG_FONT_HEIGHT == disp->param.height);
+    void *back_buffer = vk_disp_fb_get_back_buffer(disp);
+
+    if (!full_frame) {
+        memcpy(back_buffer, vk_disp_fb_get_front_buffer(disp),
+               vsf_disp_get_frame_size(disp));
     }
 
+    uint_fast32_t pitch = vsf_disp_get_pitch(disp);
+    for (int row = 0; row < fbcon->rows; row++) {
+        if (!(fbcon->dirty_rows & (1u << row))) {
+            continue;
+        }
+        fbcon->dirty_rows &= ~(1u << row);
+        void *row_buffer = (uint8_t *)back_buffer
+                         + row * VSF_FBCON_CFG_FONT_HEIGHT * pitch;
+        for (int col = 0; col < fbcon->cols; col++) {
+            __vsf_fbcon_render_cell(fbcon, row_buffer, row, col);
+        }
+    }
+
+    vk_disp_fb_set_front_buffer(disp, -1);
+    __vsf_fbcon_on_disp_ready(disp);
+}
+#endif
+
+static void __vsf_fbcon_flush(vsf_fbcon_t *fbcon)
+{
+#if VSF_DISP_USE_FB == ENABLED
+    if (fbcon->is_disp_fb) {
+        __vsf_fbcon_flush_fb(fbcon);
+        return;
+    }
+#endif
+    __vsf_fbcon_flush_next_row(fbcon);
+}
+
+static void __vsf_fbcon_try_kick(vsf_fbcon_t *fbcon)
+{
     if (fbcon->refresh_busy) {
         return;
     }
     fbcon->refresh_busy = true;
 
-    // Drain all available stream data into char_grid
+    // Drain all available stream data into char_grid, including while paused.
     uint8_t ch;
     while (1 == vsf_stream_read(fbcon->stream, &ch, 1)) {
         __vsf_fbcon_process_char(fbcon, ch);
     }
 
-    if (fbcon->dirty_rows != 0) {
-        // Start the flush chain — on_disp_ready will continue it
-        __vsf_fbcon_flush_next_row(fbcon);
+    if (fbcon->disp_ready && !fbcon->paused && (fbcon->dirty_rows != 0)) {
+        __vsf_fbcon_flush(fbcon);
     } else {
         fbcon->refresh_busy = false;
     }
@@ -488,10 +520,13 @@ static void __vsf_fbcon_on_disp_ready(vk_disp_t *disp)
         __vsf_fbcon_try_kick(fbcon);
         return;
     }
+    if (fbcon->paused) {
+        fbcon->refresh_busy = false;
+        return;
+    }
 
-    // A row refresh completed.  Continue the flush chain.
     if (fbcon->dirty_rows != 0) {
-        __vsf_fbcon_flush_next_row(fbcon);
+        __vsf_fbcon_flush(fbcon);
         return;
     }
 
@@ -502,7 +537,7 @@ static void __vsf_fbcon_on_disp_ready(vk_disp_t *disp)
     }
 
     if (fbcon->dirty_rows != 0) {
-        __vsf_fbcon_flush_next_row(fbcon);
+        __vsf_fbcon_flush(fbcon);
     } else {
         fbcon->refresh_busy = false;
     }
@@ -511,6 +546,27 @@ static void __vsf_fbcon_on_disp_ready(vk_disp_t *disp)
 /*----------------------------------------------------------------------------*
  * Public API                                                                 *
  *----------------------------------------------------------------------------*/
+
+void vsf_fbcon_pause(vsf_fbcon_t *fbcon)
+{
+    if (fbcon != NULL) {
+        fbcon->paused = true;
+    }
+}
+
+void vsf_fbcon_resume(vsf_fbcon_t *fbcon)
+{
+    if ((fbcon == NULL) || (fbcon->disp == NULL)) {
+        return;
+    }
+
+    if (fbcon->paused) {
+        fbcon->paused = false;
+        fbcon->dirty_rows = (fbcon->rows >= VSF_FBCON_MAX_ROWS)
+                          ? 0xFFFFFFFFu : ((1u << fbcon->rows) - 1);
+        __vsf_fbcon_try_kick(fbcon);
+    }
+}
 
 vsf_err_t vsf_fbcon_init(vsf_fbcon_t *fbcon)
 {
@@ -523,9 +579,15 @@ vsf_err_t vsf_fbcon_init(vsf_fbcon_t *fbcon)
 
     // Initialize private state
     fbcon->disp_ready = false;
+    fbcon->paused = false;
     fbcon->refresh_busy = false;
     fbcon->dirty_rows = 0;
     fbcon->line_buf = NULL;
+#if VSF_DISP_USE_FB == ENABLED
+    fbcon->is_disp_fb = vk_disp_fb_is_supported(disp);
+#else
+    fbcon->is_disp_fb = false;
+#endif
     fbcon->char_grid = NULL;
     fbcon->cursor_x = 0;
     fbcon->cursor_y = 0;
@@ -545,21 +607,24 @@ vsf_err_t vsf_fbcon_init(vsf_fbcon_t *fbcon)
     // Build format-specific palette
     __vsf_fbcon_init_palette(fbcon);
 
-    // Allocate line buffer: one text row of pixels
-    size_t line_buf_size = (size_t)disp->param.width * VSF_FBCON_CFG_FONT_HEIGHT
-                         * vsf_disp_get_pixel_bytesize(disp);
-    fbcon->line_buf = vsf_heap_malloc(line_buf_size);
-    if (fbcon->line_buf == NULL) {
-        return VSF_ERR_FAIL;
+    if (!fbcon->is_disp_fb) {
+        size_t line_buf_size = (size_t)disp->param.width * VSF_FBCON_CFG_FONT_HEIGHT
+                             * vsf_disp_get_pixel_bytesize(disp);
+        fbcon->line_buf = vsf_heap_malloc(line_buf_size);
+        if (fbcon->line_buf == NULL) {
+            return VSF_ERR_FAIL;
+        }
+        memset(fbcon->line_buf, 0, line_buf_size);
     }
-    memset(fbcon->line_buf, 0, line_buf_size);
 
     // Allocate char_grid
     size_t grid_size = (size_t)fbcon->rows * fbcon->cols * sizeof(vsf_fbcon_cell_t);
     fbcon->char_grid = vsf_heap_malloc(grid_size);
     if (fbcon->char_grid == NULL) {
-        vsf_heap_free(fbcon->line_buf);
-        fbcon->line_buf = NULL;
+        if (fbcon->line_buf != NULL) {
+            vsf_heap_free(fbcon->line_buf);
+            fbcon->line_buf = NULL;
+        }
         return VSF_ERR_FAIL;
     }
 
@@ -569,6 +634,8 @@ vsf_err_t vsf_fbcon_init(vsf_fbcon_t *fbcon)
         cells[i].fg = fbcon->cur_fg;
         cells[i].bg = fbcon->cur_bg;
     }
+    fbcon->dirty_rows = (fbcon->rows >= VSF_FBCON_MAX_ROWS)
+                      ? 0xFFFFFFFFu : ((1u << fbcon->rows) - 1);
 
     // Subscribe to incoming byte stream
     stream->rx.param = fbcon;
@@ -581,7 +648,9 @@ vsf_err_t vsf_fbcon_init(vsf_fbcon_t *fbcon)
     if (vk_disp_init(disp) != VSF_ERR_NONE) {
         vsf_stream_disconnect_rx(stream);
         vsf_heap_free(fbcon->char_grid);
-        vsf_heap_free(fbcon->line_buf);
+        if (fbcon->line_buf != NULL) {
+            vsf_heap_free(fbcon->line_buf);
+        }
         fbcon->char_grid = NULL;
         fbcon->line_buf = NULL;
         return VSF_ERR_FAIL;
@@ -607,4 +676,4 @@ void vsf_fbcon_fini(vsf_fbcon_t *fbcon)
     }
 }
 
-#endif  // VSF_USE_UI
+#endif  // VSF_USE_UI && VSF_USE_FBCON

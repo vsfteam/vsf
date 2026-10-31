@@ -113,6 +113,7 @@ extern const vk_disp_fb_drv_t vsf_disp_hw_fb_layer_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
+extern bool vk_disp_fb_is_supported(vk_disp_t *disp);
 extern void * vk_disp_fb_get_buffer(vk_disp_t *disp, uint_fast8_t idx);
 extern void * vk_disp_fb_get_front_buffer(vk_disp_t *disp);
 extern void * vk_disp_fb_get_back_buffer(vk_disp_t *disp);

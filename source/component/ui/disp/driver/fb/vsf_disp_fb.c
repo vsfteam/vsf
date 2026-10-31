@@ -59,14 +59,51 @@ static uint8_t __vk_disp_fb_get_back_buffer_idx(vk_disp_fb_t *disp_fb)
     return back_buffer_idx;
 }
 
+static vk_disp_t * __vk_disp_fb_get_real(vk_disp_t *pthis)
+{
+#if VSF_DISP_USE_MUX == ENABLED
+    while (pthis->param.drv == &vk_disp_mux_drv) {
+        pthis = ((vk_disp_mux_t *)pthis)->ctx->disp_real;
+    }
+#endif
+    return pthis;
+}
+
+static bool __vk_disp_fb_mux_is_active(vk_disp_t *pthis)
+{
+#if VSF_DISP_USE_MUX == ENABLED
+    while (pthis->param.drv == &vk_disp_mux_drv) {
+        if (!vk_disp_mux_is_active((vk_disp_mux_t *)pthis)) {
+            return false;
+        }
+        pthis = ((vk_disp_mux_t *)pthis)->ctx->disp_real;
+    }
+#endif
+    return true;
+}
+
+bool vk_disp_fb_is_supported(vk_disp_t *pthis)
+{
+    return __vk_disp_fb_get_real(pthis)->param.drv == &vk_disp_drv_fb;
+}
+
 void * vk_disp_fb_get_buffer(vk_disp_t *pthis, uint_fast8_t idx)
 {
+    pthis = __vk_disp_fb_get_real(pthis);
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
     return ((uint8_t *)disp_fb->fb_buffer + idx * disp_fb->fb_size);
 }
 
 void * vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int_fast8_t idx)
 {
+    if (!__vk_disp_fb_mux_is_active(pthis)) {
+        if (idx < 0) {
+            return vk_disp_fb_get_back_buffer(pthis);
+        }
+        return vk_disp_fb_get_buffer(pthis, idx);
+    }
+
+    pthis = __vk_disp_fb_get_real(pthis);
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
     disp_fb->front_buffer_idx = idx < 0 ? __vk_disp_fb_get_back_buffer_idx(disp_fb) : idx;
     void *buffer = vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx);
@@ -76,11 +113,13 @@ void * vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int_fast8_t idx)
 
 void * vk_disp_fb_get_front_buffer(vk_disp_t *pthis)
 {
+    pthis = __vk_disp_fb_get_real(pthis);
     return vk_disp_fb_get_buffer(pthis, ((vk_disp_fb_t *)pthis)->front_buffer_idx);
 }
 
 void * vk_disp_fb_get_back_buffer(vk_disp_t *pthis)
 {
+    pthis = __vk_disp_fb_get_real(pthis);
     return vk_disp_fb_get_buffer(pthis, __vk_disp_fb_get_back_buffer_idx((vk_disp_fb_t *)pthis));
 }
 
@@ -146,13 +185,14 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
     uint_fast32_t copy_size = pixel_byte_size * real_area.size.x;
     uint_fast32_t x_offset = pixel_byte_size * real_area.pos.x;
     uint_fast32_t y_end = real_area.pos.y + real_area.size.y;
-    void *cur_buffer = vk_disp_fb_get_back_buffer(pthis);
+    void *back_buffer = vk_disp_fb_get_back_buffer(pthis);
+    void *cur_buffer = (uint8_t *)back_buffer + real_area.pos.y * line_size;
 
     if (    (real_area.pos.x != 0) || (real_area.pos.y != 0)
         ||  (real_area.size.x != disp_fb->layer_area.size.x)
         ||  (real_area.size.y != disp_fb->layer_area.size.y)) {
         void *prev_buffer = vk_disp_fb_get_front_buffer(pthis);
-        memcpy(cur_buffer, prev_buffer, disp_fb->fb_size);
+        memcpy(back_buffer, prev_buffer, disp_fb->fb_size);
     }
 
     for (uint_fast32_t y = real_area.pos.y; y < y_end; y++) {

@@ -203,6 +203,254 @@ static vsf_err_t __vk_disp_cvrt_refresh(vk_disp_t *pthis, vk_disp_area_t *area, 
     return vk_disp_refresh(disp_real, area, disp_cvrt->pixel_buffer);
 }
 
+#if VSF_DISP_USE_MUX == ENABLED
+/*******************************************************************************
+* multiplexed disp                                                             *
+*******************************************************************************/
+
+enum {
+    __VK_DISP_MUX_REAL_OFF = 0,
+    __VK_DISP_MUX_REAL_ON,
+};
+
+enum {
+    __VK_DISP_MUX_OP_NONE = 0,
+    __VK_DISP_MUX_OP_INIT,
+    __VK_DISP_MUX_OP_REFRESH,
+    __VK_DISP_MUX_OP_FINI,
+};
+
+static vsf_err_t __vk_disp_mux_update(vk_disp_mux_ctx_t *ctx);
+
+static vk_disp_mux_t * __vk_disp_mux_get_top(vk_disp_mux_ctx_t *ctx)
+{
+    vk_disp_mux_t *top = NULL;
+    for (vk_disp_mux_t *layer = ctx->layers; layer != NULL; layer = layer->next) {
+        if (layer->is_inited && ((top == NULL) || (layer->layer > top->layer))) {
+            top = layer;
+        }
+    }
+    return top;
+}
+
+static void __vk_disp_mux_notify(vk_disp_mux_t *pthis, vk_disp_mux_evt_t evt)
+{
+    if (pthis->on_evt != NULL) {
+        pthis->on_evt(pthis, evt, pthis->on_evt_param);
+    }
+}
+
+static void __vk_disp_mux_complete_pending(vk_disp_mux_ctx_t *ctx)
+{
+    for (vk_disp_mux_t *layer = ctx->layers; layer != NULL; layer = layer->next) {
+        if (ctx->real_op != __VK_DISP_MUX_OP_NONE) {
+            return;
+        }
+        if (layer->init_pending && layer->is_inited
+                && (ctx->real_state == __VK_DISP_MUX_REAL_ON)) {
+            layer->init_pending = false;
+            vk_disp_on_ready(&layer->use_as__vk_disp_t);
+        } else if (layer->fini_pending && !layer->is_inited) {
+            layer->fini_pending = false;
+            vk_disp_on_ready(&layer->use_as__vk_disp_t);
+        }
+    }
+}
+
+static void __vk_disp_mux_on_real_ready(vk_disp_t *disp)
+{
+    vk_disp_mux_ctx_t *ctx = (vk_disp_mux_ctx_t *)disp->ui_data;
+    uint8_t op = ctx->real_op;
+
+    ctx->real_op = __VK_DISP_MUX_OP_NONE;
+    switch (op) {
+    case __VK_DISP_MUX_OP_INIT:
+        ctx->real_state = __VK_DISP_MUX_REAL_ON;
+        break;
+    case __VK_DISP_MUX_OP_REFRESH: {
+            vk_disp_mux_t *owner = ctx->real_owner;
+            ctx->real_owner = NULL;
+            vk_disp_on_ready(&owner->use_as__vk_disp_t);
+        }
+        break;
+    case __VK_DISP_MUX_OP_FINI:
+        ctx->real_state = __VK_DISP_MUX_REAL_OFF;
+        break;
+    default:
+        VSF_UI_ASSERT(false);
+        return;
+    }
+    (void)__vk_disp_mux_update(ctx);
+}
+
+static void __vk_disp_mux_prepare_real(vk_disp_mux_ctx_t *ctx)
+{
+    ctx->disp_real->ui_data = ctx;
+    ctx->disp_real->ui_on_ready = __vk_disp_mux_on_real_ready;
+}
+
+static vsf_err_t __vk_disp_mux_update(vk_disp_mux_ctx_t *ctx)
+{
+    if (ctx->real_op != __VK_DISP_MUX_OP_NONE) {
+        return VSF_ERR_NONE;
+    }
+
+    vk_disp_mux_t *top = __vk_disp_mux_get_top(ctx);
+    if (ctx->real_state == __VK_DISP_MUX_REAL_OFF) {
+        if (top == NULL) {
+            __vk_disp_mux_complete_pending(ctx);
+            return VSF_ERR_NONE;
+        }
+
+        ctx->real_op = __VK_DISP_MUX_OP_INIT;
+        __vk_disp_mux_prepare_real(ctx);
+        vsf_err_t err = vk_disp_init(ctx->disp_real);
+        if (err != VSF_ERR_NONE) {
+            ctx->real_op = __VK_DISP_MUX_OP_NONE;
+            return err;
+        }
+        return VSF_ERR_NONE;
+    }
+
+    if (top == NULL) {
+        if (ctx->active != NULL) {
+            vk_disp_mux_t *old = ctx->active;
+            ctx->active = NULL;
+            __vk_disp_mux_notify(old, VK_DISP_MUX_EVT_INACTIVE);
+        }
+        ctx->real_op = __VK_DISP_MUX_OP_FINI;
+        __vk_disp_mux_prepare_real(ctx);
+        vk_disp_fini(ctx->disp_real);
+        return VSF_ERR_NONE;
+    }
+
+    if ((ctx->active != NULL) && (ctx->active != top)) {
+        vk_disp_mux_t *old = ctx->active;
+        ctx->active = NULL;
+        __vk_disp_mux_notify(old, VK_DISP_MUX_EVT_INACTIVE);
+        top = __vk_disp_mux_get_top(ctx);
+    }
+
+    if (ctx->active == NULL) {
+        ctx->active = top;
+        __vk_disp_mux_complete_pending(ctx);
+        if ((ctx->active == top) && (top != NULL)) {
+            __vk_disp_mux_notify(top, VK_DISP_MUX_EVT_ACTIVE);
+        }
+    } else {
+        __vk_disp_mux_complete_pending(ctx);
+    }
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vk_disp_mux_request_update(vk_disp_mux_ctx_t *ctx)
+{
+    vk_disp_mux_t *top = __vk_disp_mux_get_top(ctx);
+    if ((ctx->active != NULL) && (ctx->active != top)) {
+        vk_disp_mux_t *old = ctx->active;
+        ctx->active = NULL;
+        __vk_disp_mux_notify(old, VK_DISP_MUX_EVT_INACTIVE);
+    }
+    return __vk_disp_mux_update(ctx);
+}
+
+void vk_disp_mux_config(vk_disp_mux_t *pthis, vk_disp_mux_ctx_t *ctx, uint8_t layer)
+{
+    VSF_UI_ASSERT((pthis != NULL) && (ctx != NULL) && (ctx->disp_real != NULL));
+    VSF_UI_ASSERT(!pthis->is_registered);
+
+    vk_disp_param_t *param = (vk_disp_param_t *)&pthis->param;
+    *param = ctx->disp_real->param;
+    param->drv = &vk_disp_mux_drv;
+    pthis->ctx = ctx;
+    pthis->layer = layer;
+}
+
+bool vk_disp_mux_is_active(vk_disp_mux_t *pthis)
+{
+    VSF_UI_ASSERT((pthis != NULL) && (pthis->ctx != NULL));
+    return    (pthis->ctx->active == pthis)
+           && (pthis->ctx->real_state == __VK_DISP_MUX_REAL_ON);
+}
+
+static vsf_err_t __vk_disp_mux_init(vk_disp_t *disp)
+{
+    vk_disp_mux_t *pthis = (vk_disp_mux_t *)disp;
+    vk_disp_mux_ctx_t *ctx = pthis->ctx;
+    VSF_UI_ASSERT((ctx != NULL) && (ctx->disp_real != NULL));
+
+    if (pthis->is_inited || pthis->init_pending) {
+        return VSF_ERR_BUSY;
+    }
+    if (!pthis->is_registered) {
+        pthis->next = ctx->layers;
+        ctx->layers = pthis;
+        pthis->is_registered = true;
+    }
+
+    pthis->is_inited = true;
+    pthis->init_pending = true;
+    pthis->fini_pending = false;
+    vsf_err_t err = __vk_disp_mux_request_update(ctx);
+    if (err != VSF_ERR_NONE) {
+        pthis->is_inited = false;
+        pthis->init_pending = false;
+        (void)__vk_disp_mux_request_update(ctx);
+    }
+    return err;
+}
+
+static void __vk_disp_mux_fini(vk_disp_t *disp)
+{
+    vk_disp_mux_t *pthis = (vk_disp_mux_t *)disp;
+    vk_disp_mux_ctx_t *ctx = pthis->ctx;
+
+    if (!pthis->is_inited) {
+        vk_disp_on_ready(disp);
+        return;
+    }
+
+    pthis->is_inited = false;
+    pthis->init_pending = false;
+    pthis->fini_pending = true;
+    (void)__vk_disp_mux_request_update(ctx);
+}
+
+static vsf_err_t __vk_disp_mux_refresh(vk_disp_t *disp, vk_disp_area_t *area, void *disp_buff)
+{
+    vk_disp_mux_t *pthis = (vk_disp_mux_t *)disp;
+    vk_disp_mux_ctx_t *ctx = pthis->ctx;
+
+    VSF_UI_ASSERT(pthis->is_inited);
+    if (!pthis->is_inited) {
+        return VSF_ERR_FAIL;
+    }
+    if ((ctx->active != pthis) || (ctx->real_state != __VK_DISP_MUX_REAL_ON)) {
+        vk_disp_on_ready(disp);
+        return VSF_ERR_NONE;
+    }
+    if (ctx->real_op != __VK_DISP_MUX_OP_NONE) {
+        return VSF_ERR_BUSY;
+    }
+
+    ctx->real_owner = pthis;
+    ctx->real_op = __VK_DISP_MUX_OP_REFRESH;
+    __vk_disp_mux_prepare_real(ctx);
+    vsf_err_t err = vk_disp_refresh(ctx->disp_real, area, disp_buff);
+    if (err != VSF_ERR_NONE) {
+        ctx->real_owner = NULL;
+        ctx->real_op = __VK_DISP_MUX_OP_NONE;
+    }
+    return err;
+}
+
+const vk_disp_drv_t vk_disp_mux_drv = {
+    .init                   = __vk_disp_mux_init,
+    .fini                   = __vk_disp_mux_fini,
+    .refresh                = __vk_disp_mux_refresh,
+};
+#endif
+
 /*******************************************************************************
 * reentrant disp                                                               *
 *******************************************************************************/
