@@ -3012,6 +3012,9 @@ int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
+    switch (cmd) {
+    case TCSETS:            return 0;
+    }
     return __vsf_linux_default_fcntl(sfd, cmd, arg);
 }
 
