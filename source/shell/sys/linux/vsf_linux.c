@@ -4810,10 +4810,10 @@ static vsf_linux_dynloader_t * __vsf_linux_dlopen_impl(const char *pathname, boo
         close(fd);
         return NULL;
     }
-#endif
 
     return NULL;
 }
+#endif
 
 void * dlopen(const char *pathname, int mode)
 {
