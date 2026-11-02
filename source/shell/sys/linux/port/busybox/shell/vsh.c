@@ -543,6 +543,20 @@ delete_process_and_fail:
     return NULL;
 }
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+static void __vsh_set_terminal_foreground(pid_t pgid)
+{
+    if (isatty(STDIN_FILENO)) {
+        tcsetpgrp(STDIN_FILENO, pgid);
+    }
+}
+
+static bool __vsh_is_interrupted(int status)
+{
+    return WIFEXITED(status) && (WEXITSTATUS(status) == 128 + SIGINT);
+}
+#endif
+
 int __vsh_run_cmd(char *cmd)
 {
     vsf_linux_process_t * processes[4];
@@ -609,8 +623,19 @@ int __vsh_run_cmd(char *cmd)
             VSF_LINUX_ASSERT(0 == process_cnt);
 
             int status;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+            setpgid(processes[0]->id.pid, processes[0]->id.pid);
+            __vsh_set_terminal_foreground(processes[0]->id.pid);
+#endif
             vsf_linux_start_process(processes[0]);
             waitpid(processes[0]->id.pid, &status, 0);
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+            __vsh_set_terminal_foreground(getpgrp());
+            if (__vsh_is_interrupted(status)) {
+                write(STDOUT_FILENO, "^C" VSH_LINEEND, sizeof("^C" VSH_LINEEND) - 1);
+                return status;
+            }
+#endif
             bool is_succeed = WIFEXITED(status) && !WEXITSTATUS(status);
 
             if (    (is_and && is_succeed)
@@ -638,6 +663,15 @@ int __vsh_run_cmd(char *cmd)
             vsf_linux_detach_process(processes[i]);
         }
     }
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    else {
+        pid_t pgid = processes[0]->id.pid;
+        for (int i = 0; i < process_cnt; i++) {
+            setpgid(processes[i]->id.pid, pgid);
+        }
+        __vsh_set_terminal_foreground(pgid);
+    }
+#endif
 
     for (int i = 0; i < process_cnt; i++) {
         vsf_linux_start_process(processes[i]);
@@ -650,9 +684,21 @@ int __vsh_run_cmd(char *cmd)
         return 0;
     } else {
         int result;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+        bool is_interrupted = false;
+#endif
         for (int i = 0; i < process_cnt; i++) {
             waitpid(processes[i]->id.pid, &result, 0);
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+            is_interrupted |= __vsh_is_interrupted(result);
+#endif
         }
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+        __vsh_set_terminal_foreground(getpgrp());
+        if (is_interrupted) {
+            write(STDOUT_FILENO, "^C" VSH_LINEEND, sizeof("^C" VSH_LINEEND) - 1);
+        }
+#endif
         return result;
     }
 cleanup:
@@ -726,6 +772,10 @@ int vsh_main(int argc, char *argv[])
     vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
 
     process->shell_process = process;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    signal(SIGINT, SIG_IGN);
+    __vsh_set_terminal_foreground(getpgrp());
+#endif
     while (1) {
     input_cmd:
         memset(ctx.cmd, 0, sizeof(ctx.cmd));
@@ -739,7 +789,13 @@ int vsh_main(int argc, char *argv[])
             ssize_t rsize;
             while ((rsize = read(STDIN_FILENO, &ch, 1)) != 1) {
                 // rsize == 0 means EOF, rsize < 0 means error
-                if (((rsize >= 0) || (errno != EINTR)) && isatty(STDIN_FILENO)) {
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+                if ((rsize < 0) && (EINTR == errno) && isatty(STDIN_FILENO)) {
+                    write(STDOUT_FILENO, "^C" VSH_LINEEND, sizeof("^C" VSH_LINEEND) - 1);
+                    goto input_cmd;
+                }
+#endif
+                if (isatty(STDIN_FILENO)) {
                     fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);
                     VSF_LINUX_ASSERT(false);
                 }
@@ -1039,7 +1095,7 @@ int sleep_main(int argc, char *argv[])
         fprintf(stderr, "unsupported unit: %s\n", unit);
         return -1;
     }
-    vsf_thread_delay_ms(ms);
+    vsf_linux_sleep(vsf_systimer_ms_to_tick(ms));
     return 0;
 }
 
@@ -1135,6 +1191,79 @@ int export_main(int argc, char *argv[])
         __free_ex(process->shell_process, env_str);
     }
     return ret;
+}
+#endif
+
+#if (VSF_USE_APPLET == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) \
+    && VSF_APPLET_CFG_LINKABLE == ENABLED
+static const char * __vsh_vplt_module_name(vsf_vplt_info_t *info)
+{
+    if (info->final) {
+        vsf_vplt_entry_t *entry = (vsf_vplt_entry_t *)&info[1];
+        for (unsigned short i = 0; i < info->entry_num; i++, entry++) {
+            if ((entry->name != NULL) && (entry->ptr == info)) {
+                return entry->name;
+            }
+        }
+    }
+    return NULL;
+}
+
+static unsigned int __vsh_vplt_list(vsf_vplt_info_t *info, const char *name,
+        unsigned int depth)
+{
+    unsigned int count = 0;
+
+    if (NULL == name) {
+        name = __vsh_vplt_module_name(info);
+    }
+    if (NULL == name) {
+        if (info == &vsf_dynamic_vplt.info) {
+            name = "dynamic";
+        }
+#if VSF_APPLET_USE_SERVICE == ENABLED
+        else if (info == &vsf_service_vplt.info) {
+            name = "service";
+        }
+#endif
+        else {
+            name = "unnamed";
+        }
+    }
+    printf("%*s%s/" VSH_LINEEND, depth * 2, "", name);
+
+    if (info->final) {
+        vsf_vplt_entry_t *entry = (vsf_vplt_entry_t *)&info[1];
+        for (unsigned short i = 0; i < info->entry_num; i++, entry++) {
+            if ((entry->name != NULL) && (entry->ptr != NULL)
+                    && (entry->ptr != info)) {
+                printf("%*s%s" VSH_LINEEND, depth * 2 + 2, "", entry->name);
+                count++;
+            }
+        }
+    } else {
+        vsf_vplt_info_t **subvplt = (vsf_vplt_info_t **)&info[1];
+        for (unsigned short i = 0; i < info->entry_num; i++, subvplt++) {
+            if (*subvplt != NULL) {
+                const char *subname = (info == &vsf_dynamic_vplt.info) ? "ram" : NULL;
+                count += __vsh_vplt_list(*subvplt, subname, depth + 1);
+            }
+        }
+    }
+    return count;
+}
+
+int vplt_main(int argc, char *argv[])
+{
+    if (argc != 1) {
+        printf("format: vplt" VSH_LINEEND);
+        return -1;
+    }
+
+    unsigned int count = __vsh_vplt_list(
+        (vsf_vplt_info_t *)&vsf_linux_vplt.info, "linux", 0);
+    printf("%u API(s)" VSH_LINEEND, count);
+    return 0;
 }
 #endif
 

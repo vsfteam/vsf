@@ -18,6 +18,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED
 typedef struct vsf_linux_libc_wchar_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libc_wchar);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(wcslen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(wcscat);

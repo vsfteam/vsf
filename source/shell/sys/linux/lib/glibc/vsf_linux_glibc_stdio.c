@@ -1032,6 +1032,7 @@ errno_t _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cn
 #if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdio_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_stdio, vsf_linux_libc_stdio_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_stdin),
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_stdout),

@@ -17,6 +17,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 typedef struct vsf_linux_libgen_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libgen);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(basename);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dirname);

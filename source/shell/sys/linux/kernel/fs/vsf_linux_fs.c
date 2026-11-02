@@ -179,6 +179,9 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_eof(vsf_linux_fd_t *sfd);
+void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
+void __vsf_linux_term_input(vsf_linux_term_priv_t *priv, const uint8_t *buf, uint_fast32_t size);
+void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv);
 
 int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf);
@@ -1218,6 +1221,7 @@ vsf_linux_fd_priv_callback_t * vsf_linux_fd_claim_calback(vsf_linux_fd_priv_t *p
         callback = &priv->events_callback[1];
     }
     if (callback != NULL) {
+        callback->owner = vsf_linux_get_cur_process();
         callback->cb = (void (*)(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig))1;
     }
     return callback;
@@ -1225,6 +1229,7 @@ vsf_linux_fd_priv_callback_t * vsf_linux_fd_claim_calback(vsf_linux_fd_priv_t *p
 
 void vsf_linux_fd_release_calback(vsf_linux_fd_priv_t *priv, vsf_linux_fd_priv_callback_t *callback)
 {
+    callback->owner = NULL;
     callback->cb = NULL;
 }
 
@@ -3020,6 +3025,19 @@ static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 
 void __vsf_linux_stream_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready)
 {
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    if (is_ready && (event & POLLIN) && (priv->term_priv != NULL)) {
+        vsf_linux_term_priv_t *term_priv = priv->term_priv;
+        uint8_t *buffer;
+        uint_fast32_t size = vsf_stream_get_rbuf(priv->stream_rx, &buffer);
+        __vsf_linux_term_input(term_priv, buffer, size);
+        if (term_priv->sig_pending) {
+            vsf_unprotect_sched(orig);
+            __vsf_linux_term_notify_rx(term_priv);
+            return;
+        }
+    }
+#endif
     if (priv->on_evt != NULL) {
         priv->on_evt(priv, orig, event, is_ready);
     } else if (is_ready) {
@@ -3340,6 +3358,8 @@ void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx)
         while ((data_size = vsf_stream_get_data_size(stream))) {
             vsf_stream_read(stream, NULL, data_size);
         }
+        // Re-arm RX notification even if another reader already drained the buffer.
+        vsf_stream_read(stream, NULL, 0);
     }
 }
 
@@ -3635,12 +3655,43 @@ int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev)
 void __vsf_linux_term_rx(vsf_linux_fd_priv_t *priv)
 {
     vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    int sig = term_priv->sig_pending;
+    if (sig != 0) {
+        term_priv->sig_pending = 0;
+        __vsf_linux_rx_stream_drop(&term_priv->use_as__vsf_linux_stream_priv_t);
+        vsf_linux_fd_clear_status(priv, POLLIN, vsf_protect_sched());
+        if (term_priv->foreground_pgid > 0) {
+            kill(-term_priv->foreground_pgid, sig);
+        }
+        return;
+    }
+#endif
     vsf_protect_t orig = vsf_protect_sched();
     if (vsf_stream_get_data_size(term_priv->stream_rx)) {
         vsf_linux_fd_set_status(&term_priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
+}
+
+void __vsf_linux_term_input(vsf_linux_term_priv_t *priv, const uint8_t *buf, uint_fast32_t size)
+{
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    if (!(priv->termios.c_lflag & ISIG) || priv->sig_pending || !priv->termios.c_cc[VINTR]) {
+        return;
+    }
+    for (uint_fast32_t i = 0; i < size; i++) {
+        if (buf[i] == priv->termios.c_cc[VINTR]) {
+            priv->sig_pending = SIGINT;
+            break;
+        }
+    }
+#else
+    VSF_UNUSED_PARAM(priv);
+    VSF_UNUSED_PARAM(buf);
+    VSF_UNUSED_PARAM(size);
+#endif
 }
 
 void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv)
@@ -3661,7 +3712,8 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
         .c_iflag        = ICRNL,
         .c_cflag        = CS8,
         .c_oflag        = OPOST | ONLCR,
-        .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON,
+        .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON | ISIG,
+        .c_cc[VINTR]    = 003,      // Ctrl-C
         .c_cc[VMIN]     = 1,
         .c_cc[VERASE]   = 010,      // BS
         .c_cc[VWERASE]  = 027,      // ETB
@@ -3669,7 +3721,12 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
         .c_ispeed       = B115200,
         .c_ospeed       = B115200,
     };
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    priv->foreground_pgid = process != NULL ? process->id.gid : 0;
     priv->termios = __default_term;
+    if ((STDIN_FILENO == sfd->fd) || (priv->file != NULL)) {
+        priv->term_priv = priv;
+    }
     sfd->fd_flags |= __FD_READALL;
 
     const vsf_linux_fd_op_t *subop = priv->subop;
@@ -3729,6 +3786,11 @@ static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t coun
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
     const vsf_linux_fd_op_t *subop = priv->subop;
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    if (priv->foreground_pgid <= 0) {
+        priv->foreground_pgid = getpgrp();
+    }
+#endif
     if ((subop != NULL) && (subop->fn_read != NULL)) {
         return subop->fn_read(sfd, buf, count);
     }
@@ -3829,6 +3891,7 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
 #if VSF_LINUX_APPLET_USE_MNTENT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_mntent_vplt_t vsf_linux_mntent_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_mntent_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libmntent, vsf_linux_mntent_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(setmntent),
     VSF_APPLET_VPLT_ENTRY_FUNC(getmntent),
@@ -3842,6 +3905,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_mntent_vplt_t vsf_linux_mntent_vplt = {
 #if VSF_LINUX_APPLET_USE_POLL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_poll_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libpoll, vsf_linux_poll_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(poll),
     VSF_APPLET_VPLT_ENTRY_FUNC(ppoll),
@@ -3851,6 +3915,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_epoll_vplt_t vsf_linux_sys_epoll_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_epoll_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_epoll, vsf_linux_sys_epoll_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(epoll_create),
     VSF_APPLET_VPLT_ENTRY_FUNC(epoll_create1),
@@ -3864,6 +3929,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_epoll_vplt_t vsf_linux_sys_epoll_vplt = {
 #if VSF_LINUX_APPLET_USE_FCNTL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_fcntl_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libfcntl, vsf_linux_fcntl_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__fcntl_va),
     VSF_APPLET_VPLT_ENTRY_FUNC(fcntl),
@@ -3878,6 +3944,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt = {
 #if VSF_LINUX_APPLET_USE_DIRENT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_dirent_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libdirent, vsf_linux_dirent_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(opendir),
     VSF_APPLET_VPLT_ENTRY_FUNC(fdopendir),
@@ -3897,6 +3964,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_eventfd_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_eventfd, vsf_linux_sys_eventfd_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(eventfd),
     VSF_APPLET_VPLT_ENTRY_FUNC(eventfd_read),
@@ -3907,6 +3975,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd_vplt =
 #if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_select_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_select, vsf_linux_sys_select_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(select),
     VSF_APPLET_VPLT_ENTRY_FUNC(pselect),
@@ -3916,6 +3985,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_stat_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_stat, vsf_linux_sys_stat_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(umask),
     VSF_APPLET_VPLT_ENTRY_FUNC(stat),
@@ -3938,6 +4008,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_sendfile_vplt_t vsf_linux_sys_sendfile_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_sendfile_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_sendfile, vsf_linux_sys_sendfile_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(sendfile),
 };
@@ -3946,6 +4017,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_sendfile_vplt_t vsf_linux_sys_sendfile_vplt
 #if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_statvfs_vplt_t vsf_linux_sys_statvfs_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_statvfs_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_statvfs, vsf_linux_sys_statvfs_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(fstatvfs),
     VSF_APPLET_VPLT_ENTRY_FUNC(statvfs),
@@ -3957,6 +4029,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_statvfs_vplt_t vsf_linux_sys_statvfs_vplt =
 #if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_file_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_file, vsf_linux_sys_file_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(flock),
 };
@@ -3965,6 +4038,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_ioctl_vplt_t vsf_linux_sys_ioctl_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_ioctl_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_ioctl, vsf_linux_sys_ioctl_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(ioctl),
 };

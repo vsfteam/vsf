@@ -75,10 +75,17 @@ vsf_class(vsf_elfloader_t) {
     private_member(
         void *ram_base;
 
+        // initarr/finiarr point into ram_base(the writable segment owns
+        // them, cleanup frees them with ram_base - never free separately)
         void *initarr;
         void *finiarr;
         uint32_t initarr_sz;
         uint32_t finiarr_sz;
+        // guard: init at most once per load; fini only after init ran, and
+        // at most once(the applet _start fini path and the later dlclose
+        // path both funnel here - the second caller must see a no-op)
+        bool initarr_done;
+        bool finiarr_done;
 
         uintptr_t ram_base_vaddr;
         uintptr_t ram_base_size;

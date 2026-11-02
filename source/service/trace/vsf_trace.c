@@ -398,6 +398,7 @@ void vsf_trace_assert(const char *expr, const char *file, int line, const char *
 #if VSF_APPLET_USE_TRACE == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_trace_vplt_t vsf_trace_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_trace_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libtrace, vsf_trace_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_trace_buffer),
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_trace_output),

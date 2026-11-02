@@ -61,6 +61,7 @@ typedef struct {
 #if VSF_LINUX_APPLET_USE_GLOB == ENABLED
 typedef struct vsf_linux_glob_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libglob);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(glob);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(globfree);

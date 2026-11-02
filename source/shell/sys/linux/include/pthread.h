@@ -242,6 +242,7 @@ enum {
 #if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
 typedef struct vsf_linux_pthread_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libpthread);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_key_create);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_key_delete);

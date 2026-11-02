@@ -558,6 +558,7 @@ getopt_long_only(int nargc, char * const *nargv, const char *options,
 #if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libgetopt_vplt_t vsf_linux_libgetopt_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libgetopt_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libgetopt, vsf_linux_libgetopt_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(getopt_long),
     VSF_APPLET_VPLT_ENTRY_FUNC(getopt_long_only),

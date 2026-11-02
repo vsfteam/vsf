@@ -24,6 +24,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_PTY == ENABLED
 typedef struct vsf_linux_pty_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libpty);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(openpty);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(login_tty);

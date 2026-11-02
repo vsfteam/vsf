@@ -36,7 +36,7 @@ typedef struct vsf_freetype_vplt_t {
     vsf_vplt_info_t info;
 
     // self
-    VSF_APPLET_VPLT_ENTRY_MOD_DEF(freetype);
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libfreetype);
 
     // Core APIs
     //  Library Setup

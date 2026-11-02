@@ -97,6 +97,7 @@ typedef struct {
 #if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED
 typedef struct vsf_linux_libc_stdlib_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libc_stdlib);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____malloc_ex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____realloc_ex);

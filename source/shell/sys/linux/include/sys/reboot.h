@@ -27,6 +27,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
 typedef struct vsf_linux_sys_reboot_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_reboot);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(reboot);
 } vsf_linux_sys_reboot_vplt_t;

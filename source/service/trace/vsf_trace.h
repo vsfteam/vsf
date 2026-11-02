@@ -181,6 +181,7 @@ extern void vsf_trace_fini(void);
 #if VSF_APPLET_USE_TRACE == ENABLED
 typedef struct vsf_trace_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libtrace);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_trace_buffer);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_trace_output);

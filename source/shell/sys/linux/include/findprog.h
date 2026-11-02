@@ -15,6 +15,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
 typedef struct vsf_linux_findprog_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libfindprog);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(find_in_path);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(find_in_given_path);

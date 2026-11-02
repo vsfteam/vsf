@@ -36,6 +36,7 @@ typedef uint64_t                eventfd_t;
 #if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED
 typedef struct vsf_linux_sys_eventfd_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_eventfd);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(eventfd);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(eventfd_read);

@@ -49,6 +49,7 @@
 //  GCC, refer to: https://gcc.gnu.org/onlinedocs/gccint/Integer-library-routines.html
 typedef struct vsf_compiler_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libcompiler);
 
     // Routines for integer arithmetic
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__ashlsi3);

@@ -36,6 +36,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
 typedef struct vsf_linux_libc_string_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libc_string);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____strdup_ex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ffs);
@@ -368,6 +369,12 @@ const char * sigabbrev_np(int sig);
 
 #ifdef __cplusplus
 }
+
+// g++(unlike MSVC) has no __cdecl keyword; the C++ const-correct strchr
+// overloads below carry it
+#if defined(__GNUC__) && !defined(__cdecl)
+#   define __cdecl
+#endif
 
 extern "C++" {
     inline char * __cdecl strchr(char * const str, int const ch)

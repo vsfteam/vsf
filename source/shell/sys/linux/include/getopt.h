@@ -64,6 +64,16 @@ struct option {
     int val;
 };
 
+#if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
+typedef struct vsf_linux_libgetopt_vplt_t {
+    vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libgetopt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getopt_long);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getopt_long_only);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getopt);
+} vsf_linux_libgetopt_vplt_t;
+#endif
+
 __BEGIN_DECLS
 
 int getopt_long(int, char * const *, const char *,

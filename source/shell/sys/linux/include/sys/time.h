@@ -80,6 +80,7 @@ struct itimerval {
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
 typedef struct vsf_linux_sys_time_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_time);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gettimeofday);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(settimeofday);

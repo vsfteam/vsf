@@ -762,6 +762,7 @@ char *if_indextoname(unsigned int ifindex, char *ifname)
 #if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_ifaddrs_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libifaddrs, vsf_linux_ifaddrs_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(getifaddrs),
     VSF_APPLET_VPLT_ENTRY_FUNC(freeifaddrs),
@@ -773,6 +774,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt = {
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_netdb_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libnetdb, vsf_linux_netdb_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_h_errno),
     VSF_APPLET_VPLT_ENTRY_FUNC(gethostbyaddr),
@@ -794,6 +796,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
 #   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_arpa_inet_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libarpa_inet, vsf_linux_arpa_inet_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(inet_addr),
     VSF_APPLET_VPLT_ENTRY_FUNC(inet_lnaof),
@@ -810,6 +813,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vplt = {
 #   if VSF_LINUX_APPLET_USE_NET_IF == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_net_if_vplt_t vsf_linux_net_if_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_net_if_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libnet_if, vsf_linux_net_if_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(if_nametoindex),
     VSF_APPLET_VPLT_ENTRY_FUNC(if_indextoname),
@@ -820,6 +824,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_net_if_vplt_t vsf_linux_net_if_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_socket_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_socket, vsf_linux_sys_socket_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(setsockopt),
     VSF_APPLET_VPLT_ENTRY_FUNC(getsockopt),

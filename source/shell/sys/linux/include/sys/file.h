@@ -24,6 +24,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
 typedef struct vsf_linux_sys_file_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_file);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(flock);
 } vsf_linux_sys_file_vplt_t;

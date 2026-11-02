@@ -686,6 +686,7 @@ int _Strftime(char *buf, size_t bufsize, const char *format, const struct tm *ti
 #if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_time_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_time, vsf_linux_libc_time_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(clock),
     VSF_APPLET_VPLT_ENTRY_FUNC(clock_gettime),

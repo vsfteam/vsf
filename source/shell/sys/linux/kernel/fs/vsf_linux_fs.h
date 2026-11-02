@@ -87,6 +87,7 @@ typedef struct vsf_linux_fd_op_t {
 
 typedef struct vsf_linux_fd_priv_callback_t {
     short pendind_events;
+    vsf_linux_process_t *owner;
     void *param;
     void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig);
 } vsf_linux_fd_priv_callback_t;
@@ -172,6 +173,7 @@ vsf_class(vsf_linux_stream_priv_t) {
         vsf_stream_t *stream_rx;
         vsf_stream_t *stream_tx;
         vsf_linux_stream_on_evt_t on_evt;
+        void *term_priv;
         bool stream_rx_allocated;
         bool stream_tx_allocated;
     )
@@ -188,6 +190,8 @@ typedef struct vsf_linux_term_priv_t {
     implement(vsf_linux_pipe_priv_t)
     const vsf_linux_fd_op_t *subop;
     struct termios termios;
+    pid_t foreground_pgid;
+    volatile uint8_t sig_pending;
     char esc_type;
     bool line_start;
     bool subop_inited;

@@ -71,6 +71,7 @@ struct timex {
 #if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
 typedef struct vsf_linux_sys_timex_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_timex);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(adjtimex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock_adjtime);

@@ -112,6 +112,7 @@ struct servent {
 #if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 typedef struct vsf_linux_netdb_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libnetdb);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_h_errno);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gethostbyaddr);

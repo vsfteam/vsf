@@ -68,6 +68,7 @@ struct ifconf {
 #if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
 typedef struct vsf_linux_net_if_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libnet_if);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(if_nametoindex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(if_indextoname);

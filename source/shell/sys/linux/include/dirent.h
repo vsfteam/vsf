@@ -51,6 +51,7 @@ typedef struct vsf_linux_fd_t DIR;
 #if VSF_LINUX_APPLET_USE_DIRENT == ENABLED
 typedef struct vsf_linux_dirent_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libdirent);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(opendir);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fdopendir);

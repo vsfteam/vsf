@@ -19,6 +19,7 @@ extern struct _reent *__vsf_linux_getreent(void);
 #if VSF_LINUX_APPLET_USE_REENT == ENABLED
 typedef struct vsf_linux_reent_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_reent);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_getreent);
     // implement __vsf_linux_errno for compatibility because older image need this

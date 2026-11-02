@@ -40,6 +40,10 @@
 #   endif
 #endif
 
+#ifndef VSF_ELFLOADER_CFG_STRICT_LINK
+#   define VSF_ELFLOADER_CFG_STRICT_LINK            DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_ELFLOADER_CFG_DEBUG == ENABLED
@@ -72,6 +76,10 @@ typedef struct vsf_elfloader_info_t {
         Elf_Addr relsz;
         Elf_Addr pltrel;
         Elf_Addr jmprel;
+        Elf_Addr init_array;
+        Elf_Addr init_arraysz;
+        Elf_Addr fini_array;
+        Elf_Addr fini_arraysz;
 
         uint32_t external_fn_num;
     } dynamic;
@@ -85,6 +93,7 @@ typedef struct vsf_elfloader_info_t {
 
     uintptr_t entry_offset_in_file;
     bool has_dynamic;
+    bool has_single_init_fini;
     bool link_fail;
 } vsf_elfloader_info_t;
 
@@ -254,25 +263,36 @@ int vsf_elfloader_foreach_program_header(vsf_elfloader_t *elfloader, vsf_loader_
 
 int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader)
 {
-    if (elfloader->initarr != 0) {
-        // TODO: call init
-        VSF_SERVICE_ASSERT(false);
+    // array entries were relocated to actual runtime addresses together with
+    // the rest of the writable segment; the array itself lives in ram_base,
+    // so it is never freed here(cleanup frees ram_base)
+    if ((elfloader->initarr != NULL) && !elfloader->initarr_done) {
+        void (**array)(void) = (void (**)(void))elfloader->initarr;
+        uint32_t num = elfloader->initarr_sz / sizeof(void (*)(void));
 
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->initarr);
-        elfloader->initarr = NULL;
-        return -1;
+        elfloader->initarr_done = true;
+        for (uint32_t i = 0; i < num; i++) {
+            array[i]();
+        }
     }
     return 0;
 }
 
 void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader)
 {
-    if (elfloader->initarr != 0) {
-        // TODO: call fini
-        VSF_SERVICE_ASSERT(false);
+    // fini runs only after init ran(objects never constructed must not be
+    // destructed), in reverse registration order per the ELF ABI, at most
+    // once(the _start fini path and dlclose both land here - the second
+    // caller must observe a no-op)
+    if ((elfloader->finiarr != NULL) && elfloader->initarr_done && !elfloader->finiarr_done) {
+        void (**array)(void) = (void (**)(void))elfloader->finiarr;
+        uint32_t num = elfloader->finiarr_sz / sizeof(void (*)(void));
 
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->finiarr);
-        elfloader->finiarr = NULL;
+        elfloader->finiarr_done = true;
+        while (num > 0) {
+            num--;
+            array[num]();
+        }
     }
 }
 
@@ -361,6 +381,15 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
             case DT_RELSZ:      linfo->dynamic.relsz = dyn.d_un.d_ptr;      break;
             case DT_PLTREL:     linfo->dynamic.pltrel = dyn.d_un.d_ptr;     break;
             case DT_JMPREL:     linfo->dynamic.jmprel = dyn.d_un.d_ptr;     break;
+            case DT_INIT_ARRAY:     linfo->dynamic.init_array = dyn.d_un.d_ptr;         break;
+            case DT_INIT_ARRAYSZ:   linfo->dynamic.init_arraysz = dyn.d_un.d_ptr;       break;
+            case DT_FINI_ARRAY:     linfo->dynamic.fini_array = dyn.d_un.d_ptr;         break;
+            case DT_FINI_ARRAYSZ:   linfo->dynamic.fini_arraysz = dyn.d_un.d_ptr;       break;
+            // single-function init/fini(crt0-style DT_INIT/DT_FINI) is not
+            // executed by this loader; images carrying them would silently
+            // lose their ctors, so fail the load instead
+            case DT_INIT:
+            case DT_FINI:       linfo->has_single_init_fini = true;         break;
             }
             i++;
         } while (dyn.d_tag != DT_NULL);
@@ -408,8 +437,9 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
 
                 if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
                     vsf_trace_warning("fail to locate %s, application will hang if this API is called" VSF_TRACE_CFG_LINEEND, symname);
-                    // do not issue error, because if application maybe not call these APIs
-                    // linfo->link_fail = true;
+#if VSF_ELFLOADER_CFG_STRICT_LINK == ENABLED
+                    linfo->link_fail = true;
+#endif
                     continue;
                 }
             } else if (__vsf_elfloader_is_vaddr_loaded(elfloader, u.rel->r_offset)) {
@@ -481,6 +511,7 @@ int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
     memset(&linfo.dynamic, 0, sizeof(linfo.dynamic));
     memset(&linfo.export, 0, sizeof(linfo.export));
     linfo.has_dynamic = false;
+    linfo.has_single_init_fini = false;
     elfloader->target = target;
 
 second_round_for_ram_base:
@@ -560,6 +591,32 @@ second_round_for_ram_base:
         if (linfo.link_fail) {
             goto cleanup_and_fail;
         }
+
+        // init/fini arrays: the tags point into the writable segment, whose
+        // entries the relocation pass above already turned into actual
+        // runtime addresses(R_RISCV_RELATIVE goes through remap in the arch
+        // relocate). only the array locations need mapping here; they live
+        // inside ram_base, so they are freed with it and never separately
+        if (linfo.has_single_init_fini) {
+            vsf_trace_error("DT_INIT/DT_FINI not supported, use .init_array/.fini_array" VSF_TRACE_CFG_LINEEND);
+            goto cleanup_and_fail;
+        }
+        if (linfo.dynamic.init_arraysz > 0) {
+            elfloader->initarr = vsf_elfloader_remap(elfloader, (void *)(uintptr_t)linfo.dynamic.init_array);
+            if (NULL == elfloader->initarr) {
+                vsf_trace_error("fail to locate init_array" VSF_TRACE_CFG_LINEEND);
+                goto cleanup_and_fail;
+            }
+            elfloader->initarr_sz = (uint32_t)linfo.dynamic.init_arraysz;
+        }
+        if (linfo.dynamic.fini_arraysz > 0) {
+            elfloader->finiarr = vsf_elfloader_remap(elfloader, (void *)(uintptr_t)linfo.dynamic.fini_array);
+            if (NULL == elfloader->finiarr) {
+                vsf_trace_error("fail to locate fini_array" VSF_TRACE_CFG_LINEEND);
+                goto cleanup_and_fail;
+            }
+            elfloader->finiarr_sz = (uint32_t)linfo.dynamic.fini_arraysz;
+        }
     }
 
     base = elfloader->is_xip ? (uintptr_t)target->object : (uintptr_t)elfloader->ram_base;
@@ -617,19 +674,43 @@ second_round_for_ram_base:
             }
 
             if (NULL == elfloader->vplt_out) {
-                int total_byte_size = sizeof(vsf_vplt_info_t) + linfo.export.num * sizeof(vsf_vplt_entry_t) + linfo.export.str_len;
+                const char *module_name = (target->name != NULL) ? target->name : "module";
+                const char *module_base = module_name;
+                for (const char *p = module_name; *p != '\0'; p++) {
+                    if ((*p == '/') || (*p == '\\')) {
+                        module_base = p + 1;
+                    }
+                }
+                const char *module_ext = strrchr(module_base, '.');
+                size_t module_name_len = (module_ext != NULL) ?
+                    (size_t)(module_ext - module_base) : strlen(module_base);
+                if (0 == module_name_len) {
+                    module_base = "module";
+                    module_name_len = sizeof("module") - 1;
+                }
+
+                int total_byte_size = sizeof(vsf_vplt_info_t)
+                    + (linfo.export.num + 1) * sizeof(vsf_vplt_entry_t)
+                    + linfo.export.str_len + module_name_len + 1;
                 elfloader->vplt_out = elfloader->alloc_vplt(total_byte_size);
                 if (NULL == elfloader->vplt_out) {
                     goto cleanup_and_fail;
                 }
 
                 vsf_vplt_info_t *vplt_info = elfloader->vplt_out;
-                vplt_info->entry_num = linfo.export.num;
+                vplt_info->entry_num = linfo.export.num + 1;
                 vplt_info->final = true;
                 vplt_info->major = 0;
                 vplt_info->minor = 0;
-                linfo.export.vplt_entry = (vsf_vplt_entry_t *)&vplt_info[1];
-                linfo.export.str = (char *)linfo.export.vplt_entry + linfo.export.num * sizeof(vsf_vplt_entry_t);
+                vsf_vplt_entry_t *vplt_entry = (vsf_vplt_entry_t *)&vplt_info[1];
+                char *export_str = (char *)vplt_entry
+                    + (linfo.export.num + 1) * sizeof(vsf_vplt_entry_t);
+                vplt_entry->name = export_str + linfo.export.str_len;
+                vplt_entry->ptr = vplt_info;
+                memcpy((char *)vplt_entry->name, module_base, module_name_len);
+                ((char *)vplt_entry->name)[module_name_len] = '\0';
+                linfo.export.vplt_entry = &vplt_entry[1];
+                linfo.export.str = export_str;
 
                 linfo.export.num = 0;
                 linfo.export.str_len = 0;

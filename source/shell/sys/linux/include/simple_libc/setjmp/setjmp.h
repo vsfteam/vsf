@@ -23,8 +23,12 @@ typedef setjmp_float128 jmp_buf[16];
 #   elif    defined(__CPU_ARM__)
 typedef unsigned long long int jmp_buf[16];
 #   elif    defined(__CPU_RV__) || defined(__CPU_RISCV__)
-// 16 words, matches the gp-aware rv_setjmp in hal/arch/rv
-typedef unsigned long int jmp_buf[16];
+// layout must match hal/arch/rv/rv_setjmp.S
+#       if defined(__riscv_flen) && __riscv_flen >= 32
+typedef unsigned long int jmp_buf[50];
+#       else
+typedef unsigned long int jmp_buf[17];
+#       endif
 #   else
 #   error not supported, do not add to path, use setjmp from libc instead
 #   endif
@@ -33,6 +37,7 @@ typedef unsigned long int jmp_buf[16];
 #if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 typedef struct vsf_linux_libc_setjmp_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libc_setjmp);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setjmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(longjmp);

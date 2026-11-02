@@ -31,6 +31,7 @@ struct passwd {
 #if VSF_LINUX_APPLET_USE_PWD == ENABLED
 typedef struct vsf_linux_pwd_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libpwd);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpwuid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpwnam);

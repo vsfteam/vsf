@@ -97,6 +97,7 @@ typedef struct {
 #if VSF_LINUX_APPLET_USE_REGEX == ENABLED
 typedef struct vsf_linux_regex_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libregex);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(regcomp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(regerror);

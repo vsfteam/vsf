@@ -28,6 +28,7 @@ struct tms {
 #if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED
 typedef struct vsf_linux_sys_times_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_times);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(times);
 } vsf_linux_sys_times_vplt_t;

@@ -163,6 +163,7 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
 #if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_semaphore_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsemaphore, vsf_linux_semaphore_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(sem_init),
     VSF_APPLET_VPLT_ENTRY_FUNC(sem_destroy),

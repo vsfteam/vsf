@@ -40,6 +40,7 @@
 // TODO: add more kernel APIs
 typedef struct vsf_kernel_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libkernel);
 
     // eda
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_eda_get_cur);

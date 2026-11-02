@@ -27,6 +27,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED
 typedef struct vsf_linux_fnmatch_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libfnmatch);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fnmatch);
 } vsf_linux_fnmatch_vplt_t;

@@ -58,6 +58,7 @@ struct pollfd {
 #if VSF_LINUX_APPLET_USE_POLL == ENABLED
 typedef struct vsf_linux_poll_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libpoll);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(poll);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ppoll);

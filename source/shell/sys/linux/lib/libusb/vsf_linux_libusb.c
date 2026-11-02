@@ -1360,6 +1360,7 @@ int libusb_set_option(libusb_context *ctx, enum libusb_option option, ...)
 #if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libusb_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libusb, vsf_linux_libusb_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(libusb_strerror),
     VSF_APPLET_VPLT_ENTRY_FUNC(libusb_get_version),

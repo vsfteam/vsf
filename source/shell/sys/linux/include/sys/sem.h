@@ -47,6 +47,7 @@ struct sembuf {
 #if VSF_LINUX_APPLET_USE_SYS_SEM == ENABLED
 typedef struct vsf_linux_sys_sem_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_sem);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__semctl_va);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(semctl);

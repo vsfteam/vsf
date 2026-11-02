@@ -27,6 +27,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_XATTR == ENABLED
 typedef struct vsf_linux_sys_xattr_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_xattr);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(removexattr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lremovexattr);

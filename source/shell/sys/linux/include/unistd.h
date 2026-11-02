@@ -252,6 +252,7 @@ struct iovec {
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
 typedef struct vsf_linux_unistd_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libunistd);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(confstr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(usleep);

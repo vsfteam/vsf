@@ -1162,6 +1162,7 @@ int pthread_getcpuclockid(pthread_t thread, clockid_t* clockid)
 #if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_pthread_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libpthread, vsf_linux_pthread_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_key_create),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_key_delete),

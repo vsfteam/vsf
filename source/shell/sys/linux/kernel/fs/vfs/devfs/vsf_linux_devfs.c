@@ -96,6 +96,7 @@
 
 extern int __vsf_linux_default_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 extern void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv);
+extern void __vsf_linux_term_input(vsf_linux_term_priv_t *priv, const uint8_t *buf, uint_fast32_t size);
 extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 extern ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 
@@ -230,7 +231,9 @@ static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_
             vsf_trace_error("term: uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE\n");
             break;
         } else {
-            all_read_size += vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, vsf_usart_rxfifo_read(uart, buffer, buflen));
+            uint_fast32_t read_size = vsf_usart_rxfifo_read(uart, buffer, buflen);
+            __vsf_linux_term_input(&priv->use_as__vsf_linux_term_priv_t, buffer, read_size);
+            all_read_size += vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, read_size);
         }
     }
 
@@ -1090,10 +1093,28 @@ static ssize_t __vsf_linux_mal_write(vsf_linux_fd_t *sfd, const void *buf, size_
     return result;
 }
 
+static int __vsf_linux_mal_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    vsf_linux_mal_priv_t *priv = (vsf_linux_mal_priv_t *)sfd->priv;
+    vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    // block node: report the device as S_IFBLK with its byte size, so
+    // block-device-aware consumers(bochs hdimage flat mode etc.) can take
+    // the geometry from st_size. without fn_stat fstat() failed on these
+    // nodes and e.g. bochs PANICed at "fstat() returns error!"(on-board
+    // evidence, ref/plan/bochs_win95.md 7 item 3)
+    buf->st_mode = S_IFBLK | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+    buf->st_size = (off_t)mal->size;
+    buf->st_blksize = 512;
+    buf->st_blocks = (blkcnt_t)(mal->size / 512);
+    return 0;
+}
+
 static const vsf_linux_fd_op_t __vsf_linux_mal_fdop = {
     .priv_size          = sizeof(vsf_linux_mal_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_mal_fcntl,
+    .fn_stat            = __vsf_linux_mal_stat,
     .fn_read            = __vsf_linux_mal_read,
     .fn_write           = __vsf_linux_mal_write,
 };
@@ -2147,6 +2168,13 @@ static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
     }
 
     vsf_eda_fini(&fb_priv->fresh_task.use_as__vsf_eda_t);
+
+    vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
+    disp->ui_on_ready = __vsf_linux_disp_on_ready;
+    disp->ui_data = vsf_eda_get_cur();
+    vk_disp_fini(disp);
+    vsf_thread_wfe(VSF_EVT_USER);
+
     if (    (fb_priv->front_buffer != NULL)
 #if VSF_DISP_USE_FB == ENABLED
         &&  !fb_priv->is_disp_fb

@@ -586,15 +586,21 @@ void vsf_linux_tls_free(int idx)
 
 vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
 {
+    VSF_LINUX_ASSERT((idx >= 0) && (idx < VSF_LINUX_CFG_TLS_NUM));
+
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
 
-    vsf_protect_t orig = vsf_protect_sched();
-        VSF_LINUX_ASSERT(vsf_bitmap_get(&process->tls.bitmap, idx));
-    vsf_unprotect_sched(orig);
-
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     VSF_LINUX_ASSERT(thread != NULL);
+
+    vsf_protect_t orig = vsf_protect_sched();
+        if (!vsf_bitmap_get(&process->tls.bitmap, idx)) {
+            vsf_bitmap_set(&process->tls.bitmap, idx);
+            thread->tls[idx].destructor = NULL;
+            thread->tls[idx].data = NULL;
+        }
+    vsf_unprotect_sched(orig);
 
     return &thread->tls[idx];
 }
@@ -761,6 +767,7 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
     vsf_unprotect_sched(orig);
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     if (trig->sig) {
+        __vsf_linux_sighandler(&thread->use_as__vsf_thread_t, trig->sig - 1);
         errno = EINTR;
     }
     return trig->sig;
@@ -1417,6 +1424,11 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
     do {
         vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
         if (sfd != NULL) {
+            for (int i = 0; i < dimof(sfd->priv->events_callback); i++) {
+                if (sfd->priv->events_callback[i].owner == process) {
+                    vsf_linux_fd_release_calback(sfd->priv, &sfd->priv->events_callback[i]);
+                }
+            }
             // do not use close because it depends on current process
             //  and vsf_linux_delete_process can be called in other processes
             ____vsf_linux_fd_close_ex(process, sfd);
@@ -1765,6 +1777,9 @@ static void __vsf_linux_sighandler(vsf_thread_t *thread, int sig)
     }
 
     if (SIG_DFL == sighandler) {
+        if (SIGINT == sig) {
+            vsf_linux_exit_process(128 + SIGINT, true);
+        }
         // TODO: try to get default handler
         sighandler = SIG_IGN;
     }
@@ -2217,14 +2232,36 @@ int __vsf_linux_script_main(int argc, char **argv)
 #endif
 
 #if VSF_LINUX_USE_APPLET == ENABLED
+#if VSF_USE_LOADER == ENABLED
+static vsf_linux_dynloader_t * __vsf_linux_dlopen_impl(const char *pathname, bool call_init);
+#endif
 static void * __vsf_linux_dynloader_remap(vsf_applet_ctx_t *ctx, void *vaddr)
 {
     return vsf_loader_remap((vsf_loader_t *)ctx->target, vaddr);
 }
+
+// exec-path init/fini: called from the applet _start via ctx->fn_init /
+// ctx->fn_fini, so the ctor/dtor arrays run under the applet gp bound below
+// (never under the shell's gp before the applet is entered). the loader's
+// once-guards make the later dlclose fini a no-op
+static int __vsf_linux_dynloader_call_init(void *target)
+{
+    return vsf_loader_call_init_array((vsf_loader_t *)target);
+}
+
+static void __vsf_linux_dynloader_call_fini(void *target)
+{
+    vsf_loader_call_fini_array((vsf_loader_t *)target);
+}
+
 int __vsf_linux_dynloader_main(int argc, char **argv)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+#if VSF_USE_LOADER == ENABLED
+    vsf_linux_dynloader_t *loader = __vsf_linux_dlopen_impl(process->path, false);
+#else
     vsf_linux_dynloader_t *loader = dlopen(process->path, 0);
+#endif
     if (NULL == loader) {
         printf("fail to dlopen %s\n", process->path);
         return -1;
@@ -2234,13 +2271,14 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
     if (loader->loader.generic.entry != NULL) {
         vsf_applet_ctx_t applet_ctx = {
             .target     = &loader->loader.generic,
-            .fn_init    = NULL,     // fn_init has already been called in dlopen
-            .fn_fini    = NULL,     // fn_fini will be called in dlclose
+            .fn_init    = __vsf_linux_dynloader_call_init,
+            .fn_fini    = __vsf_linux_dynloader_call_fini,
             .fn_remap   = __vsf_linux_dynloader_remap,
             .argc       = argc,
             .argv       = argv,
             .envp       = environ,
             .vplt       = loader->loader.generic.vplt,
+            .fn_vplt_link = vsf_vplt_link,
         };
 
 #   if VSF_ARCH_USE_THREAD_REG == ENABLED
@@ -2616,16 +2654,15 @@ int pipe2(int pipefd[2], int flags)
 
 // signal.h
 
-int kill(pid_t pid, int sig)
-{
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-    if ((sig <= 0) || (sig > _NSIG) || (sig >= 64)) {
+static int __vsf_linux_kill_process(vsf_linux_process_t *process, int sig)
+{
+    if (NULL == process) {
         return -1;
     }
 
     vsf_protect_t orig = vsf_protect_sched();
-    vsf_linux_process_t *process = vsf_linux_get_process(pid);
-    if ((NULL == process) || (process->thread_pending_exit != NULL)) {
+    if (process->thread_pending_exit != NULL) {
         vsf_unprotect_sched(orig);
         return -1;
     }
@@ -2635,12 +2672,52 @@ int kill(pid_t pid, int sig)
 #else
     process->sig.pending.sig[0] |= 1 << sig;
 #endif
-    vsf_unprotect_sched(orig);
-
     vsf_linux_thread_t *thread;
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-    vsf_thread_signal(&thread->use_as__vsf_thread_t, sig - 1);
+    vsf_unprotect_sched(orig);
+
+    if (thread != NULL) {
+        vsf_thread_signal(&thread->use_as__vsf_thread_t, sig - 1);
+    }
+
+    orig = vsf_protect_sched();
+        vsf_linux_trigger_t *trigger;
+        do {
+            vsf_dlist_peek_head(vsf_linux_trigger_t, node, &process->sig.trigger_list, trigger);
+            if (trigger != NULL) {
+                vsf_linux_trigger_signal(trigger, sig);
+            }
+        } while (trigger != NULL);
+    vsf_unprotect_sched(orig);
     return 0;
+}
+#endif
+
+int kill(pid_t pid, int sig)
+{
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    if ((sig <= 0) || (sig > _NSIG) || (sig >= 64)) {
+        return -1;
+    }
+
+    int result;
+    if (pid > 0) {
+        result = __vsf_linux_kill_process(vsf_linux_get_process(pid), sig);
+    } else {
+        pid_t pgid = pid < 0 ? -pid : getpgrp();
+        result = -1;
+        __vsf_dlist_foreach_unsafe(vsf_linux_process_t, process_node, &__vsf_linux.process_list) {
+            if (_->id.gid == pgid) {
+                if (!__vsf_linux_kill_process(_, sig)) {
+                    result = 0;
+                }
+            }
+        }
+    }
+    if (result < 0) {
+        errno = ESRCH;
+    }
+    return result;
 #else
     return -1;
 #endif
@@ -2740,6 +2817,25 @@ unsigned int alarm(unsigned int seconds)
     return 0;
 }
 
+static pid_t __vsf_linux_wait_set_foreground(pid_t pgid)
+{
+    pid_t saved_pgid = tcgetpgrp(STDIN_FILENO);
+    if ((saved_pgid >= 0) && (pgid > 0)) {
+        tcsetpgrp(STDIN_FILENO, pgid);
+    }
+    return saved_pgid;
+}
+
+static void __vsf_linux_wait_restore_foreground(pid_t saved_pgid)
+{
+    if (saved_pgid >= 0) {
+        pid_t pgid = saved_pgid > 0 ? saved_pgid : getpgrp();
+        if (pgid > 0) {
+            tcsetpgrp(STDIN_FILENO, pgid);
+        }
+    }
+}
+
 static pid_t __vsf_linux_wait_any(int *status, int options)
 {
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
@@ -2748,6 +2844,7 @@ static pid_t __vsf_linux_wait_any(int *status, int options)
     VSF_LINUX_ASSERT(cur_thread != NULL);
 
     VSF_LINUX_ASSERT(cur_process != NULL);
+    pid_t child_pgid = 0;
     vsf_protect_t orig = vsf_protect_sched();
         if (vsf_dlist_is_empty(&cur_process->child_list)) {
             vsf_unprotect_sched(orig);
@@ -2760,6 +2857,9 @@ static pid_t __vsf_linux_wait_any(int *status, int options)
                 cur_thread->pid_exited = _->id.pid;
                 goto done;
             }
+            if (!child_pgid && (_->status & PID_STATUS_RUNNING)) {
+                child_pgid = _->id.gid;
+            }
         }
         if (cur_process->thread_pending_child != NULL) {
             vsf_unprotect_sched(orig);
@@ -2768,7 +2868,9 @@ static pid_t __vsf_linux_wait_any(int *status, int options)
         cur_process->thread_pending_child = cur_thread;
     vsf_unprotect_sched(orig);
 
+    pid_t saved_pgid = __vsf_linux_wait_set_foreground(child_pgid);
     vsf_thread_wfe(VSF_EVT_USER);
+    __vsf_linux_wait_restore_foreground(saved_pgid);
 
 done:
     if (status != NULL) {
@@ -2818,7 +2920,9 @@ pid_t vsf_linux_waitpid(pid_t pid, int *status, int options, bool cleanup)
 
         process->thread_pending = cur_thread;
         vsf_unprotect_sched(orig);
+        pid_t saved_pgid = __vsf_linux_wait_set_foreground(process->id.gid);
         vsf_thread_wfe(VSF_EVT_USER);
+        __vsf_linux_wait_restore_foreground(saved_pgid);
         orig = vsf_protect_sched();
     } else {
         cur_thread->retval = process->exit_status;
@@ -4410,12 +4514,23 @@ int tcsetattr(int fd, int optional_actions, const struct termios *termios)
 
 pid_t tcgetpgrp(int fd)
 {
-    return getpgrp();
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if ((NULL == sfd) || (sfd->op != &vsf_linux_term_fdop)) {
+        errno = ENOTTY;
+        return -1;
+    }
+    return ((vsf_linux_term_priv_t *)sfd->priv)->foreground_pgid;
 }
 
 int tcsetpgrp(int fd, pid_t pgrp)
 {
-    return setpgid(0, pgrp);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if ((NULL == sfd) || (sfd->op != &vsf_linux_term_fdop)) {
+        errno = ENOTTY;
+        return -1;
+    }
+    ((vsf_linux_term_priv_t *)sfd->priv)->foreground_pgid = pgrp;
+    return 0;
 }
 
 int tcsendbreak(int fd, int duration)
@@ -4628,9 +4743,14 @@ void vsf_linux_loader_keep_ram(void)
 }
 #endif
 
-void * dlopen(const char *pathname, int mode)
-{
 #if VSF_USE_LOADER == ENABLED
+// load the ELF and return the dynloader handle. call_init selects whether
+// the init_array runs right here:
+//   - dlopen() keeps the plain shared-library semantics(init on load)
+//   - the exec path loads only: the applet gp is not bound yet, ctors must
+//     run from the applet _start via ctx->fn_init after process->reg is set
+static vsf_linux_dynloader_t * __vsf_linux_dlopen_impl(const char *pathname, bool call_init)
+{
     vsf_linux_dynloader_t *linux_loader;
 
 #   if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
@@ -4661,6 +4781,7 @@ void * dlopen(const char *pathname, int mode)
             linux_loader->target.fn_read            = __vsf_linux_loader_fd_read;
         }
 
+        linux_loader->target.name                 = pathname;
         linux_loader->loader.generic.heap_op    = &vsf_loader_default_heap_op;
         linux_loader->loader.generic.vplt       = (void *)&vsf_linux_vplt;
         linux_loader->loader.generic.alloc_vplt = __dlmalloc;
@@ -4679,7 +4800,9 @@ void * dlopen(const char *pathname, int mode)
         process->loader = linux_loader;
         atexit(__vsf_linux_loader_atexit);
         if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
-            vsf_loader_call_init_array(&linux_loader->loader.generic);
+            if (call_init) {
+                vsf_loader_call_init_array(&linux_loader->loader.generic);
+            }
             return linux_loader;
         }
 
@@ -4690,6 +4813,15 @@ void * dlopen(const char *pathname, int mode)
 #endif
 
     return NULL;
+}
+
+void * dlopen(const char *pathname, int mode)
+{
+#if VSF_USE_LOADER == ENABLED
+    return __vsf_linux_dlopen_impl(pathname, true);
+#else
+    return NULL;
+#endif
 }
 
 int dlclose(void *handle)
@@ -4870,6 +5002,7 @@ int sysinfo(struct sysinfo *info)
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_fundmental_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libfundmental, vsf_linux_fundmental_vplt),
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx_get),
@@ -4885,6 +5018,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_random_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_random, vsf_linux_sys_random_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(getrandom),
 };
@@ -4893,6 +5027,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_shm_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_shm, vsf_linux_sys_shm_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(shmget),
     VSF_APPLET_VPLT_ENTRY_FUNC(shmat),
@@ -4905,6 +5040,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_time_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_time, vsf_linux_sys_time_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(gettimeofday),
     VSF_APPLET_VPLT_ENTRY_FUNC(settimeofday),
@@ -4918,6 +5054,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_times_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_times, vsf_linux_sys_times_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(times),
 };
@@ -4926,6 +5063,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_TIMEB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_timeb_vplt_t vsf_linux_sys_timeb_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_timeb_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_timeb, vsf_linux_sys_timeb_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(ftime),
 };
@@ -4935,6 +5073,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_timeb_vplt_t vsf_linux_sys_timeb_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_timex_vplt_t vsf_linux_sys_timex_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_timex_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_timex, vsf_linux_sys_timex_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(adjtimex),
     VSF_APPLET_VPLT_ENTRY_FUNC(clock_adjtime),
@@ -4945,6 +5084,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_timex_vplt_t vsf_linux_sys_timex_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_utsname_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_utsname, vsf_linux_sys_utsname_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(uname),
 };
@@ -4953,6 +5093,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname_vplt =
 #if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_wait_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_wait, vsf_linux_sys_wait_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(wait),
     VSF_APPLET_VPLT_ENTRY_FUNC(waitpid),
@@ -4963,6 +5104,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_capability_vplt_t vsf_linux_sys_capability_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_capability_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_capability, vsf_linux_sys_capability_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(capget),
     VSF_APPLET_VPLT_ENTRY_FUNC(capset),
@@ -4972,6 +5114,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_capability_vplt_t vsf_linux_sys_capability_
 #if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_mman_vplt_t vsf_linux_sys_mman_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_mman_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_mman, vsf_linux_sys_mman_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(shm_open),
     VSF_APPLET_VPLT_ENTRY_FUNC(shm_unlink),
@@ -4986,6 +5129,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_mman_vplt_t vsf_linux_sys_mman_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_resource_vplt_t vsf_linux_sys_resource_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_resource_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_resource, vsf_linux_sys_resource_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(getpriority),
     VSF_APPLET_VPLT_ENTRY_FUNC(setpriority),
@@ -4995,6 +5139,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_resource_vplt_t vsf_linux_sys_resource_vplt
 #if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_info_vplt_t vsf_linux_sys_info_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_info_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_sysinfo, vsf_linux_sys_info_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(sysinfo),
 };
@@ -5003,6 +5148,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_info_vplt_t vsf_linux_sys_info_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_prctl_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_prctl, vsf_linux_sys_prctl_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(prctl),
 };
@@ -5011,6 +5157,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_SEM == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_sem_vplt_t vsf_linux_sys_sem_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_sem_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_sem, vsf_linux_sys_sem_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__semctl_va),
     VSF_APPLET_VPLT_ENTRY_FUNC(semctl),
@@ -5023,6 +5170,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_sem_vplt_t vsf_linux_sys_sem_vplt = {
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_signal_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsignal, vsf_linux_signal_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(kill),
     VSF_APPLET_VPLT_ENTRY_FUNC(sigprocmask),
@@ -5039,6 +5187,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
 #if VSF_LINUX_APPLET_USE_SCHED == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sched_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsched, vsf_linux_sched_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(sched_get_priority_max),
     VSF_APPLET_VPLT_ENTRY_FUNC(sched_get_priority_min),
@@ -5054,6 +5203,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt = {
 #if VSF_LINUX_APPLET_USE_SPAWN == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_spawn_vplt_t vsf_linux_spawn_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_spawn_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libspawn, vsf_linux_spawn_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(posix_spawn),
     VSF_APPLET_VPLT_ENTRY_FUNC(posix_spawnp),
@@ -5084,6 +5234,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_spawn_vplt_t vsf_linux_spawn_vplt = {
 #if VSF_LINUX_APPLET_USE_PTY == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_pty_vplt_t vsf_linux_pty_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_pty_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libpty, vsf_linux_pty_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(openpty),
     VSF_APPLET_VPLT_ENTRY_FUNC(login_tty),
@@ -5093,6 +5244,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pty_vplt_t vsf_linux_pty_vplt = {
 #if VSF_LINUX_APPLET_USE_DLFCN == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_dlfcn_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libdlfcn, vsf_linux_dlfcn_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(dlopen),
     VSF_APPLET_VPLT_ENTRY_FUNC(dlclose),
@@ -5104,6 +5256,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt = {
 #if VSF_LINUX_APPLET_USE_GRP == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_grp_vplt_t vsf_linux_grp_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_grp_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libgrp, vsf_linux_grp_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(initgroups),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgroups),
@@ -5121,6 +5274,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_grp_vplt_t vsf_linux_grp_vplt = {
 #if VSF_LINUX_APPLET_USE_PWD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_pwd_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libpwd, vsf_linux_pwd_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(getpwuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getpwnam),
@@ -5130,6 +5284,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt = {
 #if VSF_LINUX_APPLET_USE_REENT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_reent_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_reent, vsf_linux_reent_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_getreent),
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
@@ -5139,6 +5294,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt = {
 #if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_termios_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libtermios, vsf_linux_termios_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(tcgetattr),
     VSF_APPLET_VPLT_ENTRY_FUNC(tcsetattr),
@@ -5158,6 +5314,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt = {
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_unistd_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libunistd, vsf_linux_unistd_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(confstr),
     VSF_APPLET_VPLT_ENTRY_FUNC(usleep),
@@ -5403,6 +5560,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_reboot_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_reboot, vsf_linux_sys_reboot_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(reboot),
 };
@@ -5411,6 +5569,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_XATTR == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_xattr_vplt_t vsf_linux_sys_xattr_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_xattr_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_xattr, vsf_linux_sys_xattr_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(removexattr),
     VSF_APPLET_VPLT_ENTRY_FUNC(lremovexattr),
@@ -5427,6 +5586,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_xattr_vplt_t vsf_linux_sys_xattr_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_statfs_vplt_t vsf_linux_sys_statfs_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_statfs_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_statfs, vsf_linux_sys_statfs_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(statfs),
     VSF_APPLET_VPLT_ENTRY_FUNC(fstatfs),
@@ -5436,6 +5596,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_statfs_vplt_t vsf_linux_sys_statfs_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_sysmacros_vplt_t vsf_linux_sys_sysmacros_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_sysmacros_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libsys_sysmacros, vsf_linux_sys_sysmacros_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(makedev),
     VSF_APPLET_VPLT_ENTRY_FUNC(major),
@@ -5446,6 +5607,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_sysmacros_vplt_t vsf_linux_sys_sysmacros_vp
 #if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_findprog_vplt_t vsf_linux_findprog_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_findprog_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libfindprog, vsf_linux_findprog_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(find_in_path),
     VSF_APPLET_VPLT_ENTRY_FUNC(find_in_given_path),
@@ -5455,6 +5617,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_findprog_vplt_t vsf_linux_findprog_vplt = {
 #if VSF_LINUX_APPLET_USE_GLOB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_glob_vplt_t vsf_linux_glob_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_glob_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libglob, vsf_linux_glob_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(glob),
     VSF_APPLET_VPLT_ENTRY_FUNC(globfree),
@@ -5464,6 +5627,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_glob_vplt_t vsf_linux_glob_vplt = {
 #if VSF_LINUX_APPLET_USE_REGEX == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_regex_vplt_t vsf_linux_regex_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_regex_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libregex, vsf_linux_regex_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(regcomp),
     VSF_APPLET_VPLT_ENTRY_FUNC(regerror),
@@ -5475,6 +5639,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_regex_vplt_t vsf_linux_regex_vplt = {
 #if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_fnmatch_vplt_t vsf_linux_fnmatch_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_fnmatch_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libfnmatch, vsf_linux_fnmatch_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(fnmatch),
 };

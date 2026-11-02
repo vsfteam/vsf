@@ -77,6 +77,7 @@ static inline int setrlimit(int resource, struct rlimit *rlptr)
 #if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
 typedef struct vsf_linux_sys_resource_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_resource);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpriority);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setpriority);

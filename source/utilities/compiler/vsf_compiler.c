@@ -13,6 +13,7 @@ int __paritysi2(unsigned int a)
 
 __VSF_VPLT_DECORATOR__ vsf_compiler_vplt_t vsf_compiler_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_compiler_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libcompiler, vsf_compiler_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__paritysi2),
 };

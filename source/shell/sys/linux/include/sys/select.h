@@ -47,6 +47,7 @@ typedef struct fd_set {
 #if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED
 typedef struct vsf_linux_sys_select_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_select);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(select);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pselect);

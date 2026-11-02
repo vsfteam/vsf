@@ -33,6 +33,7 @@ typedef vsf_sem_t sem_t;
 #if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
 typedef struct vsf_linux_semaphore_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsemaphore);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_init);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_destroy);

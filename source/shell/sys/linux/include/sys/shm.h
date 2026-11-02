@@ -40,6 +40,7 @@ struct shmid_ds {
 #if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
 typedef struct vsf_linux_sys_shm_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_shm);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shmget);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shmat);

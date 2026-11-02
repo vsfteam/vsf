@@ -149,6 +149,7 @@ struct stat64 {
 #if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
 typedef struct vsf_linux_sys_stat_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_stat);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(umask);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stat);

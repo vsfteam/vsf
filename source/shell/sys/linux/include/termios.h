@@ -216,6 +216,7 @@ struct termios {
 #if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED
 typedef struct vsf_linux_termios_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libtermios);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcgetattr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcsetattr);

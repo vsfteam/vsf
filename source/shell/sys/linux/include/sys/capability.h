@@ -22,6 +22,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
 typedef struct vsf_linux_sys_capability_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_capability);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(capget);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(capset);

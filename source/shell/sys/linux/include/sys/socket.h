@@ -256,6 +256,7 @@ enum {
 #if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
 typedef struct vsf_linux_sys_socket_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_socket);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setsockopt);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getsockopt);

@@ -28,6 +28,7 @@ struct timeb {
 #if VSF_LINUX_APPLET_USE_SYS_TIMEB == ENABLED
 typedef struct vsf_linux_sys_timeb_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_timeb);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ftime);
 } vsf_linux_sys_timeb_vplt_t;

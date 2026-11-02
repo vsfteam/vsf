@@ -379,6 +379,7 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_USE_APPLET == ENABLED
 typedef struct vsf_linux_fundmental_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libfundmental);
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_dynlib_ctx_get);

@@ -60,6 +60,7 @@
 #if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_setjmp_vplt_t vsf_linux_libc_setjmp_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_setjmp_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_setjmp, vsf_linux_libc_setjmp_vplt),
 
 #ifdef VSF_ARCH_SETJMP
     VSF_APPLET_VPLT_ENTRY_FUNC_EX(fn_setjmp, "setjmp", VSF_ARCH_SETJMP),
@@ -112,6 +113,7 @@ static inline int __builtin_fpclassifyld(long double x) {
 
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_math_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_math, vsf_linux_libc_math_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(atan),
     VSF_APPLET_VPLT_ENTRY_FUNC(cos),
@@ -364,6 +366,7 @@ wchar_t * wmemmove(wchar_t *dest, const wchar_t *src, size_t n)
 
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_wchar_vplt_t vsf_linux_libc_wchar_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_wchar_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_wchar, vsf_linux_libc_wchar_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(wcslen),
     VSF_APPLET_VPLT_ENTRY_FUNC(wcscat),

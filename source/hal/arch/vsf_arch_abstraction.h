@@ -569,6 +569,7 @@ extern uint_fast8_t vsf_clz32(uint_fast32_t);
 #if VSF_APPLET_USE_ARCH == ENABLED
 typedef struct vsf_arch_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libarch);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(bswap_16);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(bswap_32);

@@ -36,6 +36,7 @@ struct group {
 #if VSF_LINUX_APPLET_USE_GRP == ENABLED
 typedef struct vsf_linux_grp_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libgrp);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(initgroups);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgroups);

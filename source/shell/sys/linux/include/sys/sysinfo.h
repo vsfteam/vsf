@@ -34,6 +34,7 @@ struct sysinfo {
 #if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED
 typedef struct vsf_linux_sys_info_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_sysinfo);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sysinfo);
 } vsf_linux_sys_info_vplt_t;

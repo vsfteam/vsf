@@ -1082,6 +1082,7 @@ static void __qsort(void *base, size_t nitems, size_t size, int (*compar)(const 
 
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdlib_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_stdlib, vsf_linux_libc_stdlib_vplt),
 
 #if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____malloc_ex),

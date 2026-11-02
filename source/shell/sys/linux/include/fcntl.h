@@ -106,6 +106,7 @@ struct flock {
 #if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
 typedef struct vsf_linux_fcntl_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libfcntl);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__fcntl_va);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fcntl);

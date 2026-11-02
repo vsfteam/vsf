@@ -38,7 +38,7 @@ typedef struct vsf_mbedtls_vplt_t {
     vsf_vplt_info_t info;
 
     // self
-    VSF_APPLET_VPLT_ENTRY_MOD_DEF(mbedtls);
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libmbedtls);
 
     // <mbedtls/version.h>
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_version_get_number);

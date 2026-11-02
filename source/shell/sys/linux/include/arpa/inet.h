@@ -36,6 +36,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
 typedef struct vsf_linux_arpa_inet_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libarpa_inet);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_addr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_lnaof);

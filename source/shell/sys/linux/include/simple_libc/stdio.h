@@ -171,6 +171,7 @@ typedef struct __VSF_STDIO_INTERNAL_FILE_NAME {
 #if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
 typedef struct vsf_linux_libc_stdio_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libc_stdio);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_stdin);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_stdout);

@@ -69,6 +69,7 @@ char * dirname(char *path)
 #if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libgen_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libgen, vsf_linux_libgen_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(basename),
     VSF_APPLET_VPLT_ENTRY_FUNC(dirname),

@@ -68,6 +68,7 @@ struct epoll_event {
 #if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
 typedef struct vsf_linux_sys_epoll_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_epoll);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(epoll_create);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(epoll_create1);

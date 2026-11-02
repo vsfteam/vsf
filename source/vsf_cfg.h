@@ -226,6 +226,7 @@ struct vsf_applet_ctx_t {
     char **argv;
     char **envp;
     void *vplt;
+    void * (*fn_vplt_link)(void *vplt, char *symname);
 };
 #endif
 
@@ -301,9 +302,9 @@ VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_applet_remap(vsf_applet_ctx_t 
         }                                                                       \
         return __vplt;                                                          \
     }                                                                           \
+    static vsf_applet_ctx_t *__vsf_applet_ctx = (vsf_applet_ctx_t *)0;          \
     VSF_APPLET_VPLT_ENTRY_DECORATOR void * vsf_applet_remap(vsf_applet_ctx_t *applet_ctx, void *vaddr)\
     {                                                                           \
-        static vsf_applet_ctx_t *__vsf_applet_ctx = (vsf_applet_ctx_t *)0;      \
         void *realptr = (void *)0;                                              \
         if (applet_ctx != (vsf_applet_ctx_t *)0) {                              \
             __vsf_applet_ctx = applet_ctx;                                      \
@@ -316,10 +317,11 @@ VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_applet_remap(vsf_applet_ctx_t 
     }                                                                           \
     VSF_APPLET_VPLT_ENTRY_DECORATOR void * vsf_vplt_link(void *vplt, char *symname)\
     {                                                                           \
-        vsf_vplt_t *root_vplt = vsf_vplt((void *)0);                            \
-        return ((void * (*)(void *vplt, char *symname))                         \
-                    (((vsf_applet_vplt_t *)root_vplt->applet_vplt)->fn_vsf_vplt_link.ptr))\
-                (vplt, symname);                                                \
+        if ((__vsf_applet_ctx == (vsf_applet_ctx_t *)0)                         \
+                || (__vsf_applet_ctx->fn_vplt_link == (void * (*)(void *, char *))0)) {\
+            return (void *)0;                                                   \
+        }                                                                       \
+        return __vsf_applet_ctx->fn_vplt_link(vplt, symname);                   \
     }                                                                           \
     applet_raw_entry                                                            \
     int main(__VA_ARGS__)
@@ -329,6 +331,7 @@ VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_applet_remap(vsf_applet_ctx_t 
 
 typedef struct vsf_applet_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libapplet);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_applet_ctx);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_trace_arg);

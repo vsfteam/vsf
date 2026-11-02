@@ -213,6 +213,10 @@ typedef struct Elf32_Dyn {
 #define DT_RELSZ        18
 #define DT_RELENT       19
 #define DT_PLTREL       20
+#define DT_INIT_ARRAY   25
+#define DT_FINI_ARRAY   26
+#define DT_INIT_ARRAYSZ 27
+#define DT_FINI_ARRAYSZ 28
 #define DT_DEBUG        21
 #define DT_TEXTREL      22
 #define DT_JMPREL       23

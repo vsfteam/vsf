@@ -34,6 +34,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_DLFCN == ENABLED
 typedef struct vsf_linux_dlfcn_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libdlfcn);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dlopen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dlclose);

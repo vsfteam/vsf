@@ -136,6 +136,7 @@ struct vsf_loader_target_t {
      \~chinese 目标，可以是文件、指针等等。
     */
     uintptr_t object;
+    const char *name;
 
     /**
      \~english whether xip is supported. Whether to use xip is detected in loader.

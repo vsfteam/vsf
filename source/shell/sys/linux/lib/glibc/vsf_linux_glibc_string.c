@@ -187,6 +187,7 @@ char * strdup(const char *str)
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_string_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libc_string, vsf_linux_libc_string_vplt),
 
 #if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____strdup_ex),

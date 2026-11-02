@@ -1089,6 +1089,7 @@ bool vsf_arch_init(void)
 #if VSF_APPLET_USE_ARCH == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_arch_vplt_t vsf_arch_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_arch_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libarch, vsf_arch_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(bswap_16),
     VSF_APPLET_VPLT_ENTRY_FUNC(bswap_32),

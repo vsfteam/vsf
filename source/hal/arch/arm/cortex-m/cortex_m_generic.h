@@ -204,6 +204,7 @@ typedef enum vsf_arch_prio_t {
 //  refer to: https://github.com/ARM-software/abi-aa/releases/download/2023Q1/rtabi32.pdf
 typedef struct vsf_arch_abi_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libarch_abi);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cdcmpeq);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cdcmple);

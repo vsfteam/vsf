@@ -480,6 +480,7 @@ static inline void libusb_set_iso_packet_lengths(
 #if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
 typedef struct vsf_linux_libusb_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(libusb);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_strerror);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_version);

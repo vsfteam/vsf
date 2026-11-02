@@ -47,7 +47,7 @@
 
 __VSF_VPLT_DECORATOR__ vsf_freetype_vplt_t vsf_freetype_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_freetype_vplt_t, 0, 0, true),
-    VSF_APPLET_VPLT_ENTRY_MOD(freetype, vsf_freetype_vplt),
+    VSF_APPLET_VPLT_ENTRY_MOD(libfreetype, vsf_freetype_vplt),
 
     // Core APIs
     //  Library Setup

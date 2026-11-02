@@ -200,19 +200,26 @@ int vsf_peloader_load(vsf_peloader_t *peloader, vsf_loader_target_t *target)
                 }
             }
 
-            int total_byte_size = sizeof(vsf_vplt_info_t) + export->NumberOfNames * sizeof(vsf_vplt_entry_t) + namelen;
+            char *module_name = ram_base + export->Name;
+            int total_byte_size = sizeof(vsf_vplt_info_t)
+                + (export->NumberOfNames + 1) * sizeof(vsf_vplt_entry_t)
+                + namelen + strlen(module_name) + 1;
             peloader->vplt_out = peloader->alloc_vplt(total_byte_size);
             if (NULL == peloader->vplt_out) {
                 goto free_and_fail;
             }
 
             vsf_vplt_info_t *vplt_info = peloader->vplt_out;
-            vplt_info->entry_num = export->NumberOfNames;
+            vplt_info->entry_num = export->NumberOfNames + 1;
             vplt_info->final = true;
             vplt_info->major = 0;
             vplt_info->minor = 0;
             vsf_vplt_entry_t *vplt_entry = (vsf_vplt_entry_t *)&vplt_info[1];
-            char *cur_name = (char *)vplt_entry + export->NumberOfNames * sizeof(vsf_vplt_entry_t);
+            char *cur_name = (char *)vplt_entry + (export->NumberOfNames + 1) * sizeof(vsf_vplt_entry_t);
+            vplt_entry->name = cur_name + namelen;
+            vplt_entry->ptr = vplt_info;
+            strcpy((char *)vplt_entry->name, module_name);
+            vplt_entry++;
             for (DWORD i = 0; i < export->NumberOfNames; i++) {
                 name = ram_base + *(DWORD *)(ram_base + name_vaddr + i * sizeof(DWORD));
                 nameidx = *(WORD *)(ram_base + ord_vaddr + i * sizeof(WORD));

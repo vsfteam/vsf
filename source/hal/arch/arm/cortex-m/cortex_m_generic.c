@@ -750,6 +750,7 @@ extern void *__aeabi_read_tp(void);
 
 __VSF_VPLT_DECORATOR__ vsf_arch_abi_vplt_t vsf_arch_abi_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_arch_abi_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(libarch_abi, vsf_arch_abi_vplt),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cdcmpeq),
     VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cdcmple),
