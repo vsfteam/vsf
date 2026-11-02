@@ -882,6 +882,7 @@ void __vsf_linux_process_free_arg(vsf_linux_process_t *process)
         __free_ex(process, arg->argv);
         arg->argv = NULL;
     }
+    arg->argc = 0;
 }
 
 int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, vsf_linux_process_arg_t *arg, char * const * argv)
