@@ -32,7 +32,7 @@
 
 /*============================ MACROS ========================================*/
 
-// \note    Queue_stream can use be used in interrupt, because heap is used for buffer allocation.
+// \note    Queue_stream can not use be used in interrupt, because heap is used for buffer allocation.
 #define __VSF_QUEUE_STREAM_CFG_PROTECT_LEVEL    scheduler
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
