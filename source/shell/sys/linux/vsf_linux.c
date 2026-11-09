@@ -5289,6 +5289,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_getreent),
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
+    VSF_APPLET_VPLT_ENTRY_FUNC_EX(fn___errno, "__errno", __vsf_linux_errno),
 };
 #endif
 

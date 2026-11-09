@@ -22,8 +22,8 @@ typedef struct vsf_linux_reent_vplt_t {
     VSF_APPLET_VPLT_ENTRY_MOD_DEF(libsys_reent);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_getreent);
-    // implement __vsf_linux_errno for compatibility because older image need this
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_errno);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__errno);
 } vsf_linux_reent_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_reent_vplt_t vsf_linux_reent_vplt;
