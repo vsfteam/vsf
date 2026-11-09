@@ -1080,6 +1080,24 @@ static void __qsort(void *base, size_t nitems, size_t size, int (*compar)(const 
 }
 #endif
 
+static int __vsf_linux_rand(void)
+{
+    struct _reent *reent = __vsf_linux_getreent();
+    if (!reent->_rand_seeded) {
+        reent->_rand_state = 1;
+        reent->_rand_seeded = 1;
+    }
+    reent->_rand_state = reent->_rand_state * 1103515245u + 12345u;
+    return (int)((reent->_rand_state >> 16) & RAND_MAX);
+}
+
+static void __vsf_linux_srand(unsigned int seed)
+{
+    struct _reent *reent = __vsf_linux_getreent();
+    reent->_rand_state = seed;
+    reent->_rand_seeded = 1;
+}
+
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdlib_vplt_t, 0, 0, true),
     VSF_APPLET_VPLT_ENTRY_MOD(libc_stdlib, vsf_linux_libc_stdlib_vplt),
@@ -1144,8 +1162,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(qsort),
 #endif
 
-    VSF_APPLET_VPLT_ENTRY_FUNC(rand),
-    VSF_APPLET_VPLT_ENTRY_FUNC(srand),
+    VSF_APPLET_VPLT_ENTRY_FUNC_EX(fn_rand, "rand", __vsf_linux_rand),
+    VSF_APPLET_VPLT_ENTRY_FUNC_EX(fn_srand, "srand", __vsf_linux_srand),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(abort),
     VSF_APPLET_VPLT_ENTRY_FUNC(system),

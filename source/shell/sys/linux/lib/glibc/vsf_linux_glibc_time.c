@@ -704,6 +704,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(localtime),
     VSF_APPLET_VPLT_ENTRY_FUNC(localtime_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(mktime),
+    VSF_APPLET_VPLT_ENTRY_FUNC(timegm),
     VSF_APPLET_VPLT_ENTRY_FUNC(strftime),
     VSF_APPLET_VPLT_ENTRY_FUNC(strptime),
     VSF_APPLET_VPLT_ENTRY_FUNC(nanosleep),

@@ -2,6 +2,7 @@
 #define __VSF_LINUX_SYS_REENT_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,6 +10,8 @@ extern "C" {
 
 struct _reent {
     int _errno;
+    uint32_t _rand_state;
+    uint8_t _rand_seeded;
 };
 
 #define __errno_r(r)  ((r)->_errno)
