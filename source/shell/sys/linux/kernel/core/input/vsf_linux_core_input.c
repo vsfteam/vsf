@@ -128,7 +128,8 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
                 vsf_input_touchscreen_set(&evt.ts_evt,
                     dev->absinfo[ABS_MT_TRACKING_ID].value,
                     !!vsf_bitmap_get(&dev->key_bitmap, BTN_TOUCH),
-                    dev->absinfo[ABS_MT_PRESSURE].value,
+                    !!vsf_bitmap_get(&dev->key_bitmap, BTN_TOUCH)
+                        ? dev->absinfo[ABS_MT_PRESSURE].value : 0,
                     dev->absinfo[ABS_X].value,
                     dev->absinfo[ABS_Y].value);
                 vsf_input_on_touchscreen(&evt.ts_evt);

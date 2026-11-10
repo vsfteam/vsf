@@ -35,10 +35,12 @@ VSF_CAL_WEAK(vsf_input_on_touchscreen)
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
 #if VSF_INPUT_TOUCH_SCREEN_CFG_TRACE == ENABLED
-    if (vsf_input_touchscreen_is_down(ts_evt)) {
+    bool is_down = vsf_input_touchscreen_is_down(ts_evt);
+    if (is_down || vsf_input_touchscreen_is_xy_valid(ts_evt)) {
         vsf_trace_debug("touch_screen(%d): (%d, %d) %d" VSF_TRACE_CFG_LINEEND,
             vsf_input_touchscreen_get_id(ts_evt), vsf_input_touchscreen_get_x(ts_evt),
-            vsf_input_touchscreen_get_y(ts_evt), vsf_input_touchscreen_get_pressure(ts_evt));
+            vsf_input_touchscreen_get_y(ts_evt),
+            is_down ? vsf_input_touchscreen_get_pressure(ts_evt) : 0);
     } else {
         vsf_trace_debug("touch_screen(%d): (-1, -1) 0" VSF_TRACE_CFG_LINEEND,
             vsf_input_touchscreen_get_id(ts_evt));

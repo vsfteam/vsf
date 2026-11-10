@@ -32,13 +32,25 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+// cur.valu64: x[0:15], y[16:31], pressure[32:47], xy_valid[48].
 // prototype: vsf_input_touchscreen_set(vk_touchscreen_evt_t *evt, uint8_t id,
-//                      bool is_done, uint16_t x, uint16_t y, uint16_t pressure);
-#define vsf_input_touchscreen_set(__evt, __id, __is_down, __pressure, __x, __y) \
+//                      bool is_down, uint16_t pressure, uint16_t x, uint16_t y,
+//                      bool xy_valid = true);
+// pressure must be 0 for UP events(is_down == false).
+#define __vsf_input_touchscreen_set6(__evt, __id, __is_down, __pressure, __x, __y) \
+            __vsf_input_touchscreen_set7(                                         \
+                __evt, __id, __is_down, __pressure, __x, __y, true)
+#define __vsf_input_touchscreen_set7(__evt, __id, __is_down, __pressure, __x, __y, __xy_valid) \
             do {                                                                \
                 (__evt)->id = ((__id) | (!!(__is_down) << 8));                  \
-                (__evt)->cur.valu64 = (__x) | ((__y) << 16) | ((uint64_t)(__pressure) << 32);\
+                (__evt)->cur.valu64 = (__x) | ((__y) << 16)                     \
+                    | ((uint64_t)(__pressure) << 32)                            \
+                    | ((uint64_t)(!!(__xy_valid)) << 48);                       \
             } while (0)
+#define vsf_input_touchscreen_set(__evt, __id, __is_down, __pressure, __x, __y, ...) \
+            __PLOOC_EVAL(__vsf_input_touchscreen_set,                             \
+                (__evt), (__id), (__is_down), (__pressure), (__x), (__y), ##__VA_ARGS__) \
+                ((__evt), (__id), (__is_down), (__pressure), (__x), (__y), ##__VA_ARGS__)
 
 #define vsf_input_touchscreen_get_id(__evt)                                     \
             ((uint8_t)(((__evt)->id >> 0) & 0xFF))
@@ -50,6 +62,8 @@ extern "C" {
             ((uint16_t)(((__evt)->cur.valu64 >> 16) & 0xFFFF))
 #define vsf_input_touchscreen_get_pressure(__evt)                               \
             ((uint16_t)(((__evt)->cur.valu64 >> 32) & 0xFFFF))
+#define vsf_input_touchscreen_is_xy_valid(__evt)                                \
+            (!!(((__evt)->cur.valu64 >> 48) & 1))
 
 /*============================ TYPES =========================================*/
 

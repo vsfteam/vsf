@@ -64,14 +64,15 @@ static const uint8_t __vk_input_gt9xx_addr_tab[] = {
 /*============================ IMPLEMENTATION ================================*/
 
 static void __vk_input_gt9xx_report(vk_input_gt9xx_t *gt9xx, uint8_t id,
-                bool is_down, uint16_t x, uint16_t y, uint16_t pressure)
+                bool is_down, uint16_t x, uint16_t y, uint16_t pressure,
+                bool xy_valid)
 {
     vk_touchscreen_evt_t ts_evt = {
         .dev            = gt9xx,
         .info.width     = gt9xx->width,
         .info.height    = gt9xx->height,
     };
-    vsf_input_touchscreen_set(&ts_evt, id, is_down, pressure, x, y);
+    vsf_input_touchscreen_set(&ts_evt, id, is_down, pressure, x, y, xy_valid);
     vsf_input_on_touchscreen(&ts_evt);
 }
 
@@ -90,14 +91,14 @@ static void __vk_input_gt9xx_read_touch(vk_input_gt9xx_t *gt9xx)
             uint16_t size = point[5] | ((uint16_t)point[6] << 8);
 
             cur_down |= 1 << id;
-            __vk_input_gt9xx_report(gt9xx, id, true, x, y, size);
+            __vk_input_gt9xx_report(gt9xx, id, true, x, y, size, true);
         }
     }
     // releases for track ids no longer reported(the controller only
     // reports active fingers; a vanished one is an implicit release)
     for (uint8_t id = 0; id < GT9XX_MAX_TOUCH; id++) {
         if ((gt9xx->last_down & ~cur_down) & (1 << id)) {
-            __vk_input_gt9xx_report(gt9xx, id, false, 0, 0, 0);
+            __vk_input_gt9xx_report(gt9xx, id, false, 0, 0, 0, false);
         }
     }
     gt9xx->last_down = cur_down;

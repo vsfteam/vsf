@@ -93,7 +93,7 @@ static void __vk_input_cst8_i2c_isrhandler(void *target_ptr, vsf_i2c_t *i2c_ptr,
                 uint16_t x = ((cst8->xpos_h & 0x0F) << 8) | cst8->xpos_l;
                 uint16_t y = ((cst8->ypos_h & 0x0F) << 8) | cst8->ypos_l;
 
-                vsf_input_touchscreen_set(&ts_evt, 0, is_down, 0, x, y);
+                vsf_input_touchscreen_set(&ts_evt, 0, is_down, 0, x, y, is_down);
                 vsf_input_on_touchscreen(&ts_evt);
             }
         enable_exti:

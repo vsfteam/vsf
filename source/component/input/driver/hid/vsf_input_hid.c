@@ -198,7 +198,7 @@ void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt)
                 .info.width = __width,
             };
 
-            vsf_input_touchscreen_set(&ts_evt, __id, __is_down, __pressure, __x, __y);
+            vsf_input_touchscreen_set(&ts_evt, __id, __is_down, __is_down ? __pressure : 0, __x, __y);
             vsf_input_on_touchscreen(&ts_evt);
 
             goto reset;
