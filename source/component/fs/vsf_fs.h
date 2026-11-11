@@ -145,7 +145,8 @@ struct vk_fs_info_t {
 
 #if defined(__VSF_FS_CLASS_INHERIT__) || defined(__VSF_FS_CLASS_IMPLEMENT)
 typedef enum vk_vfs_file_attr_t {
-    VSF_VFS_FILE_ATTR_MOUNTED   = VSF_FILE_ATTR_EXT,
+    VSF_VFS_FILE_ATTR_MOUNTED       = VSF_FILE_ATTR_EXT,
+    VSF_VFS_FILE_ATTR_BOUND_TARGET  = VSF_FILE_ATTR_MAX,
 } vk_vfs_file_attr_t;
 
 vsf_class(vk_vfs_file_t) {

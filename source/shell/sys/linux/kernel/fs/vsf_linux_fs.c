@@ -2860,7 +2860,7 @@ int vsf_linux_fd_bind_target_ex(int fd,
     vfs_file->f.param = target;
     vfs_file->f.callback.fn_read = peda_read;
     vfs_file->f.callback.fn_write = peda_write;
-    vfs_file->attr = feature;
+    vfs_file->attr = feature | VSF_VFS_FILE_ATTR_BOUND_TARGET;
     vfs_file->size = size;
     vfs_file->f.op = (void *)op;
     return 0;

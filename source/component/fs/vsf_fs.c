@@ -1146,7 +1146,8 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
                         vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, child);
                     vsf_unprotect_sched(orig);
 #if VSF_USE_HEAP == ENABLED
-                    if (    (NULL == child->f.callback.fn_read)
+                    if (    !(child->attr & VSF_VFS_FILE_ATTR_BOUND_TARGET)
+                        &&  (NULL == child->f.callback.fn_read)
                         &&  (NULL == child->f.callback.fn_write)
                         &&  (NULL != child->f.param)) {
                         vsf_heap_free(child->f.param);
@@ -1331,6 +1332,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_close, vk_file_close)
 
 #if VSF_USE_HEAP == ENABLED
     if (    !is_dir
+        &&  !(file->attr & VSF_VFS_FILE_ATTR_BOUND_TARGET)
         &&  (NULL == file->f.callback.fn_read)
         &&  (NULL == file->f.callback.fn_write)
         &&  (NULL != file->f.param)) {
