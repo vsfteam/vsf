@@ -207,11 +207,17 @@ static VSF_CAL_ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size
    *
    */
 
+#if defined(__VSF_APPLET__) && VSF_USE_LINUX == ENABLED
+#define ft_sfree     free
+#define ft_smalloc   malloc
+#define ft_srealloc  realloc
+#else
 #include "service/vsf_service.h"
 
 #define ft_sfree     vsf_heap_free
 #define ft_smalloc   vsf_heap_malloc
 #define ft_srealloc  vsf_heap_realloc
+#endif
 
 static inline void * ft_scalloc(unsigned int num, unsigned int size) {
     unsigned int totalsize = num * size;
