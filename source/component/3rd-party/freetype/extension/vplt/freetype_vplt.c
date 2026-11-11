@@ -36,6 +36,11 @@
 #include FT_IMAGE_H
 #include FT_OUTLINE_H
 #include FT_BBOX_H
+#include FT_MODULE_H
+#include FT_RENDER_H
+#include FT_TRUETYPE_TABLES_H
+#include FT_FONT_FORMATS_H
+#include FT_STROKER_H
 
 #include "./freetype_vplt.h"
 
@@ -68,8 +73,8 @@ __VSF_VPLT_DECORATOR__ vsf_freetype_vplt_t vsf_freetype_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Set_Pixel_Sizes),
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Request_Size),
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Select_Size),
-#if FREETYPE_MAJOR >= 2 && FREETYPE_MINOR >= 11
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Set_Transform),
+#if FREETYPE_MAJOR >= 2 && FREETYPE_MINOR >= 11
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_Transform),
 #endif
     //  Glyph
@@ -200,6 +205,50 @@ VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_Color_Glyph_Paint),
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Bitmap_Blend),
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_GlyphSlot_Own_Bitmap),
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Bitmap_Done),
+
+    //  Module Management
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Add_Module),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_Module),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Remove_Module),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Add_Default_Modules),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Property_Set),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Property_Get),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Set_Default_Properties),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_New_Library),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Done_Library),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Reference_Library),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_Renderer),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Set_Renderer),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Set_Debug_Hook),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_TrueType_Engine_Type),
+    //  TrueType Tables
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_Sfnt_Table),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Load_Sfnt_Table),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Sfnt_Table_Info),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_CMap_Language_ID),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_CMap_Format),
+    //  Font Formats
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_Font_Format),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Get_X11_Font_Format),
+    //  Glyph Stroker
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Outline_GetInsideBorder),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Outline_GetOutsideBorder),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Glyph_Stroke),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Glyph_StrokeBorder),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_New),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_Set),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_Rewind),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_ParseOutline),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_Done),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_BeginSubPath),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_EndSubPath),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_LineTo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_ConicTo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_CubicTo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_GetBorderCounts),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_ExportBorder),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_GetCounts),
+    VSF_APPLET_VPLT_ENTRY_FUNC(FT_Stroker_Export),
 
     // Error
     VSF_APPLET_VPLT_ENTRY_FUNC(FT_Error_String),
