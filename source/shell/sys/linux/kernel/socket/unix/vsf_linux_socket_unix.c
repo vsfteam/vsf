@@ -187,7 +187,7 @@ static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *bu
     vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)sfd->priv;
     const struct msghdr *msg = priv->msg_tx;
 
-    if ((msg->msg_control != NULL) && (msg->msg_controllen > 0)) {
+    if ((msg != NULL) && (msg->msg_control != NULL) && (msg->msg_controllen > 0)) {
         VSF_LINUX_ASSERT(NULL == priv->target);
         struct msghdr *tx_msg = __malloc_ex(vsf_linux_resources_process(), sizeof(*msg) + msg->msg_controllen);
         if (NULL == priv->target) {
