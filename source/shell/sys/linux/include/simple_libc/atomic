@@ -29,6 +29,8 @@
 
 namespace std {
     // copied from stdatomic.h
+    // If MSVC reports a memory_order conflict, add simple_libc/arch/win to
+    // the Windows project's include path to use the VSF <xatomic.h> shim.
     enum memory_order {
         memory_order_relaxed,
         memory_order_consume,
