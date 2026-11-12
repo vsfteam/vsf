@@ -462,6 +462,10 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             vsf_input_on_keyboard(&evt.keyboard_evt);
             break;
         case VSF_INPUT_TYPE_MOUSE:
+            if (mouse_evt != VSF_INPUT_MOUSE_EVT_WHEEL) {
+                x = vsf_min(vsf_max((int16_t)x, 0), disp_wingdi->param.width - 1);
+                y = vsf_min(vsf_max((int16_t)y, 0), disp_wingdi->param.height - 1);
+            }
             switch (mouse_evt) {
             case VSF_INPUT_MOUSE_EVT_BUTTON:
                 vsf_input_mouse_evt_button_set(&evt.mouse_evt, mouse_button, is_down, x, y, VSF_INPUT_MOUSE_ABSOLUTE);
