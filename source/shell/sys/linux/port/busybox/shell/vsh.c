@@ -789,6 +789,9 @@ int vsh_main(int argc, char *argv[])
             ssize_t rsize;
             while ((rsize = read(STDIN_FILENO, &ch, 1)) != 1) {
                 // rsize == 0 means EOF, rsize < 0 means error
+                if (0 == rsize) {
+                    return 0;
+                }
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
                 if ((rsize < 0) && (EINTR == errno) && isatty(STDIN_FILENO)) {
                     write(STDOUT_FILENO, "^C" VSH_LINEEND, sizeof("^C" VSH_LINEEND) - 1);
