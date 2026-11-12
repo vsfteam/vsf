@@ -183,6 +183,7 @@ void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
 void __vsf_linux_term_input(vsf_linux_term_priv_t *priv, const uint8_t *buf, uint_fast32_t size);
 void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv);
 
+static void __vsf_linux_pipe_init(vsf_linux_fd_t *sfd);
 int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
@@ -251,6 +252,7 @@ const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
 const vsf_linux_fd_op_t vsf_linux_pipe_fdop = {
     .priv_size          = sizeof(vsf_linux_pipe_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_init            = __vsf_linux_pipe_init,
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_read            = __vsf_linux_stream_read,
     .fn_write           = __vsf_linux_stream_write,
@@ -1883,7 +1885,7 @@ __open_again_do:
         __vsf_linux_fs_close_do(file);
     } else {
         vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-        priv->flags = flags;
+        priv->flags = flags | (file->attr & __VSF_FILE_ATTR_SHARE_PRIV);
         priv->file = file;
 
         if (sfd->op->fn_init != NULL) {
@@ -2051,7 +2053,7 @@ int __fcntl_va(int fd, int cmd, va_list ap)
     case F_SETFL: {
             long tmp_arg = arg;
             arg = arg ^ sfd->priv->flags;
-            sfd->priv->flags = tmp_arg;
+            sfd->priv->flags = (sfd->priv->flags & __VSF_FILE_ATTR_SHARE_PRIV) | tmp_arg;
             result = 0;
         }
         break;
@@ -3367,7 +3369,7 @@ static void __vsf_linux_stream_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
 
-    if (priv->file != NULL) {
+    if ((sfd->op == &__vsf_linux_stream_fdop) && (priv->file != NULL)) {
         vsf_stream_t **streams = (vsf_stream_t **)(((vk_vfs_file_t *)(priv->file))->f.param);
         VSF_LINUX_ASSERT(streams != NULL);
 
@@ -3380,6 +3382,23 @@ static void __vsf_linux_stream_init(vsf_linux_fd_t *sfd)
     }
     if (priv->stream_tx != NULL) {
         __vsf_linux_tx_stream_init(priv);
+    }
+}
+
+static void __vsf_linux_pipe_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_pipe_priv_t *priv = (vsf_linux_pipe_priv_t *)sfd->priv;
+    if ((priv->stream_rx != NULL) && !vsf_stream_is_tx_connected(priv->stream_rx)) {
+        __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+        if (!vsf_stream_is_tx_connected(priv->stream_rx)) {
+            vsf_stream_connect_tx(priv->stream_rx);
+        }
+    }
+    if ((priv->stream_tx != NULL) && !vsf_stream_is_rx_connected(priv->stream_tx)) {
+        __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+        if (!vsf_stream_is_rx_connected(priv->stream_tx)) {
+            vsf_stream_connect_rx(priv->stream_tx);
+        }
     }
 }
 
@@ -3486,6 +3505,8 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
             priv->pipe_remote->pipe_remote = NULL;
         }
         vsf_unprotect_sched(orig);
+    }
+    if ((priv->file != NULL) || !(priv->flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
         result = __vsf_linux_stream_close(sfd);
     }
     return result;
@@ -3730,7 +3751,11 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     sfd->fd_flags |= __FD_READALL;
 
     const vsf_linux_fd_op_t *subop = priv->subop;
-    if ((subop != NULL) && (subop->fn_init != NULL) && !priv->subop_inited) {
+    if (    (subop != NULL) && (subop->fn_init != NULL)
+        &&  (   !priv->subop_inited
+            ||  (   (subop == &vsf_linux_pipe_fdop)
+                &&  (   ((priv->stream_rx != NULL) && !vsf_stream_is_tx_connected(priv->stream_rx))
+                    ||  ((priv->stream_tx != NULL) && !vsf_stream_is_rx_connected(priv->stream_tx)))))) {
         subop->fn_init(sfd);
         priv->subop_inited = true;
     }
