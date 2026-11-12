@@ -795,8 +795,10 @@ static vk_usbh_urb_t * __vk_usbh_control_msg_common(vk_usbh_t *usbh, vk_usbh_dev
         dev->is_ep0_rdy = true;
     }
 
+    uint_fast32_t buffer_size = urb_hcd->buffer ? urb_hcd->transfer_length : 0;
     urb_hcd->transfer_length = req->wLength;
-    if (    !urb_hcd->buffer && (req->wLength > 0)
+    if (    (req->wLength > 0)
+        &&  ((urb_hcd->buffer == NULL) || (req->wLength > buffer_size))
         &&  !vk_usbh_urb_alloc_buffer(urb, req->wLength)) {
         return NULL;
     }
