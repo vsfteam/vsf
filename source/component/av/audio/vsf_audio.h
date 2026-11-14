@@ -234,6 +234,10 @@ extern void vsf_audio_capture_ticktock_stream_adapter_init(vsf_audio_ticktock_st
 #   if VSF_AUDIO_USE_AIC1000A == ENABLED
 #       include "./driver/aic1000a/vsf_aic1000a.h"
 #   endif
+
+#   if VSF_AUDIO_USE_ES8389 == ENABLED
+#       include "./driver/es8389/vsf_es8389.h"
+#   endif
 #endif
 
 #endif      // VSF_USE_AUDIO
