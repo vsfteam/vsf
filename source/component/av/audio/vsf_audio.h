@@ -210,6 +210,8 @@ extern void vsf_audio_playback_ticktock_stream_adapter_init(vsf_audio_ticktock_s
 extern void vsf_audio_capture_ticktock_stream_adapter_init(vsf_audio_ticktock_stream_adapter_t *adapter);
 #endif
 
+extern void vsf_audio_ticktock_stream_adapter_fini(vsf_audio_ticktock_stream_adapter_t *adapter);
+
 #ifdef __cplusplus
 }
 #endif

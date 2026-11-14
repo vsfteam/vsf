@@ -127,7 +127,21 @@ vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx)
 static void __vsf_audio_ticktock_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vsf_audio_ticktock_stream_adapter_t *adapter = param;
+#if VSF_AUDIO_CFG_TICKTOCK_STREAM_ADAPTER_DIRECT == ENABLED
+    adapter->eda.fn.evthandler(&adapter->eda,
+        (evt << 1) + (stream == adapter->stream_tx ? 0 : 1) + VSF_EVT_USER);
+#else
     vsf_eda_post_evt(&adapter->eda, (evt << 1) + (stream == adapter->stream_tx ? 0 : 1) + VSF_EVT_USER);
+#endif
+}
+
+void vsf_audio_ticktock_stream_adapter_fini(vsf_audio_ticktock_stream_adapter_t *adapter)
+{
+    vsf_stream_disconnect_tx(adapter->stream_rx);
+    vsf_stream_disconnect_rx(adapter->stream_tx);
+    vsf_stream_disconnect_rx(adapter->stream_rx);
+    vsf_stream_disconnect_tx(adapter->stream_tx);
+    vsf_eda_fini(&adapter->eda);
 }
 #endif
 
