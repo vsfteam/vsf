@@ -293,6 +293,7 @@ VSF_LINUX_APPLET_SIGNAL_IMP(sigsuspend, int, const sigset_t *set) {
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 
+// kill in VSF linux can not terminate a process, to do so a process MUST register a signal handler and do cleanup and exit itself.
 int kill(pid_t pid, int sig);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 sighandler_t signal(int signum, sighandler_t handler);
