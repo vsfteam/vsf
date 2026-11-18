@@ -110,7 +110,12 @@ static const uint8_t __vk_usbh_rh_config_descriptor[] = {
     0x81,       /*  __u8  ep_bEndpointAddress; IN Endpoint 1 */
     0x03,       /*  __u8  ep_bmAttributes; Interrupt */
     (15 + 1 + 7) / 8, 0x00, /*  __le16 ep_wMaxPacketSize; 1 + (MAX_ROOT_PORTS / 8) */
-    0xff        /*  __u8  ep_bInterval; (255ms -- usb 2.0 spec) */
+    /* bInterval must stay within the [1, 16] legal domain that
+     * __vk_usbh_get_pipe enforces for high-speed interrupt endpoints;
+     * the linux kernel carries 0xff here but never parses its own root
+     * hub descriptor, here every descriptor goes through the same pipe
+     * setup so an out-of-domain value takes the host down */
+    16          /*  __u8  ep_bInterval; */
 };
 #endif
 
