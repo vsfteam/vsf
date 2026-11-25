@@ -3551,8 +3551,14 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 int settimeofday(const struct timeval *tv, const struct timezone *tz)
 {
+#ifdef VSF_LINUX_CFG_RTC
+    // wall clock lives in the application-provided RTC instance; push the
+    // new time back into it (busybox ntpd calls xsettimeofday after a sync)
+    return vsf_rtc_set_time(&VSF_LINUX_CFG_RTC, tv->tv_sec, tv->tv_usec / 1000);
+#else
     VSF_LINUX_ASSERT(false);
     return -1;
+#endif
 }
 #endif
 

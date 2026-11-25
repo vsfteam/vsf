@@ -246,6 +246,9 @@ typedef struct vsf_linux_timer_t {
     int overrun;
     vsf_callback_timer_t timer;
     vsf_systimer_tick_t start;
+#ifdef VSF_LINUX_CFG_RTC
+    clockid_t clockid;      // kept for TIMER_ABSTIME conversion (glibc time)
+#endif
 } vsf_linux_timer_t;
 #endif
 

@@ -315,14 +315,14 @@ char * ctime_r(const time_t *t, char *buf)
 
 struct tm * gmtime_r(const time_t *timep, struct tm *result)
 {
-    static const uint16_t __lyday_month[13] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-    static const uint16_t __yday_month[13] = {-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364};
+    static const int16_t __lyday_month[13] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+    static const int16_t __yday_month[13] = {-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364};
     VSF_LINUX_ASSERT((timep != NULL) && (result != NULL));
     memset(result, 0, sizeof(struct tm));
 
     time_t caltime = *timep;
     bool is_leap_year = false;
-    const uint16_t *yday_month;
+    const int16_t *yday_month;
 
 #define SECONDS_PER_DAY             (24 * 60 * 60)
 #define SECONDS_PER_YEAR            (365 * SECONDS_PER_DAY)
@@ -412,7 +412,17 @@ int clock_getres(clockid_t clockid, struct timespec *res)
 int clock_gettime(clockid_t clockid, struct timespec *tp)
 {
     switch (clockid) {
-    case CLOCK_REALTIME:
+#ifdef VSF_LINUX_CFG_RTC
+    case CLOCK_REALTIME: {
+            vsf_rtc_time_t sec, ms;
+            if (vsf_rtc_get_time(&VSF_LINUX_CFG_RTC, &sec, &ms) != VSF_ERR_NONE) {
+                return -1;
+            }
+            tp->tv_sec = (time_t)sec;
+            tp->tv_nsec = (long)ms * 1000000L;
+        }
+        return 0;
+#endif
     case CLOCK_MONOTONIC: {
             vsf_systimer_tick_t us = vsf_systimer_get_us();
             time_t sec = us / 1000000;
@@ -428,13 +438,51 @@ int clock_gettime(clockid_t clockid, struct timespec *tp)
 
 int clock_settime(clockid_t clockid, const struct timespec *ts)
 {
+#ifdef VSF_LINUX_CFG_RTC
+    if (clockid != CLOCK_REALTIME) {
+        return -1;
+    }
+    return vsf_rtc_set_time(&VSF_LINUX_CFG_RTC, ts->tv_sec,
+            (vsf_rtc_time_t)(ts->tv_nsec / 1000000));
+#else
     VSF_LINUX_ASSERT(false);
     return -1;
+#endif
 }
 
 int clock_nanosleep(clockid_t clockid, int flags, const struct timespec *request,
                     struct timespec *remain)
 {
+#ifdef VSF_LINUX_CFG_RTC
+    struct timespec rel_req;
+    if (flags & TIMER_ABSTIME) {
+        // TIMER_ABSTIME: request is an absolute deadline on this clock.
+        // Convert to a relative duration against the clock's current time
+        // and sleep it on the systimer. Mid-sleep clock_settime jumps are
+        // not re-evaluated (documented approximation); a passed deadline
+        // returns immediately.
+        struct timespec now;
+        if (clock_gettime(clockid, &now) != 0) {
+            return -1;
+        }
+        rel_req = *request;
+        rel_req.tv_sec -= now.tv_sec;
+        rel_req.tv_nsec -= now.tv_nsec;
+        if (rel_req.tv_nsec < 0) {
+            rel_req.tv_sec--;
+            rel_req.tv_nsec += 1000 * 1000 * 1000;
+        }
+        if (    (rel_req.tv_sec < 0)
+            ||  (    (rel_req.tv_sec == 0)
+                 &&  (rel_req.tv_nsec <= 0))) {
+            return 0;           // deadline already passed
+        }
+        request = &rel_req;
+    }
+#else
+    (void) clockid;
+    (void) flags;
+#endif
     return nanosleep(request, remain);
 }
 
@@ -573,6 +621,9 @@ int timer_create(clockid_t clockid, struct sigevent *sevp, timer_t *timerid)
     }
 
     linux_timer->overrun = 0;
+#ifdef VSF_LINUX_CFG_RTC
+    linux_timer->clockid = clockid;
+#endif
     if (NULL == sevp) {
         linux_timer->evt.sigev_notify = SIGEV_SIGNAL;
         linux_timer->evt.sigev_signo = SIGALRM;
@@ -590,6 +641,30 @@ int timer_settime(timer_t timerid, int flags, const struct itimerspec *new_value
         struct itimerspec *old_value)
 {
     vsf_linux_timer_t *linux_timer = timerid;
+    struct itimerspec rel_value;
+#ifdef VSF_LINUX_CFG_RTC
+    if (flags & TIMER_ABSTIME) {
+        // absolute it_value on the timer's clock -> relative remaining, then
+        // arm on the systimer (same conversion/approximation as
+        // clock_nanosleep); an already-passed deadline fires immediately
+        struct timespec now;
+        if (clock_gettime(linux_timer->clockid, &now) != 0) {
+            return -1;
+        }
+        rel_value = *new_value;
+        rel_value.it_value.tv_sec -= now.tv_sec;
+        rel_value.it_value.tv_nsec -= now.tv_nsec;
+        if (rel_value.it_value.tv_nsec < 0) {
+            rel_value.it_value.tv_sec--;
+            rel_value.it_value.tv_nsec += 1000 * 1000 * 1000;
+        }
+        if (rel_value.it_value.tv_sec < 0) {
+            rel_value.it_value.tv_sec = 0;
+            rel_value.it_value.tv_nsec = 0;
+        }
+        new_value = &rel_value;
+    }
+#endif
     if (old_value != NULL) {
         *old_value = linux_timer->value;
     }

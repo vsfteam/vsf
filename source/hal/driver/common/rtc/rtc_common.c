@@ -152,10 +152,10 @@ static bool _vsf_rtc_is_valid(const vsf_rtc_tm_t *rtc_tm)
     if (rtc_tm->tm_hour > 23) {
         return false;
     }
-    if ((rtc_tm->tm_mday < 1) || (rtc_tm->tm_mday > 23)) {
+    if ((rtc_tm->tm_mday < 1) || (rtc_tm->tm_mday > 31)) {
         return false;
     }
-    if ((rtc_tm->tm_mday < 1) || (rtc_tm->tm_mday > 7)) {
+    if ((rtc_tm->tm_wday < 1) || (rtc_tm->tm_wday > 7)) {
         return false;
     }
     if ((rtc_tm->tm_mon < 1) || (rtc_tm->tm_mon > 12)) {
