@@ -2390,7 +2390,11 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 
 exec_ret_t execvp(const char *file, char * const * argv)
 {
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+    return execvpe(file, argv, environ);
+#else
     return execvpe(file, argv, NULL);
+#endif
 }
 
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp)
@@ -2420,7 +2424,11 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
 
 exec_ret_t execv(const char *pathname, char * const * argv)
 {
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+    return execve(pathname, argv, environ);
+#else
     return execve(pathname, argv, NULL);
+#endif
 }
 
 static exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap, char *path, bool has_env)
@@ -4781,6 +4789,13 @@ static vsf_linux_dynloader_t * __vsf_linux_dlopen_impl(const char *pathname, boo
         if ((file != NULL) && ((file_direct_access = vk_file_direct_access(file)) != NULL)) {
             linux_loader->target.object             = (uintptr_t)file_direct_access;
             linux_loader->target.support_xip        = true;
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+            char *xip_str = getenv("VSF_XIP");
+            if (xip_str != NULL) {
+                linux_loader->target.support_xip    = strtoul(xip_str, NULL, 0) != 0;
+                unsetenv("VSF_XIP");
+            }
+#endif
             linux_loader->target.fn_read            = vsf_loader_xip_read;
         } else {
             linux_loader->target.object             = (uintptr_t)fd;

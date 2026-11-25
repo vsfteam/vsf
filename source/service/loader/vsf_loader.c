@@ -38,9 +38,6 @@
 #if VSF_ARCH_PROVIDE_EXE == ENABLED
 static void * __vsf_loader_arch_exe_alloc(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, uint32_t size, uint32_t alignment);
 static void __vsf_loader_arch_exe_free(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer);
-#elif VSF_USE_HEAP == ENABLED
-static void * __vsf_loader_heap_malloc(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, uint32_t size, uint32_t alignment);
-static void __vsf_loader_heap_free(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer);
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -51,8 +48,8 @@ const vsf_loader_heap_op_t vsf_loader_default_heap_op = {
     .fn_malloc  = __vsf_loader_arch_exe_alloc,
     .fn_free    = __vsf_loader_arch_exe_free,
 #elif VSF_USE_HEAP == ENABLED
-    .fn_malloc  = __vsf_loader_heap_malloc,
-    .fn_free    = __vsf_loader_heap_free,
+    .fn_malloc  = vsf_loader_heap_malloc,
+    .fn_free    = vsf_loader_heap_free,
 #else
 #   warning no valid allocator
     .fn_malloc  = NULL,
@@ -73,12 +70,14 @@ static void __vsf_loader_arch_exe_free(vsf_loader_t *loader, vsf_loader_mem_attr
     vsf_arch_free_exe(buffer);
 }
 #elif VSF_USE_HEAP == ENABLED
-static void * __vsf_loader_heap_malloc(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, uint32_t size, uint32_t alignment)
+VSF_CAL_WEAK(vsf_loader_heap_malloc)
+void * vsf_loader_heap_malloc(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, uint32_t size, uint32_t alignment)
 {
     return vsf_heap_malloc(size);
 }
 
-static void __vsf_loader_heap_free(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer)
+VSF_CAL_WEAK(vsf_loader_heap_free)
+void vsf_loader_heap_free(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer)
 {
     vsf_heap_free(buffer);
 }

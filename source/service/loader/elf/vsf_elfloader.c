@@ -166,7 +166,7 @@ void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
     elfloader->target = NULL;
     vsf_elfloader_arch_fini_plt(elfloader);
     if (elfloader->ram_base != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->ram_base);
+        vsf_loader_free(elfloader, elfloader->is_xip ? VSF_LOADER_MEM_RW : VSF_LOADER_MEM_RWX, elfloader->ram_base);
         elfloader->ram_base = NULL;
     }
     if ((elfloader->vplt_out != NULL) && (elfloader->free_vplt != NULL)) {

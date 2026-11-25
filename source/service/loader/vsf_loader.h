@@ -203,6 +203,8 @@ vsf_class(vsf_loader_t) {
  @note 不支持对其。
 */
 extern const vsf_loader_heap_op_t vsf_loader_default_heap_op;
+extern void * vsf_loader_heap_malloc(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, uint32_t size, uint32_t alignment);
+extern void vsf_loader_heap_free(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer);
 #endif
 
 /*============================ PROTOTYPES ====================================*/
