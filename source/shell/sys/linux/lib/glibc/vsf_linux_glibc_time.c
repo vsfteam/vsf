@@ -139,19 +139,25 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     static const char *__day_name[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     static const char *__mon_name[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
-    VSF_LINUX_ASSERT((str != NULL) && (format != NULL) && (tm != NULL) && (maxsize > 0));
+    VSF_LINUX_ASSERT((format != NULL) && (tm != NULL));
+    if (maxsize == 0) {
+        return 0;
+    }
+    VSF_LINUX_ASSERT(str != NULL);
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
-    char *str_end = str + maxsize - 1, *str_cur = str;
+    size_t pos = 0, maxlen = maxsize - 1;
     char *curfmt, *subfmt, ch, *substr;
+    char pad;
     ssize_t curlen;
-    int value, valuelen;
+    int value, valuelen, digit;
 
     while ((ch = *format++) != '\0') {
         if (ch == '%') {
             curfmt = subfmt = substr = NULL;
             curlen = -1;
             valuelen = 2;
+            pad = '\0';
             ch = *format++;
             switch (ch) {
             case '%':
@@ -174,8 +180,14 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
                 subfmt = "%a %b %e %H:%M:%S %Y";
                 break;
             case 'd':
+                value = tm->tm_mday;
+                break;
             case 'e':
                 value = tm->tm_mday;
+                if (value < 10) {
+                    pad = ' ';
+                    valuelen = 1;
+                }
                 break;
             case 'H':
                 value = tm->tm_hour;
@@ -232,45 +244,57 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
                 break;
             default:
                 vsf_trace_error("invalid fmt %c in strftime" VSF_TRACE_CFG_LINEEND, ch);
-                return 0;
+                goto fail;
             }
             if (substr != NULL) {
-                int substr_size = strlen(substr), buf_size = str_end - str_cur;
-                int size = vsf_min(substr_size, buf_size);
-                memcpy(str_cur, substr, size);
-                str_cur += size;
-                if (str_cur >= str_end) {
-                    break;
+                size_t substr_size = strlen(substr);
+                if (substr_size > maxlen - pos) {
+                    goto fail;
                 }
+                memcpy(str + pos, substr, substr_size);
+                pos += substr_size;
             } else if (subfmt != NULL) {
-                curlen = strftime(str_cur, str_end - str_cur, subfmt, tm);
+                curlen = strftime(str + pos, maxsize - pos, subfmt, tm);
                 if (!curlen) {
-                    break;
+                    goto fail;
                 }
-                str_cur += curlen;
+                pos += curlen;
             } else if (curfmt != NULL) {
-                while (((ch = *curfmt++) != '\0') && (curlen < 0 || (curlen-- > 0))) {
-                    *str_cur++ = ch;
+                size_t curfmt_size = curlen < 0 ? strlen(curfmt) : (size_t)curlen;
+                if (curfmt_size > maxlen - pos) {
+                    goto fail;
                 }
-            } else if (str_cur + valuelen >= str_end) {
-                break;
+                memcpy(str + pos, curfmt, curfmt_size);
+                pos += curfmt_size;
             } else {
-                int pos = -1, digit;
-                str_cur += valuelen;
+                size_t size = (size_t)valuelen + (pad != '\0');
+                if (size > maxlen - pos) {
+                    goto fail;
+                }
+                if (pad != '\0') {
+                    str[pos++] = pad;
+                }
+                char *num_cur = str + pos + valuelen;
+                pos += valuelen;
                 while (valuelen-- > 0) {
                     digit = value % 10;
                     value = value / 10;
-                    str_cur[pos--] = '0' + digit;
+                    *--num_cur = '0' + digit;
                 }
             }
-        } else if (str_cur >= str_end) {
-            break;
         } else {
-            *str_cur++ = ch;
+            if (pos >= maxlen) {
+                goto fail;
+            }
+            str[pos++] = ch;
         }
     }
-    *str_cur = '\0';
-    return str_cur - str;
+    str[pos] = '\0';
+    return pos;
+
+fail:
+    str[pos] = '\0';
+    return 0;
 }
 
 char * strptime(const char *str, const char *format, struct tm *tm)
@@ -287,8 +311,8 @@ static char * __asctime_r(const struct tm *tm, char *buf, size_t buflen)
 {
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
-    int n = strftime(buf, buflen, "%c", tm);
-    return n < 0 ? NULL : buf;
+    size_t n = strftime(buf, buflen, "%a %b %e %H:%M:%S %Y\n", tm);
+    return n == 25 ? buf : NULL;
 }
 
 char * asctime_r(const struct tm *tm, char *buf)
