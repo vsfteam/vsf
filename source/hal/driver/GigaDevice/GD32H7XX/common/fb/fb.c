@@ -70,7 +70,7 @@ const vk_disp_fb_drv_t vsf_disp_hw_fb_layer_drv = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-int_fast8_t vsf_hw_fb_init(vsf_hw_fb_t *fb)
+vsf_err_t vsf_hw_fb_init(vsf_hw_fb_t *fb)
 {
     vsf_hw_fb_timing_rgb_t *timing = &fb->timing.rgb;
 
@@ -98,7 +98,7 @@ int_fast8_t vsf_hw_fb_init(vsf_hw_fb_t *fb)
         }
     }
     if (!done) {
-        return -1;
+        return VSF_ERR_FAIL;
     }
 
     vsf_hw_peripheral_enable(VSF_HW_EN_TLI);
@@ -134,7 +134,7 @@ int_fast8_t vsf_hw_fb_init(vsf_hw_fb_t *fb)
     TLI_BGC = timing->bgcolor.b | (timing->bgcolor.g << 8) | (timing->bgcolor.r << 16);
     TLI_CTL &= ~(TLI_CTL_HPPS | TLI_CTL_VPPS | TLI_CTL_DEPS | TLI_CTL_CLKPS);
     TLI_CTL |= timing->polarity;
-    return 2;
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_fb_fini(vsf_hw_fb_t *fb)

@@ -105,8 +105,7 @@ typedef struct vsf_hw_fb_t {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-// vsf_hw_fb_timing_rgb_init returns num_of_layer(> 0) on success, <= 0 on failure
-extern int_fast8_t vsf_hw_fb_init(vsf_hw_fb_t *fb);
+extern vsf_err_t vsf_hw_fb_init(vsf_hw_fb_t *fb);
 extern vsf_err_t vsf_hw_fb_fini(vsf_hw_fb_t *fb);
 extern vsf_err_t vsf_hw_fb_enable(vsf_hw_fb_t *fb);
 extern vsf_err_t vsf_hw_fb_disable(vsf_hw_fb_t *fb);
