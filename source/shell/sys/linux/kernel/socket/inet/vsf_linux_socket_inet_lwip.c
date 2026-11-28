@@ -1589,33 +1589,31 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
     }
 
     vsf_linux_fd_t *sfd = __vsf_linux_socket_inet_fd_decode(conn->socket);
-    if (NULL == sfd) {
+    if ((NULL == sfd) || (NULL == sfd->priv)) {
         return;
     }
 
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    if (sfd != NULL) {
-        switch (evt) {
-        case NETCONN_EVT_RCVPLUS:
-            if (0 == priv->rxcnt++) {
-                vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
-            }
-            break;
-        case NETCONN_EVT_RCVMINUS:
-            if (0 == --priv->rxcnt) {
-                vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
-            }
-            break;
-        case NETCONN_EVT_SENDPLUS:
-            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
-            break;
-        case NETCONN_EVT_SENDMINUS:
-            vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
-            break;
-        case NETCONN_EVT_ERROR:
-            // TODO: issue POLLERR?
-            break;
+    switch (evt) {
+    case NETCONN_EVT_RCVPLUS:
+        if (0 == priv->rxcnt++) {
+            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
         }
+        break;
+    case NETCONN_EVT_RCVMINUS:
+        if (0 == --priv->rxcnt) {
+            vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+        }
+        break;
+    case NETCONN_EVT_SENDPLUS:
+        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+        break;
+    case NETCONN_EVT_SENDMINUS:
+        vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+        break;
+    case NETCONN_EVT_ERROR:
+        // TODO: issue POLLERR?
+        break;
     }
 }
 
@@ -1851,8 +1849,12 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
         }
     }
 
-    __vsf_linux_socket_inet_fd_release(conn->socket);
-    conn->socket = 0;
+    int socket_slot;
+    LOCK_TCPIP_CORE();
+        socket_slot = conn->socket;
+        conn->socket = 0;
+        __vsf_linux_socket_inet_fd_release(socket_slot);
+    UNLOCK_TCPIP_CORE();
     if (ERR_OK != netconn_prepare_delete(conn)) {
         return -1;
     }
